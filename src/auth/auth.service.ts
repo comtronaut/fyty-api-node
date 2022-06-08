@@ -37,9 +37,9 @@ export class AuthService {
   //   return await this.usersRepository.findOneOrFail({ where: { email }}); 
   // }
 
-  // async getUserById(id: User["id"]) {
-  //   return await this.usersRepository.findOneOrFail({ where: { id }})
-  // }
+  async getUserById(id: User["id"]) {
+    return await this.userModel.findOneOrFail({ where: { id }})
+  }
 
   async localLogin(username: User["username"], password: User["password"]) {
     try {

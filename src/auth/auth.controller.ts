@@ -1,7 +1,7 @@
-import { Controller, Get, Query, Req } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
+import { Controller, Get, NotAcceptableException, Query, Req, UseGuards } from "@nestjs/common";
 import { Request } from "express";
 import { AuthService } from "./auth.service";
+import { JwtAuthGuard } from "./guard/jwt-auth.guard";
 
 @Controller("api/auth")
 export class AuthController {
@@ -15,15 +15,13 @@ export class AuthController {
     return await this.authService.localLogin(username, password);
   }
 
-  // @UseGuards(JwtAuthGuard)
-//   @Get("profile")
-//   async getProfile(@Req() req: Request) {
-//     if (!req.user && typeof req.user !== "string") {
-//       throw new NotAcceptableException();
-//     }
+  @UseGuards(JwtAuthGuard)
+  @Get("profile")
+  async getProfile(@Req() req: Request) {        
+    if (!req.user && typeof req.user !== "string") {
+      throw new NotAcceptableException();
+    }    
 
-//     const user = await this.authService.getUserByUsername(req.user as string);
-
-//     return user;
-//   }
+    return req.user;
+  }
 }

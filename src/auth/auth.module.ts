@@ -14,7 +14,7 @@ import env from "src/common/env.config";
     PassportModule,
     JwtModule.register({
       secret: env.JWT_SECRET,
-      // signOptions: { expiresIn: "60s" }
+      signOptions: { expiresIn: "10800s" }
     }),
     TypeOrmModule.forFeature([ User ])
   ],
