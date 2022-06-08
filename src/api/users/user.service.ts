@@ -5,6 +5,8 @@ import { Repository } from "typeorm";
 
 import { PhoneNumber } from "src/model/sql-entity/phoneNumber.entity";
 import { User } from "src/model/sql-entity/user.entity";
+import { UpdateGameDto } from "src/model/dto/game.dto";
+import { CreateUserDto } from "src/model/dto/user.dto";
 
 @Injectable()
 export class UserService {
@@ -14,14 +16,14 @@ export class UserService {
   ) { }
   
   // CRUD
-  async createUser(input: Record<string, any>) {
+  async create(req: CreateUserDto) {
     try {
       const [ hashedPassword, hashedPhoneNumber ] = await Promise.all([ // parallel promise
-        bcrypt.hashSync(input.password, 12),
-        bcrypt.hashSync(input.phoneNumber, 12),
+        bcrypt.hashSync(req.password, 12),
+        bcrypt.hashSync(req.phoneNumber, 12),
       ]);
 
-      const { phoneNumber, ...rest } = input;
+      const { phoneNumber, ...rest } = req;
       const createdContent = { ...rest, password: hashedPassword };
       
       await this.phoneNumberModel.save({ phoneNumber: hashedPhoneNumber });
@@ -33,13 +35,9 @@ export class UserService {
     }
   }
 
-  async getAllUsers() {
-    return await this.userModel.find();
-  }
-
-  async updateUser(user: User, input: Record<string, any>) {
+  async update(user: User, req: UpdateGameDto) {
     try {
-      const updateRes = await this.userModel.update(user.id, input);
+      const updateRes = await this.userModel.update(user.id, req);
 
       if(updateRes.affected === 0) {
         return new HttpException("", HttpStatus.NO_CONTENT);
@@ -53,7 +51,7 @@ export class UserService {
     }
   }
 
-  // async deleteUser(id: string) {
+  // async delete(id: string) {
   //   try {
   //     const res = await this.userModel.delete(id);
   //     if(res.affected === 0) {

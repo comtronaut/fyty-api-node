@@ -26,7 +26,7 @@ export class User extends AbstractModel {
   bio: string;
 
   @Column({ default: 5.00 })
-  ratingScore: string;
+  ratingScore: number;
 
   @Column({ default: "" })
   profileImageUrl: string;
