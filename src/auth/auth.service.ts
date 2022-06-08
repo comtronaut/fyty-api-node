@@ -5,7 +5,7 @@ import * as jwt from "jsonwebtoken";
 import env from "src/common/env.config";
 import { User } from "src/model/sql-entity/user.entity";
 import { Repository } from "typeorm";
-import validator from "validator";
+// import validator from "validator";
 
 @Injectable()
 export class AuthService {

@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post, Param, Delete, Put } from "@nestjs/common";
-import { CreateUserDto } from "src/model/dto/user.dto";
+import { Body, Controller, Get, Post, Param, Delete, Put, UseGuards } from "@nestjs/common";
+import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
 import { Subject } from "src/common/subject.decorator";
 import { UserService } from "./user.service";
 import { User } from "src/model/sql-entity/user.entity";
+import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 
 @Controller("api/users")
 export class UserController {
@@ -14,7 +15,7 @@ export class UserController {
   }
 
   @Get("me")
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getSelf(
     @Subject() subject: User
   ) {
@@ -22,15 +23,15 @@ export class UserController {
   }
 
   @Put()
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async updateUser(
     @Subject() subject: User, 
-    @Body() req: Record<string, any>
+    @Body() req: UpdateUserDto,
     ) {
     return await this.userService.updateUser(subject, req);
   }
 
-  // // @UseGuards()
+  // @UseGuards()
   // @Delete(":id")
   // async deleteUser(@Param("id") id: string) {
     // await this.userService.deleteUser(id);
