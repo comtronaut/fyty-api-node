@@ -1,24 +1,154 @@
-module.exports = {
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    project: 'tsconfig.json',
-    sourceType: 'module',
-  },
-  plugins: ['@typescript-eslint/eslint-plugin'],
-  extends: [
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
-  ],
-  root: true,
-  env: {
-    node: true,
-    jest: true,
-  },
-  ignorePatterns: ['.eslintrc.js'],
-  rules: {
-    '@typescript-eslint/interface-name-prefix': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
-  },
-};
+env:
+  es2021: true
+extends:
+  - eslint:recommended
+  - plugin:@typescript-eslint/recommended
+parser: "@typescript-eslint/parser"
+parserOptions:
+  ecmaVersion: 12
+  sourceType: module
+  tsconfigRootDir: ./
+  project:
+    - ./tsconfig.json
+plugins:
+  - "@typescript-eslint"
+rules:
+  # vanilla warn
+  accessor-pairs:
+    - warn
+    - setWithoutGet: true
+      enforceForClassMembers: true
+  array-bracket-spacing:
+    - warn
+    - always
+    - objectsInArrays: false
+      arraysInArrays: false
+  arrow-spacing: warn
+  comma-style: warn
+  eol-last:
+    - warn
+    - always
+  # dot-notation: "off" (should be fixed with typescript!)
+  func-call-spacing: warn
+  grouped-accessor-pairs:
+    - warn
+    - getBeforeSet
+  key-spacing:
+    - warn
+    - beforeColon: false
+      afterColon: true
+      mode: strict
+  lines-between-class-members:
+    - warn
+    - always
+    - exceptAfterSingleLine: true
+  no-alert: warn
+  no-empty: warn
+  no-multi-spaces: warn
+  no-multiple-empty-lines:
+    - warn
+    - max: 1
+      maxEOF: 0
+      maxBOF: 0
+  no-negated-condition: warn
+  no-trailing-spaces:
+    - warn
+    - skipBlankLines: true
+  no-useless-concat: warn
+  no-useless-return: warn
+  no-whitespace-before-property: warn
+  object-curly-spacing:
+    - warn
+    - always
+  object-shorthand: warn
+  operator-linebreak:
+    - warn
+    - before
+  padded-blocks:
+    - warn
+    - never
+  prefer-const: warn
+  semi-spacing:
+    - warn
+    - before: false
+      after: true
+  semi-style: warn
+  space-before-blocks: warn
+  space-before-function-paren:
+    - warn
+    - anonymous: always
+      named: never
+      asyncArrow: always
+  space-in-parens: warn
+  space-infix-ops: warn
+  spaced-comment:
+    - warn
+    - always
+  switch-colon-spacing: warn
+  template-curly-spacing: warn
+  yoda: warn
+
+  # vanilla error
+  arrow-parens: error
+  comma-dangle:
+    - error
+    - never
+  curly: error
+  default-case: error
+  default-case-last: error
+  eqeqeq: error
+  init-declarations: error
+  no-caller: error
+  no-constructor-return: error
+  no-extend-native: error
+  no-floating-decimal: error
+  no-implicit-coercion: error
+  no-labels: error
+  no-multi-assign: error
+  no-new: error
+  no-new-func: error
+  no-new-object: error
+  no-new-wrappers: error
+  no-param-reassign: error
+  no-plusplus: error
+  no-restricted-syntax:
+    - error
+    - selector: BinaryExpression[operator="**"]
+      message: Unexpected exponential operator, use Math.pow instead.
+    - UnaryExpression[operator="delete"]
+    - DoWhileStatement
+    - ForInStatement
+    - ForStatement
+  no-sequences: error
+  no-template-curly-in-string: error
+  no-throw-literal: error
+  no-undefined: error
+  no-unneeded-ternary:
+    - error
+    - defaultAssignment: false
+  one-var:
+    - error
+    - never
+  prefer-arrow-callback: error
+  prefer-object-spread: error
+  prefer-promise-reject-errors: error
+  prefer-regex-literals: error
+  prefer-template: error
+  quote-props:
+    - error
+    - consistent
+
+  # vanilla default
+  indent:
+    - warn
+    - 2
+    - SwitchCase: 1
+  linebreak-style:
+    - error
+    - unix
+  quotes:
+    - error
+    - double
+  semi:
+    - error
+    - always
