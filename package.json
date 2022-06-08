@@ -14,7 +14,9 @@
   "dependencies": {
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",
+    "@nestjs/jwt": "^8.0.1",
     "@nestjs/mapped-types": "^1.0.1",
+    "@nestjs/passport": "^8.2.1",
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/swagger": "^5.2.1",
     "@nestjs/typeorm": "^8.1.2",
@@ -23,11 +25,13 @@
     "class-validator": "^0.13.2",
     "dotenv": "^16.0.1",
     "non-null": "^2.0.1",
+    "passport-jwt": "^4.0.0",
     "pg": "^8.7.3",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
-    "swagger-ui-express": "^4.4.0"
+    "swagger-ui-express": "^4.4.0",
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",
@@ -37,7 +41,9 @@
     "@types/express": "^4.17.13",
     "@types/jest": "27.0.2",
     "@types/node": "^16.0.0",
+    "@types/passport-jwt": "^3.0.6",
     "@types/supertest": "^2.0.11",
+    "@types/validator": "^13.7.3",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "eslint": "^8.0.1",

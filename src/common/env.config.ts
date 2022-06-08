@@ -6,7 +6,8 @@ config();
 const env = {
 //   DATABASE_URL: grant("DATABASE_URL")
   NODE_ENV: grant("NODE_ENV"),
-  POSTGRES_URL: grant("POSTGRES_URL")
+  POSTGRES_URL: grant("POSTGRES_URL"),
+  JWT_SECRET: grant("JWT_SECRET")
 } as const;
 
 function grant(envKey: string) {
