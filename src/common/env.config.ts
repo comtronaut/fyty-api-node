@@ -5,6 +5,7 @@ config();
 
 const env = {
 //   DATABASE_URL: grant("DATABASE_URL")
+  NODE_ENV: grant("NODE_ENV")
 } as const;
 
 function grant(envKey: string) {
