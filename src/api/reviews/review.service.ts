@@ -53,9 +53,6 @@ export class ReviewService {
     else if(ratingScore < 0) {
       ratingScore = 0.00
     }
-
-    console.log(ratingScore);
-    
     
     return this.userService.updateRatingScore(user, { ratingScore })
   }
