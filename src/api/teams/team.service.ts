@@ -11,16 +11,18 @@ import { TeamMemberService } from "./members/team-member.service";
 export class TeamService {
   constructor(
     @InjectRepository(Team) private teamModel: Repository<Team>,
-    private readonly memberService: TeamMemberService
+    private readonly memberService: TeamMemberService // Just think of the least imported components(both service and model)
   ) { }
   
   // CRUD
   async create(user: User, req: CreateTeamDto) {
     try {
-      req.memberCount = 1;
+      req.memberCount = 1;    // this can be default in entity file
 
       const team = await this.teamModel.save(req);
-      const memberData = { teamId: team.id, userId: user.id, role: MemberRole.LEADER };
+      // if it's possible, use enum. But makes it usable first if you don't sure
+      // enum is in common file (can be seperated in further)
+      const memberData = { teamId: team.id, userId: user.id, role: MemberRole.LEADER };   
       await this.memberService.create(memberData);
 
       return team;

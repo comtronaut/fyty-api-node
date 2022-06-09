@@ -22,28 +22,34 @@ export class RoomController {
   @Debug()
   // @UseGuards(JwtAuthGuard)
   @Post("/participants")
-  async joinRoom(@Body() req: CreateParticipantDto) {    
+  async joinRoom(@Body() req: CreateParticipantDto) {   // need both roomId, teamId for creating
     return await this.roomService.joinRoom(req);
   }
 
   @Debug()
   // @UseGuards(JwtAuthGuard)
   @Delete("/participants")
-  async leaveRoom(@Body() req: CreateParticipantDto) {  
+  async leaveRoom(@Body() req: CreateParticipantDto) {  // need both roomId, teamId for deleting
     return await this.roomService.leaveRoom(req);
   }
+
+  // two routes have overlapped each other
+  // so the shorter(url) one will be below
 
   @Debug()
   @UseGuards(JwtAuthGuard)
   @Post()
   async createRoom(
+    // this is abstraction, think that user will be auto-generated from JwtAuthGuard
+    // so if you want to use @Subject, you have to use @UseGuards(JwtAuthGuard) first
+    // if you dont familiar with using Entity (user: User), just using id and findOne
+    // but this will make your coding much more easier, if you have a chance, just try it
+    // validationPipe is a keyword for this method (Subject decorator implementation is in common file if you want to read it)
     @Subject() user: User,
     @Body() req: CreateRoomDto,
     ) {
     return this.roomService.create(user, req);
   }
-
-
 
   @Get("/:gameId")
   async getRoomsByGameId(@Param("gameId") gameId: string) {
@@ -54,7 +60,7 @@ export class RoomController {
   @Put("/:roomId")
   async updateRoom(
     @Param("roomId") roomId: string,
-    @Body() req: UpdateRoomDto
+    @Body() req: UpdateRoomDto    // need only one of these properties for updating
     ) {    
     return await this.roomService.update(roomId, req);
   }
