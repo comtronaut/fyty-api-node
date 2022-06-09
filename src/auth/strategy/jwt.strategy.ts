@@ -15,11 +15,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload) {    
-    if (!payload.sub) {
-      throw new UnauthorizedException("invalid token format");
+  async validate(payload: JwtPayload) {
+    try {
+      if (!payload.sub) {
+        throw new UnauthorizedException("invalid token format");
+      }
+      
+      return await this.authService.getUserById(payload.sub);
+    } catch(err) {
+      throw new UnauthorizedException();
     }
-    
-    return await this.authService.getUserById(payload.sub);
   }
 }

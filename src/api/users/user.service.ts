@@ -6,7 +6,7 @@ import { Repository } from "typeorm";
 import { PhoneNumber } from "src/model/sql-entity/phoneNumber.entity";
 import { User } from "src/model/sql-entity/user.entity";
 import { UpdateGameDto } from "src/model/dto/game.dto";
-import { CreateUserDto } from "src/model/dto/user.dto";
+import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
 
 @Injectable()
 export class UserService {
@@ -35,7 +35,7 @@ export class UserService {
     }
   }
 
-  async update(user: User, req: UpdateGameDto) {
+  async update(user: User, req: UpdateUserDto) {
     try {
       const updateRes = await this.userModel.update(user.id, req);
 

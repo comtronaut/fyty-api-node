@@ -62,7 +62,7 @@ export class AuthService {
 
   private getAccessToken(id: User["id"]) {
     const payload = { sub: id };
-    const accessToken = jwt.sign(payload, env.JWT_SECRET);
+    const accessToken = jwt.sign(payload, env.JWT_SECRET);    
 
     return { accessToken };
   }

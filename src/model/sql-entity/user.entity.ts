@@ -25,7 +25,7 @@ export class User extends AbstractModel {
   @Column({ default: "" })
   bio: string;
 
-  @Column({ default: 5.00 })
+  @Column("decimal", { precision: 5, scale: 2 , default: 5.00})
   ratingScore: number;
 
   @Column({ default: "" })

@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsEmail, Min } from "class-validator";
-import { Column, CreateDateColumn, Entity } from "typeorm";
+import { IsNotEmpty } from "class-validator";
+import { Column, Entity } from "typeorm";
 import { AbstractModel } from "./_model";
 
 @Entity()

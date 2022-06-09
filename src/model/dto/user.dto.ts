@@ -23,7 +23,7 @@ export class CreateUserDto {
     @ApiPropertyOptional()
     bio: string;
   
-    @ApiPropertyOptional({ default: 5 })
+    @ApiPropertyOptional({ default: 5.00 })
     ratingScore: number;
   
     @ApiPropertyOptional()
