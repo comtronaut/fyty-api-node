@@ -47,12 +47,9 @@ export class ReviewService {
     const sumScore = reviews.reduce((acc, cur) => acc + cur.ratingScore, 0);
     let ratingScore = sumScore / reviews.length;
 
-    if(ratingScore > 5) {
-      ratingScore = 5.00
-    }
-    else if(ratingScore < 0) {
-      ratingScore = 0.00
-    }
+    // check upper and lower bound
+    if(ratingScore > 5) ratingScore = 5.00
+    else if(ratingScore < 0) ratingScore = 0.00
     
     return this.userService.updateRatingScore(user, { ratingScore })
   }
