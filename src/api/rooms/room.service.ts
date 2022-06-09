@@ -1,14 +1,17 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
+import { RoomStatus } from "src/common/_enum";
+import { CreateParticipantDto, CreateRoomDto, UpdateParticipantDto, UpdateRoomDto } from "src/model/dto/room.dto";
 import { Room } from "src/model/sql-entity/room.entity";
 import { User } from "src/model/sql-entity/user.entity";
 import { Repository } from "typeorm";
+import { RoomParticipantService } from "./participants/room-participant.service";
 
 @Injectable()
 export class RoomService {
   constructor(
     @InjectRepository(Room) private roomModel: Repository<Room>,
+    private readonly participantService: RoomParticipantService,
   ) { }
   
   // CRUD
@@ -20,7 +23,10 @@ export class RoomService {
      
       req.hostId = user.id;
 
-      const room = this.roomModel.save(req);
+      const room = await this.roomModel.save(req);
+
+      const participantData = { roomId: room.id, teamId: req.teamId };
+      await this.participantService.create(participantData);
       
       return room;
     }
@@ -72,6 +78,45 @@ export class RoomService {
       }
       return;
     } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async joinRoom(req: CreateParticipantDto) {
+    try {
+      const room = await this.roomModel.findOneOrFail({ where: { id: req.roomId }});
+
+      // check is room available
+      if(room.status === RoomStatus.UNAVAILABLE || room.status === RoomStatus.FULL) {
+        throw new Error("room is not available");
+      }
+
+      // 1 team / room / game validation
+
+      // update participant count
+      await this.update(room.id, { participantCount: room.participantCount + 1 });
+
+      // update room status
+      
+      // add participant to the room
+      return await this.participantService.create(req);
+    } catch(err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async leaveRoom(req: CreateParticipantDto) {
+    try {
+      const room = await this.roomModel.findOneOrFail({ where: { id: req.roomId }});
+
+      // update participant count
+      await this.update(room.id, { participantCount: room.participantCount - 1 });
+
+      // update room status
+      
+      // remove participant from the room
+      return await this.participantService.delete(req);
+    } catch(err) {
       throw new BadRequestException(err.message);
     }
   }

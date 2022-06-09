@@ -1,5 +1,5 @@
 import { PartialType } from "@nestjs/mapped-types";
-import { IsEnum, IsNotEmpty } from "class-validator";
+import { IsEnum, IsNotEmpty, IsUUID } from "class-validator";
 import { RoomStatus } from "src/common/_enum";
 
 export class CreateRoomDto {
@@ -36,3 +36,15 @@ export class CreateRoomDto {
 }
 
 export class UpdateRoomDto extends PartialType(CreateRoomDto) { }
+
+export class CreateParticipantDto {
+  @IsNotEmpty()
+  @IsUUID()
+  teamId: string;
+  
+  @IsNotEmpty()
+  @IsUUID()
+  roomId: string;
+}
+
+export class UpdateParticipantDto extends PartialType(CreateParticipantDto) { }

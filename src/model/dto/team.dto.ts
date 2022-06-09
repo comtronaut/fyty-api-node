@@ -32,8 +32,6 @@ export class CreateTeamMemberDto {
 
   @IsNotEmpty()
   userId: string;
-
-  joinedAt: Date;
 }
 
 export class UpdateTeamMemberDto extends PartialType(CreateTeamMemberDto) { }
