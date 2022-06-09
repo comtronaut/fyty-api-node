@@ -22,3 +22,18 @@ export class CreateTeamDto {
 }
 
 export class UpdateTeamDto extends PartialType(CreateTeamDto) { }
+
+export class CreateTeamMemberDto {
+  @IsNotEmpty()
+  role: string;
+
+  @IsNotEmpty()
+  teamId: string;
+
+  @IsNotEmpty()
+  userId: string;
+
+  joinedAt: Date;
+}
+
+export class UpdateTeamMemberDto extends PartialType(CreateTeamMemberDto) { }

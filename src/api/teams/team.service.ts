@@ -1,21 +1,29 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { MemberRole } from "src/common/_enum";
 import { CreateTeamDto } from "src/model/dto/team.dto";
 import { Team } from "src/model/sql-entity/team.entity";
+import { User } from "src/model/sql-entity/user.entity";
 import { Repository } from "typeorm";
+import { TeamMemberService } from "./members/team-member.service";
 
 @Injectable()
 export class TeamService {
   constructor(
     @InjectRepository(Team) private teamModel: Repository<Team>,
+    private readonly memberService: TeamMemberService
   ) { }
   
   // CRUD
-  async create(req: CreateTeamDto) {
+  async create(user: User, req: CreateTeamDto) {
     try {
       req.memberCount = 1;
-      
-      return await this.teamModel.save(req);
+
+      const team = await this.teamModel.save(req);
+      const memberData = { teamId: team.id, userId: user.id, role: MemberRole.LEADER };
+      await this.memberService.create(memberData);
+
+      return team;
     }
     catch(err) {
       throw new BadRequestException(err.message);
@@ -24,6 +32,10 @@ export class TeamService {
 
   async getTeamsByGameId(gameId: string) {
     return await this.teamModel.find({ where: { gameId }});
+  }
+
+  async getTeam(teamId: string) {
+    return await this.teamModel.find({ where: { id: teamId }})
   }
 
   async update(gameId: string, req: object) {
