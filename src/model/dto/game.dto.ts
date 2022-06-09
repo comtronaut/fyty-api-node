@@ -8,7 +8,11 @@ export class CreateGameDto {
 
   @IsNumberString()
   @IsNotEmpty()
-  partyCap: number;
+  roomCap: number;
+
+  @IsNumberString()
+  @IsNotEmpty()
+  lineupCap: number;
 
   @IsUrl()
   @IsNotEmpty()
