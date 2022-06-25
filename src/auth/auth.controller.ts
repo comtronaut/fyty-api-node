@@ -4,7 +4,7 @@ import { Debug } from "src/common/debug.decorator";
 import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./guard/jwt-auth.guard";
 
-@Controller("api/auth")
+@Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 

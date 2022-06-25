@@ -1,6 +1,5 @@
 import { Module } from "@nestjs/common";
 import { GameModule } from "./games/game.module";
-import { ReviewModule } from "./reviews/review.module";
 import { RoomModule } from "./rooms/room.module";
 import { TeamModule } from "./teams/team.module";
 import { UserModule } from "./users/user.module";
@@ -9,7 +8,6 @@ import { UserModule } from "./users/user.module";
   imports: [
     UserModule,
     GameModule,
-    ReviewModule,
     TeamModule,
     RoomModule,
   ],

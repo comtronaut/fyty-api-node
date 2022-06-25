@@ -5,7 +5,6 @@ import { Repository } from "typeorm";
 
 import { PhoneNumber } from "src/model/sql-entity/phoneNumber.entity";
 import { User } from "src/model/sql-entity/user.entity";
-import { UpdateGameDto } from "src/model/dto/game.dto";
 import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
 
 @Injectable()
@@ -51,15 +50,14 @@ export class UserService {
     }
   }
 
-  // async delete(id: string) {
-  //   try {
-  //     const res = await this.userModel.delete(id);
-  //     if(res.affected === 0) {
-  //       return new HttpException("", HttpStatus.NO_CONTENT)
-  //     }
-  //     return
-  //   } catch (err) {
-  //     throw new BadRequestException(err.message);
-  //   }
-  // }
+  async delete(id: string) {
+    try {
+      const res = await this.userModel.delete(id);
+      if(res.affected === 0) {
+        return new HttpException("", HttpStatus.NO_CONTENT)
+      }
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
 }

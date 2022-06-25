@@ -1,30 +1,21 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { MemberRole } from "src/common/_enum";
-import { CreateTeamDto } from "src/model/dto/team.dto";
+import { CreateTeamDto, UpdateTeamDto } from "src/model/dto/team.dto";
 import { Team } from "src/model/sql-entity/team.entity";
 import { User } from "src/model/sql-entity/user.entity";
 import { Repository } from "typeorm";
-import { TeamMemberService } from "./members/team-member.service";
 
 @Injectable()
 export class TeamService {
   constructor(
     @InjectRepository(Team) private teamModel: Repository<Team>,
-    private readonly memberService: TeamMemberService // Just think of the least imported components(both service and model)
   ) { }
   
   // CRUD
-  async create(user: User, req: CreateTeamDto) {
+  async create(user: User, req: CreateTeamDto) { // for manager only version
     try {
-      req.memberCount = 1;    // this can be default in entity file
-
+      req.ownerId = user.id; // set the team's owner
       const team = await this.teamModel.save(req);
-      // if it's possible, use enum. But makes it usable first if you don't sure
-      // enum is in common file (can be seperated in further)
-      const memberData = { teamId: team.id, userId: user.id, role: MemberRole.LEADER };   
-      await this.memberService.create(memberData);
-
       return team;
     }
     catch(err) {
@@ -32,37 +23,53 @@ export class TeamService {
     }
   }
 
-  async getTeamsByGameId(gameId: string) {
-    return await this.teamModel.find({ where: { gameId }});
-  }
-
   async getTeam(teamId: string) {
-    return await this.teamModel.find({ where: { id: teamId }})
-  }
-
-  async update(gameId: string, req: object) {
-    try {
-      const updateRes = await this.teamModel.update(gameId, req);
-
-      if(updateRes.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT);
-      }
-
-      return await this.teamModel.findOneOrFail({ where: { id: gameId }});
-    } catch (err) {
+    try{
+      return this.teamModel.findOneByOrFail({ id: teamId });
+    }
+    catch(err){
       throw new BadRequestException(err.message);
     }
   }
 
-  // async delete(gameId: string) {
-  //   try {
-  //     const res = await this.teamModel.delete(gameId);
-  //     if(res.affected === 0) {
-  //       return new HttpException("", HttpStatus.NO_CONTENT)
-  //     }
-  //     return;
-  //   } catch (err) {
-  //     throw new BadRequestException(err.message);
-  //   }
-  // }
+  async getTeamsByGameId(gameId: string) {
+    try{
+      return await this.teamModel.findOneByOrFail({ gameId: gameId });
+    }
+    catch(err){
+      throw new BadRequestException(err.message);
+    }
+    
+  }
+
+  async getAllTeam() {
+    return await this.teamModel.find();
+  }
+
+  async update(ownerId: string, req: UpdateTeamDto): Promise <Team> {
+    try {
+      const updateRes = await this.teamModel.update({ ownerId: ownerId }, req);
+
+      if(updateRes.affected === 0) {
+        throw new HttpException("", HttpStatus.NO_CONTENT);
+      }
+      return await this.teamModel.findOneByOrFail({ ownerId: ownerId });
+    } 
+    catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async delete(ownerID: string, teamId: string) {
+    try {
+      const targetedTeam = await this.teamModel.findOneByOrFail({ id: teamId });
+      if(targetedTeam.ownerId === ownerID)
+      await this.teamModel.delete(teamId);
+
+      return new HttpException("", HttpStatus.NO_CONTENT);
+    }
+     catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
 }

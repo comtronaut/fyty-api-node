@@ -9,14 +9,12 @@ export class CreateTeamDto {
 
   logoUrl: string;
 
-  memberCount: number;
-
   lineupCount: number;
-
-  tier: string;
 
   @IsNotEmpty()
   gameId: string;
+
+  ownerId: string;
 
   createdAt: Date;
 }

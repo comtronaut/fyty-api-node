@@ -1,17 +1,19 @@
-import { Body, Controller, Get, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
 import { Subject } from "src/common/subject.decorator";
 import { UserService } from "./user.service";
 import { User } from "src/model/sql-entity/user.entity";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
+import { Debug } from "src/common/debug.decorator";
 
 @Controller("api/users")
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
   @Post()
-  async addUser(@Body() req: CreateUserDto) {
-    return this.userService.create(req);
+  async addUser(@Body() user: CreateUserDto){
+    const newUser = await this.userService.create(user);
+    return newUser;
   }
 
   @Get("me")
@@ -22,7 +24,7 @@ export class UserController {
     return subject;
   }
 
-  @Put()
+  @Put("me")
   @UseGuards(JwtAuthGuard)
   async updateUser(
     @Subject() subject: User, 
@@ -31,11 +33,14 @@ export class UserController {
     return await this.userService.update(subject, req);
   }
 
-  // @UseGuards()
-  // @Delete(":id")
-  // async deleteUser(@Param("id") id: string) {
-    // await this.userService.delete(id);
+  @Debug()
+  @UseGuards(JwtAuthGuard)
+  @Delete("me")
+  async deleteUser(
+    @Subject() subject: User
+    ) {
+    await this.userService.delete(subject.id);
 
-    // return `Delete user ${id} success`;
-  // }
+    return `Delete user ${subject.username} success`;
+  }
 }

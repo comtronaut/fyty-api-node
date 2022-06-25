@@ -41,9 +41,9 @@ export class AuthService {
     return await this.userModel.findOneOrFail({ where: { id }})
   }
 
-  async localLogin(username: User["username"], password: User["password"]) {
+  async localLogin(userName: string, password: string) {
     try {
-      const user = await this.userModel.findOneOrFail({ where: { username }});
+      const user = await this.userModel.findOneByOrFail({ username: userName });
       await this.validateLogin(user, password);
 
       return this.getAccessToken(user.id);
