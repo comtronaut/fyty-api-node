@@ -25,6 +25,7 @@ export class RoomParticipantService {
   async getParticipantByRoomId(roomId: string) {
     return this.participantModel.find({ where: { roomId }});
   }
+  
 
   async validation() {
     

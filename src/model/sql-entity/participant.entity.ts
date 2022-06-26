@@ -7,7 +7,7 @@ import { AbstractModel } from "./_model";
 @Entity()
 export class RoomParticipant extends AbstractModel {
   @IsNotEmpty()
-  @ManyToOne(() => Team, { onUpdate: 'CASCADE' })
+  @ManyToOne(() => Team, { onUpdate: 'CASCADE' }) // joined team
   @Column({ type: "uuid" })
   teamId: string;
 

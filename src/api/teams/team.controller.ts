@@ -11,7 +11,7 @@ import { TeamMemberService } from "./members/team-member.service";
 export class TeamController {
   constructor(
     private readonly teamService: TeamService,
-    ) { }
+  ) { }
 
   @UseGuards(JwtAuthGuard)
   @Post()

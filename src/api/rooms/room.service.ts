@@ -53,6 +53,15 @@ export class RoomService {
     return this.roomModel.find({ where: { gameId }});
   }
 
+  async getAllRooms() {
+    try{
+      return await this.roomModel.find();
+    }
+    catch(err){
+      throw new BadRequestException(err.message);
+    }
+  }
+
   // async updateUserRatingScore(userId: string) {
 
   //   const [ user, reviews ] = await Promise.all([
