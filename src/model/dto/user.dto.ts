@@ -1,6 +1,6 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsPhoneNumber } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsPhoneNumber } from "class-validator";
 
 export class CreateUserDto {
     @ApiProperty()
@@ -41,7 +41,7 @@ export class CreateUserDto {
   //   inventoryId: string;
 
     @IsNotEmpty()
-    @IsPhoneNumber()
+    @IsNumber()
     phoneNumber: string
   
     @ApiPropertyOptional({ description: "auto generated" })

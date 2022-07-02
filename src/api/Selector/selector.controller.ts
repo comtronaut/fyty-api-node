@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from "@nestjs/common";
+import { Controller, Get, HttpStatus, Param, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Subject } from "src/common/subject.decorator";
 import { User } from "src/model/sql-entity/user.entity";
@@ -38,7 +38,7 @@ export class SelectorController{
     async getMySelf(
       @Subject () user: User,
     ){
-        return this.selectorService.getMe(user);
+      return this.selectorService.getMe(user);
     }
     
 }

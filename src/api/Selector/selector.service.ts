@@ -14,16 +14,17 @@ export class SelectorService {
     @InjectRepository(Team) private teamModel: Repository<Team>,
     @InjectRepository(Room) private roomModel: Repository<Room>,
     @InjectRepository(RoomParticipant) private participantModel: Repository<RoomParticipant>,
-    @InjectRepository(LineUp) private lineUpModel: Repository<LineUp>
+    @InjectRepository(LineUp) private lineUpModel: Repository<LineUp>,
   ) { }
 
   async getMe(me: User){
     try{
-        const myTeam = await this.teamModel.findBy({ ownerId: me.id });
+        const myTeams = await this.teamModel.findBy({ ownerId: me.id });
         return {
-            user: me,
-            userTeam: myTeam
+          user: me,
+          teams: myTeams
         };
+
     }
     catch(err){
         throw new BadRequestException(err.message);

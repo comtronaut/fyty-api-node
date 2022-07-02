@@ -7,6 +7,8 @@ import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { JwtStrategy } from "./strategy/jwt.strategy";
 import env from "src/common/env.config";
+import { FacebookStrategy } from "./strategy/facebook.strategy";
+import { GoogleStrategy } from "./strategy/google.strategy";
 
 @Module({
   imports: [
@@ -18,6 +20,6 @@ import env from "src/common/env.config";
     TypeOrmModule.forFeature([ User ])
   ],
   controllers: [ AuthController ],
-  providers: [ AuthService, JwtStrategy ]
+  providers: [ AuthService, JwtStrategy, FacebookStrategy, GoogleStrategy ]
 })
 export class AuthModule {}
