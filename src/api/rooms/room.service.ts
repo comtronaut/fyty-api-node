@@ -5,6 +5,7 @@ import { CreateParticipantDto, CreateRoomDto, UpdateParticipantDto, UpdateRoomDt
 import { Room } from "src/model/sql-entity/room.entity";
 import { User } from "src/model/sql-entity/user.entity";
 import { Repository } from "typeorm";
+import { ChatService } from "../chats/chat.service";
 import { RoomParticipantService } from "./participants/room-participant.service";
 
 @Injectable()
@@ -12,21 +13,22 @@ export class RoomService {
   constructor(
     @InjectRepository(Room) private roomModel: Repository<Room>,
     private readonly participantService: RoomParticipantService,
+    private readonly chatService: ChatService
   ) { }
   
   // CRUD
   async create(user: User, req: CreateRoomDto) {
     try {
-      /*
-        generate chat-id here 
-      */
-     
       req.hostId = user.id;
-
       const room = await this.roomModel.save(req);
 
       const participantData = { roomId: room.id, teamId: req.teamId };
-      await this.participantService.create(participantData);
+
+      // generate chat and participant
+      await Promise.all([
+        this.chatService.create({ roomId: room.id }),
+        this.participantService.create(participantData)
+      ]);
       
       return room;
     }
