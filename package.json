@@ -27,7 +27,7 @@
     "class-validator": "^0.13.2",
     "dotenv": "^16.0.1",
     "non-null": "^2.0.1",
-    "passport": "^0.6.0",
+    "passport": "^0.5.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.0",

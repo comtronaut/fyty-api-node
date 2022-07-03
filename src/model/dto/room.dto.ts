@@ -16,8 +16,8 @@ export class CreateRoomDto {
   // startAt: Date;
   startAt: string;
 
-  @IsNotEmpty()
-  nMatches: number;
+  // @IsNotEmpty()
+  // nMatches: number;
 
   participantCount: number;
 
