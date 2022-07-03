@@ -29,10 +29,22 @@ import {
       this.server.emit(`res/room/create`, payload);
     }
 
-    @SubscribeMessage("join/create")
+    @SubscribeMessage("room/join")
     async joinRoom(client: Socket, payload: string): Promise<void> {
       await this.roomService.joinRoom(payload);
       this.server.emit(`res/room/${ payload }/join`, payload);
+    }
+
+    @SubscribeMessage("room/disband")
+    async disbandRoom(client: Socket, payload: any): Promise<void> {
+      await this.roomService.disband(payload);
+      this.server.emit(`res/room/${ payload }/disband`, payload);
+    }
+
+    @SubscribeMessage("room/leave")
+    async leaveRoom(client: Socket, payload: any): Promise<void> {
+      await this.roomService.leaveRoom(payload);
+      this.server.emit(`res/room/${ payload }/leave`, payload);
     }
 
     afterInit(server: Server) {

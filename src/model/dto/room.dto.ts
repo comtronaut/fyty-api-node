@@ -1,4 +1,5 @@
 import { PartialType } from "@nestjs/mapped-types";
+import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IsDate, IsEnum, IsNotEmpty, IsUUID } from "class-validator";
 import { RoomStatus } from "src/common/_enum";
 
@@ -10,10 +11,13 @@ export class CreateRoomDto {
   @IsEnum(RoomStatus)
   status: string;
 
+  @ApiPropertyOptional()
   option: string;
 
+  @ApiPropertyOptional()
   startAt: Date;
   
+  @ApiPropertyOptional()
   endAt: Date;
 
   // @IsNotEmpty()
@@ -24,12 +28,11 @@ export class CreateRoomDto {
   @IsNotEmpty()
   gameId: string;
 
+  @IsNotEmpty()
   hostId: string;
 
   @IsNotEmpty()
   chatId: string;
-  
-  createdAt: Date;
 
   @IsNotEmpty()
   teamId: string;

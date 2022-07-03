@@ -63,6 +63,10 @@ export class RoomService {
     }
   }
 
+  async disband(payload: any){
+    return "blai";
+  }
+
   // async updateUserRatingScore(userId: string) {
 
   //   const [ user, reviews ] = await Promise.all([
@@ -93,26 +97,25 @@ export class RoomService {
   }
 
   async joinRoom(teamId: string) {
-    // try {
-    //   const room = await this.roomModel.findOneOrFail({ where: { id: req.roomId }});
+    try {
+      const room = await this.roomModel.findOneByOrFail({ id: teamId });
 
-    //   // check is room available
-    //   if(room.status === RoomStatus.UNAVAILABLE || room.status === RoomStatus.FULL) {
-    //     throw new Error("room is not available");
-    //   }
+      // check is room available
+      if(room.status === RoomStatus.UNAVAILABLE || room.status === RoomStatus.FULL) {
+        throw new Error("room is not available");
+      }
 
-    //   // 1 team / room / game validation
+      // 1 team / room / game validation
 
-    //   // update participant count
-    //   await this.update(room.id, { teamCount: room.teamCount + 1 });
+      // update participant count
+      await this.update(room.id, { teamCount: room.teamCount + 1 });
 
-    //   // update room status
+      // update room status
       
-    //   // add participant to the room
-    //   return await this.participantService.create(req);
-    // } catch(err) {
-    //   throw new BadRequestException(err.message);
-    // }
+      // add participant to the room
+    } catch(err) {
+      throw new BadRequestException(err.message);
+    }
   }
 
   async leaveRoom(req: CreateParticipantDto) {
