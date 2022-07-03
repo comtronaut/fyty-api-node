@@ -11,4 +11,8 @@ export class CreateParticipantDto {
     @IsUUID()
     roomId: string;
 
+    @IsNotEmpty()
+    @IsUUID()
+    gameId: string;
+
 }

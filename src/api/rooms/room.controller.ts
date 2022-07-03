@@ -44,10 +44,9 @@ export class RoomController {
     // if you dont familiar with using Entity (user: User), just using id and findOne
     // but this will make your coding much more easier, if you have a chance, just try it
     // validationPipe is a keyword for this method (Subject decorator implementation is in common file if you want to read it)
-    @Subject() user: User,
     @Body() req: CreateRoomDto,
     ) {
-    // return this.roomService.create(user);
+     return this.roomService.create(req);
   }
 
   // @Get("/:gameId")

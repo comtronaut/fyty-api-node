@@ -14,6 +14,8 @@ export class CreateTeamDto {
   @IsNotEmpty()
   gameId: string;
 
+  joinedNumber: number;
+
   ownerId: string;
 
   createdAt: Date;

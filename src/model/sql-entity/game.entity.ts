@@ -10,7 +10,7 @@ export class Game extends AbstractModel {
 
   @IsNotEmpty()
   @Column()
-  roomCap: number;
+  teamCap: number;
 
   @IsNotEmpty()
   @Column()

@@ -14,7 +14,7 @@ export class RoomParticipantService {
   // CRUD
   async create(req: CreateParticipantDto) {
     try {
-      this.validation();
+      // this.validation();
       return await this.participantModel.save(req);
     }
     catch(err) {
@@ -29,6 +29,16 @@ export class RoomParticipantService {
 
   async validation() {
     
+  }
+
+  async countTeamGame(teamId: string, gameId: string){
+    try{
+      const res = await this.participantModel.findAndCountBy({ teamId: teamId, gameId: gameId });
+      return res[1];
+    }
+    catch(err){
+      throw new BadRequestException(err.message);
+    }
   }
 //   async update(roomId: string, req: UpdateRoomDto) {
 //     try {

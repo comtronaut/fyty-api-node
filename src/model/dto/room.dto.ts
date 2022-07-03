@@ -31,11 +31,8 @@ export class CreateRoomDto {
   @IsNotEmpty()
   hostId: string;
 
-  @IsNotEmpty()
   chatId: string;
 
-  @IsNotEmpty()
-  teamId: string;
 }
 
 export class UpdateRoomDto extends PartialType(CreateRoomDto) { }

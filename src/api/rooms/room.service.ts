@@ -1,18 +1,23 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { identity } from "rxjs";
 import { RoomStatus } from "src/common/_enum";
 import { CreateParticipantDto, CreateRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
+import { Game } from "src/model/sql-entity/game.entity";
 import { Room } from "src/model/sql-entity/room.entity";
 import { Repository } from "typeorm";
 import { ChatService } from "../chats/chat.service";
+import { TeamService } from "../teams/team.service";
 import { RoomParticipantService } from "./participants/room-participant.service";
 
 @Injectable()
 export class RoomService {
   constructor(
     @InjectRepository(Room) private roomModel: Repository<Room>,
+    @InjectRepository(Game) private gameModel: Repository<Game>,
     private readonly participantService: RoomParticipantService,
-    private readonly chatService: ChatService
+    private readonly chatService: ChatService,
+    private readonly teamService: TeamService
   ) { }
   
   // CRUD
@@ -20,7 +25,7 @@ export class RoomService {
     try {
       const room = await this.roomModel.save(req);
 
-      const participantData = { roomId: room.id, teamId: req.teamId };
+      const participantData = { roomId: room.id, teamId: room.hostId, gameId: req.gameId };
 
       // generate chat and participant
       await Promise.all([
@@ -62,10 +67,6 @@ export class RoomService {
     }
   }
 
-  async disband(payload: any){
-    return "blai";
-  }
-
   // async updateUserRatingScore(userId: string) {
 
   //   const [ user, reviews ] = await Promise.all([
@@ -83,21 +84,28 @@ export class RoomService {
   //   return this.userService.updateRatingScore(user, { ratingScore })
   // }
 
-  async delete(roomId: string) {
+  async disband(roomId: string) {
     try {
       const res = await this.roomModel.delete(roomId);
       if(res.affected === 0) {
         return new HttpException("", HttpStatus.NO_CONTENT)
       }
-      return;
+      return res;
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async joinRoom(teamId: string) {
+  async joinRoom(payload: any) {
     try {
-      const room = await this.roomModel.findOneByOrFail({ id: teamId });
+      const teamId = payload.teamId;
+      const roomId = payload.roomId;
+
+      const room = await this.roomModel.findOneByOrFail({ id: roomId });
+      const team = await this.teamService.getTeam(teamId);
+      const game = await this.gameModel.findOneByOrFail({ id: room.gameId });
+
+      const count = await this.participantService.countTeamGame(teamId, room.gameId);
 
       // check is room available
       if(room.status === RoomStatus.UNAVAILABLE || room.status === RoomStatus.FULL) {
@@ -105,16 +113,33 @@ export class RoomService {
       }
 
       // 1 team / room / game validation
+      if(count > 0){
+        throw new Error("Your team has already joined some where");
+      }      
 
       // update participant count
       await this.update(room.id, { teamCount: room.teamCount + 1 });
 
       // update room status
+      this.updateStatus(game, room);
+      
       
       // add participant to the room
+      const participantData = { roomId: room.id, teamId: teamId, gameId: room.gameId };
+      await this.participantService.create(participantData);
+      
     } catch(err) {
       throw new BadRequestException(err.message);
     }
+  }
+
+  async updateStatus(game: Game, room: Room){
+    const del = game.teamCap - room.teamCount;
+    if(del == 1){ // available
+      room.status = RoomStatus.UNAVAILABLE; 
+      await this.roomModel.update({ id: room.id }, room);
+    }
+
   }
 
   async leaveRoom(req: CreateParticipantDto) {
@@ -125,9 +150,13 @@ export class RoomService {
       await this.update(room.id, { teamCount: room.teamCount - 1 });
 
       // update room status
+      room.status = RoomStatus.AVAILABLE;
+      await this.roomModel.update({ id: room.id }, room);
+
+      const parti = await this.participantService.delete(req);
       
       // remove participant from the room
-      return await this.participantService.delete(req);
+      return parti;
     } catch(err) {
       throw new BadRequestException(err.message);
     }

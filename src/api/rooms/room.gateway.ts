@@ -23,14 +23,14 @@ import {
     
     @WebSocketServer() server: Server;
   
-    @SubscribeMessage("room/create")
+    @SubscribeMessage("room/create")  // done maybe :)
     async createRoom(client: Socket, payload: CreateRoomDto): Promise<void> {
       await this.roomService.create(payload);
       this.server.emit(`res/room/create`, payload);
     }
 
     @SubscribeMessage("room/join")
-    async joinRoom(client: Socket, payload: string): Promise<void> {
+    async joinRoom(client: Socket, payload: any): Promise<void> {
       await this.roomService.joinRoom(payload);
       this.server.emit(`res/room/${ payload }/join`, payload);
     }
