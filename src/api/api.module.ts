@@ -4,6 +4,7 @@ import { RoomModule } from "./rooms/room.module";
 import { SelectorModule } from "./Selector/selector.module";
 import { TeamModule } from "./teams/team.module";
 import { UserModule } from "./users/user.module";
+import { UtilModule } from "./utils/util.module";
 
 @Module({
   imports: [
@@ -11,7 +12,8 @@ import { UserModule } from "./users/user.module";
     GameModule,
     TeamModule,
     RoomModule,
-    SelectorModule
+    SelectorModule,
+    UtilModule
   ],
   controllers: [],
   providers: []
