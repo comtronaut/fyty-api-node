@@ -1,5 +1,5 @@
 import { PartialType } from "@nestjs/mapped-types";
-import { IsEnum, IsNotEmpty, IsUUID } from "class-validator";
+import { IsDate, IsEnum, IsNotEmpty, IsUUID } from "class-validator";
 import { RoomStatus } from "src/common/_enum";
 
 export class CreateRoomDto {
@@ -12,14 +12,14 @@ export class CreateRoomDto {
 
   option: string;
 
-  @IsNotEmpty()
-  // startAt: Date;
-  startAt: string;
+  startAt: Date;
+  
+  endAt: Date;
 
   // @IsNotEmpty()
   // nMatches: number;
 
-  participantCount: number;
+  teamCount: number;
 
   @IsNotEmpty()
   gameId: string;

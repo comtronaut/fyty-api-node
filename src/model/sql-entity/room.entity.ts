@@ -21,16 +21,20 @@ export class Room extends AbstractModel {
 
   @IsNotEmpty()
   @Column()
-  // startAt: Date;
-  startAt: string;
+  startAt: Date;
 
   @IsNotEmpty()
   @Column()
-  nMatches: number;
+  endAt: Date;
+  
+
+  // @IsNotEmpty()
+  // @Column()
+  // nMatches: number;
 
   @IsNotEmpty()
   @Column({ default: 1 })
-  participantCount: number;
+  teamCount: number;
 
   @IsNotEmpty()
   @ManyToOne(() => Game, { onUpdate: 'CASCADE' })
@@ -42,9 +46,9 @@ export class Room extends AbstractModel {
   @Column({ type: "uuid" })
   hostId: string;
 
-  @IsNotEmpty()
-  @Column({ type: "uuid" })
-  chatId: string;
+  // @IsNotEmpty()
+  // @Column({ type: "uuid" })
+  // chatId: string;
   
   @CreateDateColumn()
   createdAt: Date;

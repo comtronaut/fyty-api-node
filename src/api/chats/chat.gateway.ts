@@ -18,16 +18,16 @@ import { MessageService } from "./messages/message.service";
     }
   })
   
-export class AppGateway
+export class ChatGateway
 implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   constructor(private messageService: MessageService) {}
   
   @WebSocketServer() server: Server;
 
-  @SubscribeMessage("sendMessage")
+  @SubscribeMessage("message")
   async handleSendMessage(client: Socket, payload: CreateMessageDto): Promise<void> {
     await this.messageService.create(payload);
-    this.server.emit(`recMessage ${payload.chatId}`, payload);
+    this.server.emit(`chat/${payload.chatId}`, payload);
   }
 
   afterInit(server: Server) {

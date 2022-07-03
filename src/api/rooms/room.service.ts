@@ -17,9 +17,8 @@ export class RoomService {
   ) { }
   
   // CRUD
-  async create(user: User, req: CreateRoomDto) {
+  async create(req: CreateRoomDto) {
     try {
-      req.hostId = user.id;
       const room = await this.roomModel.save(req);
 
       const participantData = { roomId: room.id, teamId: req.teamId };
@@ -93,27 +92,27 @@ export class RoomService {
     }
   }
 
-  async joinRoom(req: CreateParticipantDto) {
-    try {
-      const room = await this.roomModel.findOneOrFail({ where: { id: req.roomId }});
+  async join(teamId: string) {
+    // try {
+    //   const room = await this.roomModel.findOneOrFail({ where: { id: req.roomId }});
 
-      // check is room available
-      if(room.status === RoomStatus.UNAVAILABLE || room.status === RoomStatus.FULL) {
-        throw new Error("room is not available");
-      }
+    //   // check is room available
+    //   if(room.status === RoomStatus.UNAVAILABLE || room.status === RoomStatus.FULL) {
+    //     throw new Error("room is not available");
+    //   }
 
-      // 1 team / room / game validation
+    //   // 1 team / room / game validation
 
-      // update participant count
-      await this.update(room.id, { participantCount: room.participantCount + 1 });
+    //   // update participant count
+    //   await this.update(room.id, { teamCount: room.teamCount + 1 });
 
-      // update room status
+    //   // update room status
       
-      // add participant to the room
-      return await this.participantService.create(req);
-    } catch(err) {
-      throw new BadRequestException(err.message);
-    }
+    //   // add participant to the room
+    //   return await this.participantService.create(req);
+    // } catch(err) {
+    //   throw new BadRequestException(err.message);
+    // }
   }
 
   async leaveRoom(req: CreateParticipantDto) {
@@ -121,7 +120,7 @@ export class RoomService {
       const room = await this.roomModel.findOneOrFail({ where: { id: req.roomId }});
 
       // update participant count
-      await this.update(room.id, { participantCount: room.participantCount - 1 });
+      await this.update(room.id, { teamCount: room.teamCount - 1 });
 
       // update room status
       
