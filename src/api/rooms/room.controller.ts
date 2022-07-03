@@ -56,11 +56,11 @@ export class RoomController {
   //   return this.roomService.getRoomsByGameId(gameId);
   // }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Get()
-  // async getRooms() {
-  //   return this.roomService.getAllRooms();
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async getRooms() {
+    return this.roomService.getAllRooms();
+  }
 
   // @Debug()
   // @Put("/:roomId")

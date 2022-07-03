@@ -92,7 +92,7 @@ export class RoomService {
     }
   }
 
-  async join(teamId: string) {
+  async joinRoom(teamId: string) {
     // try {
     //   const room = await this.roomModel.findOneOrFail({ where: { id: req.roomId }});
 

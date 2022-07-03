@@ -1,6 +1,6 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsNumber, IsPhoneNumber } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsPhoneNumber, IsUrl } from "class-validator";
 
 export class CreateUserDto {
     @ApiProperty()
@@ -26,8 +26,9 @@ export class CreateUserDto {
     // @ApiPropertyOptional({ default: 5.00 })
     // ratingScore: number;
   
+    @IsUrl()
     @ApiPropertyOptional()
-    profileImageUrl: string;
+    protraitUrl: string;
   
     @ApiPropertyOptional()
     coverUrl: string;

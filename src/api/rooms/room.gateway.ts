@@ -1,4 +1,3 @@
-import { UseGuards } from "@nestjs/common";
 import {
     SubscribeMessage,
     WebSocketGateway,
@@ -8,9 +7,7 @@ import {
     OnGatewayDisconnect
   } from "@nestjs/websockets";
   import { Socket, Server } from "socket.io";
-import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
-  import { CreateMessageDto } from "src/model/dto/chat.dto";
-import { CreateRoomDto } from "src/model/dto/room.dto";
+  import { CreateRoomDto } from "src/model/dto/room.dto";
   import { RoomService } from "./room.service";
 
     
@@ -34,7 +31,7 @@ import { CreateRoomDto } from "src/model/dto/room.dto";
 
     @SubscribeMessage("join/create")
     async joinRoom(client: Socket, payload: string): Promise<void> {
-      await this.roomService.join(payload);
+      await this.roomService.joinRoom(payload);
       this.server.emit(`res/room/${ payload }/join`, payload);
     }
 
