@@ -2,6 +2,8 @@ import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nes
 import { InjectRepository } from "@nestjs/typeorm";
 import { RoomStatus } from "src/common/_enum";
 import { CreateParticipantDto, CreateRoomDto, UpdateParticipantDto, UpdateRoomDto } from "src/model/dto/room.dto";
+import { Chat } from "src/model/sql-entity/chat.entity";
+import { RoomParticipant } from "src/model/sql-entity/participant.entity";
 import { Room } from "src/model/sql-entity/room.entity";
 import { User } from "src/model/sql-entity/user.entity";
 import { Repository } from "typeorm";
@@ -12,8 +14,8 @@ import { RoomParticipantService } from "./participants/room-participant.service"
 export class RoomService {
   constructor(
     @InjectRepository(Room) private roomModel: Repository<Room>,
-    private readonly participantService: RoomParticipantService,
-    private readonly chatService: ChatService
+    @InjectRepository(RoomParticipant) private participantModel: Repository <RoomParticipant>,
+    @InjectRepository(Chat) private chatModel: Repository <Chat>
   ) { }
   
   // CRUD
@@ -24,10 +26,6 @@ export class RoomService {
       const participantData = { roomId: room.id, teamId: req.teamId };
 
       // generate chat and participant
-      await Promise.all([
-        this.chatService.create({ roomId: room.id }),
-        this.participantService.create(participantData)
-      ]);
       
       return room;
     }
@@ -128,7 +126,7 @@ export class RoomService {
       // update room status
       
       // remove participant from the room
-      return await this.participantService.delete(req);
+      //return await this.participantService.delete(req);
     } catch(err) {
       throw new BadRequestException(err.message);
     }
