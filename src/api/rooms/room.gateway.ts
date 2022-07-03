@@ -44,7 +44,13 @@ import {
     @SubscribeMessage("room/leave")
     async leaveRoom(client: Socket, payload: any): Promise<void> {
       await this.roomService.leaveRoom(payload);
-      this.server.emit(`res/room/${ payload }/leave`, payload);
+      this.server.emit(`res/room/${ payload.roomId }/leave`, payload);
+    }
+
+    @SubscribeMessage("room/modify")
+    async modifyRoom(client: Socket, payload: any): Promise<void> {
+      await this.roomService.update(payload.roomId, payload.req);
+      this.server.emit(`res/room/${ payload.roomId }/modify`, payload);
     }
 
     afterInit(server: Server) {

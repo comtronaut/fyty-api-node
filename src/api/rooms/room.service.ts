@@ -84,13 +84,20 @@ export class RoomService {
   //   return this.userService.updateRatingScore(user, { ratingScore })
   // }
 
-  async disband(roomId: string) {
+  async disband(payload: any) {
     try {
-      const res = await this.roomModel.delete(roomId);
-      if(res.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT)
+      const teamId = payload.teamId;
+      const room = await this.roomModel.findOneByOrFail({ id: payload.roomId });
+
+      if(room.hostId === teamId){
+        const res = await this.roomModel.delete(room.id);
+        if(res.affected === 0) {
+          return room.id
+        }
+        throw new Error("room is not deleted");
       }
-      return res;
+      throw new Error("Only host can disband the room");
+      
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -102,7 +109,6 @@ export class RoomService {
       const roomId = payload.roomId;
 
       const room = await this.roomModel.findOneByOrFail({ id: roomId });
-      const team = await this.teamService.getTeam(teamId);
       const game = await this.gameModel.findOneByOrFail({ id: room.gameId });
 
       const count = await this.participantService.countTeamGame(teamId, room.gameId);
