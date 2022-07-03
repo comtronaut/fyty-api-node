@@ -4,6 +4,7 @@ import { Chat } from "src/model/sql-entity/chat.entity";
 import { RoomParticipant } from "src/model/sql-entity/participant.entity";
 import { Room } from "src/model/sql-entity/room.entity";
 import { ChatModule } from "../chats/chat.module";
+import { ChatService } from "../chats/chat.service";
 import { RoomParticipantService } from "./participants/room-participant.service";
 import { RoomController } from "./room.controller";
 import { RoomGateway } from "./room.gateway";
@@ -15,6 +16,6 @@ import { RoomService } from "./room.service";
     ChatModule
   ],
   controllers: [ RoomController ],
-  providers: [ RoomService, RoomParticipantService, RoomGateway ]
+  providers: [ RoomService, RoomParticipantService, RoomGateway, ChatService ]
 })
 export class RoomModule { }

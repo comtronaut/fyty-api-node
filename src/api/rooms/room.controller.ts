@@ -36,20 +36,19 @@ export class RoomController {
   // // two routes have overlapped each other
   // // so the shorter(url) one will be below
 
-  // @Debug()
-  // @UseGuards(JwtAuthGuard)
-  // @Post()
-  // async createRoom(
-  //   // this is abstraction, think that user will be auto-generated from JwtAuthGuard
-  //   // so if you want to use @Subject, you have to use @UseGuards(JwtAuthGuard) first
-  //   // if you dont familiar with using Entity (user: User), just using id and findOne
-  //   // but this will make your coding much more easier, if you have a chance, just try it
-  //   // validationPipe is a keyword for this method (Subject decorator implementation is in common file if you want to read it)
-  //   @Subject() user: User,
-  //   @Body() req: CreateRoomDto,
-  //   ) {
-  //   return this.roomService.create(user);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async createRoom(
+    // this is abstraction, think that user will be auto-generated from JwtAuthGuard
+    // so if you want to use @Subject, you have to use @UseGuards(JwtAuthGuard) first
+    // if you dont familiar with using Entity (user: User), just using id and findOne
+    // but this will make your coding much more easier, if you have a chance, just try it
+    // validationPipe is a keyword for this method (Subject decorator implementation is in common file if you want to read it)
+    @Subject() user: User,
+    @Body() req: CreateRoomDto,
+    ) {
+    // return this.roomService.create(user);
+  }
 
   // @Get("/:gameId")
   // async getRoomsByGameId(@Param("gameId") gameId: string) {
