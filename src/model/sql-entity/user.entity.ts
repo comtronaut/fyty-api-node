@@ -29,7 +29,7 @@ export class User extends AbstractModel {
   // ratingScore: number;
 
   @Column({ default: "" })
-  protraitUrl: string;
+  portraitUrl: string;
 
   @Column({ default: "" })
   coverUrl: string;

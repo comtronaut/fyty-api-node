@@ -28,7 +28,7 @@ export class CreateUserDto {
   
     @IsUrl()
     @ApiPropertyOptional()
-    protraitUrl: string;
+    portraitUrl: string;
   
     @ApiPropertyOptional()
     coverUrl: string;
