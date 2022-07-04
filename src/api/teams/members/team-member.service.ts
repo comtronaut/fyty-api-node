@@ -1,8 +1,6 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { CreateTeamDto, CreateTeamMemberDto } from "src/model/dto/team.dto";
 import { TeamMember } from "src/model/sql-entity/team-member.entity";
-import { Team } from "src/model/sql-entity/team.entity";
 import { Repository } from "typeorm";
 
 @Injectable()
