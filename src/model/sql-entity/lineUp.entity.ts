@@ -8,7 +8,7 @@ import { AbstractModel } from "./_model";
 export class LineUp extends AbstractModel {
     
   @IsNotEmpty()
-  @ManyToOne(() => Team, { onUpdate: 'CASCADE' })
+  @ManyToOne(() => Team, { onDelete: 'CASCADE' })
   @Column({ type: "uuid" })
   teamId: string;
 

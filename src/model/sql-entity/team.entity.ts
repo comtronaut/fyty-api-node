@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsEmail, Min } from "class-validator";
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, Unique } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, OneToOne, Unique } from "typeorm";
 import { Game } from "./game.entity";
 import { User } from "./user.entity";
 import { AbstractModel } from "./_model";
@@ -7,7 +7,7 @@ import { AbstractModel } from "./_model";
 @Entity()
 export class Team extends AbstractModel {
   @IsNotEmpty()
-  @Column({ unique: true })
+  @Column()
   name: string;
 
   @IsNotEmpty()

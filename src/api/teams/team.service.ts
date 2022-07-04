@@ -72,4 +72,9 @@ export class TeamService {
       throw new BadRequestException(err.message);
     }
   }
+  // async clear(){
+    
+  //   await this.teamModel.clear();
+  //   return "PK";
+  // }
 }
