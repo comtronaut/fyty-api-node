@@ -17,10 +17,10 @@ export class SelectorController{
     @UseGuards(JwtAuthGuard)
     @Get("room/:id")
     async getMyRoom(
-      @Param () id: string
+      @Param () id: string,
     ) 
     {
-        return this.selectorService.getRoom(id);
+      return this.selectorService.getRoom(id);
     }
 
 
