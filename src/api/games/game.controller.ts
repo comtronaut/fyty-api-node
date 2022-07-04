@@ -21,17 +21,18 @@ export class GameController {
 
   // only admin can edit game
   @Debug()
-  @Put("/:gameId")
+  @Put(":id")
   async updateGame(
-    @Param("gameId") gameId: string, 
+    @Param("id") gameId: string, 
     @Body() req: UpdateGameDto,
     ) {
     return await this.gameService.update(gameId, req);
   }
 
   @Debug()
-  @Delete("/:gameId")
-  async deleteUser(@Param("gameId") gameId: string) {    
+  @Delete(":id")
+  async deleteUser(
+    @Param("id") gameId: string) {    
     return await this.gameService.delete(gameId);
   }
 }
