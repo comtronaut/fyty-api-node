@@ -17,7 +17,7 @@ export class SelectorController{
     @UseGuards(JwtAuthGuard)
     @Get("room/:id")
     async getMyRoom(
-      @Param () id: string,
+      @Param ("id") id: string,
     ) 
     {
       return this.selectorService.getRoom(id);
@@ -27,7 +27,7 @@ export class SelectorController{
     @UseGuards(JwtAuthGuard)
     @Get("team/:id")
     async getMyTeams(
-      @Param () id: string
+      @Param ("id") id: string
     ) 
     {
         return this.selectorService.getTeam(id);
