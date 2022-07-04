@@ -42,8 +42,7 @@ export class CreateUserDto {
   //   inventoryId: string;
 
     @IsNotEmpty()
-    @IsNumber()
-    phoneNumber: string
+    phoneNumber: string;
   
     @ApiPropertyOptional({ description: "auto generated" })
     createdAt: Date;

@@ -6,8 +6,6 @@ import { AbstractModel } from "./_model";
 @Entity()
 export class PhoneNumber extends AbstractModel {
   @IsNotEmpty()
-  // @IsPhoneNumber()
-  @IsNumber()
   @Column({ unique: true, update: false })
   phoneNumber: string;
 }
