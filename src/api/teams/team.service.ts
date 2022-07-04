@@ -25,6 +25,7 @@ export class TeamService {
 
   async getTeam(teamId: string) {
     try{
+      
       return this.teamModel.findOneByOrFail({ id: teamId });
     }
     catch(err){

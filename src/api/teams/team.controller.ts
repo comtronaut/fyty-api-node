@@ -34,7 +34,7 @@ export class TeamController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(":id")
+  @Get(":teamId")
   async getMembersByTeamId(
     @Param("teamId") teamId: string) {
     return this.teamService.getTeam(teamId);
