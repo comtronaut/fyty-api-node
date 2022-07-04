@@ -34,7 +34,7 @@ export class TeamService {
 
   async getTeamsByGameId(gameId: string) {
     try{
-      return await this.teamModel.findOneByOrFail({ gameId: gameId });
+      return await this.teamModel.findBy({ gameId: gameId });
     }
     catch(err){
       throw new BadRequestException(err.message);
