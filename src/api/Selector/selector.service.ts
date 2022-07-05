@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import e from "express";
 import { LineUp } from "src/model/sql-entity/lineUp.entity";
 import { RoomParticipant } from "src/model/sql-entity/participant.entity";
 import { Room } from "src/model/sql-entity/room.entity";
 import { Team } from "src/model/sql-entity/team.entity";
 import { User } from "src/model/sql-entity/user.entity";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 
 
 @Injectable()
@@ -34,8 +35,12 @@ export class SelectorService {
   async getRoom(roomId: string){        // not sure for map without await
     try{
         const room = await this.roomModel.findOneByOrFail({ id: roomId });
-        const participants = await this.participantModel.findBy({ roomId: roomId })
-        const teams = participants.map(e => this.teamModel.findOneByOrFail({ id: e.teamId })) // good? maybe not 
+        const participants = await this.participantModel.findBy({ roomId: roomId });
+
+        const teams = await this.teamModel.findBy({ id: In (participants.map(e => e.teamId ))})
+
+        // const teams = participants.map(e => this.teamModel.findOneByOrFail({ id: e.teamId })) // good? maybe not 
+        // console.log(teams);
 
         return {
             room: room,
