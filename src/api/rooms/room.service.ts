@@ -92,7 +92,7 @@ export class RoomService {
 
       if(room.hostId === teamId){
         const res = await this.roomModel.delete(room.id);
-        if(res.affected === 0) {
+        if(res.affected !== 0) {
           return room.id
         }
         throw new Error("room is not deleted");
