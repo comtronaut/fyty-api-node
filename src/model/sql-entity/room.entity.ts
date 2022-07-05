@@ -20,12 +20,10 @@ export class Room extends AbstractModel {
   @Column({ default: "" })
   option: string;
 
-  @IsNotEmpty()
-  @Column()
+  @CreateDateColumn()
   startAt: Date;
 
-  @IsNotEmpty()
-  @Column()
+  @CreateDateColumn()
   endAt: Date;
   
 

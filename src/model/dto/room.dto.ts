@@ -8,7 +8,6 @@ export class CreateRoomDto {
   name: string;
 
   @ApiPropertyOptional()
-  @IsEnum(RoomStatus)
   status: string;
 
   @ApiPropertyOptional()

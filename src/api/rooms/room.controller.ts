@@ -36,7 +36,7 @@ export class RoomController {
   // // two routes have overlapped each other
   // // so the shorter(url) one will be below
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
   async createRoom(
     // this is abstraction, think that user will be auto-generated from JwtAuthGuard

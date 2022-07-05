@@ -4,6 +4,7 @@ import { identity } from "rxjs";
 import { RoomStatus } from "src/common/_enum";
 import { CreateParticipantDto, CreateRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
 import { Game } from "src/model/sql-entity/game.entity";
+import { RoomParticipant } from "src/model/sql-entity/participant.entity";
 import { Room } from "src/model/sql-entity/room.entity";
 import { Repository } from "typeorm";
 import { ChatService } from "../chats/chat.service";
@@ -14,24 +15,25 @@ import { RoomParticipantService } from "./participants/room-participant.service"
 export class RoomService {
   constructor(
     @InjectRepository(Room) private roomModel: Repository<Room>,
+    @InjectRepository(RoomParticipant) private participantModel: Repository<RoomParticipant>,
     @InjectRepository(Game) private gameModel: Repository<Game>,
     private readonly participantService: RoomParticipantService,
     private readonly chatService: ChatService,
-    private readonly teamService: TeamService
   ) { }
   
   // CRUD
   async create(req: CreateRoomDto) {
     try {
-      const room = this.roomModel.create(req);
-      await this.roomModel.save(req);
+      const room = await this.roomModel.save(req);
+      
 
-      const participantData = { roomId: room.id, teamId: room.hostId, gameId: req.gameId };
-
+      const participantData = { roomId: room.id, teamId: req.hostId, gameId: req.gameId };
+      
       // generate chat and participant
-      const res = await this.participantService.create(participantData);
+      const res = this.participantModel.create(participantData);
+      await this.participantModel.save(res);
       await this.chatService.create({ roomId: room.id });
-      console.log(res);
+      
       
       return room;
     }
