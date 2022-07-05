@@ -52,7 +52,9 @@ export class RoomService {
         return new HttpException("", HttpStatus.NO_CONTENT);
       }
 
-      return await this.roomModel.findOneOrFail({ where: { id: roomId }});
+      return {
+        room: await this.roomModel.findOneOrFail({ where: { id: roomId }})
+      }
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -96,7 +98,9 @@ export class RoomService {
       if(room.hostId == teamId){
         const res = await this.roomModel.delete(room.id);
         if(res.affected !== 0) {
-          return room.id
+          return {
+            roomId: room.id
+          };
         }
         throw new Error("room is not deleted");
       }
@@ -136,7 +140,10 @@ export class RoomService {
       
       // add participant to the room
       const participantData = { roomId: room.id, teamId: teamId, gameId: room.gameId };
-      await this.participantService.create(participantData);
+      return {
+        participant: await this.participantService.create(participantData)
+      };
+      
       
     } catch(err) {
       throw new BadRequestException(err.message);
@@ -163,10 +170,14 @@ export class RoomService {
       room.status = RoomStatus.AVAILABLE;
       await this.roomModel.update({ id: room.id }, room);
 
-      const parti = await this.participantService.delete(req);
-      
       // remove participant from the room
-      return parti;
+      const parti = this.participantModel.findOneByOrFail({ roomId: req.roomId })
+      await this.participantService.delete(req);
+      
+      return {
+        participant: parti
+      };
+
     } catch(err) {
       throw new BadRequestException(err.message);
     }
