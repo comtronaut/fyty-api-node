@@ -31,6 +31,9 @@ export class CreateRoomDto {
   @IsNotEmpty()
   hostId: string;
 
+  @IsNotEmpty()
+  teamId: string;
+
   chatId: string;
 
 }
@@ -45,6 +48,10 @@ export class CreateParticipantDto {
   @IsNotEmpty()
   @IsUUID()
   roomId: string;
+
+  @IsNotEmpty()
+  @IsUUID()
+  gameId: string;
 }
 
 export class UpdateParticipantDto extends PartialType(CreateParticipantDto) { }
