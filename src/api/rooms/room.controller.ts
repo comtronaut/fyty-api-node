@@ -70,10 +70,10 @@ export class RoomController {
   // }
 
   // @Debug()
-  // @Delete(":id")
-  // async deleteRoom(
-  //   @Param("id") partiId: string) {    
-  //   return await this.roomService.leaveRoom(partiId);
-  // }
+  @Delete(":id")
+  async deleteRoom(
+    @Param("id") partiId: string) {    
+    return await this.roomService.leaveRoom(partiId);
+  }
   
 }

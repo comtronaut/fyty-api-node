@@ -43,7 +43,7 @@ import {
 
     @SubscribeMessage("room/leave")
     async leaveRoom(client: Socket, payload: any): Promise<void> {
-      const res = await this.roomService.leaveRoom(payload.participantId);
+      const res = await this.roomService.leaveRoom(payload.roomParticipantId);
       this.server.emit(`res/room/${ res.roomId }/leave`, res.res);
     }
 
