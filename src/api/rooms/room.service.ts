@@ -161,7 +161,9 @@ export class RoomService {
 
   async leaveRoom(participantId: string) {
     try {
-      const parti = await this.participantModel.findOneByOrFail({ id: participantId })
+      
+      const parti = await this.participantModel.findOneByOrFail({ id: participantId });
+      console.log("test")
       const room = await this.roomModel.findOneByOrFail({ id: parti.roomId });
 
       // update participant count
@@ -173,7 +175,8 @@ export class RoomService {
 
       // remove participant from the room
       
-     await this.participantModel.delete({ id: participantId });
+      const res = await this.participantModel.delete({ id: participantId });
+      console.log(res.affected + " participants has been delete");
       
       return {
         res: {
