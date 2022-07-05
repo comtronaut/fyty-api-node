@@ -25,7 +25,8 @@ export class LineUpService {
 
   async update(lineUpId: string ,req: UpdateLineUpDto){
     try{
-        return await this.lineUpModel.update(lineUpId, req); 
+        await this.lineUpModel.update(lineUpId, req);
+        return await this.lineUpModel.findOneByOrFail({ id: lineUpId })
     }
     catch(err){
         throw new BadRequestException(err.message);
