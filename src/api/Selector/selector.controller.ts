@@ -34,7 +34,7 @@ export class SelectorController{
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get("chat/:id")
+    @Get("room/:id/chat")
     async getchat(
       @Param ("id") chatId: string
     ) 
