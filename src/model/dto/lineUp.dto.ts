@@ -1,18 +1,19 @@
 import { PartialType } from "@nestjs/mapped-types";
+import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IsNotEmpty, IsUrl, IsUUID } from "class-validator";
 
 export class CreateLineUpDto {
 
-    @IsNotEmpty()
+    @ApiPropertyOptional()
     @IsUUID()
     teamId: string;
 
     @IsNotEmpty()
     inGameId: string;
 
-    @IsNotEmpty()
+    @ApiPropertyOptional()
     @IsUrl()
-    imgUrl: string;
+    imageUrl: string;
 
 }
 

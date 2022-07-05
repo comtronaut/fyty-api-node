@@ -19,6 +19,6 @@ export class LineUp extends AbstractModel {
   @IsNotEmpty()
   @IsUrl()
   @Column()
-  imgUrl: string
+  imageUrl: string
 
 }
