@@ -26,7 +26,7 @@ export class LineUpService {
   async update(lineUpId: string ,req: UpdateLineUpDto){
     
       await this.lineUpModel.update(lineUpId, req);
-      return await this.lineUpModel.findOneByOrFail({ id: lineUpId })
+      return req;
   }
 
   async getLineUps(teamId?: string){
