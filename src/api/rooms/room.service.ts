@@ -141,7 +141,7 @@ export class RoomService {
       // add participant to the room
       const participantData = { roomId: room.id, teamId: teamId, gameId: room.gameId };
       return {
-        participant: await this.participantService.create(participantData)
+        roomParticipant: await this.participantService.create(participantData)
       };
       
       
@@ -159,9 +159,10 @@ export class RoomService {
 
   }
 
-  async leaveRoom(req: CreateParticipantDto) {
+  async leaveRoom(participantId: string) {
     try {
-      const room = await this.roomModel.findOneOrFail({ where: { id: req.roomId }});
+      const parti = await this.participantModel.findOneByOrFail({ id: participantId })
+      const room = await this.roomModel.findOneByOrFail({ id: parti.roomId });
 
       // update participant count
       await this.update(room.id, { teamCount: room.teamCount - 1 });
@@ -171,12 +172,12 @@ export class RoomService {
       await this.roomModel.update({ id: room.id }, room);
 
       // remove participant from the room
-      const parti = this.participantModel.findOneByOrFail({ roomId: req.roomId })
-      await this.participantService.delete(req);
+      
+     await this.participantModel.delete({ id: participantId });
       
       return {
         res: {
-          participant: parti
+          roomParticipant: parti
         },
         roomId: room.id
       };
