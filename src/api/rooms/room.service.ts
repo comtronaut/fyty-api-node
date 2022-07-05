@@ -175,7 +175,10 @@ export class RoomService {
       await this.participantService.delete(req);
       
       return {
-        participant: parti
+        res: {
+          participant: parti
+        },
+        roomId: room.id
       };
 
     } catch(err) {

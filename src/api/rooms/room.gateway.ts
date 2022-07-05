@@ -32,7 +32,7 @@ import {
     @SubscribeMessage("room/join")
     async joinRoom(client: Socket, payload: any): Promise<void> {
       const res = await this.roomService.joinRoom(payload);
-      this.server.emit(`res/room/${ payload }/join`, res);
+      this.server.emit(`res/room/${ payload.roomId }/join`, res);
     }
 
     @SubscribeMessage("room/disband")
@@ -44,7 +44,7 @@ import {
     @SubscribeMessage("room/leave")
     async leaveRoom(client: Socket, payload: any): Promise<void> {
       const res = await this.roomService.leaveRoom(payload);
-      this.server.emit(`res/room/${ payload.roomId }/leave`, res);
+      this.server.emit(`res/room/${ res.roomId }/leave`, res.res);
     }
 
     @SubscribeMessage("room/modify")
