@@ -27,7 +27,7 @@ export class LineUpService {
       try{
         const team = await this.teamModel.findOneByOrFail({ ownerId: user.id });
         const lineup = await this.lineUpModel.findOneByOrFail({ id: lineUpId });
-        if(team.id === lineup.teamId){
+        if(team.id == lineup.teamId){ // cheack if you are ownerTeam
           await this.lineUpModel.update(lineUpId, req);
           return req;
         }

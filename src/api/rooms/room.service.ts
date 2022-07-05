@@ -35,7 +35,9 @@ export class RoomService {
       await this.chatService.create({ roomId: room.id });
       
       
-      return room;
+      return {
+        room: room
+      };
     }
     catch(err) {
       throw new BadRequestException(err.message);
@@ -91,7 +93,7 @@ export class RoomService {
       const teamId = payload.teamId;
       const room = await this.roomModel.findOneByOrFail({ id: payload.roomId });
 
-      if(room.hostId === teamId){
+      if(room.hostId == teamId){
         const res = await this.roomModel.delete(room.id);
         if(res.affected !== 0) {
           return room.id
