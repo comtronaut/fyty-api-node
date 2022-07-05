@@ -29,10 +29,9 @@ export class RoomService {
       const participantData = { roomId: room.id, teamId: room.hostId, gameId: req.gameId };
 
       // generate chat and participant
-      await Promise.all([
-        this.chatService.create({ roomId: room.id }),
-        this.participantService.create(participantData)
-      ]);
+      const res = await this.participantService.create(participantData);
+      await this.chatService.create({ roomId: room.id });
+      console.log(res);
       
       return room;
     }

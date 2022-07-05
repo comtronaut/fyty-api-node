@@ -23,10 +23,23 @@ export class LineUpService {
     }
   }
 
-  async update(lineUpId: string ,req: UpdateLineUpDto){
-    
-      await this.lineUpModel.update(lineUpId, req);
-      return req;
+  async update(user: User, lineUpId: string, req: UpdateLineUpDto){
+      try{
+        const team = await this.teamModel.findOneByOrFail({ ownerId: user.id });
+        const lineup = await this.lineUpModel.findOneByOrFail({ id: lineUpId });
+        if(team.id === lineup.teamId){
+          await this.lineUpModel.update(lineUpId, req);
+          return req;
+        }
+        else{
+          throw new Error("Only team's owner can edit lineUps");
+        }
+        
+      }
+      catch(err){
+        throw new BadRequestException(err.message);
+      }
+      
   }
 
   async getLineUps(teamId?: string){

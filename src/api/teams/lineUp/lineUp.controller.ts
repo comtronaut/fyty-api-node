@@ -23,10 +23,11 @@ export class LineUpController{
   @UseGuards(JwtAuthGuard)
   @Put("/:id")
   async updateLineUp(
+    @Subject() user: User,
     @Param() lineUpId: string,
     @Body() req: CreateLineUpDto,
     ) {
-    return this.lineUpService.update(lineUpId, req);
+    return this.lineUpService.update(user ,lineUpId, req);
   }
   
   @UseGuards(JwtAuthGuard)
