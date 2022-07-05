@@ -38,7 +38,7 @@ import {
     @SubscribeMessage("room/disband")
     async disbandRoom(client: Socket, payload: any): Promise<void> {
       const res = await this.roomService.disband(payload);
-      this.server.emit(`res/room/${ payload }/disband`, res);
+      this.server.emit(`res/room/${ payload.roomId }/disband`, res);
     }
 
     @SubscribeMessage("room/leave")
