@@ -25,32 +25,32 @@ import {
   
     @SubscribeMessage("room/create")  // done maybe :)
     async createRoom(client: Socket, payload: CreateRoomDto): Promise<void> {
-      await this.roomService.create(payload);
-      this.server.emit(`res/room/create`, payload);
+      const res = await this.roomService.create(payload);
+      this.server.emit(`res/room/create`, res);
     }
 
     @SubscribeMessage("room/join")
     async joinRoom(client: Socket, payload: any): Promise<void> {
-      await this.roomService.joinRoom(payload);
-      this.server.emit(`res/room/${ payload }/join`, payload);
+      const res = await this.roomService.joinRoom(payload);
+      this.server.emit(`res/room/${ payload }/join`, res);
     }
 
     @SubscribeMessage("room/disband")
     async disbandRoom(client: Socket, payload: any): Promise<void> {
-      await this.roomService.disband(payload);
-      this.server.emit(`res/room/${ payload }/disband`, payload);
+      const res = await this.roomService.disband(payload);
+      this.server.emit(`res/room/${ payload }/disband`, res);
     }
 
     @SubscribeMessage("room/leave")
     async leaveRoom(client: Socket, payload: any): Promise<void> {
-      await this.roomService.leaveRoom(payload);
-      this.server.emit(`res/room/${ payload.roomId }/leave`, payload);
+      const res = await this.roomService.leaveRoom(payload);
+      this.server.emit(`res/room/${ payload.roomId }/leave`, res);
     }
 
     @SubscribeMessage("room/modify")
     async modifyRoom(client: Socket, payload: any): Promise<void> {
-      await this.roomService.update(payload.roomId, payload.req);
-      this.server.emit(`res/room/${ payload.roomId }/modify`, payload);
+      const res = await this.roomService.update(payload.roomId, payload.req);
+      this.server.emit(`res/room/${ payload.roomId }/modify`, res);
     }
 
     afterInit(server: Server) {
