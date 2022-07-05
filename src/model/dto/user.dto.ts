@@ -26,7 +26,7 @@ export class CreateUserDto {
     // @ApiPropertyOptional({ default: 5.00 })
     // ratingScore: number;
   
-    @IsUrl()
+    // @IsUrl()
     @ApiPropertyOptional()
     portraitUrl: string;
   

@@ -7,7 +7,7 @@ export class CreateRoomDto {
   @IsNotEmpty()
   name: string;
 
-  @IsNotEmpty()
+  @ApiPropertyOptional()
   @IsEnum(RoomStatus)
   status: string;
 
@@ -30,9 +30,6 @@ export class CreateRoomDto {
 
   @IsNotEmpty()
   hostId: string;
-
-  @IsNotEmpty()
-  teamId: string;
 
   chatId: string;
 

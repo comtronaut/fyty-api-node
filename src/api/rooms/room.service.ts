@@ -23,7 +23,8 @@ export class RoomService {
   // CRUD
   async create(req: CreateRoomDto) {
     try {
-      const room = await this.roomModel.save(req);
+      const room = this.roomModel.create(req);
+      await this.roomModel.save(req);
 
       const participantData = { roomId: room.id, teamId: room.hostId, gameId: req.gameId };
 

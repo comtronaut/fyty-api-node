@@ -2,6 +2,7 @@ import { IsNotEmpty } from "class-validator";
 import { RoomStatus } from "src/common/_enum";
 import { Column, CreateDateColumn, Entity, ManyToOne } from "typeorm";
 import { Game } from "./game.entity";
+import { Team } from "./team.entity";
 import { User } from "./user.entity";
 import { AbstractModel } from "./_model";
 
@@ -42,7 +43,7 @@ export class Room extends AbstractModel {
   gameId: string;
 
   @IsNotEmpty()
-  @ManyToOne(() => User, { onUpdate: 'CASCADE' })
+  @ManyToOne(() => Team, { onUpdate: 'CASCADE' })
   @Column({ type: "uuid" })
   hostId: string;
 
