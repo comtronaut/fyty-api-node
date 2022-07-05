@@ -1,7 +1,9 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import e from "express";
+import { Chat } from "src/model/sql-entity/chat.entity";
 import { LineUp } from "src/model/sql-entity/lineUp.entity";
+import { Message } from "src/model/sql-entity/message.entity";
 import { RoomParticipant } from "src/model/sql-entity/participant.entity";
 import { Room } from "src/model/sql-entity/room.entity";
 import { Team } from "src/model/sql-entity/team.entity";
@@ -16,6 +18,8 @@ export class SelectorService {
     @InjectRepository(Room) private roomModel: Repository<Room>,
     @InjectRepository(RoomParticipant) private participantModel: Repository<RoomParticipant>,
     @InjectRepository(LineUp) private lineUpModel: Repository<LineUp>,
+    @InjectRepository(Chat) private chatModel: Repository<Chat>,
+    @InjectRepository(Message) private messageModel: Repository<Message>,
   ) { }
 
   async getMe(me: User){
@@ -31,6 +35,22 @@ export class SelectorService {
         throw new BadRequestException(err.message);
     }
   }
+
+  async getChat(chatId: string){
+    try{
+        const chat = await this.chatModel.findOneByOrFail({ id: chatId });
+        const message = await this.messageModel.findBy({ chatId: chatId })
+        return {
+          chat: chat,
+          message: message
+        };
+
+    }
+    catch(err){
+        throw new BadRequestException(err.message);
+    }
+  }
+
 
   async getRoom(roomId: string){        // not sure for map without await
     try{

@@ -36,10 +36,10 @@ export class SelectorController{
     @UseGuards(JwtAuthGuard)
     @Get("chat/:id")
     async getchat(
-      @Param ("id") id: string
+      @Param ("id") chatId: string
     ) 
     {
-        return this.selectorService.getTeam(id);
+        return this.selectorService.getChat(chatId);
     }
     
     @UseGuards(JwtAuthGuard)
