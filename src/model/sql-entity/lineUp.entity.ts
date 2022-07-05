@@ -12,13 +12,11 @@ export class LineUp extends AbstractModel {
   @Column({ type: "uuid" })
   teamId: string;
 
-  @IsNotEmpty()
   @Column({ unique: true })
   inGameId: string;
 
-  @IsNotEmpty()
   @IsUrl()
-  @Column()
+  @Column({ default: "" })
   imageUrl: string
 
 }
