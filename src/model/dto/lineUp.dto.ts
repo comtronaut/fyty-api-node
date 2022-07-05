@@ -4,15 +4,15 @@ import { IsNotEmpty, IsUrl, IsUUID } from "class-validator";
 
 export class CreateLineUpDto {
 
-    @ApiPropertyOptional()
+    
     @IsUUID()
     teamId: string;
 
+    @ApiPropertyOptional()
     @IsNotEmpty()
     inGameId: string;
 
     @ApiPropertyOptional()
-    @IsUrl()
     imageUrl: string;
 
 }
