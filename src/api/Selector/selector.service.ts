@@ -29,7 +29,6 @@ export class SelectorService {
           user: me,
           teams: myTeams
         };
-
     }
     catch(err){
         throw new BadRequestException(err.message);
@@ -42,9 +41,8 @@ export class SelectorService {
         const message = await this.messageModel.findBy({ chatId: chat.id })
         return {
           chat: chat,
-          message: message
+          messages: message
         };
-
     }
     catch(err){
         throw new BadRequestException(err.message);
