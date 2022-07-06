@@ -25,9 +25,9 @@ implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
   @SubscribeMessage("message")
-  async handleSendMessage(client: Socket, payload: CreateMessageDto): Promise<void> {
-    await this.messageService.create(payload);
-    this.server.emit(`chat/${payload.chatId}`, payload);
+  async handleSendMessage(client: Socket, payload: any): Promise<void> {
+    await this.messageService.create(payload.data);
+    this.server.emit(`res/chat/${payload.data.chatId}`, payload);
   }
 
   afterInit(server: Server) {
