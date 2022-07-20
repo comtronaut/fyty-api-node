@@ -4,7 +4,7 @@ import * as bcrypt from "bcrypt";
 import { Repository } from "typeorm";
 
 import { PhoneNumber } from "src/model/sql-entity/phoneNumber.entity";
-import { User } from "src/model/sql-entity/user.entity";
+import { User } from "src/model/sql-entity/user/user.entity";
 import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
 
 @Injectable()

@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToOne } from "typeorm";
 import { Chat } from "./chat.entity";
-import { User } from "./user.entity";
+import { User } from "./user/user.entity";
 import { AbstractModel } from "./_model";
 
 @Entity()

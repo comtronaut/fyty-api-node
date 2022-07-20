@@ -1,7 +1,7 @@
 import { Controller, Get, HttpStatus, Param, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Subject } from "src/common/subject.decorator";
-import { User } from "src/model/sql-entity/user.entity";
+import { User } from "src/model/sql-entity/user/user.entity";
 import { SelectorService } from "./selector.service";
 
 @Controller("api/selector")

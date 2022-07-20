@@ -1,8 +1,8 @@
 import { IsNotEmpty } from "class-validator";
-import { Column, CreateDateColumn, Entity, ManyToOne, Unique } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne } from "typeorm";
 import { Team } from "./team.entity";
-import { User } from "./user.entity";
-import { AbstractModel } from "./_model";
+import { User } from "../user/user.entity";
+import { AbstractModel } from "../_model";
 
 @Entity()
 export class TeamMember extends AbstractModel {
@@ -23,3 +23,4 @@ export class TeamMember extends AbstractModel {
   @CreateDateColumn()
   joinedAt: Date;
 }
+

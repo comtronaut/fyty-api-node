@@ -1,10 +1,10 @@
 import { IsNotEmpty } from "class-validator";
 import { RoomStatus } from "src/common/_enum";
 import { Column, CreateDateColumn, Entity, ManyToOne } from "typeorm";
-import { Game } from "./game.entity";
-import { Team } from "./team.entity";
-import { User } from "./user.entity";
-import { AbstractModel } from "./_model";
+import { Game } from "../game.entity";
+import { Team } from "../team/team.entity";
+import { User } from "../user/user.entity";
+import { AbstractModel } from "../_model";
 
 @Entity()
 export class Room extends AbstractModel {

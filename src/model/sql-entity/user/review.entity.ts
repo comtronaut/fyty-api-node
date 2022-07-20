@@ -1,7 +1,7 @@
 import { IsNotEmpty } from "class-validator";
 import { Column, CreateDateColumn, Entity, ManyToOne, JoinColumn } from "typeorm";
 import { User } from "./user.entity";
-import { AbstractModel } from "./_model";
+import { AbstractModel } from "../_model";
 
 @Entity()
 export class Review extends AbstractModel {

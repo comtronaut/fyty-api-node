@@ -4,7 +4,7 @@ import { TeamService } from "./team.service";
 import { CreateTeamDto, UpdateTeamDto, UpdateTeamMemberDto } from "src/model/dto/team.dto";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Subject } from "src/common/subject.decorator";
-import { User } from "src/model/sql-entity/user.entity";
+import { User } from "src/model/sql-entity/user/user.entity";
 import { TeamMemberService } from "./members/team-member.service";
 
 @Controller("api/teams")

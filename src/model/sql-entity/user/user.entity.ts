@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsEmail, Min } from "class-validator";
 import { Column, CreateDateColumn, Entity } from "typeorm";
-import { AbstractModel } from "./_model";
+import { AbstractModel } from "../_model";
 
 @Entity()
 export class User extends AbstractModel {

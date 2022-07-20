@@ -2,9 +2,9 @@ import { BadRequestException, HttpCode, HttpStatus, Injectable } from "@nestjs/c
 import { InjectRepository } from "@nestjs/typeorm";
 import { Http2ServerResponse } from "http2";
 import { CreateLineUpDto, UpdateLineUpDto } from "src/model/dto/lineUp.dto";
-import { LineUp } from "src/model/sql-entity/lineUp.entity";
-import { Team } from "src/model/sql-entity/team.entity";
-import { User } from "src/model/sql-entity/user.entity";
+import { LineUp } from "src/model/sql-entity/team/lineUp.entity";
+import { Team } from "src/model/sql-entity/team/team.entity";
+import { User } from "src/model/sql-entity/user/user.entity";
 import { Repository } from "typeorm";
 
 @Injectable()

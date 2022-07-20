@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nes
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Subject } from "src/common/subject.decorator";
 import { CreateLineUpDto } from "src/model/dto/lineUp.dto";
-import { User } from "src/model/sql-entity/user.entity";
+import { User } from "src/model/sql-entity/user/user.entity";
 import { LineUpService } from "./lineUp.service";
 
 

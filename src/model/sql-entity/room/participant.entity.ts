@@ -1,9 +1,10 @@
 import { IsNotEmpty } from "class-validator";
 import { Column, CreateDateColumn, Entity, ManyToOne } from "typeorm";
-import { Game } from "./game.entity";
+import { Game } from "../game.entity";
 import { Room } from "./room.entity";
-import { Team } from "./team.entity";
-import { AbstractModel } from "./_model";
+import { Team } from "../team/team.entity";
+
+import { AbstractModel } from "../_model";
 
 @Entity()
 export class RoomParticipant extends AbstractModel {

@@ -3,7 +3,7 @@ import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Debug } from "src/common/debug.decorator";
 import { Subject } from "src/common/subject.decorator";
 import { CreateParticipantDto, CreateRoomDto, UpdateParticipantDto, UpdateRoomDto } from "src/model/dto/room.dto";
-import { User } from "src/model/sql-entity/user.entity";
+import { User } from "src/model/sql-entity/user/user.entity";
 import { RoomParticipantService } from "./participants/room-participant.service";
 import { RoomService } from "./room.service";
 
