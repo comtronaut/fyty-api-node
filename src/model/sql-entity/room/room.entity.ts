@@ -25,11 +25,6 @@ export class Room extends AbstractModel {
 
   @CreateDateColumn()
   endAt: Date;
-  
-
-  // @IsNotEmpty()
-  // @Column()
-  // nMatches: number;
 
   @IsNotEmpty()
   @Column({ default: 1 })
@@ -44,10 +39,6 @@ export class Room extends AbstractModel {
   @ManyToOne(() => Team, { onUpdate: 'CASCADE' })
   @Column({ type: "uuid" })
   hostId: string;
-
-  // @IsNotEmpty()
-  // @Column({ type: "uuid" })
-  // chatId: string;
   
   @CreateDateColumn()
   createdAt: Date;

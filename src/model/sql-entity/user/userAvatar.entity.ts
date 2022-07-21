@@ -4,26 +4,30 @@ import { AbstractModel } from "../_model";
 
 @Entity()
 export class UserAvatar extends AbstractModel {
-  // @IsNotEmpty()
-  // @Column({ unique: true, update: false })
-  // uuid: string;
+  @IsNotEmpty()
+  @Column()
+  uuid: string;
 
-  // @IsNotEmpty()
-  // @Column()
-  // characterName: string;
+  @IsNotEmpty()
+  @Column({ default: "player 1" })
+  characterName: string;
 
-  // @IsNotEmpty()
-  // @Column()
-  // rank: string;
+  @IsNotEmpty()
+  @Column()
+  rank: string;
 
-  // @IsEmail()
-  // @IsNotEmpty()
-  // @Column({ unique: true, update: false })
-  // gameId: string;
+  @IsNotEmpty()
+  @Column({ default: 5 })
+  ratingScore: number;
 
-  // @Column({ default: "" })
-  // userId: string;
+  @IsEmail()
+  @IsNotEmpty()
+  @Column({ unique: true, update: false })
+  gameId: string;
 
-  // @CreateDateColumn()
-  // createdAt: Date;
+  @Column({ default: "" })
+  userId: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }

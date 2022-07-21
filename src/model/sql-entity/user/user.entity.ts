@@ -17,6 +17,9 @@ export class User extends AbstractModel {
   @Column()
   displayName: string;
 
+  @Column({ default: "" })
+  description: string;
+
   @IsEmail()
   @IsNotEmpty()
   @Column({ unique: true, update: false })
@@ -25,22 +28,11 @@ export class User extends AbstractModel {
   @Column({ default: "" })
   bio: string;
 
-  // @Column("decimal", { precision: 5, scale: 2 , default: 5.00})
-  // ratingScore: number;
-
   @Column({ default: "" })
   portraitUrl: string;
 
   @Column({ default: "" })
   coverUrl: string;
-
-//   prefId: string;
-  
-//   availableFeatureId: string;
-
-//   premiumId: string;
-
-//   inventoryId: string;
 
   @CreateDateColumn()
   createdAt: Date;
