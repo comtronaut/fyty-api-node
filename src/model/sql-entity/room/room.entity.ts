@@ -8,38 +8,40 @@ import { AbstractModel } from "../_model";
 
 @Entity()
 export class Room extends AbstractModel {
-  @IsNotEmpty()
-  @Column()
-  name: string;
 
-  @IsNotEmpty()
-  @Column({ default: RoomStatus.AVAILABLE })
-  status: string;
+    @IsNotEmpty()
+    @Column()
+    name: string;
 
-  @IsNotEmpty()
-  @Column({ default: "" })
-  option: string;
+    @IsNotEmpty()
+    @Column({ default: RoomStatus.AVAILABLE })
+    status: string;
 
-  @CreateDateColumn()
-  startAt: Date;
+    @IsNotEmpty()
+    @Column({ default: "" })
+    option: string;
 
-  @CreateDateColumn()
-  endAt: Date;
+    @CreateDateColumn()
+    startAt: Date;
 
-  @IsNotEmpty()
-  @Column({ default: 1 })
-  teamCount: number;
+    @CreateDateColumn()
+    endAt: Date;
 
-  @IsNotEmpty()
-  @ManyToOne(() => Game, { onUpdate: 'CASCADE' })
-  @Column({ type: "uuid" })
-  gameId: string;
+    @IsNotEmpty()
+    @Column({ default: 1 })
+    teamCount: number;
 
-  @IsNotEmpty()
-  @ManyToOne(() => Team, { onUpdate: 'CASCADE' })
-  @Column({ type: "uuid" })
-  hostId: string;
-  
-  @CreateDateColumn()
-  createdAt: Date;
+    @IsNotEmpty()
+    @ManyToOne(() => Game, { onUpdate: 'CASCADE' })
+    @Column({ type: "uuid" })
+    gameId: string;
+
+    @IsNotEmpty()
+    @ManyToOne(() => Team, { onUpdate: 'CASCADE' })
+    @Column({ type: "uuid" })
+    hostId: string;
+        
+    @CreateDateColumn()
+    createdAt: Date;
+    
 }
