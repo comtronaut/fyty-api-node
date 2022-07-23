@@ -15,7 +15,7 @@ import { TeampendingService } from "./teampending.service";
     }
   })
   
-export class ChatGateway
+export class TeamGateway
 implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   constructor(private teampendingService: TeampendingService) {}
   
@@ -24,7 +24,7 @@ implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage("message")
   async handleSendMessage(client: Socket, payload: any): Promise<void> {
     await this.teampendingService.create(payload.data);
-    this.server.emit(`res/chat/${payload.data.teamId}`, payload);
+    this.server.emit(`res/team/${payload.data.teamId}`, payload);
   }
 
   afterInit(server: Server) {
