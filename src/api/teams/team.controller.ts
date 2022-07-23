@@ -16,7 +16,7 @@ export class TeamController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async creteTeam(
+  async createTeam(
     @Subject() user: User,
     @Body() req: CreateTeamDto,
   ) {
@@ -53,7 +53,7 @@ export class TeamController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
-  async delateTeam(
+  async deleteTeam(
     @Subject() user: User,
     @Param("id") teamId: string
   ) {
