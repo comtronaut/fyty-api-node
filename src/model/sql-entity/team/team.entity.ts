@@ -22,10 +22,6 @@ export class Team extends AbstractModel {
   @Column({ default: 0 })
   lineupCount: number;
 
-  @IsNotEmpty()
-  @Column({ default: 0 })
-  joinedNumber: number;
-
   @Column({ default: "" })
   tier: string;
 

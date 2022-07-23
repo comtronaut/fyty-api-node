@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import e from "express";
 import { Chat } from "src/model/sql-entity/chat.entity";
-import { LineUp } from "src/model/sql-entity/team/lineUp.entity";
+import { TeamLineUp } from "src/model/sql-entity/team/lineUp.entity";
 import { Message } from "src/model/sql-entity/message.entity";
 import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
 import { Room } from "src/model/sql-entity/room/room.entity";
@@ -17,7 +17,7 @@ export class SelectorService {
     @InjectRepository(Team) private teamModel: Repository<Team>,
     @InjectRepository(Room) private roomModel: Repository<Room>,
     @InjectRepository(RoomParticipant) private participantModel: Repository<RoomParticipant>,
-    @InjectRepository(LineUp) private lineUpModel: Repository<LineUp>,
+    @InjectRepository(TeamLineUp) private lineUpModel: Repository<TeamLineUp>,
     @InjectRepository(Chat) private chatModel: Repository<Chat>,
     @InjectRepository(Message) private messageModel: Repository<Message>,
   ) { }

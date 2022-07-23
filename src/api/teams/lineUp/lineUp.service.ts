@@ -2,7 +2,7 @@ import { BadRequestException, HttpCode, HttpStatus, Injectable } from "@nestjs/c
 import { InjectRepository } from "@nestjs/typeorm";
 import { Http2ServerResponse } from "http2";
 import { CreateLineUpDto, UpdateLineUpDto } from "src/model/dto/lineUp.dto";
-import { LineUp } from "src/model/sql-entity/team/lineUp.entity";
+import { TeamLineUp} from "src/model/sql-entity/team/lineUp.entity";
 import { Team } from "src/model/sql-entity/team/team.entity";
 import { User } from "src/model/sql-entity/user/user.entity";
 import { Repository } from "typeorm";
@@ -10,7 +10,7 @@ import { Repository } from "typeorm";
 @Injectable()
 export class LineUpService {
   constructor(
-    @InjectRepository(LineUp) private lineUpModel: Repository<LineUp>,
+    @InjectRepository(TeamLineUp) private lineUpModel: Repository<TeamLineUp>,
     @InjectRepository(Team) private teamModel: Repository<Team>
   ) { }
 

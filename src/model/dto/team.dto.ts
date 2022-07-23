@@ -14,8 +14,6 @@ export class CreateTeamDto {
   @IsNotEmpty()
   gameId: string;
 
-  joinedNumber: number;
-
   ownerId: string;
 
   createdAt: Date;
@@ -24,7 +22,7 @@ export class CreateTeamDto {
 export class UpdateTeamDto extends PartialType(CreateTeamDto) { }
 
 export class CreateTeamMemberDto {
-  @IsNotEmpty()
+
   role: string;
 
   @IsNotEmpty()
@@ -32,6 +30,25 @@ export class CreateTeamMemberDto {
 
   @IsNotEmpty()
   userId: string;
+
+  joinedAt: Date;
+
 }
 
 export class UpdateTeamMemberDto extends PartialType(CreateTeamMemberDto) { }
+
+export class CreateTeamPendingDto {
+  @IsNotEmpty()
+  teamId: string;
+
+  @IsNotEmpty()
+  userId: string;
+
+  @IsNotEmpty()
+  status: string;
+  
+  createdAt: Date;
+
+}
+
+export class UpdateTeamPendingDto extends PartialType(CreateTeamPendingDto) { }

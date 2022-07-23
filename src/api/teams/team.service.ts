@@ -2,6 +2,7 @@ import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nes
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreateTeamDto, UpdateTeamDto } from "src/model/dto/team.dto";
 import { Team } from "src/model/sql-entity/team/team.entity";
+import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
 import { User } from "src/model/sql-entity/user/user.entity";
 import { Repository } from "typeorm";
 
@@ -9,6 +10,7 @@ import { Repository } from "typeorm";
 export class TeamService {
   constructor(
     @InjectRepository(Team) private teamModel: Repository<Team>,
+    @InjectRepository(TeamMember) private memberModel: Repository<TeamMember>,
   ) { }
   
   // CRUD
@@ -16,6 +18,7 @@ export class TeamService {
     try {
       req.ownerId = user.id; // set the team's owner
       const team = await this.teamModel.save(req);
+      const member = await this.memberModel.save({teamId:team.id,userId:user.id,role:"Manager"});
       return team;
     }
     catch(err) {

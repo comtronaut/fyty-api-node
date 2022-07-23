@@ -1,4 +1,4 @@
-import { IsNotEmpty } from "class-validator";
+import { IsEnum, IsNotEmpty } from "class-validator";
 import { Column, CreateDateColumn, Entity, ManyToOne } from "typeorm";
 import { Team } from "./team.entity";
 import { User } from "../user/user.entity";
@@ -7,7 +7,7 @@ import { AbstractModel } from "../_model";
 @Entity()
 export class TeamMember extends AbstractModel {
   @IsNotEmpty()
-  @Column()
+  @Column( )
   role: string;
 
   @IsNotEmpty()

@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Chat } from "src/model/sql-entity/chat.entity";
-import { LineUp } from "src/model/sql-entity/team/lineUp.entity";
+import { TeamLineUp } from "src/model/sql-entity/team/lineUp.entity";
 import { Message } from "src/model/sql-entity/message.entity";
 import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
 import { Room } from "src/model/sql-entity/room/room.entity";
@@ -12,7 +12,7 @@ import { SelectorService } from "./selector.service"
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ Team, LineUp, User, Room, RoomParticipant, Message, Chat ])
+    TypeOrmModule.forFeature([ Team, TeamLineUp, User, Room, RoomParticipant, Message, Chat ])
   ],
   controllers: [ SelectorController ],
   providers: [ SelectorService ]
