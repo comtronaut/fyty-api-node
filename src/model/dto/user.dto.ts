@@ -49,3 +49,25 @@ export class CreateUserDto {
   }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) { }
+
+export class CreateUserAvatarDto {
+
+  @IsNotEmpty()
+  characterName: string;
+
+  @IsNotEmpty()
+  rank: string;
+
+  @IsNotEmpty()
+  ratingScore: string;
+
+  @IsNotEmpty()
+  gameId: string;
+
+  @IsNotEmpty()
+  userId: string;
+
+  createdAt: Date;
+}
+
+export class UpdateUserAvatarDto extends PartialType(CreateUserAvatarDto) { }

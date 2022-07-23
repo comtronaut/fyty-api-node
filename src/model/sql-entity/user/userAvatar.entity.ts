@@ -1,5 +1,7 @@
 import { IsNotEmpty, IsEmail, Min } from "class-validator";
-import { Column, CreateDateColumn, Entity } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne } from "typeorm";
+import { Game } from "../game.entity";
+import { User } from "../user/user.entity";
 import { AbstractModel } from "../_model";
 
 @Entity()
@@ -20,14 +22,16 @@ export class UserAvatar extends AbstractModel {
   @Column({ default: 5 })
   ratingScore: number;
 
-  @IsEmail()
-  @IsNotEmpty()
-  @Column({ unique: true, update: false })
+  @ManyToOne(() => Game, { onUpdate: 'CASCADE' })
+  @Column({ type: "uuid" })
   gameId: string;
 
-  @Column({ default: "" })
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @Column({ type: "uuid", unique: true })
   userId: string;
 
   @CreateDateColumn()
   createdAt: Date;
 }
+
+

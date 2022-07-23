@@ -25,7 +25,7 @@ export class Team extends AbstractModel {
   @Column({ default: "" })
   tier: string;
 
-  @OneToOne(() => Game, { onUpdate: 'CASCADE' })
+  @ManyToOne(() => Game, { onUpdate: 'CASCADE' })
   @Column({ type: "uuid" })
   gameId: string;
 
