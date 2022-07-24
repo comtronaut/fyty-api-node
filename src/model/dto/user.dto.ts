@@ -56,10 +56,12 @@ export class CreateUserAvatarDto {
   characterName: string;
 
   @IsNotEmpty()
-  rank: string;
+  ingameId: string;
 
   @IsNotEmpty()
-  ratingScore: string;
+  rank: string;
+
+  ratingScore: number;
 
   @IsNotEmpty()
   gameId: string;

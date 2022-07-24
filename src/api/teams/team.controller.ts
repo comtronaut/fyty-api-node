@@ -35,14 +35,6 @@ export class TeamController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(":id")
-  async getMembersByTeamId(
-    @Param("id") teamId: string) {
-    return this.memberService.getMemberByTeamId(teamId);
-  }
-
-
-  @UseGuards(JwtAuthGuard)
   @Put(":id")
   async updateTeam(
     @Subject() user: User,
@@ -59,6 +51,13 @@ export class TeamController {
   ) {
 
     return await this.teamService.delete(user.id, teamId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(":id/member")
+  async getMembersByTeamId(
+    @Param("id") teamId: string) {
+    return this.memberService.getMemberByTeamId(teamId);
   }
 
   @Post("/members")

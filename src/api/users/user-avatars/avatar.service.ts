@@ -1,64 +1,55 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-
+import { CreateUserAvatarDto,UpdateUserAvatarDto } from "src/model/dto/user.dto";
+import { UserAvatar } from "src/model/sql-entity/user/userAvatar.entity";
 import { User } from "src/model/sql-entity/user/user.entity";
 
 @Injectable()
 export class UserAvatarService {
   constructor(
-    @InjectRepository(User) private avatarModel: Repository<User>,
+    @InjectRepository(UserAvatar) private avatarModel: Repository<UserAvatar>,
   ) { }
   
   // CRUD
-//   async createUser(input: Record<string, any>) {
-//     try {
-//       const [ hashedPassword, hashedPhoneNumber ] = await Promise.all([ // parallel promise
-//         bcrypt.hashSync(input.password, 12),
-//         bcrypt.hashSync(input.phoneNumber, 12),
-//       ]);
+  async createUserAvatar( req : CreateUserAvatarDto) {
+    try {
+        return await this.avatarModel.save(req);
+    }
+    catch(err) {
+      throw new BadRequestException(err.message);
+    }
+  }
 
-//       const { phoneNumber, ...rest } = input;
-//       const createdContent = { ...rest, password: hashedPassword };
-      
-//       await this.phoneNumberModel.save({ phoneNumber: hashedPhoneNumber });
-//       const { password, ...userData } = await this.userModel.save(createdContent);
-//       return userData;
-//     }
-//     catch(err) {
-//       throw new BadRequestException(err.message);
-//     }
-//   }
+  async getUserAvatar( gameId:string , user:User) {
+    return await this.avatarModel.find({where:{gameId:gameId,userId:user.id}});
+  }
 
-//   async getAllUsers() {
-//     return await this.userModel.find();
-//   }
+  async update(avatarId: string, req: UpdateUserAvatarDto) {
+    try {
+      const updateRes = await this.avatarModel.update(avatarId, req);
 
-//   async updateUser(user: User, input: Record<string, any>) {
-//     try {
-//       const updateRes = await this.userModel.update(user.id, input);
+      if (updateRes.affected === 0) {
+        return new HttpException("", HttpStatus.NO_CONTENT);
+      }
 
-//       if(updateRes.affected === 0) {
-//         return new HttpException("", HttpStatus.NO_CONTENT);
-//       }
+      return await this.avatarModel.findOneOrFail({ where: { id: avatarId } });
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
 
-//       const { password, ...res } = await this.userModel.findOneOrFail({ where: { id: user.id }});
-       
-//       return res;
-//     } catch (err) {
-//       throw new BadRequestException(err.message);
-//     }
-//   }
+  async deleteUserAvatar(avatarId: string) {
+    try {
+      const res = await this.avatarModel.delete({ id: avatarId });
+      if (res.affected === 0) {
+        return new HttpException("", HttpStatus.NO_CONTENT)
+      }
+      console.log(res);
+      return;
+    } catch(err) {
+      throw new BadRequestException(err.message);
+    }
+  }
 
-  // async deleteUser(id: string) {
-  //   try {
-  //     const res = await this.userModel.delete(id);
-  //     if(res.affected === 0) {
-  //       return new HttpException("", HttpStatus.NO_CONTENT)
-  //     }
-  //     return
-  //   } catch (err) {
-  //     throw new BadRequestException(err.message);
-  //   }
-  // }
 }

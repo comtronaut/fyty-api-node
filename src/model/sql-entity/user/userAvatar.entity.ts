@@ -8,7 +8,7 @@ import { AbstractModel } from "../_model";
 export class UserAvatar extends AbstractModel {
   @IsNotEmpty()
   @Column()
-  uuid: string;
+  ingameId: string;
 
   @IsNotEmpty()
   @Column({ default: "player 1" })
@@ -22,12 +22,14 @@ export class UserAvatar extends AbstractModel {
   @Column({ default: 5 })
   ratingScore: number;
 
+  @IsNotEmpty()
   @ManyToOne(() => Game, { onUpdate: 'CASCADE' })
   @Column({ type: "uuid" })
   gameId: string;
 
+  @IsNotEmpty()
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @Column({ type: "uuid", unique: true })
+  @Column({ type: "uuid"})
   userId: string;
 
   @CreateDateColumn()
