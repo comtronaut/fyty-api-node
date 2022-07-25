@@ -19,7 +19,7 @@ export class UserAvatar extends AbstractModel {
   rank: string;
 
   @IsNotEmpty()
-  @Column({ default: 5 })
+  @Column({ type:"decimal",default: 0.00 })
   ratingScore: number;
 
   @IsNotEmpty()

@@ -13,6 +13,9 @@ export class CreateReviewDto {
     
     @IsNotEmpty()
     revieweeId: string;
+
+    @IsNotEmpty()
+    gameId:string;
   
     createdAt: Date;
 }
