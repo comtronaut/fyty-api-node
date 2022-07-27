@@ -1,14 +1,13 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { identity } from "rxjs";
 import { RoomStatus } from "src/common/_enum";
-import { CreateParticipantDto, CreateRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
+import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
 import { Game } from "src/model/sql-entity/game.entity";
+import { RoomNote } from "src/model/sql-entity/room/note.entity";
 import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
 import { Room } from "src/model/sql-entity/room/room.entity";
 import { Repository } from "typeorm";
 import { ChatService } from "../chats/chat.service";
-import { TeamService } from "../teams/team.service";
 import { RoomParticipantService } from "./participants/room-participant.service";
 
 @Injectable()
@@ -25,7 +24,6 @@ export class RoomService {
   async create(req: CreateRoomDto) {
     try {
       const room = await this.roomModel.save(req);
-      
 
       const participantData = { roomId: room.id, teamId: req.hostId, gameId: req.gameId };
       
@@ -60,12 +58,28 @@ export class RoomService {
     }
   }
 
-  async getRoomsByGameId(gameId: string) {
-    return this.roomModel.find({ where: { gameId }});
+  async getRoomsByGameId(gameId: string) {  // new
+    try{
+      return this.roomModel.findBy({ gameId: gameId });
+    }
+    catch(err){
+      throw new BadRequestException(err.message);
+    }
+    
   }
 
-  async getAllRooms() {
+  async getAllRooms(roomName?: string, startAt?: Date) { // new 
+
     try{
+      if(roomName && startAt){
+        return await this.roomModel.findBy({ name: roomName, startAt: startAt });
+      }
+      if(roomName){
+        return await this.roomModel.findBy({ name: roomName });
+      }
+      if(startAt){
+        return await this.roomModel.findBy({ startAt: startAt });
+      }
       return await this.roomModel.find();
     }
     catch(err){
@@ -189,4 +203,5 @@ export class RoomService {
       throw new BadRequestException(err.message);
     }
   }
+
 }
