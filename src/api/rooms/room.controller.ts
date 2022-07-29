@@ -42,6 +42,8 @@ export class RoomController {
     return this.roomService.getRoomsByGameId(gameId);
   }
 
+// room note
+
   @UseGuards(JwtAuthGuard)
   @Get("/:id/note")
   async getRoomsNotes(
@@ -82,8 +84,7 @@ export class RoomController {
     return this.roomNoteService.delete(noteId, user.id);
   }
 
-
-
+  
 
 
   // @Get("/participants/:roomId")
