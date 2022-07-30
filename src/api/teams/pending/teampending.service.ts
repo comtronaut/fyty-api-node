@@ -12,39 +12,52 @@ export class TeampendingService{
 
   async getteampending(teamId: string) {
     try {
-      return await this.teampendingModel.find({ where: { teamId } });
+      return await this.teampendingModel.find({ where: { teamId,status:'pending' } });
     } catch(err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async create(dto: CreateTeamPendingDto) {
+  async getteaminvitation(teamId: string) {
+    try {
+      return await this.teampendingModel.find({ where: { teamId,status:'invitation' } });
+    } catch(err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async createpending(dto: CreateTeamPendingDto) {
     return await this.teampendingModel.save(dto);
   }
 
-  // async update(gameId: string, req: object) {
-  //   try {
-  //     const updateRes = await this.gameModel.update(gameId, req);
+  async createinvitation(dto: CreateTeamPendingDto) {
+    dto.status ='invitation';
+    return await this.teampendingModel.save(dto);
+  }
 
-  //     if(updateRes.affected === 0) {
-  //       return new HttpException("", HttpStatus.NO_CONTENT);
-  //     }
+  async updatestatus(teampendingId: string, req: object) {
+    try {
+      const updateRes = await this.teampendingModel.update(teampendingId, req);
 
-  //     return await this.gameModel.findOneOrFail({ where: { id: gameId }});
-  //   } catch (err) {
-  //     throw new BadRequestException(err.message);
-  //   }
-  // }
+      if(updateRes.affected === 0) {
+        return new HttpException("", HttpStatus.NO_CONTENT);
+      }
 
-  // async delete(gameId: string) {
-  //   try {
-  //     const res = await this.gameModel.delete(gameId);
-  //     if(res.affected === 0) {
-  //       return new HttpException("", HttpStatus.NO_CONTENT)
-  //     }
-  //     return;
-  //   } catch (err) {
-  //     throw new BadRequestException(err.message);
-  //   }
-  // }
+      return await this.teampendingModel.findOneOrFail({ where: { id: teampendingId }});
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async discard(teampendingId: string) {
+    try {
+      const res = await this.teampendingModel.delete({id:teampendingId});
+      if(res.affected === 0) {
+        return new HttpException("", HttpStatus.NO_CONTENT)
+      }
+      return;
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
 }
