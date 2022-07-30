@@ -146,7 +146,7 @@ export class RoomService {
       }      
 
       // update participant count
-      await this.update(room.id, { teamCount: room.teamCount + 1 });
+      await this.roomModel.update({ id: roomId }, { teamCount: room.teamCount + 1 });
 
       // update room status
       this.updateStatus(game, room);
@@ -181,7 +181,7 @@ export class RoomService {
       const room = await this.roomModel.findOneByOrFail({ id: parti.roomId });
 
       // update participant count
-      await this.update(room.id, { teamCount: room.teamCount - 1 });
+      await this.roomModel.update({ id: room.id }, { teamCount: room.teamCount - 1 });
 
       // update room status
       room.status = RoomStatus.AVAILABLE;
