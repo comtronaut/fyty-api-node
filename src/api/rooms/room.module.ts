@@ -10,11 +10,11 @@ import { Team } from "src/model/sql-entity/team/team.entity";
 import { ChatModule } from "../chats/chat.module";
 import { ChatService } from "../chats/chat.service";
 import { TeamService } from "../teams/team.service";
-import { RoomParticipantService } from "./participants/room-participant.service";
+import { RoomParticipantService } from "./participants/participant.service";
 import { RoomController } from "./room.controller";
 import { RoomGateway } from "./room.gateway";
 import { RoomService } from "./room.service";
-import { RoomNoteService } from "./roomNote/note.service";
+import { RoomNoteService } from "./note/note.service";
 
 @Module({
   imports: [

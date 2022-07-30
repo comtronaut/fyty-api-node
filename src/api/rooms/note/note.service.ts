@@ -1,6 +1,6 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { CreateRoomNoteDto, UpdateRoomNoteDto } from "src/model/dto/room.dto";
+import { CreateRoomNoteDto, UpdateRoomNoteDto } from "src/model/dto/room/room.dto";
 import { RoomNote } from "src/model/sql-entity/room/note.entity";
 import { Repository } from "typeorm";
 

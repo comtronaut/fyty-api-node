@@ -1,14 +1,14 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { RoomStatus } from "src/common/_enum";
-import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
+import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room/room.dto";
 import { Game } from "src/model/sql-entity/game.entity";
 import { RoomNote } from "src/model/sql-entity/room/note.entity";
 import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
 import { Room } from "src/model/sql-entity/room/room.entity";
 import { Repository } from "typeorm";
 import { ChatService } from "../chats/chat.service";
-import { RoomParticipantService } from "./participants/room-participant.service";
+import { RoomParticipantService } from "./participants/participant.service";
 
 @Injectable()
 export class RoomService {
