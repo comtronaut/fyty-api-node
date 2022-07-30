@@ -1,6 +1,6 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { CreateTeamPendingDto } from "src/model/dto/team.dto";
+import { CreateTeamPendingDto,UpdateTeamPendingDto } from "src/model/dto/team.dto";
 import { TeamPending } from "src/model/sql-entity/team/pending.entity";
 import { Repository } from "typeorm";
 
@@ -26,16 +26,16 @@ export class TeampendingService{
     }
   }
 
-  async createpending(dto: CreateTeamPendingDto) {
-    return await this.teampendingModel.save(dto);
+  async createpending(req: CreateTeamPendingDto) {
+    return await this.teampendingModel.save(req);
   }
 
-  async createinvitation(dto: CreateTeamPendingDto) {
-    dto.status ='invitation';
-    return await this.teampendingModel.save(dto);
+  async createinvitation(req: CreateTeamPendingDto) {
+    req.status ='invitation';
+    return await this.teampendingModel.save(req);
   }
 
-  async updatestatus(teampendingId: string, req: object) {
+  async updatestatus(teampendingId: string, req: UpdateTeamPendingDto) {
     try {
       const updateRes = await this.teampendingModel.update(teampendingId, req);
 
