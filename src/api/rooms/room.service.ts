@@ -3,8 +3,9 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { RoomStatus } from "src/common/_enum";
 import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room/room.dto";
 import { Game } from "src/model/sql-entity/game.entity";
-import { RoomNote } from "src/model/sql-entity/room/note.entity";
+import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.entity";
 import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
+import { RoomRequest } from "src/model/sql-entity/room/request.entity";
 import { Room } from "src/model/sql-entity/room/room.entity";
 import { Repository } from "typeorm";
 import { ChatService } from "../chats/chat.service";
@@ -14,7 +15,10 @@ import { RoomParticipantService } from "./participants/participant.service";
 export class RoomService {
   constructor(
     @InjectRepository(Room) private roomModel: Repository<Room>,
+    @InjectRepository(RoomRequest) private roomRequestModel: Repository<RoomRequest>,
     @InjectRepository(RoomParticipant) private participantModel: Repository<RoomParticipant>,
+    @InjectRepository(RoomLineupBoard) private roomLineUpBoardModel: Repository<RoomLineupBoard>,
+    @InjectRepository(RoomLineup) private roomLineUpModel: Repository<RoomLineup>,
     @InjectRepository(Game) private gameModel: Repository<Game>,
     private readonly participantService: RoomParticipantService,
     private readonly chatService: ChatService,
@@ -25,7 +29,13 @@ export class RoomService {
     try {
       const room = await this.roomModel.save(req);
 
-      const participantData = { roomId: room.id, teamId: req.hostId, gameId: req.gameId };
+      const board = await this.roomLineUpBoardModel.save({});
+        for(let i in req.teamlineUpIds){
+            const lineUp = this.roomLineUpModel.create({ teamLineUpId: i, roomLineUpBoardId: board.id});
+            await this.roomLineUpModel.save(lineUp);
+        }
+
+      const participantData = { roomId: room.id, teamId: req.hostId, gameId: req.gameId, roomLineUpBoardId: board.id };
       
       // generate chat and participant
       const res = this.participantModel.create(participantData);
@@ -145,17 +155,23 @@ export class RoomService {
         throw new Error("Your team has already joined some where");
       }      
 
-      // update participant count
+      // update team count
       await this.roomModel.update({ id: roomId }, { teamCount: room.teamCount + 1 });
 
       // update room status
       this.updateStatus(game, room);
-      
+
+      const board = await this.roomLineUpBoardModel.save({});
+        for(let i in payload.teamlineUpIds){
+            const lineUp = this.roomLineUpModel.create({ teamLineUpId: i, roomLineUpBoardId: board.id});
+            await this.roomLineUpModel.save(lineUp);
+        }
       
       // add participant to the room
-      const participantData = { roomId: room.id, teamId: teamId, gameId: room.gameId };
+      const participantData = { roomId: room.id, teamId: teamId, gameId: game.id, roomLineUpBoardId: board.id };
+      const participant = this.participantService.create(participantData)
       return {
-        roomParticipant: await this.participantService.create(participantData)
+        roomParticipant: participant
       };
       
       
@@ -177,7 +193,6 @@ export class RoomService {
     try {
       
       const parti = await this.participantModel.findOneByOrFail({ id: participantId });
-      console.log("test")
       const room = await this.roomModel.findOneByOrFail({ id: parti.roomId });
 
       // update participant count

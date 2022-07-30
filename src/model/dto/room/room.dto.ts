@@ -7,18 +7,15 @@ export class CreateRoomDto {
   name: string;
 
   @ApiPropertyOptional()
-  status: string;
-
-  @ApiPropertyOptional()
-  option: string;
-
-  @ApiPropertyOptional()
   startAt: Date;
   
   @ApiPropertyOptional()
   endAt: Date;
 
   teamCount: number;
+
+  @IsNotEmpty()
+  teamlineUpIds: [string];
 
   @IsNotEmpty()
   gameId: string;

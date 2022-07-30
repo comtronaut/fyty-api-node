@@ -15,13 +15,16 @@ import { RoomController } from "./room.controller";
 import { RoomGateway } from "./room.gateway";
 import { RoomService } from "./room.service";
 import { RoomNoteService } from "./note/note.service";
+import { RoomRequest } from "src/model/sql-entity/room/request.entity";
+import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.entity";
+import { RoomRequestService } from "./request/request.service";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ Room, RoomParticipant, Chat, Team,TeamMember, Game, RoomNote ]),
+    TypeOrmModule.forFeature([ Room, RoomParticipant, Chat, Team, TeamMember, Game, RoomNote, RoomRequest, RoomLineup, RoomLineupBoard ]),
     ChatModule
   ],
   controllers: [ RoomController ],
-  providers: [ RoomService, RoomGateway, ChatService, TeamService, RoomNoteService, RoomParticipantService ]
+  providers: [ RoomService, RoomGateway, ChatService, TeamService, RoomNoteService, RoomParticipantService, RoomRequestService ]
 })
 export class RoomModule { }

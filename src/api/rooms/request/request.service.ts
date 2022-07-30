@@ -16,7 +16,7 @@ export class RoomRequestService {
   async create(roomId: string, body: CreateRoomRequestDto){
     try{
         const board = await this.roomLineUpBoardModel.save({});
-        for(let i in body.participantIds){
+        for(let i in body.teamlineUpIds){
             const lineUp = this.roomLineUpModel.create({ teamLineUpId: i, roomLineUpBoardId: board.id});
             await this.roomLineUpModel.save(lineUp);
         }

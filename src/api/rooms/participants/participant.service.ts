@@ -14,8 +14,9 @@ export class RoomParticipantService {
   async create(req: CreateParticipantDto) {
     try {
       // this.validation();
+      const participant = this.participantModel.create(req)
       
-      return await this.participantModel.save(req);
+      return await this.participantModel.save(participant);
     }
     catch(err) {
       throw new BadRequestException(err.message);
