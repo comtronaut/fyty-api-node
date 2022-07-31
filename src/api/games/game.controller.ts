@@ -31,8 +31,9 @@ export class GameController {
 
   @Debug()
   @Delete(":id")
-  async deleteUser(
-    @Param("id") gameId: string) {    
+  async deleteGame(
+    @Param("id") gameId: string
+    ) {    
     return await this.gameService.delete(gameId);
   }
 }

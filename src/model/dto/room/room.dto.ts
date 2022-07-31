@@ -1,17 +1,10 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IsDate, IsEnum, IsNotEmpty, IsUUID } from "class-validator";
-import { RoomStatus } from "src/common/_enum";
 
 export class CreateRoomDto {
   @IsNotEmpty()
   name: string;
-
-  @ApiPropertyOptional()
-  status: string;
-
-  @ApiPropertyOptional()
-  option: string;
 
   @ApiPropertyOptional()
   startAt: Date;
@@ -19,10 +12,10 @@ export class CreateRoomDto {
   @ApiPropertyOptional()
   endAt: Date;
 
-  // @IsNotEmpty()
-  // nMatches: number;
-
   teamCount: number;
+
+  @IsNotEmpty()
+  teamlineUpIds: [string];
 
   @IsNotEmpty()
   gameId: string;
@@ -33,6 +26,8 @@ export class CreateRoomDto {
 }
 
 export class UpdateRoomDto extends PartialType(CreateRoomDto) { }
+
+// participant
 
 export class CreateParticipantDto {
   @IsNotEmpty()
@@ -49,3 +44,26 @@ export class CreateParticipantDto {
 }
 
 export class UpdateParticipantDto extends PartialType(CreateParticipantDto) { }
+
+// RoomNote
+
+export class UpdateRoomNoteDto {
+
+  topic: string;
+
+  body: string;
+}
+
+export class CreateRoomNoteDto  {
+  
+  @ApiPropertyOptional()
+  roomId: string;
+
+  @IsNotEmpty()
+  topic: string;
+
+  @ApiPropertyOptional()
+  body: string;
+
+}
+

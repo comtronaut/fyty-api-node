@@ -7,7 +7,7 @@ import {
     OnGatewayDisconnect
   } from "@nestjs/websockets";
   import { Socket, Server } from "socket.io";
-  import { CreateRoomDto } from "src/model/dto/room.dto";
+  import { CreateRoomDto } from "src/model/dto/room/room.dto";
   import { RoomService } from "./room.service";
 
     
