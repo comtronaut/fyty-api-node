@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { AppiontmentModule } from "./appointment/appiontment.module";
+import { AppointmentModule } from "./appointment/appointment.module";
 import { GameModule } from "./games/game.module";
 import { RoomModule } from "./rooms/room.module";
 import { SelectorModule } from "./Selector/selector.module";
@@ -13,7 +13,7 @@ import { UtilModule } from "./utils/util.module";
     GameModule,
     TeamModule,
     RoomModule,
-    AppiontmentModule,
+    AppointmentModule,
     SelectorModule,
     UtilModule
   ],

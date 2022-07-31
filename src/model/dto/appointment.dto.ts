@@ -2,7 +2,7 @@ import { PartialType } from "@nestjs/mapped-types";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IsNotEmpty, IsNumberString, IsString, IsUrl, IsUUID } from "class-validator";
 
-export class CreateAppiontmentDto {
+export class CreateAppointmentDto {
 
     @IsNotEmpty()
     teamIds: [string];
@@ -12,7 +12,7 @@ export class CreateAppiontmentDto {
     roomId: string;
 }
 
-export class UpdateAppiontmentDto { 
+export class UpdateAppointmentDto { 
 
     @ApiPropertyOptional()
     startAt: Date;

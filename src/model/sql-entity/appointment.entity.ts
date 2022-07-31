@@ -7,7 +7,7 @@ import { AbstractModel } from "./_model";
 // appiontment
 
 @Entity()
-export class Appiontment extends AbstractModel {
+export class Appointment extends AbstractModel {
 
   @CreateDateColumn()
   startAt: Date;
@@ -30,7 +30,7 @@ export class Appiontment extends AbstractModel {
 // member is here
 
 @Entity()
-export class AppiontmentMember extends AbstractModel {
+export class AppointmentMember extends AbstractModel {
 
   @IsNotEmpty()
   @ManyToOne(() => Team, { onUpdate: 'CASCADE' })
@@ -38,7 +38,7 @@ export class AppiontmentMember extends AbstractModel {
   teamId: string;
 
   @IsNotEmpty()
-  @ManyToOne(() => Appiontment, { onUpdate: 'CASCADE' })
+  @ManyToOne(() => Appointment, { onUpdate: 'CASCADE' })
   @Column({ type: "uuid" })
   appointId: string;
   
