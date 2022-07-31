@@ -15,7 +15,7 @@ export class Appiontment extends AbstractModel {
   @CreateDateColumn()
   endAt: Date;
 
-  @Column({ default: "not yet" })
+  @Column({ default: "" })
   status: string;
 
   @IsNotEmpty()
