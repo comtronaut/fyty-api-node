@@ -70,7 +70,7 @@ export class UserService {
         this.userModel.findOneBy({ email: email }),
         this.phoneNumberModel.findOneBy({ phoneNumber: hashedPhoneNumber })
       ]);
-      
+    
       if(user){
         return {
           username: false
