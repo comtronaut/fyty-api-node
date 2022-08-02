@@ -10,7 +10,7 @@ import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
 export class UserService {
   constructor(
     @InjectRepository(User) private userModel: Repository<User>,
-    @InjectRepository(PhoneNumber) private readonly phoneNumberModel: Repository<PhoneNumber>,
+    @InjectRepository(PhoneNumber) private phoneNumberModel: Repository<PhoneNumber>,
   ) { }
   
   // CRUD
@@ -58,5 +58,37 @@ export class UserService {
     } catch (err) {
       throw new BadRequestException(err.message);
     }
+  }
+
+  async validation(userName: string, email: string, phoneNumber: string){
+    try{
+      const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12);
+
+      const [ user, mail, phone ] = 
+      await Promise.all([ // parallel promise
+        this.userModel.findOneBy({ username: userName }),
+        this.userModel.findOneBy({ email: email }),
+        this.phoneNumberModel.findOneBy({ phoneNumber: hashedPhoneNumber })
+      ]);
+      
+      if(user){
+        return new Error("Duplicate UserName");
+      }
+      if(mail){
+        return new Error("Duplicate Email");
+      }
+      if(phone){
+        return new Error("Duplicate PhoneNumber");
+      }
+
+      return HttpStatus.OK;
+
+
+    }
+    catch(err){
+      throw new BadRequestException(err.message);
+    }
+    
+
   }
 }

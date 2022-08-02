@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
 import { Subject } from "src/common/subject.decorator";
 import { UserService } from "./user.service";
@@ -26,6 +26,15 @@ export class UserController {
     @Subject() subject: User
   ) {
     return subject;
+  }
+
+  @Get("/validation")
+  async validateUser(
+    @Query() userName: string,
+    @Query() email: string,
+    @Query() phoneNumber: string
+  ) {
+    return this.userService.validation(userName, email, phoneNumber);
   }
 
   @Put("me")
