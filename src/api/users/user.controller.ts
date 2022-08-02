@@ -30,11 +30,11 @@ export class UserController {
 
   @Get("/validation")
   async validateUser(
-    @Query() userName: string,
+    @Query() username: string,
     @Query() email: string,
     @Query() phoneNumber: string
   ) {
-    return this.userService.validation(userName, email, phoneNumber);
+    return this.userService.validation(username, email, phoneNumber);
   }
 
   @Put("me")
