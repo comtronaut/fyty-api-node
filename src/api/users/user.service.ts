@@ -60,25 +60,31 @@ export class UserService {
     }
   }
 
-  async validation(userName: string, email: string, phoneNumber: string){
+  async validation(username: string, email: string, phoneNumber: string){
     try{
       const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12);
 
       const [ user, mail, phone ] = 
       await Promise.all([ // parallel promise
-        this.userModel.findOneBy({ username: userName }),
+        this.userModel.findOneBy({ username: username }),
         this.userModel.findOneBy({ email: email }),
         this.phoneNumberModel.findOneBy({ phoneNumber: hashedPhoneNumber })
       ]);
       
       if(user){
-        return new Error("Duplicate UserName");
+        return {
+          username: false
+        };
       }
       if(mail){
-        return new Error("Duplicate Email");
+        return {
+          email: false
+        };
       }
       if(phone){
-        return new Error("Duplicate PhoneNumber");
+        return {
+          phoneNumber: false
+        };
       }
 
       return HttpStatus.OK;
