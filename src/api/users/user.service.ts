@@ -60,36 +60,25 @@ export class UserService {
     }
   }
 
-  async validation(username: string, email: string, password: string){
+  async validate(username?: string, email?: string){
     try{
+      let res = {};
+      
       if(username){
-        const user = await this.userModel.findOneBy({ username: username });
-        if(password){
-          if(user && bcrypt.compareSync(user.password, password)){
-            return {
-              password: false
-            };
-          }
-        }
-        return {
-          username: false
-        };
+        const user = await this.userModel.findOneBy({ username });
+
+        res = { ...res, username: Boolean(user) }
       }
       if(email){
-        if(await this.userModel.findOneBy({ username: username })){
-          return {
-            email: false
-          };
-        }
+        const user = await this.userModel.findOneBy({ email });
+        
+        res = { ...res, email: Boolean(user) }
       }
 
-      return HttpStatus.OK;
+      return res;
 
-    }
-    catch(err){
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
-    
-
   }
 }
