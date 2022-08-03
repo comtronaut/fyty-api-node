@@ -40,7 +40,7 @@ export class RoomController {
   @UseGuards(JwtAuthGuard)
   @Get("/game/:id")
   async getRoomsBygame(
-    @Param("gameId") gameId: string
+    @Param("id") gameId: string
   ) {
     return this.roomService.getRoomsByGameId(gameId);
   }
@@ -50,7 +50,7 @@ export class RoomController {
   @UseGuards(JwtAuthGuard)
   @Get("/:id/note")
   async getRoomsNotes(
-    @Param("roomId") roomId: string
+    @Param("id") roomId: string
   ) 
   {
     return this.roomNoteService.getRoomNotes(roomId);
@@ -59,7 +59,7 @@ export class RoomController {
   @UseGuards(JwtAuthGuard)
   @Post("/:id/note")
   async createRoomNote(
-    @Param("roomId") roomId: string,
+    @Param("id") roomId: string,
     @Body() body: CreateRoomNoteDto,
     ) 
   {
@@ -69,7 +69,7 @@ export class RoomController {
   @UseGuards(JwtAuthGuard)
   @Put("/note/:id")
   async updateRoomNote(
-    @Param("noteId") noteId: string,
+    @Param("id") noteId: string,
     @Subject() user: User,
     @Body() body: UpdateRoomNoteDto,
     ) 
@@ -92,7 +92,7 @@ export class RoomController {
   @UseGuards(JwtAuthGuard)
   @Get("/:id/request")
   async getRoomsRequest(
-    @Param("roomId") roomId: string
+    @Param("id") roomId: string
   ) 
   {
     return this.roomRequestService.getRoomRequest(roomId);
@@ -101,7 +101,7 @@ export class RoomController {
   @UseGuards(JwtAuthGuard)
   @Post("/:id/request")
   async createRoomRequest(
-    @Param("roomId") roomId: string,
+    @Param("id") roomId: string,
     @Body() body: CreateRoomRequestDto,
     ) 
   {
@@ -111,7 +111,7 @@ export class RoomController {
   @UseGuards(JwtAuthGuard)
   @Delete("/request/:id")
   async deleteRoomRequest(
-    @Param("requestId") requestId: string,
+    @Param("id") requestId: string,
     @Subject() user: User,
     ) 
   {
