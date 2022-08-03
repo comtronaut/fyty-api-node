@@ -78,19 +78,19 @@ export class RoomService {
     
   }
 
-  async getAllRooms(roomName?: string, startAt?: Date) { // new 
+  async getAllRooms(gameId: string, roomName?: string, startAt?: Date) { // new 
 
     try{
       if(roomName && startAt){
-        return await this.roomModel.findBy({ name: roomName, startAt: startAt });
+        return await this.roomModel.findBy({ name: roomName, startAt: startAt, gameId: gameId });
       }
       if(roomName){
-        return await this.roomModel.findBy({ name: roomName });
+        return await this.roomModel.findBy({ name: roomName, gameId: gameId });
       }
       if(startAt){
-        return await this.roomModel.findBy({ startAt: startAt });
+        return await this.roomModel.findBy({ startAt: startAt, gameId: gameId });
       }
-      return await this.roomModel.find();
+      return await this.roomModel.findBy({ gameId: gameId });
     }
     catch(err){
       throw new BadRequestException(err.message);

@@ -29,20 +29,13 @@ export class RoomController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get()
-  async getRooms(
+  @Get("/game/:id")
+  async getRoomsBygame(
+    @Param("id") gameId: string,
     @Param("name") roomName: string,
     @Param("startAt") startAt: Date
   ) {
-    return this.roomService.getAllRooms(roomName, startAt);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get("/game/:id")
-  async getRoomsBygame(
-    @Param("id") gameId: string
-  ) {
-    return this.roomService.getRoomsByGameId(gameId);
+    return this.roomService.getAllRooms(gameId, roomName, startAt);
   }
 
 // room note

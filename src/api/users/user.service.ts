@@ -60,7 +60,7 @@ export class UserService {
     }
   }
 
-  async validation(username: string, email: string, phoneNumber: string, password: string){
+  async validation(username: string, email: string, password: string){
     try{
       if(username){
         const user = await this.userModel.findOneBy({ username: username });
@@ -79,16 +79,6 @@ export class UserService {
         if(await this.userModel.findOneBy({ username: username })){
           return {
             email: false
-          };
-        }
-      }
-      if(phoneNumber){
-        console.log(phoneNumber)
-        const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12);
-        console.log(hashedPhoneNumber);
-        if(await this.phoneNumberModel.findOneBy({ phoneNumber: hashedPhoneNumber })){
-          return {
-            phoneNumber: false
           };
         }
       }
