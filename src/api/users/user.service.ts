@@ -62,39 +62,38 @@ export class UserService {
 
   async validation(username: string, email: string, phoneNumber: string, password: string){
     try{
-      const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12);
-      const hashedPassword = bcrypt.hashSync(password, 12);
-
-      const [ user, mail, phone ] = 
-      await Promise.all([ 
-        this.userModel.findOneBy({ username: username }),
-        this.userModel.findOneBy({ email: email }),
-        this.phoneNumberModel.findOneBy({ phoneNumber: hashedPhoneNumber })
-      ]);
-    
-      if(user){
-        if(user.password == hashedPassword){
-          return {
-            password: false
-          };
+      if(username){
+        const user = await this.userModel.findOneBy({ username: username });
+        if(password){
+          if(user && bcrypt.compareSync(user.password, password)){
+            return {
+              password: false
+            };
+          }
         }
         return {
           username: false
         };
       }
-      if(mail){
-        return {
-          email: false
-        };
+      if(email){
+        if(await this.userModel.findOneBy({ username: username })){
+          return {
+            email: false
+          };
+        }
       }
-      if(phone){
-        return {
-          phoneNumber: false
-        };
+      if(phoneNumber){
+        console.log(phoneNumber)
+        const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12);
+        console.log(hashedPhoneNumber);
+        if(await this.phoneNumberModel.findOneBy({ phoneNumber: hashedPhoneNumber })){
+          return {
+            phoneNumber: false
+          };
+        }
       }
 
       return HttpStatus.OK;
-
 
     }
     catch(err){

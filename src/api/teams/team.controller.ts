@@ -57,6 +57,8 @@ export class TeamController {
     return await this.teamService.delete(user.id, teamId);
   }
 
+  // team member
+
   @UseGuards(JwtAuthGuard)
   @Get(":id/member")
   async getMembersByTeamId(
@@ -97,6 +99,9 @@ export class TeamController {
   // async deleteUser(@Param("gameId") gameId: string) {    
   //   return await this.teamService.delete(gameId);
   // }
+
+
+  // team pending
 
   @Get(":id/pending")
   async getPendingByTeamId(
