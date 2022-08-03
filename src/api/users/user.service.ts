@@ -60,18 +60,24 @@ export class UserService {
     }
   }
 
-  async validation(username: string, email: string, phoneNumber: string){
+  async validation(username: string, email: string, phoneNumber: string, password: string){
     try{
       const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12);
+      const hashedPassword = bcrypt.hashSync(password, 12);
 
       const [ user, mail, phone ] = 
-      await Promise.all([ // parallel promise
+      await Promise.all([ 
         this.userModel.findOneBy({ username: username }),
         this.userModel.findOneBy({ email: email }),
         this.phoneNumberModel.findOneBy({ phoneNumber: hashedPhoneNumber })
       ]);
     
       if(user){
+        if(user.password == hashedPassword){
+          return {
+            password: false
+          };
+        }
         return {
           username: false
         };

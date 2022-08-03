@@ -5,7 +5,7 @@ import { AbstractModel } from "../_model";
 @Entity()
 export class User extends AbstractModel {
   @IsNotEmpty()
-  @Column({ unique: true, update: false })
+  @Column({ unique: true })
   username: string;
 
   @IsNotEmpty()
@@ -22,7 +22,7 @@ export class User extends AbstractModel {
 
   @IsEmail()
   @IsNotEmpty()
-  @Column({ unique: true, update: false })
+  @Column({ unique: true })
   email: string;
 
   @Column({ default: "" })
