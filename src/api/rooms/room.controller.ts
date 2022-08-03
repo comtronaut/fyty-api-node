@@ -33,9 +33,9 @@ export class RoomController {
   async getRoomsBygame(
     @Param("id") gameId: string,
     @Param("name") roomName: string,
-    @Param("startAt") startAt: Date
+    @Param("date") date: Date
   ) {
-    return this.roomService.getAllRooms(gameId, roomName, startAt);
+    return this.roomService.getAllRooms(gameId, roomName, date);
   }
 
 // room note
