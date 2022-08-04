@@ -18,13 +18,13 @@ export class ReviewController {
     return this.reviewService.createReview(req);
   }
 
-  @Get(":id")
+  @Get("/reviewee/:id")
   async getReviewByRevieweeId(
     @Param("id") revieweeId: string) {
     return this.reviewService.getReviewByRevieweeId(revieweeId);
   }
 
-  @Get(":id")
+  @Get("/reviewer/:id")
   async getReviewByReviewerId(
     @Param("id") reviewerId: string) {
     return this.reviewService.getReviewByReviewerId(reviewerId);

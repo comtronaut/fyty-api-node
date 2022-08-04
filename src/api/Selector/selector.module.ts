@@ -9,10 +9,11 @@ import { Team } from "src/model/sql-entity/team/team.entity";
 import { User } from "src/model/sql-entity/user/user.entity";
 import { SelectorController } from "./selector.controller";
 import { SelectorService } from "./selector.service"
+import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ Team, TeamLineUp, User, Room, RoomParticipant, Message, Chat ])
+    TypeOrmModule.forFeature([ Team, TeamLineUp, User, Room, RoomParticipant, Message, Chat ,TeamMember])
   ],
   controllers: [ SelectorController ],
   providers: [ SelectorService ]

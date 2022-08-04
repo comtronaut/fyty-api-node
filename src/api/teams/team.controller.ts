@@ -106,13 +106,27 @@ export class TeamController {
   @Get(":id/pending")
   async getPendingByTeamId(
     @Param("id") teamId: string) {
-    return this.teampendingService.getteampending(teamId);
+    return this.teampendingService.getTeamPending(teamId);
   }
 
   @Get(":id/invitation")
   async getInvitationByTeamId(
     @Param("id") teamId: string) {
-    return this.teampendingService.getteaminvitation(teamId);
+    return this.teampendingService.getTeamInvitation(teamId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("/pending")
+  async getPendingByUserId(
+    @Subject() user: User) {
+    return this.teampendingService.getTeamPendingByUser(user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(":/invitation")
+  async getInvitationByUserId(
+    @Subject() user: User) {
+    return this.teampendingService.getTeamInvitationByUser(user.id);
   }
 
   @Post("/pending")
@@ -120,7 +134,7 @@ export class TeamController {
     @Body() req: CreateTeamPendingDto,
   ) {
     this.subject.next({ req });
-    return this.teampendingService.createpending(req);
+    return this.teampendingService.createTeamPending(req);
   }
 
   @Post("/invitation")
@@ -128,7 +142,7 @@ export class TeamController {
     @Body() req: CreateTeamPendingDto,
   ) {
     this.subject.next({ req });
-    return this.teampendingService.createinvitation(req);
+    return this.teampendingService.createTeamInvitation(req);
   }
 
   @Put("/pending/:id")
@@ -136,7 +150,7 @@ export class TeamController {
     @Param("id") teampendingId: string,
     @Body() req: UpdateTeamPendingDto,) {
     this.subject.next({ req });
-    return this.teampendingService.updatestatus(teampendingId,req);
+    return this.teampendingService.updateStatus(teampendingId,req);
   }
 
   @Delete("/pending/:id")

@@ -2,12 +2,13 @@ import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nes
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreateAppointmentDto, UpdateAppointmentDto } from "src/model/dto/appointment.dto";
 import { Appointment, AppointmentMember } from "src/model/sql-entity/appointment.entity";
-import { Team } from "src/model/sql-entity/team/team.entity";
 import { In, Repository } from "typeorm";
+import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
 
 @Injectable()
 export class AppointmentService {
   constructor(
+    @InjectRepository(TeamMember) private memberModel: Repository<TeamMember>,
     @InjectRepository(Appointment) private appointmentModel: Repository<Appointment>,
     @InjectRepository(AppointmentMember) private appointmentMemberModel: Repository<AppointmentMember>,
   ) { }
@@ -51,10 +52,9 @@ export class AppointmentService {
 
   async getAppointmentByUserId(userId: string) {
     try{
-        const appointments = await this.appointmentMemberModel.findBy({  });
+        const team=await this.memberModel.findOneOrFail({ where: { userId } });
+        const appointments = await this.appointmentMemberModel.findBy({ teamId:team.teamId });
         return await this.appointmentModel.findBy({ id: In (appointments.map(e => e.appointId )), isDel: false })
-        
-        
     }
     catch(err){
         throw new BadRequestException(err.message);

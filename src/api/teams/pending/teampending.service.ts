@@ -10,7 +10,23 @@ export class TeampendingService{
     @InjectRepository(TeamPending) private teampendingModel: Repository<TeamPending>,
   ) { }
 
-  async getteampending(teamId: string) {
+  async getTeamPendingByUser(userId: string) {
+    try {
+      return await this.teampendingModel.find({ where: { userId,status:'pending' } });
+    } catch(err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async getTeamInvitationByUser(userId: string) {
+    try {
+      return await this.teampendingModel.find({ where: { userId,status:'invitation' } });
+    } catch(err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async getTeamPending(teamId: string) {
     try {
       return await this.teampendingModel.find({ where: { teamId,status:'pending' } });
     } catch(err) {
@@ -18,7 +34,7 @@ export class TeampendingService{
     }
   }
 
-  async getteaminvitation(teamId: string) {
+  async getTeamInvitation(teamId: string) {
     try {
       return await this.teampendingModel.find({ where: { teamId,status:'invitation' } });
     } catch(err) {
@@ -26,16 +42,16 @@ export class TeampendingService{
     }
   }
 
-  async createpending(req: CreateTeamPendingDto) {
+  async createTeamPending(req: CreateTeamPendingDto) {
     return await this.teampendingModel.save(req);
   }
 
-  async createinvitation(req: CreateTeamPendingDto) {
+  async createTeamInvitation(req: CreateTeamPendingDto) {
     req.status ='invitation';
     return await this.teampendingModel.save(req);
   }
 
-  async updatestatus(teampendingId: string, req: UpdateTeamPendingDto) {
+  async updateStatus(teampendingId: string, req: UpdateTeamPendingDto) {
     try {
       const updateRes = await this.teampendingModel.update(teampendingId, req);
 
