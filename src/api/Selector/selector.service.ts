@@ -9,12 +9,14 @@ import { Room } from "src/model/sql-entity/room/room.entity";
 import { Team } from "src/model/sql-entity/team/team.entity";
 import { User } from "src/model/sql-entity/user/user.entity";
 import { In, Repository } from "typeorm";
+import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
 
 
 @Injectable()
 export class SelectorService {
   constructor(
     @InjectRepository(Team) private teamModel: Repository<Team>,
+    @InjectRepository(TeamMember) private teamMemberModel: Repository<TeamMember>,
     @InjectRepository(Room) private roomModel: Repository<Room>,
     @InjectRepository(RoomParticipant) private participantModel: Repository<RoomParticipant>,
     @InjectRepository(TeamLineUp) private lineUpModel: Repository<TeamLineUp>,
@@ -29,6 +31,16 @@ export class SelectorService {
           user: me,
           teams: myTeams
         };
+    }
+    catch(err){
+        throw new BadRequestException(err.message);
+    }
+  }
+
+  async getAppointment(me: User){
+    try{
+        const myTeams = await this.teamMemberModel.findBy({ userId: me.id });
+        
     }
     catch(err){
         throw new BadRequestException(err.message);

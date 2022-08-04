@@ -1,6 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
+import { Subject } from "src/common/subject.decorator";
 import { CreateAppointmentDto, UpdateAppointmentDto } from "src/model/dto/appointment.dto";
+import { User } from "src/model/sql-entity/user/user.entity";
 import { AppointmentService } from "./appointment.service";
 
 @Controller("api/appointments")
@@ -20,6 +22,14 @@ export class AppointmentController {
     @Param("teamId") teamId: string
   ) {
     return this.appointmentService.getAppointment(roomId, teamId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async getUserAppointmnet(
+    @Subject() user: User
+  ) {
+    return this.appointmentService.getAppointmentByUserId(user.id);
   }
 
   @UseGuards(JwtAuthGuard)
