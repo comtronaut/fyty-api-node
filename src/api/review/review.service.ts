@@ -41,13 +41,13 @@ export class ReviewService {
       throw new BadRequestException(err.message);
     }
   }
-
-  async getReviewByRevieweeId( revieweeId:string ) {
-    return await this.reviewModel.find({where:{revieweeId}});
+  
+  async getReviewFilter(filter: UpdateReviewDto) {
+    return await this.reviewModel.find({where:{ ...filter }});
   }
 
-  async getReviewByReviewerId( reviewerId:string ) {
-    return await this.reviewModel.find({where:{reviewerId}});
+  async getReviewById(id: string) {
+    return await this.reviewModel.find({where:{ id }});
   }
 
 

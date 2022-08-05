@@ -1,33 +1,29 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, UseGuards } from "@nestjs/common";
-import { Subject } from "src/common/subject.decorator";
-import { ReviewService } from "./review.service";
-import { User } from "src/model/sql-entity/user/user.entity";
+import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { CreateReviewDto, UpdateReviewDto } from "src/model/dto/review.dto";
-import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
-import { Debug } from "src/common/debug.decorator";
+import { ReviewService } from "./review.service";
 
 @Controller("api/review")
 export class ReviewController {
   constructor(
-    private readonly reviewService: ReviewService,
-   ) { }
+    private readonly reviewService: ReviewService
+  ) { }
 
-  @Post("")
+  @Post()
   async createReview(
     @Body() req: CreateReviewDto) {
     return this.reviewService.createReview(req);
   }
 
-  @Get("/reviewee/:id")
-  async getReviewByRevieweeId(
-    @Param("id") revieweeId: string) {
-    return this.reviewService.getReviewByRevieweeId(revieweeId);
+  @Get("")
+  async getReview(
+    @Query() revieweeId: UpdateReviewDto) {
+    return this.reviewService.getReviewFilter(revieweeId);
   }
-
-  @Get("/reviewer/:id")
-  async getReviewByReviewerId(
-    @Param("id") reviewerId: string) {
-    return this.reviewService.getReviewByReviewerId(reviewerId);
+  
+  @Get(":id")
+  async getReviewById(
+    @Param("id") id: string) {
+    return this.reviewService.getReviewById(id);
   }
 
   // @Put("/review/:id")
@@ -42,5 +38,4 @@ export class ReviewController {
   //   @Param("id") revieweId: string,) {
   //   return this.reviewService.deleteReview(revieweId);
   // }
-
 }

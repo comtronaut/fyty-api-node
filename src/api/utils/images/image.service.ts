@@ -69,7 +69,7 @@ export class ImageService {
     catch (err) {
       await this.imageRepo.delete(tempImg);
 
-      throw new ConflictException("upload failed");
+      throw new ConflictException(err);
     }
   }
 
