@@ -28,6 +28,15 @@ export class UserController {
     return subject;
   }
 
+  @Get(":id")
+  @UseGuards(JwtAuthGuard)
+  async getById(
+    @Subject() subject: User,
+    @Param("id") id: string
+  ) {
+    return await this.userService.getUserById(id);
+  }
+
   @Get("/validation")
   async validateUserDuplication(
     @Query("username") username?: string,

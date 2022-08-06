@@ -10,15 +10,19 @@ import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
 export class UserService {
   constructor(
     @InjectRepository(User) private userModel: Repository<User>,
-    @InjectRepository(PhoneNumber) private phoneNumberModel: Repository<PhoneNumber>,
+    @InjectRepository(PhoneNumber) private phoneNumberModel: Repository<PhoneNumber>
   ) { }
   
   // CRUD
+  async getUserById(id: string) {
+    return await this.userModel.findOneOrFail({ where: { id } });
+  }
+
   async create(req: CreateUserDto) {
     try {
       const [ hashedPassword, hashedPhoneNumber ] = await Promise.all([ // parallel promise
         bcrypt.hashSync(req.password, 12),
-        bcrypt.hashSync(req.phoneNumber, 12),
+        bcrypt.hashSync(req.phoneNumber, 12)
       ]);
 
       const { phoneNumber, ...rest } = req;
@@ -41,7 +45,7 @@ export class UserService {
         return new HttpException("", HttpStatus.NO_CONTENT);
       }
 
-      const { password, ...res } = await this.userModel.findOneOrFail({ where: { id: user.id }});
+      const { password, ...res } = await this.userModel.findOneOrFail({ where: { id: user.id } });
        
       return res;
     } catch (err) {
@@ -53,30 +57,29 @@ export class UserService {
     try {
       const res = await this.userModel.delete(id);
       if(res.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT)
+        return new HttpException("", HttpStatus.NO_CONTENT);
       }
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async validate(username?: string, email?: string){
+  async validate(username?: string, email?: string) {
     try{
       let res = {};
       
-      if(username){
+      if(username) {
         const user = await this.userModel.findOneBy({ username });
 
-        res = { ...res, username: Boolean(user) }
+        res = { ...res, username: Boolean(user) };
       }
-      if(email){
+      if(email) {
         const user = await this.userModel.findOneBy({ email });
         
-        res = { ...res, email: Boolean(user) }
+        res = { ...res, email: Boolean(user) };
       }
 
       return res;
-
     } catch (err) {
       throw new BadRequestException(err.message);
     }
