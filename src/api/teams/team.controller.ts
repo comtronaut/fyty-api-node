@@ -70,7 +70,7 @@ export class TeamController {
   // team member
 
   @UseGuards(JwtAuthGuard)
-  @Get(":id/member")
+  @Get(":id/members")
   async getMembersByTeamId(
     @Param("id") teamId: string) {
     return this.teammemberService.getMemberByTeamId(teamId);
