@@ -4,11 +4,13 @@ import { CreateTeamMemberDto, UpdateTeamMemberDto } from "src/model/dto/team.dto
 import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
 import { Repository } from "typeorm";
 import { User } from "src/model/sql-entity/user/user.entity";
+import { Team } from "src/model/sql-entity/team/team.entity";
 
 @Injectable()
 export class TeamMemberService {
   constructor(
     @InjectRepository(TeamMember) private memberModel: Repository<TeamMember>,
+    @InjectRepository(Team) private teamModel: Repository<Team>,
   ) { }
 
   async create( req: CreateTeamMemberDto) {
@@ -65,11 +67,20 @@ export class TeamMemberService {
 
   async leaveTeam(teammemberId: string) {
     try {
+      const teamMember = await this.memberModel.findOneOrFail({ where: { id:teammemberId } });
+      // console.log(teamMember);
+      const countMember = await this.memberModel.findAndCount({ where: { teamId:teamMember.teamId } });
       const res = await this.memberModel.delete({ id: teammemberId });
       if (res.affected === 0) {
         return new HttpException("", HttpStatus.NO_CONTENT)
       }
-      console.log(res);
+      // console.log(countMember[0]);
+      // console.log(countMember[1]);
+      if(countMember[1] == 1){
+        const deleteTeam = await this.teamModel.delete({ id:teamMember.teamId });
+      //   console.log(deleteTeam);
+      }
+      // console.log(res);
       return;
     } catch(err) {
       throw new BadRequestException(err.message);
