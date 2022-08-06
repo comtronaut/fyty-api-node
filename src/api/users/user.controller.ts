@@ -15,9 +15,18 @@ export class UserController {
     private readonly avatarService: UserAvatarService) { }
 
   @Post()
-  async addUser(@Body() user: CreateUserDto){
-    const newUser = await this.userService.create(user);
-    return newUser;
+  async addUser(@Body() user: CreateUserDto) {
+    return await this.userService.create(user);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async getAll(
+    @Query("q") q: string,
+    @Query("teamId") teamId: string,
+    @Subject() subject: User
+  ) {
+    return await this.userService.searchUsers(q, teamId);
   }
 
   @Get("me")
@@ -40,7 +49,7 @@ export class UserController {
   @Get("/validation")
   async validateUserDuplication(
     @Query("username") username?: string,
-    @Query("email") email?: string,
+    @Query("email") email?: string
   ) {
     return this.userService.validate(username, email);
   }
@@ -48,9 +57,9 @@ export class UserController {
   @Put("me")
   @UseGuards(JwtAuthGuard)
   async updateUser(
-    @Subject() subject: User, 
-    @Body() req: UpdateUserDto,
-    ) {
+    @Subject() subject: User,
+    @Body() req: UpdateUserDto
+  ) {
     return await this.userService.update(subject, req);
   }
 
@@ -59,13 +68,13 @@ export class UserController {
   @Delete("me")
   async deleteUser(
     @Subject() subject: User
-    ) {
+  ) {
     await this.userService.delete(subject.id);
 
     return `Delete user ${subject.username} success`;
   }
 
-  //UserAvatar
+  // UserAvatar
   @Post("avatar")
   async createUserAvatar(
     @Body() req: CreateUserAvatarDto) {
@@ -83,14 +92,13 @@ export class UserController {
   @Put("/avatar/:id")
   async updateUserAvatar(
     @Param("id") avatarId: string,
-    @Body() req: UpdateUserAvatarDto,) {
+    @Body() req: UpdateUserAvatarDto) {
     return this.avatarService.update(avatarId, req);
   }
 
   @Delete("/avatar/:id")
   async daleteUserAvatar(
-    @Param("id") avatarId: string,) {
+    @Param("id") avatarId: string) {
     return this.avatarService.deleteUserAvatar(avatarId);
   }
-
 }

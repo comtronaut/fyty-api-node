@@ -18,6 +18,12 @@ export class UserService {
     return await this.userModel.findOneOrFail({ where: { id } });
   }
 
+  async searchUsers(searchString: string, teamId: string) {
+    return await this.userModel.createQueryBuilder("user")
+      .where("user.displayName like :displayName OR user.username like :username", { displayName: `%${searchString}%`, username: `%${searchString}%` })
+      .getMany();
+  }
+
   async create(req: CreateUserDto) {
     try {
       const [ hashedPassword, hashedPhoneNumber ] = await Promise.all([ // parallel promise
