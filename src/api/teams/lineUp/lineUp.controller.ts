@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Subject } from "src/common/subject.decorator";
-import { CreateLineUpDto } from "src/model/dto/lineUp.dto";
+import { CreateLineUpDto, UpdateLineUpDto } from "src/model/dto/lineUp.dto";
 import { User } from "src/model/sql-entity/user/user.entity";
 import { LineUpService } from "./lineUp.service";
 
@@ -25,7 +25,7 @@ export class LineUpController{
   async updateLineUp(
     @Subject() user: User,
     @Param() lineUpId: string,
-    @Body() req: CreateLineUpDto,
+    @Body() req: UpdateLineUpDto,
     ) {
     return this.lineUpService.update(user ,lineUpId, req);
   }
