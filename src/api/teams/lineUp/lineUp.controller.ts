@@ -24,7 +24,7 @@ export class LineUpController{
   @Put("/:id")
   async updateLineUp(
     @Subject() user: User,
-    @Param() lineUpId: string,
+    @Param("id") lineUpId: string,
     @Body() req: UpdateLineUpDto,
     ) {
     return this.lineUpService.update(user ,lineUpId, req);
