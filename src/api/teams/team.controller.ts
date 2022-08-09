@@ -133,7 +133,7 @@ export class TeamController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(":/invitation")
+  @Get("/invitation")
   async getInvitationByUserId(
     @Subject() user: User) {
     return this.teampendingService.getTeamInvitationByUser(user.id);
