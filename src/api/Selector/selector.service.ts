@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import e from "express";
 import { Chat } from "src/model/sql-entity/chat.entity";
 import { TeamLineUp } from "src/model/sql-entity/team/lineUp.entity";
 import { Message } from "src/model/sql-entity/message.entity";
@@ -40,7 +39,6 @@ export class SelectorService {
   async getAppointment(me: User){
     try{
         const myTeams = await this.teamMemberModel.findBy({ userId: me.id });
-        
     }
     catch(err){
         throw new BadRequestException(err.message);

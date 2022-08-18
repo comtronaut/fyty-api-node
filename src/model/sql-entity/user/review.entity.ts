@@ -11,16 +11,16 @@ export class Review extends AbstractModel {
   content: string;
 
   @IsNotEmpty()
-  @Column({ type:"decimal",precision:2,default: 0.00 })
+  @Column({ type: "decimal", precision:2, default: 0.00 })
   ratingScore: number;
 
   @IsNotEmpty()
-  @ManyToOne(() => User, { onUpdate: 'CASCADE' })
+  @ManyToOne(() => User, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
   @Column({ type: "uuid" })
   reviewerId: string;
 
   @IsNotEmpty()
-  @ManyToOne(() => User, { onUpdate: 'CASCADE' })
+  @ManyToOne(() => User, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
   @Column({ type: "uuid" })
   revieweeId: string;
 

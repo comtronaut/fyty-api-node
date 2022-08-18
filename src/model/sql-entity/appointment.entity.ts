@@ -23,7 +23,7 @@ export class Appointment extends AbstractModel {
   isDel: boolean;
 
   @Column()
-  @OneToOne(() => Room, { onUpdate: 'CASCADE' })
+  @OneToOne(() => Room, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
   roomId: string;
 }
 

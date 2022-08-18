@@ -37,7 +37,7 @@ export class Room extends AbstractModel {
   gameId: string;
 
   @IsNotEmpty()
-  @ManyToOne(() => Team, { onUpdate: 'CASCADE' })
+  @ManyToOne(() => Team, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
   @Column({ type: "uuid" })
   hostId: string;
         

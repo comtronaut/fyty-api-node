@@ -63,6 +63,15 @@ export class UserController {
     return await this.userService.update(subject, req);
   }
 
+  @Put("me/password")
+  @UseGuards(JwtAuthGuard)
+  async updatePassword(
+    @Subject() subject: User,
+    @Param("password") password: string
+  ) {
+    return await this.userService.updatePassword(subject, password);
+  }
+
   @Debug()
   @UseGuards(JwtAuthGuard)
   @Delete("me")

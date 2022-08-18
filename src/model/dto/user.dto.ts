@@ -23,23 +23,11 @@ export class CreateUserDto {
     @ApiPropertyOptional()
     bio: string;
   
-    // @ApiPropertyOptional({ default: 5.00 })
-    // ratingScore: number;
-  
-    // @IsUrl()
     @ApiPropertyOptional()
     portraitUrl: string;
   
     @ApiPropertyOptional()
     coverUrl: string;
-  
-  //   prefId: string;
-    
-  //   availableFeatureId: string;
-  
-  //   premiumId: string;
-  
-  //   inventoryId: string;
 
     @IsNotEmpty()
     phoneNumber: string;

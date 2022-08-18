@@ -8,12 +8,12 @@ import { Team } from "./team.entity";
 export class TeamPending extends AbstractModel {
 
   @IsNotEmpty()
-  @ManyToOne(() => Team, { onUpdate: 'CASCADE' })
+  @ManyToOne(() => Team, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
   @Column({ type: "uuid" })
   teamId: string;
 
   @IsNotEmpty()
-  @ManyToOne(() => User, { onUpdate: 'CASCADE' })
+  @ManyToOne(() => User, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
   @Column({ type: "uuid" })
   userId: string;
 

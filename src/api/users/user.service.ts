@@ -45,15 +45,36 @@ export class UserService {
 
   async update(user: User, req: UpdateUserDto) {
     try {
-      const updateRes = await this.userModel.update(user.id, req);
+      const { password, phoneNumber, ...updateData } = req;
+      const updateRes = await this.userModel.update(user.id, updateData);
 
       if(updateRes.affected === 0) {
         return new HttpException("", HttpStatus.NO_CONTENT);
       }
 
-      const { password, ...res } = await this.userModel.findOneOrFail({ where: { id: user.id } });
+      const res = await this.userModel.findOneByOrFail({ id: user.id });
+      const flatten = (userInfo: User) => {
+        const { password, ...rest } = userInfo;
+        return rest; 
+      }
+
+      return flatten(res);
+
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async updatePassword(user: User, password: string){
+    try {
+      const hashedPassword = bcrypt.hashSync(password, 12)
+      const updateRes = await this.userModel.update(user.id, { password: hashedPassword });
+
+      if(updateRes.affected === 0) {
+        return new HttpException("", HttpStatus.NO_CONTENT);
+      }
        
-      return res;
+      return HttpStatus.OK;
     } catch (err) {
       throw new BadRequestException(err.message);
     }
