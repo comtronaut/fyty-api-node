@@ -143,7 +143,7 @@ export class TeamController {
   async createPending(
     @Body() req: CreateTeamPendingDto,
   ) {
-    this.subject.next({ req });
+    // this.subject.next({ req });
     return this.teampendingService.createTeamPending(req);
   }
 
@@ -151,7 +151,7 @@ export class TeamController {
   async createInvitation(
     @Body() req: CreateTeamPendingDto,
   ) {
-    this.subject.next({ req });
+    // this.subject.next({ req });
     return this.teampendingService.createTeamInvitation(req);
   }
 
@@ -159,22 +159,22 @@ export class TeamController {
   async updateStatusTeampending(
     @Param("id") teampendingId: string,
     @Body() req: UpdateTeamPendingDto,) {
-    this.subject.next({ req });
+    // this.subject.next({ req });
     return this.teampendingService.updateStatus(teampendingId,req);
   }
 
   @Delete("/pending/:id")
   async discardpending(
     @Param("id") teampendingId: string,) {
-    this.subject.next({ teampendingId });
+    // this.subject.next({ teampendingId });
     return this.teampendingService.discard(teampendingId);
   }
 //server sending
-  @Sse("/sse")
-  sse(): Observable<MessageEvent> {
-    console.log("see activated");
-    return this.subject.pipe(
-      map((data: any) => ({ data }))
-    );
-  }
+  // @Sse("/sse")
+  // sse(): Observable<MessageEvent> {
+  //   console.log("see activated");
+  //   return this.subject.pipe(
+  //     map((data: any) => ({ data }))
+  //   );
+  // }
 }
