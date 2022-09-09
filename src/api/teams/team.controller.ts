@@ -126,14 +126,14 @@ export class TeamController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get("/pending")
+  @Get("/pending/me")
   async getPendingByUserId(
     @Subject() user: User) {
     return this.teampendingService.getTeamPendingByUser(user.id);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get("/invitation")
+  @Get("/invitation/me")
   async getInvitationByUserId(
     @Subject() user: User) {
     return this.teampendingService.getTeamInvitationByUser(user.id);
