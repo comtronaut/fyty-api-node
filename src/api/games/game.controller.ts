@@ -8,7 +8,7 @@ export class GameController {
   constructor(private readonly gameService: GameService) { }
 
   // only admin can add game
-  @Debug()
+  // @Debug()
   @Post()
   async addGame(@Body() req: CreateGameDto) {
     return this.gameService.create(req);
@@ -20,7 +20,7 @@ export class GameController {
   }
 
   // only admin can edit game
-  @Debug()
+  // @Debug()
   @Put(":id")
   async updateGame(
     @Param("id") gameId: string, 
@@ -29,7 +29,7 @@ export class GameController {
     return await this.gameService.update(gameId, req);
   }
 
-  @Debug()
+  // @Debug()
   @Delete(":id")
   async deleteGame(
     @Param("id") gameId: string

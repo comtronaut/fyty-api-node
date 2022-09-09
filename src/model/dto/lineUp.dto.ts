@@ -4,7 +4,6 @@ import { IsNotEmpty, IsUrl, IsUUID } from "class-validator";
 
 export class CreateLineUpDto {
 
-    
     @IsUUID()
     teamId: string;
 

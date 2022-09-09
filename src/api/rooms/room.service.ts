@@ -78,7 +78,7 @@ export class RoomService {
     
   }
 
-  async getAllRooms(gameId: string, roomName?: string, date?: Date) { // new 
+  async getAllRooms(gameId: string, roomName?: string, date?: any) { // new 
 
     try{
       if(roomName && date){

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Subject } from "src/common/subject.decorator";
 import { CreateAppointmentDto, UpdateAppointmentDto } from "src/model/dto/appointment.dto";
@@ -18,8 +18,8 @@ export class AppointmentController {
   @UseGuards(JwtAuthGuard)
   @Get()
   async get(
-    @Param("roomId") roomId: string,
-    @Param("teamId") teamId: string
+    @Query("roomId") roomId: string,
+    @Query("teamId") teamId: string
   ) {
     return this.appointmentService.getAppointment(roomId, teamId);
   }

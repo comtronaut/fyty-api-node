@@ -67,7 +67,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   async updatePassword(
     @Subject() subject: User,
-    @Param("password") password: string
+    @Body() password: string
   ) {
     return await this.userService.updatePassword(subject, password);
   }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Subject } from "src/common/subject.decorator";
 import { CreateLineUpDto, UpdateLineUpDto } from "src/model/dto/lineUp.dto";
@@ -33,7 +33,7 @@ export class LineUpController{
   @UseGuards(JwtAuthGuard)
   @Get()
   async getAllLineups(
-    @Param("teamId") teamId: string){
+    @Query("teamId") teamId: string){
 
     return this.lineUpService.getLineUps(teamId);
 
