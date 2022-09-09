@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { start } from "repl";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Debug } from "src/common/debug.decorator";
@@ -32,8 +32,9 @@ export class RoomController {
   @Get("/game/:id")
   async getRoomsBygame(
     @Param("id") gameId: string,
-    @Param("name") roomName: string,
-    @Param("date") date: Date
+
+    @Query("name") roomName?: string,
+    @Query("date") date?: any
   ) {
     return this.roomService.getAllRooms(gameId, roomName, date);
   }
