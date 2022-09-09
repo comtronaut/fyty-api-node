@@ -74,7 +74,7 @@ export class RoomController {
   @UseGuards(JwtAuthGuard)
   @Delete("/note/:id")
   async deleteRoomNote(
-    @Param("noteId") noteId: string,
+    @Param("id") noteId: string,
     @Subject() user: User,
     ) 
   {
