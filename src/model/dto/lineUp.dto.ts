@@ -8,6 +8,9 @@ export class CreateLineUpDto {
     teamId: string;
 
     @ApiPropertyOptional()
+    isDefault: boolean;
+
+    @ApiPropertyOptional()
     @IsNotEmpty()
     inGameId: string;
 

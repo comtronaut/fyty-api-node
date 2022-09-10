@@ -78,6 +78,18 @@ export class RoomService {
     
   }
 
+  async getRoomsById(roomId: string) {  
+    try{
+      return this.roomModel.findBy({ id: roomId });
+    }
+    catch(err){
+      throw new BadRequestException(err.message);
+    }
+    
+  }
+
+
+
   async getAllRooms(gameId: string, roomName?: string, date?: any) { // new 
 
     try{
