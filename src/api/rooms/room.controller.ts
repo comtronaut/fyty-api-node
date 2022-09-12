@@ -39,7 +39,7 @@ export class RoomController {
   }
 
   @UseGuards(JwtAuthGuard)  // get all rooms which u r host
-  @Get("/game/team/:id")
+  @Get("/team/:id")
   async getHostedRooms(
     @Param("id") teamId: string,
   ){
