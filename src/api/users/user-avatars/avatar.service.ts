@@ -23,15 +23,15 @@ export class UserAvatarService {
 
   async getUserAvatar(userId: string, gameId: string) {
     try {
-      return await this.avatarModel.findBy({ userId: userId, gameId: gameId });
+      return await this.avatarModel.findBy({ gameId: gameId, userId: userId });
     }
     catch(err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async getUserAvatarByGameId( gameId:string , user:User) {
-    return await this.avatarModel.find({where:{gameId:gameId,userId:user.id}});
+  async getUserAvatarByGameId(gameId: string , user: User) {
+    return await this.avatarModel.find({ where:{ gameId: gameId, userId: user.id } });
   }
 
   async update(avatarId: string, req: UpdateUserAvatarDto) {
