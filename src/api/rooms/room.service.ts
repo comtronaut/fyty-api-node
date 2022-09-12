@@ -7,7 +7,7 @@ import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.en
 import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
 import { RoomRequest } from "src/model/sql-entity/room/request.entity";
 import { Room } from "src/model/sql-entity/room/room.entity";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { ChatService } from "../chats/chat.service";
 import { RoomParticipantService } from "./participants/participant.service";
 
@@ -68,6 +68,18 @@ export class RoomService {
     }
   }
 
+  async getJoidedRoom(teamId: string) {  // new
+    try{
+      const participants = await this.participantModel.findBy({ teamId: teamId });
+      const rooms = await this.roomModel.findBy({ id: In (participants.map(e => e.roomId ))})
+      return rooms;
+    }
+    catch(err){
+      throw new BadRequestException(err.message);
+    }
+    
+  }
+
   async getRoomsByGameId(gameId: string) {  // new
     try{
       return this.roomModel.findBy({ gameId: gameId });
@@ -88,7 +100,15 @@ export class RoomService {
     
   }
 
-
+  async getRoomByHostId(teamId: string) {  // hostId is also teamId
+    try{
+      return this.roomModel.findBy({ hostId: teamId });
+    }
+    catch(err){
+      throw new BadRequestException(err.message);
+    }
+    
+  }
 
   async getAllRooms(gameId: string, roomName?: string, date?: any) { // new 
 

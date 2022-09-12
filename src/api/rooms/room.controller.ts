@@ -32,11 +32,18 @@ export class RoomController {
   @Get("/game/:id")
   async getRoomsBygame(
     @Param("id") gameId: string,
-
     @Query("name") roomName?: string,
     @Query("date") date?: any
   ) {
     return this.roomService.getAllRooms(gameId, roomName, date);
+  }
+
+  @UseGuards(JwtAuthGuard)  // get all teams that u r host
+  @Get("/game/team/:id")
+  async getHostRoom(
+    @Param("id") teamId: string,
+  ){
+    return this.roomService.getRoomByHostId(teamId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -45,6 +52,14 @@ export class RoomController {
     @Param("id") roomId: string,
   ) {
     return this.roomService.getAllRooms(roomId);
+  }
+
+  @UseGuards(JwtAuthGuard)    // new
+  @Get("/me/team/:id")
+  async getJoidedRooms(
+    @Param("id") teamId: string,
+  ) {
+    return this.roomService.getJoidedRoom(teamId);
   }
 
 // room note

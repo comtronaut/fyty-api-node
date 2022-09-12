@@ -95,7 +95,15 @@ export class UserController {
   async getUserAvatarBygameId(
     @Subject() user: User,
     @Param("id") gameId: string) {
-    return this.avatarService.getUserAvatar(gameId,user);
+    return this.avatarService.getUserAvatarByGameId(gameId,user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("/avatar")
+  async getUserAvatar(
+    @Query("userId") userId: string,
+    @Query("gameId") gameId: string) {
+    return this.avatarService.getUserAvatar(userId, gameId);
   }
 
   @Put("/avatar/:id")

@@ -12,16 +12,25 @@ export class UserAvatarService {
   ) { }
   
   // CRUD
-  async createUserAvatar( req : CreateUserAvatarDto) {
+  async createUserAvatar(req: CreateUserAvatarDto) {
     try {
-        return await this.avatarModel.save(req);
+      return await this.avatarModel.save(req);
     }
     catch(err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async getUserAvatar( gameId:string , user:User) {
+  async getUserAvatar(userId: string, gameId: string) {
+    try {
+      return await this.avatarModel.findBy({ userId: userId, gameId: gameId });
+    }
+    catch(err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async getUserAvatarByGameId( gameId:string , user:User) {
     return await this.avatarModel.find({where:{gameId:gameId,userId:user.id}});
   }
 
