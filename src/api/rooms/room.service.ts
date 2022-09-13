@@ -7,9 +7,10 @@ import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.en
 import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
 import { RoomRequest } from "src/model/sql-entity/room/request.entity";
 import { Room } from "src/model/sql-entity/room/room.entity";
-import { In, Repository } from "typeorm";
+import { Between, In, MoreThan, Repository } from "typeorm";
 import { ChatService } from "../chats/chat.service";
 import { RoomParticipantService } from "./participants/participant.service";
+import { Dayjs } from "dayjs";
 
 @Injectable()
 export class RoomService {
@@ -110,6 +111,18 @@ export class RoomService {
     
   }
 
+  async getRoomsByDate(date: string, gameId: string){ // date format is yyyy-mm-dd just like 2020-5-27 and we need output that at input day
+    try{
+      const today = new Date(date);
+      let tomorrow = new Date(date);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      return this.roomModel.findBy({ startAt: Between(today, tomorrow),  gameId: gameId});
+    }
+    catch(err){
+      throw new BadRequestException(err.message);
+    }
+  }
+
   async getAllRooms(gameId: string, roomName?: string, date?: any) { // new 
 
     try{
@@ -128,23 +141,6 @@ export class RoomService {
       throw new BadRequestException(err.message);
     }
   }
-
-  // async updateUserRatingScore(userId: string) {
-
-  //   const [ user, reviews ] = await Promise.all([
-  //     this.userModel.findOneOrFail({ where: { id: userId }}),
-  //     this.reviewModel.find({ where: { revieweeId: userId }}),
-  //   ]);
-
-  //   const sumScore = reviews.reduce((acc, cur) => acc + cur.ratingScore, 0);
-  //   let ratingScore = sumScore / reviews.length;
-
-  //   // check upper and lower bound
-  //   if(ratingScore > 5) ratingScore = 5.00
-  //   else if(ratingScore < 0) ratingScore = 0.00
-    
-  //   return this.userService.updateRatingScore(user, { ratingScore })
-  // }
 
   async disband(payload: any) {
     try {
@@ -206,7 +202,6 @@ export class RoomService {
         roomParticipant: participant
       };
       
-      
     } catch(err) {
       throw new BadRequestException(err.message);
     }
@@ -218,7 +213,6 @@ export class RoomService {
       room.status = RoomStatus.UNAVAILABLE; 
       await this.roomModel.update({ id: room.id }, room);
     }
-
   }
 
   async leaveRoom(participantId: string) {

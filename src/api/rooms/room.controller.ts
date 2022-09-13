@@ -46,6 +46,15 @@ export class RoomController {
     return this.roomService.getRoomByHostId(teamId);
   }
 
+  @UseGuards(JwtAuthGuard)  // get all rooms which u r host
+  @Get("/me/game/:id")
+  async getTodayRooms(
+    @Param("id") gameId: string,
+    @Query("date") date: string
+  ){
+    return this.roomService.getRoomsByDate(date, gameId);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get("/:id")
   async getRoomsById(
