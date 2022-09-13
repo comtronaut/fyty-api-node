@@ -45,14 +45,14 @@ export class UserController {
     return subject;
   }
 
-  @Get(":id")
+  /* @Get(":id")
   @UseGuards(JwtAuthGuard)
   async getById(
     @Subject() subject: User,
     @Param("id") id: string
   ) {
     return await this.userService.getUserById(id);
-  }
+  } */
 
   @Put("me")
   @UseGuards(JwtAuthGuard)
