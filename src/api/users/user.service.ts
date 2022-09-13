@@ -91,17 +91,11 @@ export class UserService {
     }
   }
 
-  async getDuplicationResult({
-    username,
-    email
-  }: UpdateUserDto): Promise<Record<string, boolean>> {
+  async getDuplicationResult(payload: UpdateUserDto): Promise<Record<string, boolean>> {
     const res = {} as Record<string, boolean>;
 
-    if (username) {
-      res.username = Boolean(await this.userModel.findOne({ where: { username }}));
-    }
-    if (email) {
-      res.email = Boolean(await this.userModel.findOne({ where: { email }}));
+    for (const [ key, value ] of Object.entries(payload)) {
+      res[key] = Boolean(await this.userModel.findOne({ where: { [key]: value }}));
     }
     
     return res;

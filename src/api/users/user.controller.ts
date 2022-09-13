@@ -19,6 +19,14 @@ export class UserController {
     return await this.userService.create(user);
   }
 
+  @Get("validation")
+  async validateUserDuplication(
+    @Query("username") username?: string,
+    @Query("email") email?: string
+  ) {
+    return await this.userService.getDuplicationResult({ username, email });
+  }
+
   @Get()
   @UseGuards(JwtAuthGuard)
   async getAll(
@@ -44,14 +52,6 @@ export class UserController {
     @Param("id") id: string
   ) {
     return await this.userService.getUserById(id);
-  }
-
-  @Get("/validation")
-  async validateUserDuplication(
-    @Query("username") username?: string,
-    @Query("email") email?: string
-  ) {
-    return await this.userService.getDuplicationResult({ username, email });
   }
 
   @Put("me")
