@@ -4,7 +4,7 @@ git:
 	git add .
 	git commit -m "$m"
 	git push
-push-heroku:
+push-dev:
 	git push heroku main
 build-deploy:
 	docker build -t $t .

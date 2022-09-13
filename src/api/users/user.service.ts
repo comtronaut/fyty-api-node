@@ -91,24 +91,19 @@ export class UserService {
     }
   }
 
-  async validate(username?: string, email?: string) {
-    try{
-      let res = {};
-      
-      if(username) {
-        const user = await this.userModel.findOneBy({ username });
+  async getDuplicationResult({
+    username,
+    email
+  }: UpdateUserDto): Promise<Record<string, boolean>> {
+    const res = {} as Record<string, boolean>;
 
-        res = { ...res, username: Boolean(user) };
-      }
-      if(email) {
-        const user = await this.userModel.findOneBy({ email });
-        
-        res = { ...res, email: Boolean(user) };
-      }
-
-      return res;
-    } catch (err) {
-      throw new BadRequestException(err.message);
+    if (username) {
+      res.username = Boolean(await this.userModel.findOne({ where: { username }}));
     }
+    if (email) {
+      res.email = Boolean(await this.userModel.findOne({ where: { email }}));
+    }
+    
+    return res;
   }
 }

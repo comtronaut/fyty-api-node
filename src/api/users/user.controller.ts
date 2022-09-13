@@ -51,7 +51,7 @@ export class UserController {
     @Query("username") username?: string,
     @Query("email") email?: string
   ) {
-    return this.userService.validate(username, email);
+    return await this.userService.getDuplicationResult({ username, email });
   }
 
   @Put("me")
