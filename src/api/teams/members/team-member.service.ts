@@ -75,10 +75,18 @@ export class TeamMemberService {
         return new HttpException("", HttpStatus.NO_CONTENT)
       }
 
-      if(teamMember.role == "Manager" && countManager[1] == 1){
-        await this.teamModel.delete({ id:teamMember.teamId });
+      const countMember = await this.memberModel.countBy({ teamId: teamMember.teamId });
+
+      if(countMember == 0){
+        await this.teamModel.delete({ id: teamMember.teamId });
+        return "Delete empty team";
       }
-      
+
+      if(teamMember.role == "Manager" && countManager[1] == 1){
+        console.log(countManager[1])
+        await this.teamModel.delete({ id: teamMember.teamId });
+      }
+
       return HttpStatus.OK;
 
     } catch(err) {
