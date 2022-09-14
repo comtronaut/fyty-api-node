@@ -39,6 +39,7 @@ export class CreateTeamMemberDto {
 export class UpdateTeamMemberDto extends PartialType(CreateTeamMemberDto) { }
 
 export class CreateTeamPendingDto {
+  
   @IsNotEmpty()
   teamId: string;
 

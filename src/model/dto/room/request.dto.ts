@@ -8,6 +8,6 @@ export class CreateRoomRequestDto {
     teamId: string;
 
     @IsNotEmpty()
-    teamlineUpIds: [string];
+    teamlineUpIds: string;
 
 }

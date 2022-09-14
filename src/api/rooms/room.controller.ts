@@ -30,7 +30,7 @@ export class RoomController {
 
   @UseGuards(JwtAuthGuard)
   @Get("/game/:id")
-  async getRoomsBygame(
+  async getRoomsBygame(       // 
     @Param("id") gameId: string,
     @Query("name") roomName?: string,
     @Query("date") date?: any
