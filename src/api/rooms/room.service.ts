@@ -10,7 +10,7 @@ import { Room } from "src/model/sql-entity/room/room.entity";
 import { Between, In, MoreThan, Repository } from "typeorm";
 import { ChatService } from "../chats/chat.service";
 import { RoomParticipantService } from "./participants/participant.service";
-import { Dayjs } from "dayjs";
+
 
 @Injectable()
 export class RoomService {
