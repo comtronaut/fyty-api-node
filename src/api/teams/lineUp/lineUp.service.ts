@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Http2ServerResponse } from "http2";
 import { CreateLineUpDto, UpdateLineUpDto } from "src/model/dto/lineUp.dto";
 import { TeamLineUp} from "src/model/sql-entity/team/lineUp.entity";
+import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
 import { Team } from "src/model/sql-entity/team/team.entity";
 import { User } from "src/model/sql-entity/user/user.entity";
 import { Repository } from "typeorm";
@@ -11,6 +12,7 @@ import { Repository } from "typeorm";
 export class LineUpService {
   constructor(
     @InjectRepository(TeamLineUp) private lineUpModel: Repository<TeamLineUp>,
+    @InjectRepository(TeamMember) private memberModel: Repository<TeamMember>,
     @InjectRepository(Team) private teamModel: Repository<Team>
   ) { }
 
@@ -25,9 +27,10 @@ export class LineUpService {
 
   async update(user: User, lineUpId: string, req: UpdateLineUpDto){
       try{
-        const team = await this.teamModel.findOneByOrFail({ ownerId: user.id });
+        const teamMember = await this.memberModel.findOneOrFail({ where: { userId:user.id } });
+        const team = await this.teamModel.findOneByOrFail({ id:teamMember.teamId});
         const lineup = await this.lineUpModel.findOneByOrFail({ id: lineUpId });
-        if(team.id == lineup.teamId){ // cheack if you are ownerTeam
+        if(teamMember.role=="Manager" && team.id == lineup.teamId){ // cheack if you are ownerTeam
           await this.lineUpModel.update(lineUpId, req);
           return req;
         }
