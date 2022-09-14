@@ -125,6 +125,15 @@ export class RoomController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get("/request/team/:id")
+  async getRoomsRequestByTeam(
+    @Param("id") teamId: string
+  ) 
+  {
+    return this.roomRequestService.getRoomRequestByTeamId(teamId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post("/:id/request")
   async createRoomRequest(
     @Param("id") roomId: string,

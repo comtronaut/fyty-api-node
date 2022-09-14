@@ -45,6 +45,15 @@ export class RoomRequestService {
     }
   }
 
+  async getRoomRequestByTeamId(teamId: string){
+    try{
+      return this.roomRequestModel.findBy({ teamId: teamId });
+    }
+    catch(err){
+      throw new BadRequestException(err.message);
+    }
+  }
+
   async delete(requestId: string, userId: string){
     try{
         if(await this.validateUser(requestId, userId)){
