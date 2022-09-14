@@ -30,12 +30,13 @@ export class LineUpService {
         const teamMember = await this.memberModel.findOneOrFail({ where: { userId:user.id } });
         const team = await this.teamModel.findOneByOrFail({ id:teamMember.teamId});
         const lineup = await this.lineUpModel.findOneByOrFail({ id: lineUpId });
-        if(teamMember.role=="Manager" && team.id == lineup.teamId){ // cheack if you are ownerTeam
+
+        if(teamMember.role == "Manager" && team.id == lineup.teamId){ // cheack if you are ownerTeam
           await this.lineUpModel.update(lineUpId, req);
           return req;
         }
         else{
-          throw new Error("Only team's owner can edit lineUps");
+          throw new Error("Only team's Manager can edit lineUps");
         }
         
       }

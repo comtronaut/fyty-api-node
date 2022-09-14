@@ -18,7 +18,7 @@ export class TeamService {
     try {
       req.ownerId = user.id; // set the team's owner
       const team = await this.teamModel.save(req);
-      const member = await this.memberModel.save({teamId:team.id,userId:user.id,role:"Manager"});
+      const member = await this.memberModel.save({ teamId: team.id, userId: user.id, role: "Manager" });
       return team;
     }
     catch(err) {
