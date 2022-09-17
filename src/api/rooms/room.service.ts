@@ -43,7 +43,6 @@ export class RoomService {
       await this.participantModel.save(res);
       await this.chatService.create({ roomId: room.id });
       
-      
       return {
         room: room
       };
@@ -72,7 +71,8 @@ export class RoomService {
   async getJoidedRoom(teamId: string) {  // new
     try{
       const participants = await this.participantModel.findBy({ teamId: teamId });
-      const rooms = await this.roomModel.findBy({ id: In (participants.map(e => e.roomId ))})
+      const rooms = await this.roomModel.findBy({ id: In (participants.map(e => e.roomId ))});
+
       return rooms;
     }
     catch(err){
@@ -103,7 +103,7 @@ export class RoomService {
 
   async getRoomByHostId(teamId: string) {  // hostId is also teamId
     try{
-      return this.roomModel.findBy({ hostId: teamId });
+      return await this.roomModel.findBy({ hostId: teamId });
     }
     catch(err){
       throw new BadRequestException(err.message);
@@ -116,7 +116,7 @@ export class RoomService {
       const today = new Date(date);
       let tomorrow = new Date(date);
       tomorrow.setDate(tomorrow.getDate() + 1);
-      return this.roomModel.findBy({ startAt: Between(today, tomorrow),  gameId: gameId});
+      return await this.roomModel.findBy({ startAt: Between(today, tomorrow),  gameId: gameId});
     }
     catch(err){
       throw new BadRequestException(err.message);
@@ -171,7 +171,7 @@ export class RoomService {
       const room = await this.roomModel.findOneByOrFail({ id: roomId });
       const game = await this.gameModel.findOneByOrFail({ id: room.gameId });
 
-      const count = await this.participantService.countTeamGame(teamId, room.gameId);
+      //const count = await this.participantService.countTeamGame(teamId, room.gameId);
 
       // check is room available
       if(room.status === RoomStatus.UNAVAILABLE || room.status === RoomStatus.FULL) {
@@ -179,9 +179,9 @@ export class RoomService {
       }
 
       // 1 team / room / game validation
-      if(count > 0){
-        throw new Error("Your team has already joined some where");
-      }      
+      // if(count > 0){
+      //   throw new Error("Your team has already joined some where");
+      // }      
 
       // update team count
       await this.roomModel.update({ id: roomId }, { teamCount: room.teamCount + 1 });
@@ -189,14 +189,17 @@ export class RoomService {
       // update room status
       this.updateStatus(game, room);
 
-      const board = await this.roomLineUpBoardModel.save({});
-        for(let i in payload.teamlineUpIds){
-            const lineUp = this.roomLineUpModel.create({ teamLineUpId: i, roomLineUpBoardId: board.id});
-            await this.roomLineUpModel.save(lineUp);
-        }
+      // const board = await this.roomLineUpBoardModel.save({});
+      // for(let i in payload.teamlineUpIds){
+      //     const lineUp = this.roomLineUpModel.create({ teamLineUpId: i, roomLineUpBoardId: board.id});
+      //     await this.roomLineUpModel.save(lineUp);
+      // }
+
+      //find room request
+      const request = await this.roomRequestModel.findOneByOrFail({ teamId: teamId, roomId: roomId });
       
       // add participant to the room
-      const participantData = { roomId: room.id, teamId: teamId, gameId: game.id, roomLineUpBoardId: board.id };
+      const participantData = { roomId: room.id, teamId: teamId, gameId: game.id, roomLineUpBoardId: request.roomLineUpBoardId };
       const participant = this.participantService.create(participantData)
       return {
         roomParticipant: participant
