@@ -18,10 +18,11 @@ import { RoomNoteService } from "./note/note.service";
 import { RoomRequest } from "src/model/sql-entity/room/request.entity";
 import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.entity";
 import { RoomRequestService } from "./request/request.service";
+import { Appointment, AppointmentMember } from "src/model/sql-entity/appointment.entity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ Room, RoomParticipant, Chat, Team, TeamMember, Game, RoomNote, RoomRequest, RoomLineup, RoomLineupBoard ]),
+    TypeOrmModule.forFeature([ Room, RoomParticipant, Chat, Team, TeamMember, Game, RoomNote, RoomRequest, RoomLineup, RoomLineupBoard, Appointment, AppointmentMember ]),
     ChatModule
   ],
   controllers: [ RoomController ],

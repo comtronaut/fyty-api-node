@@ -29,6 +29,15 @@ export class RoomController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post("/join")
+  async joinRoom(     
+    @Body() payload: any,
+    ) 
+  {
+    return await this.roomService.joinRoom(payload);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get("/game/:id")
   async getRoomsBygame(       // 
     @Param("id") gameId: string,

@@ -16,7 +16,6 @@ export class AppointmentService {
   // CRUD
   async create(req: CreateAppointmentDto) {
     try {
-
     // create appointment
       const appointment = this.appointmentModel.create(req);
       const res = await this.appointmentModel.save(appointment);

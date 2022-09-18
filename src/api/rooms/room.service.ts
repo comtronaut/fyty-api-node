@@ -2,6 +2,7 @@ import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nes
 import { InjectRepository } from "@nestjs/typeorm";
 import { RoomStatus } from "src/common/_enum";
 import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room/room.dto";
+import { Appointment, AppointmentMember } from "src/model/sql-entity/appointment.entity";
 import { Game } from "src/model/sql-entity/game.entity";
 import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.entity";
 import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
@@ -21,6 +22,9 @@ export class RoomService {
     @InjectRepository(RoomLineupBoard) private roomLineUpBoardModel: Repository<RoomLineupBoard>,
     @InjectRepository(RoomLineup) private roomLineUpModel: Repository<RoomLineup>,
     @InjectRepository(Game) private gameModel: Repository<Game>,
+    @InjectRepository(Appointment) private appointmentModel: Repository<Appointment>,
+    @InjectRepository(AppointmentMember) private appointmentMemberModel: Repository<AppointmentMember>,
+
     private readonly participantService: RoomParticipantService,
     private readonly chatService: ChatService,
   ) { }
@@ -189,18 +193,19 @@ export class RoomService {
       // update room status
       this.updateStatus(game, room);
 
-      // const board = await this.roomLineUpBoardModel.save({});
-      // for(let i in payload.teamlineUpIds){
-      //     const lineUp = this.roomLineUpModel.create({ teamLineUpId: i, roomLineUpBoardId: board.id});
-      //     await this.roomLineUpModel.save(lineUp);
-      // }
 
       //find room request
       const request = await this.roomRequestModel.findOneByOrFail({ teamId: teamId, roomId: roomId });
       
       // add participant to the room
       const participantData = { roomId: room.id, teamId: teamId, gameId: game.id, roomLineUpBoardId: request.roomLineUpBoardId };
-      const participant = this.participantService.create(participantData)
+      const participant = this.participantService.create(participantData);
+
+      // add appointment
+      const appointmentData = { startAt: room.startAt, endAt: room.endAt, roomId: room.id, status: "WAITING", isDel: false };
+      const appointment = await this.appointmentModel.save(appointmentData);
+      await this.appointmentMemberModel.save({ teamId: teamId, appointId: appointment.id });
+
       return {
         roomParticipant: participant
       };
