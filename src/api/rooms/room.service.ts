@@ -76,9 +76,14 @@ export class RoomService {
   async getJoidedRoom(teamId: string) {  // new
     try{
       const participants = await this.participantModel.findBy({ teamId: teamId });
-      const rooms = await this.roomModel.findBy({ id: In (participants.map(e => e.roomId ))});
+      const joided = await this.roomModel.findBy({ id: In (participants.map(e => e.roomId ))});
+      const request = await this.roomRequestModel.findBy({ teamId: teamId });
+      const requested = await this.roomModel.findBy({ id: In (request.map(e => e.roomId)) });
 
-      return rooms;
+      return {
+        joided: joided,
+        requested: requested
+      };
     }
     catch(err){
       throw new BadRequestException(err.message);
@@ -108,14 +113,7 @@ export class RoomService {
 
   async getRoomByHostId(teamId: string) {  // hostId is also teamId
     try{
-      const hosted = await this.roomModel.findBy({ hostId: teamId });
-      const request = await this.roomRequestModel.findBy({ teamId: teamId });
-      const requested = await this.roomModel.findBy({ id: In (request.map(e => e.roomId)) });
-
-      return {
-        hosted: hosted,
-        requested: requested
-      };
+      return await this.roomModel.findBy({ hostId: teamId });
     }
     catch(err){
       throw new BadRequestException(err.message);
