@@ -201,6 +201,7 @@ export class RoomService {
       const appointmentData = { startAt: room.startAt, endAt: room.endAt, roomId: room.id, status: "WAITING", isDel: false };
       const appointment = await this.appointmentModel.save(appointmentData);
       await this.appointmentMemberModel.save({ teamId: teamId, appointId: appointment.id });
+      await this.roomRequestModel.delete({ id: request.id });
 
       return {
         roomParticipant: participant
