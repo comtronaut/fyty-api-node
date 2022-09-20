@@ -1,5 +1,6 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import e from "express";
 import { RoomStatus } from "src/common/_enum";
 import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room/room.dto";
 import { Appointment, AppointmentMember } from "src/model/sql-entity/appointment.entity";
@@ -107,7 +108,14 @@ export class RoomService {
 
   async getRoomByHostId(teamId: string) {  // hostId is also teamId
     try{
-      return await this.roomModel.findBy({ hostId: teamId });
+      const hosted = await this.roomModel.findBy({ hostId: teamId });
+      const request = await this.roomRequestModel.findBy({ teamId: teamId });
+      const requested = await this.roomModel.findBy({ id: In (request.map(e => e.roomId)) });
+
+      return {
+        hosted: hosted,
+        requested: requested
+      };
     }
     catch(err){
       throw new BadRequestException(err.message);
