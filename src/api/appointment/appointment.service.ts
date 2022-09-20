@@ -51,8 +51,8 @@ export class AppointmentService {
 
   async getAppointmentByUserId(userId: string) {
     try{
-        const team=await this.memberModel.findOneOrFail({ where: { userId } });
-        const appointments = await this.appointmentMemberModel.findBy({ teamId:team.teamId });
+        const team = await this.memberModel.findOneByOrFail({ id: userId });
+        const appointments = await this.appointmentMemberModel.findBy({ teamId: team.teamId });
         return await this.appointmentModel.findBy({ id: In (appointments.map(e => e.appointId )), isDel: false })
     }
     catch(err){

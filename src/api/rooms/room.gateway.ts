@@ -31,7 +31,7 @@ import {
 
     @SubscribeMessage("room/join")
     async joinRoom(client: Socket, payload: any): Promise<void> {
-      const res = await this.roomService.joinRoom(payload);
+      const res = await this.roomService.joinRoom(payload.teamId, payload.roomId);
       this.server.emit(`res/room/${ payload.roomId }/join`, res);
     }
 

@@ -31,10 +31,11 @@ export class RoomController {
   @UseGuards(JwtAuthGuard)
   @Post("/join")
   async joinRoom(     
-    @Body() payload: any,
+    @Query("teamId") teamId: string,
+    @Query("roomId") roomId: string
     ) 
   {
-    return await this.roomService.joinRoom(payload);
+    return await this.roomService.joinRoom(teamId, roomId);
   }
 
   @UseGuards(JwtAuthGuard)

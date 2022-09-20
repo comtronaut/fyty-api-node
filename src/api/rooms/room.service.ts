@@ -167,11 +167,8 @@ export class RoomService {
     }
   }
 
-  async joinRoom(payload: any) {
+  async joinRoom(teamId: string, roomId: string) {
     try {
-      const teamId = payload.teamId;
-      const roomId = payload.roomId;
-
       const room = await this.roomModel.findOneByOrFail({ id: roomId });
       const game = await this.gameModel.findOneByOrFail({ id: room.gameId });
 
@@ -191,8 +188,7 @@ export class RoomService {
       await this.roomModel.update({ id: roomId }, { teamCount: room.teamCount + 1 });
 
       // update room status
-      this.updateStatus(game, room);
-
+      // await this.updateStatus(game, room);
 
       //find room request
       const request = await this.roomRequestModel.findOneByOrFail({ teamId: teamId, roomId: roomId });
@@ -217,7 +213,7 @@ export class RoomService {
 
   async updateStatus(game: Game, room: Room){
     const del = game.teamCap - room.teamCount;
-    if(del == 1){ // available
+    if(del === 1){ // available
       room.status = RoomStatus.UNAVAILABLE; 
       await this.roomModel.update({ id: room.id }, room);
     }
