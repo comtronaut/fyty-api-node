@@ -157,7 +157,7 @@ export class RoomService {
       const teamId = payload.teamId;
       const room = await this.roomModel.findOneByOrFail({ id: payload.roomId });
 
-      if(room.hostId == teamId){
+      if(room.hostId === teamId){
         const res = await this.roomModel.delete(room.id);
         if(res.affected !== 0) {
           return {
@@ -194,7 +194,7 @@ export class RoomService {
       await this.roomModel.update({ id: roomId }, { teamCount: room.teamCount + 1 });
 
       // update room status
-      // await this.updateStatus(game, room);
+      await this.updateStatus(game, room);
 
       //find room request
       const request = await this.roomRequestModel.findOneByOrFail({ teamId: teamId, roomId: roomId });
