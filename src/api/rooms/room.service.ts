@@ -73,15 +73,15 @@ export class RoomService {
     }
   }
 
-  async getJoidedRoom(teamId: string) {  // new
+  async getJoinedRoom(teamId: string) {  // new
     try{
       const participants = await this.participantModel.findBy({ teamId: teamId });
-      const joided = await this.roomModel.findBy({ id: In (participants.map(e => e.roomId ))});
+      const joined = await this.roomModel.findBy({ id: In (participants.map(e => e.roomId ))});
       const request = await this.roomRequestModel.findBy({ teamId: teamId });
       const requested = await this.roomModel.findBy({ id: In (request.map(e => e.roomId)) });
 
       return {
-        joided: joided,
+        joined: joined,
         requested: requested
       };
     }

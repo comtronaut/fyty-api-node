@@ -75,10 +75,10 @@ export class RoomController {
 
   @UseGuards(JwtAuthGuard)    // new
   @Get("/me/team/:id")
-  async getJoidedRooms(
+  async getJoinedRooms(
     @Param("id") teamId: string,
   ) {
-    return this.roomService.getJoidedRoom(teamId);
+    return this.roomService.getJoinedRoom(teamId);
   }
 
 // room note
