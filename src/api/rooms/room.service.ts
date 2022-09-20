@@ -195,7 +195,7 @@ export class RoomService {
       
       // add participant to the room
       const participantData = { roomId: room.id, teamId: teamId, gameId: game.id, roomLineUpBoardId: request.roomLineUpBoardId };
-      const participant = this.participantService.create(participantData);
+      const participant = await this.participantModel.save(participantData);
 
       // add appointment
       const appointmentData = { startAt: room.startAt, endAt: room.endAt, roomId: room.id, status: "WAITING", isDel: false };
