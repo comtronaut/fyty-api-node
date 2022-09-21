@@ -1,5 +1,7 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.entity";
+import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
 import { TeamLineUp } from "src/model/sql-entity/team/lineUp.entity";
 import { TeamPending } from "src/model/sql-entity/team/pending.entity";
 import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
@@ -13,7 +15,7 @@ import { TeamService } from "./team.service";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ Team, TeamLineUp, TeamMember, TeamPending])
+    TypeOrmModule.forFeature([ Team, TeamLineUp, TeamMember, TeamPending, RoomLineup, RoomLineupBoard, RoomParticipant ])
   ],
   controllers: [ TeamController, LineUpController ],
   providers: [ TeamService, LineUpService, TeamMemberService, TeampendingService ]

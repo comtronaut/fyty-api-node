@@ -7,7 +7,7 @@ import { AbstractModel } from "../_model";
 @Entity()
 export class TeamMember extends AbstractModel {
   @IsNotEmpty()
-  @Column( )
+  @Column()
   role: string;
 
   @IsNotEmpty()

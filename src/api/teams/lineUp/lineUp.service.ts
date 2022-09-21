@@ -2,18 +2,24 @@ import { BadRequestException, HttpCode, HttpStatus, Injectable } from "@nestjs/c
 import { InjectRepository } from "@nestjs/typeorm";
 import { Http2ServerResponse } from "http2";
 import { CreateLineUpDto, UpdateLineUpDto } from "src/model/dto/lineUp.dto";
+import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.entity";
+import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
 import { TeamLineUp} from "src/model/sql-entity/team/lineUp.entity";
 import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
 import { Team } from "src/model/sql-entity/team/team.entity";
 import { User } from "src/model/sql-entity/user/user.entity";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 
 @Injectable()
 export class LineUpService {
   constructor(
     @InjectRepository(TeamLineUp) private lineUpModel: Repository<TeamLineUp>,
     @InjectRepository(TeamMember) private memberModel: Repository<TeamMember>,
-    @InjectRepository(Team) private teamModel: Repository<Team>
+    @InjectRepository(Team) private teamModel: Repository<Team>,
+
+    @InjectRepository(RoomParticipant) private participantModel: Repository<RoomParticipant>,
+    @InjectRepository(RoomLineup) private roomLineUpModel: Repository<RoomLineup>,
+    @InjectRepository(RoomLineupBoard) private roomLineUpBoardModel: Repository<RoomLineupBoard>
   ) { }
 
   async create(req: CreateLineUpDto){
@@ -31,7 +37,7 @@ export class LineUpService {
         const team = await this.teamModel.findOneByOrFail({ id:teamMember.teamId});
         const lineup = await this.lineUpModel.findOneByOrFail({ id: lineUpId });
 
-        if(teamMember.role == "Manager" && team.id == lineup.teamId){ // cheack if you are ownerTeam
+        if(teamMember.role == "Manager" && team.id == lineup.teamId){ // cheack if you are Manager
           await this.lineUpModel.update(lineUpId, req);
           return req;
         }
@@ -67,6 +73,27 @@ export class LineUpService {
         throw new BadRequestException(err.message);
     }
     
+  }
+
+  async getLineUpsByParti(participantId: string){
+    try {      
+      const parti = await this.participantModel.findOneByOrFail({ id: participantId });
+      const lineUpBoard = await this.roomLineUpBoardModel.findBy({ id: parti.roomLineUpBoardId });
+
+    }
+    catch(err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async getLineUpsByBoard(roomLineUpBoardId: string){
+    try {      
+      const roomLineUps = await this.roomLineUpModel.findBy({ roomLineUpBoardId: roomLineUpBoardId });
+      return await this.lineUpModel.findBy({ id: In( roomLineUps.map( (e) => e.id) ) });
+    }
+    catch(err) {
+      throw new BadRequestException(err.message);
+    }
   }
 
   async deleteAllLineUps(ownerId: string, teamId: string){

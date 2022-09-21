@@ -1,8 +1,11 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import e from "express";
 import { CreateParticipantDto } from "src/model/dto/room/participant.dto";
+import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.entity";
 import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
-import { Repository } from "typeorm";
+import { TeamLineUp } from "src/model/sql-entity/team/lineUp.entity";
+import { In, Repository } from "typeorm";
 
 @Injectable()
 export class RoomParticipantService {
@@ -25,11 +28,6 @@ export class RoomParticipantService {
 
   async getParticipantByRoomId(roomId: string) {
     return this.participantModel.find({ where: { roomId }});
-  }
-  
-
-  async validation() {
-    
   }
 
   async countTeamGame(teamId: string, gameId: string){

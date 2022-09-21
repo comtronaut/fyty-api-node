@@ -27,7 +27,7 @@ export class LineUpController{
     @Param("id") lineUpId: string,
     @Body() req: UpdateLineUpDto,
     ) {
-    return this.lineUpService.update(user ,lineUpId, req);
+    return this.lineUpService.update(user, lineUpId, req);
   }
   
   @UseGuards(JwtAuthGuard)
@@ -46,6 +46,15 @@ export class LineUpController{
 
     return this.lineUpService.getLineUpById(lineUpId);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("participant/:id")
+  async getLineups(
+    @Param("id") participantId: string){
+
+    return await this.lineUpService.getLineUpsByParti(participantId);
+  }
+
 
   @UseGuards(JwtAuthGuard)
   @Delete()
