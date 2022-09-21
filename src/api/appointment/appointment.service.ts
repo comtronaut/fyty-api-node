@@ -61,17 +61,26 @@ export class AppointmentService {
           }
         }
         const appointmentMember = await this.appointmentMemberModel.findBy({ teamId: member.teamId });
-        const team = await this.teamModel.findOneByOrFail({ id: member.id });
         const appointments = await this.appointmentModel.findBy({ id: In (appointmentMember.map(e => e.appointId )), isDel: false });
-
-        return {
-          team: team,
-          appointments: appointments
-        }
+        return Promise.all( [ appointments.map(e => this.packAppointment(e)) ] )
 
     }
     catch(err){
         throw new BadRequestException(err.message);
+    }
+  }
+
+  async packAppointment(appointment: Appointment){
+
+    try {
+        const appointMember = await this.appointmentMemberModel.findOneByOrFail({ appointId: appointment.id })
+        return {
+          appointment: appointment,
+          team: await this.teamModel.findOneByOrFail({ id: appointMember.teamId })
+        };
+    } 
+    catch (err) {
+      throw new Error(err.message);
     }
   }
 
