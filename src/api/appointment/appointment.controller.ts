@@ -25,7 +25,7 @@ export class AppointmentController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get()
+  @Get("/me")
   async getUserAppointmnet(
     @Subject() user: User
   ) {

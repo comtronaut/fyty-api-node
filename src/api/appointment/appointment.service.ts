@@ -4,11 +4,13 @@ import { CreateAppointmentDto, UpdateAppointmentDto } from "src/model/dto/appoin
 import { Appointment, AppointmentMember } from "src/model/sql-entity/appointment.entity";
 import { In, Repository } from "typeorm";
 import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
+import { Team } from "src/model/sql-entity/team/team.entity";
 
 @Injectable()
 export class AppointmentService {
   constructor(
     @InjectRepository(TeamMember) private memberModel: Repository<TeamMember>,
+    @InjectRepository(Team) private teamModel: Repository<Team>,
     @InjectRepository(Appointment) private appointmentModel: Repository<Appointment>,
     @InjectRepository(AppointmentMember) private appointmentMemberModel: Repository<AppointmentMember>,
   ) { }
@@ -51,9 +53,22 @@ export class AppointmentService {
 
   async getAppointmentByUserId(userId: string) {
     try{
-        const team = await this.memberModel.findOneByOrFail({ id: userId });
-        const appointments = await this.appointmentMemberModel.findBy({ teamId: team.teamId });
-        return await this.appointmentModel.findBy({ id: In (appointments.map(e => e.appointId )), isDel: false })
+        const member = await this.memberModel.findOneBy({ id: userId });
+        if(member === null){
+          return {
+            team: [],
+            appointments: []
+          }
+        }
+        const appointmentMember = await this.appointmentMemberModel.findBy({ teamId: member.teamId });
+        const team = await this.teamModel.findOneByOrFail({ id: member.id });
+        const appointments = await this.appointmentModel.findBy({ id: In (appointmentMember.map(e => e.appointId )), isDel: false });
+
+        return {
+          team: team,
+          appointments: appointments
+        }
+
     }
     catch(err){
         throw new BadRequestException(err.message);
