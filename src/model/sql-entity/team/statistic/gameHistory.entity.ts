@@ -23,4 +23,7 @@ export class GameHistory extends AbstractModel {
   @Column({})  
   imgUrl: string;
 
+  @Column({ default: "NONE" })  
+  uploader: string;
+
 }
