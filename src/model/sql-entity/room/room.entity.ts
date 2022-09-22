@@ -31,6 +31,9 @@ export class Room extends AbstractModel {
   @Column({ default: 1 })
   teamCount: number;
 
+  @Column({ default: "" })
+  note: string;
+
   @IsNotEmpty()
   @ManyToOne(() => Game, { onUpdate: 'CASCADE' })
   @Column({ type: "uuid" })
