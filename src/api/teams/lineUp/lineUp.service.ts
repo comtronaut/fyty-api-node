@@ -87,9 +87,9 @@ export class LineUpService {
   }
 
   async getLineUpsByBoard(roomLineUpBoardId: string){
-    try {      
+    try {
       const roomLineUps = await this.roomLineUpModel.findBy({ roomLineUpBoardId: roomLineUpBoardId });
-      return await this.lineUpModel.findBy({ id: In( roomLineUps.map( (e) => e.id) ) });
+      return await this.lineUpModel.findBy({ id: In( roomLineUps.map( (e) => e.teamLineUpId) ) });
     }
     catch(err) {
       throw new BadRequestException(err.message);
