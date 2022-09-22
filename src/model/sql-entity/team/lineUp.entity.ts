@@ -40,4 +40,7 @@ export class TeamLineUp extends AbstractModel {
   @Column({ default: "" })
   note: string;
 
+  @Column({ default: false })
+  isDel: boolean;
+
 }
