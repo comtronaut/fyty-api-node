@@ -20,6 +20,8 @@ export class CreateRoomDto {
   @IsNotEmpty()
   gameId: string;
 
+  note: string;
+
   @IsNotEmpty()
   hostId: string;
 
