@@ -78,8 +78,8 @@ export class LineUpService {
   async getLineUpsByParti(participantId: string){
     try {      
       const parti = await this.participantModel.findOneByOrFail({ id: participantId });
-      const lineUpBoard = await this.roomLineUpBoardModel.findBy({ id: parti.roomLineUpBoardId });
-
+      const lineUpBoard = await this.roomLineUpBoardModel.findOneByOrFail({ id: parti.roomLineUpBoardId });
+      return await this.getLineUpsByBoard(lineUpBoard.id);
     }
     catch(err) {
       throw new BadRequestException(err.message);
