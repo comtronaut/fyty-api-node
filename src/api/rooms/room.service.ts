@@ -158,6 +158,11 @@ export class RoomService {
       const room = await this.roomModel.findOneByOrFail({ id: payload.roomId });
 
       if(room.hostId === teamId){
+
+        // create match history right here
+
+
+
         const res = await this.roomModel.delete(room.id);
         if(res.affected !== 0) {
           return {
@@ -166,6 +171,8 @@ export class RoomService {
         }
         throw new Error("room is not deleted");
       }
+
+
       throw new Error("Only host can disband the room");
       
     } catch (err) {
@@ -177,8 +184,6 @@ export class RoomService {
     try {
       const room = await this.roomModel.findOneByOrFail({ id: roomId });
       const game = await this.gameModel.findOneByOrFail({ id: room.gameId });
-
-      //const count = await this.participantService.countTeamGame(teamId, room.gameId);
 
       // check is room available
       if(room.status === RoomStatus.UNAVAILABLE || room.status === RoomStatus.FULL) {
