@@ -45,10 +45,10 @@ export class TeamStatisticService {
     async getMatchesWithOpponent(yourTeamId: string, OpponentTeamId: string){ // opponent teamId
       try {
         
-        let matchesMy = this.matchHistoryModel.findBy({hostId:yourTeamId,guestId:OpponentTeamId});
-        let matchesOppo = this.matchHistoryModel.findBy({hostId:OpponentTeamId,guestId:yourTeamId});
-        let matches =[];
-        matches.push(matchesMy,matchesOppo);
+        let matchesMy = this.matchHistoryModel.findBy({ hostId: yourTeamId, guestId: OpponentTeamId });
+        let matchesOppo = this.matchHistoryModel.findBy({ hostId: OpponentTeamId, guestId: yourTeamId });
+        let matches = [];
+        matches.push(matchesMy, matchesOppo);
         // find all matches that u make with the opponent
 
         return matches;
@@ -58,19 +58,21 @@ export class TeamStatisticService {
       }
     }
 
-    async updateMatch(matchId: string,req:UpdateMatchHistoryDto){ 
+    async updateMatch(matchId: string, req: UpdateMatchHistoryDto){ 
       try {
-        let oldmatch =  await this.matchHistoryModel.findOneByOrFail({id:matchId});
-        let stathost = await this.teamStatModel.findOneByOrFail({teamId:req.hostId});
-        let statguest = await this.teamStatModel.findOneByOrFail({teamId:req.guestId});
-        let match = this.matchHistoryModel.update({id:matchId},req);
-        if(req.hostWin!=oldmatch.hostWin){
-          let numhostwin = stathost.win-oldmatch.hostWin+req.hostWin;
-          let numhostlose = stathost.lose-oldmatch.hostlose+req.hostlose;
-          let numguestwin = statguest.win-oldmatch.hostlose+req.hostlose;
-          let numguestlose = statguest.lose-oldmatch.hostWin+req.hostWin;
-          await this.teamStatModel.update({id:stathost.id},{win:numhostwin,lose:numhostlose});
-          await this.teamStatModel.update({id:statguest.id},{win:numguestwin,lose:numguestlose});
+        let oldmatch = await this.matchHistoryModel.findOneByOrFail({ id: matchId });
+        let stathost = await this.teamStatModel.findOneByOrFail({ teamId: req.hostId });
+        let statguest = await this.teamStatModel.findOneByOrFail({ teamId: req.guestId });
+        let match = this.matchHistoryModel.update({ id: matchId }, req);
+
+        if(req.hostWin != oldmatch.hostWin){
+          let numhostwin = stathost.win - oldmatch.hostWin + req.hostWin;
+          let numhostlose = stathost.lose - oldmatch.hostlose + req.hostlose;
+          let numguestwin = statguest.win - oldmatch.hostlose + req.hostlose;
+          let numguestlose = statguest.lose - oldmatch.hostWin + req.hostWin;
+
+          await this.teamStatModel.update({ id: stathost.id },{ win: numhostwin, lose: numhostlose });
+          await this.teamStatModel.update({ id: statguest.id },{ win: numguestwin, lose: numguestlose });
         }
         // update and return the updated match 
 

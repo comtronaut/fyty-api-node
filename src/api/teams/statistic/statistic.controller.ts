@@ -92,11 +92,4 @@ export class StatisticController {
   ) {
     return await this.gameHistoryService.deleteGameHistory(gameHistoryId);
   }
-
-
-
-  
-  
-
-  
 }
