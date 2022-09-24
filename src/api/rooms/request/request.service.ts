@@ -19,11 +19,11 @@ export class RoomRequestService {
         const lineUps = body.teamlineUpIds.split(",");
         
         for(let i = 0; i < lineUps.length; i++){
-            this.roomLineUpModel.save({ teamLineUpId: lineUps[i], roomLineUpBoardId: board.id});
+            await this.roomLineUpModel.save({ teamLineUpId: lineUps[i], roomLineUpBoardId: board.id});
         }
 
         const request = this.roomRequestModel.
-        save({ teamId: body.teamId, 
+            save({ teamId: body.teamId, 
                  roomLineUpBoardId: board.id, 
                  roomId: roomId });
 

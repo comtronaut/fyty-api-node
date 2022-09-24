@@ -5,12 +5,14 @@ import { Appointment, AppointmentMember } from "src/model/sql-entity/appointment
 import { In, Repository } from "typeorm";
 import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
 import { Team } from "src/model/sql-entity/team/team.entity";
+import { Room } from "src/model/sql-entity/room/room.entity";
 
 @Injectable()
 export class AppointmentService {
   constructor(
     @InjectRepository(TeamMember) private memberModel: Repository<TeamMember>,
     @InjectRepository(Team) private teamModel: Repository<Team>,
+    @InjectRepository(Room) private roomModel: Repository<Room>,
     @InjectRepository(Appointment) private appointmentModel: Repository<Appointment>,
     @InjectRepository(AppointmentMember) private appointmentMemberModel: Repository<AppointmentMember>,
   ) { }
@@ -18,16 +20,23 @@ export class AppointmentService {
   // CRUD
   async create(req: CreateAppointmentDto) {
     try {
+
+    //find room 
+    const room = await this.roomModel.findOneByOrFail({ id: req.roomId });
+
     // create appointment
-      const appointment = this.appointmentModel.create(req);
-      const res = await this.appointmentModel.save(appointment);
+      req.startAt = room.startAt;
+      req.endAt = room.endAt;
+      const res = await this.appointmentModel.save(req);
 
     // create appointment member
 
-    for(let i in req.teamIds ){
-        const member = this.appointmentMemberModel.create({ teamId: i, appointId: res.id });
-        await this.appointmentMemberModel.save(member);
-    }
+      const memberIds = req.teamIds.split(",");
+
+      for(let i = 0; i < memberIds.length; i++){
+        await this.appointmentMemberModel.save({ appointmentId: res.id, teamId: memberIds[i]  });
+      }
+
       return res;
     }
     catch(err) {
