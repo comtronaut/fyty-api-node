@@ -42,6 +42,12 @@ export enum Result{
 }
 
 export class UpdateMatchHistoryDto { 
+    
+    @IsUUID()
+    hostId: string;
+    
+    @IsUUID()
+    guestId: string;
 
     @ApiPropertyOptional()
     hostWin: number;
@@ -51,11 +57,11 @@ export class UpdateMatchHistoryDto {
 
     @ApiPropertyOptional()
     @IsEnum(Result)
-    result: string;
+    result: Result;
 
     @ApiPropertyOptional()
     @IsEnum(Uploader)
-    uploader: string;
+    uploader: Uploader;
 }
 
 
