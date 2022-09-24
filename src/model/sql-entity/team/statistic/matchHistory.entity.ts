@@ -23,6 +23,9 @@ export class MatchHistory extends AbstractModel {
   @Column({ default: 0 })  
   hostlose: number;
 
-  @Column({ default: "tie" })  
+  @Column({ default: "TIE" })  
   result: string;
+
+  @Column({ default: "NONE" })  
+  uploader: string;
 }

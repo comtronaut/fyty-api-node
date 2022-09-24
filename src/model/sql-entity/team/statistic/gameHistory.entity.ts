@@ -17,9 +17,6 @@ export class GameHistory extends AbstractModel {
   @Column({ default: 0 })  
   gameNum: number;
 
-  @Column({ default: 0 })  
-  gameResult: number;
-
   @Column({})  
   imgUrl: string;
 
