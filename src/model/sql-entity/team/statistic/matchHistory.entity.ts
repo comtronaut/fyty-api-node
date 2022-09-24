@@ -1,4 +1,5 @@
 import { IsNotEmpty } from "class-validator";
+import { Result, Uploader } from "src/model/dto/statistic.dto";
 import { Column, CreateDateColumn, Entity, ManyToOne } from "typeorm";
 import { AbstractModel } from "../../_model";
 import { Team } from "../team.entity";
@@ -23,9 +24,9 @@ export class MatchHistory extends AbstractModel {
   @Column({ default: 0 })  
   hostlose: number;
 
-  @Column({ default: "TIE" })  
-  result: string;
+  @Column({ default: Result.TIE })  
+  result: Result;
 
-  @Column({ default: "NONE" })  
-  uploader: string;
+  @Column({ default: Uploader.NONE })  
+  uploader: Uploader;
 }
