@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
-import { CreateGameHistoryDto, UpdateGameHistoryDto } from "src/model/dto/statistic.dto";
+import { CreateGameHistoryDto, UpdateGameHistoryDto, UpdateMatchHistoryDto } from "src/model/dto/statistic.dto";
 import { GameHistortService } from "./gameHistory.service";
 import { TeamStatisticService } from "./statistic.service";
 
@@ -44,9 +44,10 @@ export class StatisticController {
   @UseGuards(JwtAuthGuard)
   @Put("/matchHistory/:id")
   async updateMatch(
-    @Param("/matchHistory/id") matchId: string,
+    @Param("id") matchId: string,
+    @Body() req: UpdateMatchHistoryDto
   ) {
-    return await this.statisticService.updateMatch(matchId);
+    return await this.statisticService.updateMatch(matchId,req);
   }
 
   // game history
@@ -89,7 +90,7 @@ export class StatisticController {
   async deleteGameHistory(
     @Param("id") gameHistoryId: string,
   ) {
-    return ;
+    return await this.gameHistoryService.deleteGameHistory(gameHistoryId);
   }
 
 

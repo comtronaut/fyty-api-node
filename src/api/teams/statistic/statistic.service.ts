@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { UpdateMatchHistoryDto } from "src/model/dto/statistic.dto";
 import { MatchDetail } from "src/model/sql-entity/team/statistic/matchDetail.entity";
 import { MatchHistory } from "src/model/sql-entity/team/statistic/matchHistory.entity";
 import { TeamStatistic } from "src/model/sql-entity/team/statistic/stat.entity";
@@ -26,8 +27,8 @@ export class TeamStatisticService {
 
     async getMatches(teamId: string){
       try {
-        let hostedMatches = [MatchHistory];
-        let guestedmatches = [MatchHistory];
+        let hostedMatches = this.matchHistoryModel.findBy({hostId: teamId});
+        let guestedmatches = this.matchHistoryModel.findBy({guestId: teamId});
 
         // find both that ur make a matches on host and guest
 
@@ -44,8 +45,10 @@ export class TeamStatisticService {
     async getMatchesWithOpponent(yourTeamId: string, OpponentTeamId: string){ // opponent teamId
       try {
         
-        let matches = [MatchHistory];
-
+        let matchesMy = this.matchHistoryModel.findBy({hostId:yourTeamId,guestId:OpponentTeamId});
+        let matchesOppo = this.matchHistoryModel.findBy({hostId:OpponentTeamId,guestId:yourTeamId});
+        let matches =[];
+        matches.push(matchesMy,matchesOppo);
         // find all matches that u make with the opponent
 
         return matches;
@@ -55,11 +58,20 @@ export class TeamStatisticService {
       }
     }
 
-    async updateMatch(matchId: string){ 
+    async updateMatch(matchId: string,req:UpdateMatchHistoryDto){ 
       try {
-        
-        let match = null;
-
+        let oldmatch =  await this.matchHistoryModel.findOneByOrFail({id:matchId});
+        let stathost = await this.teamStatModel.findOneByOrFail({teamId:req.hostId});
+        let statguest = await this.teamStatModel.findOneByOrFail({teamId:req.guestId});
+        let match = this.matchHistoryModel.update({id:matchId},req);
+        if(req.hostWin!=oldmatch.hostWin){
+          let numhostwin = stathost.win-oldmatch.hostWin+req.hostWin;
+          let numhostlose = stathost.lose-oldmatch.hostlose+req.hostlose;
+          let numguestwin = statguest.win-oldmatch.hostlose+req.hostlose;
+          let numguestlose = statguest.lose-oldmatch.hostWin+req.hostWin;
+          await this.teamStatModel.update({id:stathost.id},{win:numhostwin,lose:numhostlose});
+          await this.teamStatModel.update({id:statguest.id},{win:numguestwin,lose:numguestlose});
+        }
         // update and return the updated match 
 
         return match;
