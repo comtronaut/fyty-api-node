@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsUrl, IsUUID } from "class-validator";
+import { IsEnum, IsNotEmpty, IsUrl, IsUUID } from "class-validator";
 import { PartialType } from "@nestjs/mapped-types";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 
@@ -19,11 +19,26 @@ export class CreateGameHistoryDto {
 
 export class UpdateGameHistoryDto { 
 
+    @IsUUID()
+    teamId: string
+
     @ApiPropertyOptional()
     gameNum: number;
 
     @ApiPropertyOptional()
     imgUrl: string;
+}
+
+export enum Uploader{
+    HOST,
+    GUEST,
+    NONE
+}
+
+export enum Result{
+    WIN,
+    LOSE,
+    TIE
 }
 
 export class UpdateMatchHistoryDto { 
@@ -35,9 +50,16 @@ export class UpdateMatchHistoryDto {
     hostlose: number;
 
     @ApiPropertyOptional()
+    @IsEnum(Result)
     result: string;
 
     @ApiPropertyOptional()
+    @IsEnum(Uploader)
     uploader: string;
 }
+
+
+
+
+
 
