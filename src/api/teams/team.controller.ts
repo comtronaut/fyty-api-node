@@ -43,7 +43,6 @@ export class TeamController {
   async getTeamById(
     @Subject() user: User,
     @Param("id") id: string,
-    @Body() req: UpdateTeamDto
   ) {
     return await this.teamService.getTeam(id);
   }
