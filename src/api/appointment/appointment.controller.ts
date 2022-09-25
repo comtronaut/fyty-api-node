@@ -29,7 +29,7 @@ export class AppointmentController {
   async getUserAppointmnet(
     @Subject() user: User
   ) {
-    return this.appointmentService.getAppointmentByUserId(user.id);
+    return await this.appointmentService.getAppointmentByUserId(user.id);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -36,10 +36,12 @@ export class RoomService {
       const room = await this.roomModel.save(req);
 
       const board = await this.roomLineUpBoardModel.save({});
-        for(let i in req.teamlineUpIds){
-            const lineUp = this.roomLineUpModel.create({ teamLineUpId: i, roomLineUpBoardId: board.id});
-            await this.roomLineUpModel.save(lineUp);
-        }
+      
+      const lineUps = req.teamlineUpIds.split(",");
+
+      for(let i = 0; i < lineUps.length; i++ ){
+          await this.roomLineUpModel.save({ roomLineUpBoardId: board.id, teamLineUpId: lineUps[i] });
+      }
 
       const participantData = { roomId: room.id, teamId: req.hostId, gameId: req.gameId, roomLineUpBoardId: board.id };
       
@@ -160,6 +162,7 @@ export class RoomService {
       if(room.hostId === teamId){
         const res = await this.roomModel.delete(room.id);
         if(res.affected !== 0) {
+
           return {
             roomId: room.id
           };
@@ -206,6 +209,7 @@ export class RoomService {
       // add appointment
       const appointmentData = { startAt: room.startAt, endAt: room.endAt, roomId: room.id, status: "WAITING", isDel: false };
       const appointment = await this.appointmentModel.save(appointmentData);
+
       await this.appointmentMemberModel.save({ teamId: teamId, appointId: appointment.id });
       await this.roomRequestModel.delete({ id: request.id });
 

@@ -2,7 +2,7 @@ import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nes
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreateAppointmentDto, UpdateAppointmentDto } from "src/model/dto/appointment.dto";
 import { Appointment, AppointmentMember } from "src/model/sql-entity/appointment.entity";
-import { In, Repository } from "typeorm";
+import { Any, In, Repository } from "typeorm";
 import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
 import { Team } from "src/model/sql-entity/team/team.entity";
 import { Room } from "src/model/sql-entity/room/room.entity";
@@ -62,7 +62,7 @@ export class AppointmentService {
 
   async getAppointmentByUserId(userId: string) {
     try{
-        const member = await this.memberModel.findOneBy({ id: userId });
+        const member = await this.memberModel.findOneBy({ userId: userId });
         if(member === null){
           return {
             team: [],
@@ -71,7 +71,14 @@ export class AppointmentService {
         }
         const appointmentMember = await this.appointmentMemberModel.findBy({ teamId: member.teamId });
         const appointments = await this.appointmentModel.findBy({ id: In (appointmentMember.map(e => e.appointId )), isDel: false });
-        return Promise.all( [ appointments.map(e => this.packAppointment(e)) ] )
+        let res = [];
+
+        for(let i = 0; i < appointments.length; i++){
+          const val = await this.packAppointment(appointments[i]);
+          res.push(val);
+        }
+
+        return res;
 
     }
     catch(err){
@@ -82,10 +89,11 @@ export class AppointmentService {
   async packAppointment(appointment: Appointment){
 
     try {
-        const appointMember = await this.appointmentMemberModel.findOneByOrFail({ appointId: appointment.id })
-        return {
+        const appointMember = await this.appointmentMemberModel.findOneByOrFail({ appointId: appointment.id });
+        const team = await this.teamModel.findOneByOrFail({ id: appointMember.teamId });
+        return  {
           appointment: appointment,
-          team: await this.teamModel.findOneByOrFail({ id: appointMember.teamId })
+          team: team
         };
     } 
     catch (err) {

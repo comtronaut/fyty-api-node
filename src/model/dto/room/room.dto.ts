@@ -15,7 +15,7 @@ export class CreateRoomDto {
   teamCount: number;
 
   @IsNotEmpty()
-  teamlineUpIds: [string];
+  teamlineUpIds: string;
 
   @IsNotEmpty()
   gameId: string;
