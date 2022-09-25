@@ -139,13 +139,19 @@ export class RoomService {
 
     try{
       if(roomName && date){
-        return await this.roomModel.findBy({ name: roomName, startAt: date, gameId: gameId });
+        const today = new Date(date);
+        let tomorrow = new Date(date);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return await this.roomModel.findBy({ name: roomName, startAt: Between(today, tomorrow), gameId: gameId });
       }
       if(roomName){
         return await this.roomModel.findBy({ name: roomName, gameId: gameId });
       }
       if(date){
-        return await this.roomModel.findBy({ startAt: date, gameId: gameId });
+        const today = new Date(date);
+        let tomorrow = new Date(date);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return await this.roomModel.findBy({ startAt: Between(today, tomorrow), gameId: gameId });
       }
       return await this.roomModel.findBy({ gameId: gameId });
     }
