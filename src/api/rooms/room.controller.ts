@@ -25,7 +25,7 @@ export class RoomController {
     @Body() req: CreateRoomDto,
     ) 
   {
-    return this.roomService.create(req);
+    return await this.roomService.create(req);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -45,7 +45,7 @@ export class RoomController {
     @Query("name") roomName?: string,
     @Query("date") date?: any
   ) {
-    return this.roomService.getAllRooms(gameId, roomName, date);
+    return await this.roomService.getAllRooms(gameId, roomName, date);
   }
 
   @UseGuards(JwtAuthGuard)  // get all rooms which u r host
@@ -53,7 +53,7 @@ export class RoomController {
   async getHostedRooms(
     @Param("id") teamId: string,
   ){
-    return this.roomService.getRoomByHostId(teamId);
+    return await this.roomService.getRoomByHostId(teamId);
   }
 
   @UseGuards(JwtAuthGuard)  // get all rooms which u r host
@@ -70,7 +70,7 @@ export class RoomController {
   async getRoomsById(
     @Param("id") roomId: string,
   ) {
-    return this.roomService.getAllRooms(roomId);
+    return await this.roomService.getAllRooms(roomId);
   }
 
   @UseGuards(JwtAuthGuard)    // new
@@ -78,7 +78,7 @@ export class RoomController {
   async getJoinedRooms(
     @Param("id") teamId: string,
   ) {
-    return this.roomService.getJoinedRoom(teamId);
+    return await this.roomService.getJoinedRoom(teamId);
   }
 
 // room note
@@ -89,7 +89,7 @@ export class RoomController {
     @Param("id") roomId: string
   ) 
   {
-    return this.roomNoteService.getRoomNotes(roomId);
+    return await this.roomNoteService.getRoomNotes(roomId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -99,7 +99,7 @@ export class RoomController {
     @Body() body: CreateRoomNoteDto,
     ) 
   {
-    return this.roomNoteService.create(roomId, body);
+    return await this.roomNoteService.create(roomId, body);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -110,7 +110,7 @@ export class RoomController {
     @Body() body: UpdateRoomNoteDto,
     ) 
   {
-    return this.roomNoteService.update(noteId, user.id, body);
+    return await this.roomNoteService.update(noteId, user.id, body);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -120,7 +120,7 @@ export class RoomController {
     @Subject() user: User,
     ) 
   {
-    return this.roomNoteService.delete(noteId, user.id);
+    return await this.roomNoteService.delete(noteId, user.id);
   }
 
 // room request
@@ -131,7 +131,7 @@ export class RoomController {
     @Param("id") roomId: string
   ) 
   {
-    return this.roomRequestService.getRoomRequest(roomId);
+    return await this.roomRequestService.getRoomRequest(roomId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -140,7 +140,7 @@ export class RoomController {
     @Param("id") teamId: string
   ) 
   {
-    return this.roomRequestService.getRoomRequestByTeamId(teamId);
+    return await this.roomRequestService.getRoomRequestByTeamId(teamId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -150,7 +150,7 @@ export class RoomController {
     @Body() body: CreateRoomRequestDto,
     ) 
   {
-    return this.roomRequestService.create(roomId, body);
+    return await this.roomRequestService.create(roomId, body);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -160,48 +160,7 @@ export class RoomController {
     @Subject() user: User,
     ) 
   {
-    return this.roomRequestService.delete(requestId, user.id);
+    return await this.roomRequestService.delete(requestId, user.id);
   }
-
-  
-
-
-  // @Get("/participants/:roomId")
-  // async getParticipantByRoomId(@Param("roomId") roomId: string) {
-  //   return this.participantService.getParticipantByRoomId(roomId);
-  // }
-
-  // @Debug()
-  // // @UseGuards(JwtAuthGuard)
-  // @Post("/participants")
-  // async joinRoom(@Body() req: CreateParticipantDto) {   // need both roomId, teamId for creating
-  //   return await this.roomService.joinRoom(req);
-  // }
-
-  // @Debug()
-  // // @UseGuards(JwtAuthGuard)
-  // @Delete("/participants")
-  // async leaveRoom(@Body() req: CreateParticipantDto) {  // need both roomId, teamId for deleting
-  //   return await this.roomService.leaveRoom(req);
-  // }
-
-  // // two routes have overlapped each other
-  // // so the shorter(url) one will be below
-
-  // @Debug()
-  // @Put("/:roomId")
-  // async updateRoom(
-  //   @Param("roomId") roomId: string,
-  //   @Body() req: UpdateRoomDto    // need only one of these properties for updating
-  //   ) {    
-  //   return await this.roomService.update(roomId, req);
-  // }
-
-  // @Debug()
-  // @Delete(":id")
-  // async deleteRoom(
-  //   @Param("id") partiId: string) {    
-  //   return await this.roomService.leaveRoom(partiId);
-  // }
   
 }

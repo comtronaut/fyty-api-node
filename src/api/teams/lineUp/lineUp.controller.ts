@@ -35,7 +35,7 @@ export class LineUpController{
   async getAllLineups(
     @Query("teamId") teamId: string){
 
-    return this.lineUpService.getLineUps(teamId);
+    return await this.lineUpService.getLineUps(teamId);
 
   }
 
@@ -44,7 +44,7 @@ export class LineUpController{
   async getLineup(
     @Param("id") lineUpId: string){
 
-    return this.lineUpService.getLineUpById(lineUpId);
+    return await this.lineUpService.getLineUpById(lineUpId);
   }
 
   @UseGuards(JwtAuthGuard)
