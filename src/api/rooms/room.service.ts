@@ -181,17 +181,10 @@ export class RoomService {
       const room = await this.roomModel.findOneByOrFail({ id: roomId });
       const game = await this.gameModel.findOneByOrFail({ id: room.gameId });
 
-      //const count = await this.participantService.countTeamGame(teamId, room.gameId);
-
       // check is room available
       if(room.status === RoomStatus.UNAVAILABLE || room.status === RoomStatus.FULL) {
         throw new Error("room is not available");
       }
-
-      // 1 team / room / game validation
-      // if(count > 0){
-      //   throw new Error("Your team has already joined some where");
-      // }      
 
       // update team count
       await this.roomModel.update({ id: roomId }, { teamCount: room.teamCount + 1 });
@@ -210,7 +203,8 @@ export class RoomService {
       const appointmentData = { startAt: room.startAt, endAt: room.endAt, roomId: room.id, status: "WAITING", isDel: false };
       const appointment = await this.appointmentModel.save(appointmentData);
 
-      await this.appointmentMemberModel.save({ teamId: teamId, appointId: appointment.id });
+      await this.appointmentMemberModel.save({ teamId: teamId, appointId: appointment.id });  // for guest
+      await this.appointmentMemberModel.save({ teamId: room.hostId, appointId: appointment.id }); // for host
       await this.roomRequestModel.delete({ id: request.id });
 
       return {

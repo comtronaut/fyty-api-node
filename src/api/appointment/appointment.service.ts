@@ -74,7 +74,7 @@ export class AppointmentService {
         let res = [];
 
         for(let i = 0; i < appointments.length; i++){
-          const val = await this.packAppointment(appointments[i]);
+          const val = await this.packAppointment(appointments[i], member.teamId);
           res.push(val);
         }
 
@@ -86,11 +86,26 @@ export class AppointmentService {
     }
   }
 
-  async packAppointment(appointment: Appointment){
+  async packAppointment(appointment: Appointment, teamId: string){
 
     try {
-        const appointMember = await this.appointmentMemberModel.findOneByOrFail({ appointId: appointment.id });
-        const team = await this.teamModel.findOneByOrFail({ id: appointMember.teamId });
+        const appointMember = await this.appointmentMemberModel.findAndCountBy({ appointId: appointment.id });
+
+        if(appointMember[1] !== 2){
+          return {
+            appointment: appointment,
+            team: null
+          };
+        }
+
+        let team = null;
+        if(appointMember[0][0].teamId === teamId){
+          team = await this.teamModel.findOneByOrFail({ id: appointMember[0][1].teamId });
+        }
+        else{
+          team = await this.teamModel.findOneByOrFail({ id: appointMember[0][0].teamId });
+        }
+
         return  {
           appointment: appointment,
           team: team
