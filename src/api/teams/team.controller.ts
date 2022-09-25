@@ -41,7 +41,6 @@ export class TeamController {
   @UseGuards(JwtAuthGuard)
   @Get(":id")
   async getTeamById(
-    @Subject() user: User,
     @Param("id") id: string,
   ) {
     return await this.teamService.getTeam(id);

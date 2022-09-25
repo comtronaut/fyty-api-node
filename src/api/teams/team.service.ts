@@ -29,7 +29,7 @@ export class TeamService {
   async getTeam(teamId: string) {
     try{
       
-      return this.teamModel.findOneByOrFail({ id: teamId });
+      return await this.teamModel.findOneByOrFail({ id: teamId });
     }
     catch(err){
       throw new BadRequestException(err.message);
