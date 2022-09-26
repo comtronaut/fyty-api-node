@@ -193,7 +193,7 @@ export class RoomService {
       }
 
       // update room status
-      await this.updateStatus(game, room);
+      await this.updateStatus(room);
 
       //find room request
       const request = await this.roomRequestModel.findOneByOrFail({ teamId: teamId, roomId: roomId });
