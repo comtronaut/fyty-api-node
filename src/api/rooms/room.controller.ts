@@ -70,7 +70,7 @@ export class RoomController {
   async getRoomsById(
     @Param("id") roomId: string,
   ) {
-    return await this.roomService.getAllRooms(roomId);
+    return await this.roomService.getRoomsById(roomId);
   }
 
   @UseGuards(JwtAuthGuard)    // new

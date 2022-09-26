@@ -12,8 +12,6 @@ export class CreateRoomDto {
   @ApiPropertyOptional()
   endAt: Date;
 
-  teamCount: number;
-
   @IsNotEmpty()
   teamlineUpIds: string;
 

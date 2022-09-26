@@ -39,7 +39,7 @@ export class RoomService {
       
       const lineUps = req.teamlineUpIds.split(",");
 
-      for(let i = 0; i < lineUps.length; i++ ){
+      for(let i = 0; i < lineUps.length; i++){
           await this.roomLineUpModel.save({ roomLineUpBoardId: board.id, teamLineUpId: lineUps[i] });
       }
 
@@ -192,9 +192,6 @@ export class RoomService {
         throw new Error("room is not available");
       }
 
-      // update team count
-      await this.roomModel.update({ id: roomId }, { teamCount: room.teamCount + 1 });
-
       // update room status
       await this.updateStatus(game, room);
 
@@ -225,7 +222,8 @@ export class RoomService {
   async updateStatus(game: Game, room: Room){
     const del = game.teamCap - room.teamCount;
     if(del === 1){ // available
-      room.status = RoomStatus.UNAVAILABLE; 
+      room.status = RoomStatus.UNAVAILABLE;
+      room.teamCount ++;
       await this.roomModel.update({ id: room.id }, room);
     }
   }
