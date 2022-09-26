@@ -66,7 +66,7 @@ export class AppointmentService {
         if(member === null){
           return {
             team: [],
-            appointments: []
+            appointment: []
           }
         }
         const appointmentMember = await this.appointmentMemberModel.findBy({ teamId: member.teamId });
