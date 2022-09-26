@@ -22,7 +22,7 @@ export class RoomRequestService {
             await this.roomLineUpModel.save({ teamLineUpId: lineUps[i], roomLineUpBoardId: board.id});
         }
 
-        const request = this.roomRequestModel.
+        const request = await this.roomRequestModel.
             save({ teamId: body.teamId, 
                  roomLineUpBoardId: board.id, 
                  roomId: roomId });
