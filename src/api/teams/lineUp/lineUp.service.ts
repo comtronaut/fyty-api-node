@@ -33,11 +33,11 @@ export class LineUpService {
 
   async update(user: User, lineUpId: string, req: UpdateLineUpDto){
       try{
-        const teamMember = await this.memberModel.findOneOrFail({ where: { userId:user.id } });
-        const team = await this.teamModel.findOneByOrFail({ id:teamMember.teamId});
+        const teamMember = await this.memberModel.findOneOrFail({ where: { userId: user.id } });
+        const team = await this.teamModel.findOneByOrFail({ id: teamMember.teamId});
         const lineup = await this.lineUpModel.findOneByOrFail({ id: lineUpId });
 
-        if(teamMember.role == "Manager" && team.id == lineup.teamId){ // cheack if you are Manager
+        if(teamMember.role === "Manager" || (teamMember.role === "Leader" && team.id === lineup.teamId)){ // cheack if you are Manager
           await this.lineUpModel.update(lineUpId, req);
           return req;
         }
@@ -96,10 +96,10 @@ export class LineUpService {
     }
   }
 
-  async deleteAllLineUps(ownerId: string, teamId: string){
+  async deleteAllLineUps(userId: string, teamId: string){
     try{
-        const targetedTeam = await this.teamModel.findOneByOrFail({ id: teamId });
-        if(targetedTeam.ownerId === ownerId){
+        const member = await this.memberModel.findOneByOrFail({ teamId: teamId, userId: userId });
+        if(member.role === "Manager" || member.id === "Leader"){
             await this.lineUpModel.delete({ teamId: teamId });
             return HttpStatus.NO_CONTENT;
         }
@@ -111,12 +111,13 @@ export class LineUpService {
     
   }
 
-  async deleteLineById(ownerId: string, lineUpId: string){
+  async deleteLineById(userId: string, lineUpId: string){
     try{
         const targetedLineUp = await this.lineUpModel.findOneByOrFail({ id: lineUpId });
-        const team = await this.teamModel.findOneByOrFail({ id: targetedLineUp.teamId })
+        const team = await this.teamModel.findOneByOrFail({ id: targetedLineUp.teamId });
+        const member = await this.memberModel.findOneByOrFail({ userId: userId, teamId: team.id });
         
-        if(team.ownerId === ownerId){
+        if(member.role === "Manager" || member.role === "Leader"){
             await this.lineUpModel.delete({ id: lineUpId });
             return HttpStatus.NO_CONTENT;
         }
@@ -126,8 +127,5 @@ export class LineUpService {
     }
     
   }
-
-  
-
 
 }

@@ -17,9 +17,15 @@ export class TeamService {
   // CRUD
   async create(user: User, req: CreateTeamDto) { // for manager only version
     try {
+
+      const teamCount = await this.memberModel.countBy({ userId: user.id });
+      if(teamCount > 0)
+        throw new Error("You already have team");
+
       req.ownerId = user.id; // set the team's owner
       const team = await this.teamModel.save(req);
-      const member = await this.memberModel.save({ teamId: team.id, userId: user.id, role: "Manager" });
+
+      await this.memberModel.save({ teamId: team.id, userId: user.id, role: "Manager" });
       return team;
     }
     catch(err) {
@@ -75,21 +81,20 @@ export class TeamService {
     }
   }
 
-  async delete(ownerID: string, teamId: string) {
+  async delete(userId: string, teamId: string) {
     try {
-      const targetedTeam = await this.teamModel.findOneByOrFail({ id: teamId });
-      if(targetedTeam.ownerId === ownerID)
-      await this.teamModel.delete(teamId);
+      const member = await this.memberModel.findOneByOrFail({ userId: userId, teamId: teamId });
+      if(member.role === "Manager")
+        await this.teamModel.delete(teamId);
+      else{
+        throw new Error("Only Manager can delete team");
+      }
 
-      return new HttpException("", HttpStatus.NO_CONTENT);
+      return HttpStatus.NO_CONTENT;
     }
      catch (err) {
       throw new BadRequestException(err.message);
     }
   }
-  // async clear(){
-    
-  //   await this.teamModel.clear();
-  //   return "PK";
-  // }
+
 }

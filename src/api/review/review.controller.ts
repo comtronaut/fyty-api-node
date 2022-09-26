@@ -26,16 +26,4 @@ export class ReviewController {
     return this.reviewService.getReviewById(id);
   }
 
-  // @Put("/review/:id")
-  // async updateReview(
-  //   @Param("id") reviewerId: string,
-  //   @Body() req: UpdateReviewDto ,) {
-  //   return this.reviewService.update(reviewerId, req);
-  // }
-
-  // @Delete("/:id")
-  // async daleteReview(
-  //   @Param("id") revieweId: string,) {
-  //   return this.reviewService.deleteReview(revieweId);
-  // }
 }
