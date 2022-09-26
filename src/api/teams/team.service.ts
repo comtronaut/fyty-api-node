@@ -4,7 +4,8 @@ import { CreateTeamDto, UpdateTeamDto } from "src/model/dto/team.dto";
 import { Team } from "src/model/sql-entity/team/team.entity";
 import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
 import { User } from "src/model/sql-entity/user/user.entity";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
+import e from "express";
 
 @Injectable()
 export class TeamService {
@@ -30,6 +31,16 @@ export class TeamService {
     try{
       
       return await this.teamModel.findOneByOrFail({ id: teamId });
+    }
+    catch(err){
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async getMyTeam(userId: string) {
+    try{
+      const members = await this.memberModel.findBy({ userId: userId });
+      return await this.teamModel.findBy({ id: In (members.map (e => e.teamId)) });
     }
     catch(err){
       throw new BadRequestException(err.message);

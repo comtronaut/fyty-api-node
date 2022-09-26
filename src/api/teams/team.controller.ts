@@ -39,12 +39,22 @@ export class TeamController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(":id")
+  @Get("/me")
+  async getMyTeam(
+    @Subject() user: User,
+  ) {
+    return await this.teamService.getMyTeam(user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("/:id")
   async getTeamById(
     @Param("id") id: string,
   ) {
     return await this.teamService.getTeam(id);
   }
+
+  
 
   @UseGuards(JwtAuthGuard)
   @Put(":id")

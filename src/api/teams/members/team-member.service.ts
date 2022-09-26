@@ -48,8 +48,8 @@ export class TeamMemberService {
 
   async kickMember(teammemberId: string, user: User) {
     try {
-      const member =  await this.memberModel.findOneOrFail({ where: { userId:user.id } });
-      if (member.role == "Manager" || member.role == "Leader") {
+      const member = await this.memberModel.findOneOrFail({ where: { userId: user.id } });
+      if (member.role === "Manager" || member.role === "Leader") {
         const res = await this.memberModel.delete({ id: teammemberId });
         if (res.affected === 0) {
           return new HttpException("", HttpStatus.NO_CONTENT)
