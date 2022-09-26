@@ -219,13 +219,10 @@ export class RoomService {
     }
   }
 
-  async updateStatus(game: Game, room: Room){
-    const del = game.teamCap - room.teamCount;
-    if(del === 1){ // available
+  async updateStatus(room: Room){
       room.status = RoomStatus.UNAVAILABLE;
       room.teamCount ++;
       await this.roomModel.update({ id: room.id }, room);
-    }
   }
 
   async leaveRoom(participantId: string) {
