@@ -36,7 +36,6 @@ export class LineUpController{
     @Query("teamId") teamId: string){
 
     return await this.lineUpService.getLineUps(teamId);
-
   }
 
   @UseGuards(JwtAuthGuard)

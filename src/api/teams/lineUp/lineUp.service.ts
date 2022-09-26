@@ -38,7 +38,8 @@ export class LineUpService {
         const lineup = await this.lineUpModel.findOneByOrFail({ id: lineUpId });
 
         if((teamMember.role === "Manager" || teamMember.role === "Leader") && team.id === lineup.teamId){ // cheack if you are Manager
-          await this.lineUpModel.update(lineUpId, req);
+          const res = await this.lineUpModel.update({ id: lineUpId }, req);
+          console.log(res);
           return req;
         }
         else{

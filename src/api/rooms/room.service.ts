@@ -79,8 +79,11 @@ export class RoomService {
     try{
       const participants = await this.participantModel.findBy({ teamId: teamId });
       const joined = await this.roomModel.findBy({ id: In (participants.map(e => e.roomId ))});
+
       const request = await this.roomRequestModel.findBy({ teamId: teamId });
       const requested = await this.roomModel.findBy({ id: In (request.map(e => e.roomId)) });
+
+      console.log(requested);
 
       return {
         joined: joined,
