@@ -172,6 +172,7 @@ export class RoomService {
 
         // remove appointment
         await this.appointmentModel.delete({ roomId: room.id });
+        
         const res = await this.roomModel.delete(room.id);
         if(res.affected !== 0) {
 
