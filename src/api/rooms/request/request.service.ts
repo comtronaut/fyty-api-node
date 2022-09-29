@@ -36,7 +36,7 @@ export class RoomRequestService {
   
   async getRoomRequest(roomId: string){
     try{
-        return this.roomRequestModel.findBy({ roomId: roomId });
+        return await this.roomRequestModel.findBy({ roomId: roomId });
     }
     catch(err){
         throw new BadRequestException(err.message);
@@ -45,7 +45,7 @@ export class RoomRequestService {
 
   async getRoomRequestByTeamId(teamId: string){
     try{
-      return this.roomRequestModel.findBy({ teamId: teamId });
+      return await this.roomRequestModel.findBy({ teamId: teamId });
     }
     catch(err){
       throw new BadRequestException(err.message);

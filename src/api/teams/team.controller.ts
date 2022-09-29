@@ -11,7 +11,6 @@ import { map, Observable, Subject as SJ } from 'rxjs';
 
 @Controller("api/teams")
 export class TeamController {
-  private readonly subject = new SJ();
   constructor(
     private readonly teamService: TeamService,
     private readonly teammemberService: TeamMemberService,
@@ -24,7 +23,7 @@ export class TeamController {
     @Subject() user: User,
     @Body() req: CreateTeamDto,
   ) {
-    return this.teamService.create(user, req);
+    return await this.teamService.create(user, req);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -32,9 +31,9 @@ export class TeamController {
   async getTeamsByGameId(
     @Param("gameId") gameId: string) {
     if (gameId) {
-      return this.teamService.getTeamsByGameId(gameId);
+      return await this.teamService.getTeamsByGameId(gameId);
     }
-    return this.teamService.getAllTeam();
+    return await this.teamService.getAllTeam();
 
   }
 
@@ -54,8 +53,6 @@ export class TeamController {
     return await this.teamService.getTeam(id);
   }
 
-  
-
   @UseGuards(JwtAuthGuard)
   @Put(":id")
   async updateTeam(
@@ -71,7 +68,6 @@ export class TeamController {
     @Subject() user: User,
     @Param("id") teamId: string
   ) {
-
     return await this.teamService.delete(user.id, teamId);
   }
 
@@ -81,70 +77,63 @@ export class TeamController {
   @Get(":id/members")
   async getMembersByTeamId(
     @Param("id") teamId: string) {
-    return this.teammemberService.getMemberByTeamId(teamId);
+    return await this.teammemberService.getMemberByTeamId(teamId);
   }
 
   @Post("/members")
   async createMember(
     @Body() req: CreateTeamMemberDto,
   ) {
-    return this.teammemberService.create(req);
+    return await this.teammemberService.create(req);
   }
 
   @Put("/members/:id")
   async updateMemberRole(
-    @Param("id") teammemberId: string,
+    @Param("id") teamMemberId: string,
     @Body() req: UpdateTeamMemberDto,) {
-    return this.teammemberService.update(teammemberId, req);
+    return await this.teammemberService.update(teamMemberId, req);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete("/members/:id")
   async kickMember(
-    @Param("id") teammemberId: string,
+    @Param("id") teamMemberId: string,
     @Subject() user: User) {
-    return this.teammemberService.kickMember(teammemberId,user);
+    return await this.teammemberService.kickMember(teamMemberId, user);
   }
 
   @Delete("/members/:id/leave")
   async leaveTeam(
-    @Param("id") teammemberId: string,) {
-    return this.teammemberService.leaveTeam(teammemberId);
+    @Param("id") teamMemberId: string,) {
+    return this.teammemberService.leaveTeam(teamMemberId);
   }
-
-  // @Debug()
-  // @Delete("/:gameId")
-  // async deleteUser(@Param("gameId") gameId: string) {    
-  //   return await this.teamService.delete(gameId);
-  // }
-
 
   // team pending
 
   @Get(":id/pending")
   async getPendingByTeamId(
     @Param("id") teamId: string) {
-    return this.teampendingService.getTeamPending(teamId);
+    return await this.teampendingService.getTeamPending(teamId);
   }
 
   @Get(":id/invitation")
   async getInvitationByTeamId(
     @Param("id") teamId: string) {
-    return this.teampendingService.getTeamInvitation(teamId);
+    return await this.teampendingService.getTeamInvitation(teamId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get("/pending/me")
   async getPendingByUserId(
     @Subject() user: User) {
-    return this.teampendingService.getTeamPendingByUser(user.id);
+    return await this.teampendingService.getTeamPendingByUser(user.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get("/invitation/me")
   async getInvitationByUserId(
     @Subject() user: User) {
-    return this.teampendingService.getTeamInvitationByUser(user.id);
+    return await this.teampendingService.getTeamInvitationByUser(user.id);
   }
 
   @Post("/pending")
@@ -152,7 +141,7 @@ export class TeamController {
     @Body() req: CreateTeamPendingDto,
   ) {
     // this.subject.next({ req });
-    return this.teampendingService.createTeamPending(req);
+    return await this.teampendingService.createTeamPending(req);
   }
 
   @Post("/invitation")
@@ -160,7 +149,7 @@ export class TeamController {
     @Body() req: CreateTeamPendingDto,
   ) {
     // this.subject.next({ req });
-    return this.teampendingService.createTeamInvitation(req);
+    return await this.teampendingService.createTeamInvitation(req);
   }
 
   @Put("/pending/:id")
@@ -168,15 +157,16 @@ export class TeamController {
     @Param("id") teampendingId: string,
     @Body() req: UpdateTeamPendingDto,) {
     // this.subject.next({ req });
-    return this.teampendingService.updateStatus(teampendingId,req);
+    return await this.teampendingService.updateStatus(teampendingId,req);
   }
 
   @Delete("/pending/:id")
   async discardpending(
     @Param("id") teampendingId: string,) {
     // this.subject.next({ teampendingId });
-    return this.teampendingService.discard(teampendingId);
+    return await this.teampendingService.discard(teampendingId);
   }
+
 //server sending
   // @Sse("/sse")
   // sse(): Observable<MessageEvent> {
@@ -185,4 +175,5 @@ export class TeamController {
   //     map((data: any) => ({ data }))
   //   );
   // }
+  
 }

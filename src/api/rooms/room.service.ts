@@ -1,7 +1,6 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common";
-import { Cron, CronExpression } from "@nestjs/schedule";
+import { Cron } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
-import e from "express";
 import moment from "moment";
 import { RoomStatus } from "src/common/_enum";
 import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room/room.dto";
@@ -11,10 +10,8 @@ import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.en
 import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
 import { RoomRequest } from "src/model/sql-entity/room/request.entity";
 import { Room } from "src/model/sql-entity/room/room.entity";
-import { Between, In, LessThanOrEqual, MoreThan, Repository } from "typeorm";
+import { Between, In, LessThanOrEqual, Repository } from "typeorm";
 import { ChatService } from "../chats/chat.service";
-import { RoomParticipantService } from "./participants/participant.service";
-
 
 @Injectable()
 export class RoomService {
@@ -27,7 +24,6 @@ export class RoomService {
     @InjectRepository(Game) private gameModel: Repository<Game>,
     @InjectRepository(Appointment) private appointmentModel: Repository<Appointment>,
     @InjectRepository(AppointmentMember) private appointmentMemberModel: Repository<AppointmentMember>,
-    private readonly participantService: RoomParticipantService,
     private readonly chatService: ChatService,
   ) { }
   
@@ -39,14 +35,9 @@ export class RoomService {
       // console.log(timestramp);
       timestramp = moment(timestramp).add(391, 'm').toDate();
 
-      const room = await this.roomModel.delete({endAt:LessThanOrEqual(timestramp)});
+      await this.roomModel.delete({endAt:LessThanOrEqual(timestramp)});
       // console.log(timestramp)
-
-      if(room.affected !== 0) {
-        return ;
-      }
-      
-      throw new Error("room is not deleted");
+      return ;
 
       }catch (err) {
       throw new BadRequestException(err.message);
@@ -131,7 +122,7 @@ export class RoomService {
 
   async getRoomsById(roomId: string) {  
     try{
-      return this.roomModel.findBy({ id: roomId });
+      return await this.roomModel.findBy({ id: roomId });
     }
     catch(err){
       throw new BadRequestException(err.message);

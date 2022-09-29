@@ -11,19 +11,19 @@ export class ReviewController {
   @Post()
   async createReview(
     @Body() req: CreateReviewDto) {
-    return this.reviewService.createReview(req);
+    return await this.reviewService.createReview(req);
   }
 
   @Get("")
   async getReview(
     @Query() revieweeId: UpdateReviewDto) {
-    return this.reviewService.getReviewFilter(revieweeId);
+    return await this.reviewService.getReviewFilter(revieweeId);
   }
   
   @Get(":id")
   async getReviewById(
     @Param("id") id: string) {
-    return this.reviewService.getReviewById(id);
+    return await this.reviewService.getReviewById(id);
   }
 
 }

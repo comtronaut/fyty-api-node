@@ -16,25 +16,24 @@ export class ReviewService {
   ) { }
   
   // CRUD
-  async createReview( req : CreateReviewDto) {
+  async createReview(req : CreateReviewDto) {
     try {
       const review=await this.reviewModel.save(req);
-      const [useravatar,reviewscore] = await Promise.all([
-        this.avatarModel.findOneOrFail({where:{userId:req.revieweeId,gameId:req.gameId}}),
-        this.reviewModel.findAndCount({where:{revieweeId:req.revieweeId,gameId:req.gameId}})
+      const [useravatar, reviewscore] = await Promise.all([
+        this.avatarModel.findOneOrFail({ where: { userId: req.revieweeId, gameId: req.gameId }}),
+        this.reviewModel.findAndCount({ where: { revieweeId: req.revieweeId, gameId: req.gameId}})
       ])
       let count = reviewscore[1];
       let nowscore = 0;
       // console.log(count);
       // console.log(nowscore);
       reviewscore[0].map((score)=>{
-        nowscore=nowscore+Number(score.ratingScore);
+        nowscore = nowscore + Number(score.ratingScore);
         // console.log(nowscore);
       })
-      nowscore=nowscore/count;
-      useravatar.ratingScore=nowscore;
-      this.avatarService.update(useravatar.id,useravatar);
-      console.log(useravatar);
+      nowscore = nowscore / count;
+      useravatar.ratingScore = nowscore;
+      await this.avatarService.update(useravatar.id, useravatar);
       return review;
     }
     catch(err) {

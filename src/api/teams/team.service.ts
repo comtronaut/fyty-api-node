@@ -90,7 +90,7 @@ export class TeamService {
         throw new Error("Only Manager can delete team");
       }
 
-      return HttpStatus.NO_CONTENT;
+      return HttpStatus.OK;
     }
      catch (err) {
       throw new BadRequestException(err.message);
