@@ -1,6 +1,8 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
 import e from "express";
+import moment from "moment";
 import { RoomStatus } from "src/common/_enum";
 import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room/room.dto";
 import { Appointment, AppointmentMember } from "src/model/sql-entity/appointment.entity";
@@ -9,7 +11,7 @@ import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.en
 import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
 import { RoomRequest } from "src/model/sql-entity/room/request.entity";
 import { Room } from "src/model/sql-entity/room/room.entity";
-import { Between, In, MoreThan, Repository } from "typeorm";
+import { Between, In, LessThanOrEqual, MoreThan, Repository } from "typeorm";
 import { ChatService } from "../chats/chat.service";
 import { RoomParticipantService } from "./participants/participant.service";
 
@@ -25,11 +27,32 @@ export class RoomService {
     @InjectRepository(Game) private gameModel: Repository<Game>,
     @InjectRepository(Appointment) private appointmentModel: Repository<Appointment>,
     @InjectRepository(AppointmentMember) private appointmentMemberModel: Repository<AppointmentMember>,
-
     private readonly participantService: RoomParticipantService,
     private readonly chatService: ChatService,
   ) { }
   
+  @Cron('* */30 * * * *')
+  async handleCron() {
+    try {
+      var time = Date.now();
+      let timestramp = new Date(time);
+      // console.log(timestramp);
+      timestramp = moment(timestramp).add(391, 'm').toDate();
+
+      const room = await this.roomModel.delete({endAt:LessThanOrEqual(timestramp)});
+      // console.log(timestramp)
+
+      if(room.affected !== 0) {
+        return ;
+      }
+      
+      throw new Error("room is not deleted");
+
+      }catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
   // CRUD
   async create(req: CreateRoomDto) {
     try {
@@ -170,8 +193,8 @@ export class RoomService {
 
       if(room.hostId === teamId){
 
-        // remove appointment
-        await this.appointmentModel.delete({ roomId: room.id });
+        // // remove appointment
+        // await this.appointmentModel.delete({ roomId: room.id });
         
         const res = await this.roomModel.delete(room.id);
         if(res.affected !== 0) {
@@ -264,5 +287,7 @@ export class RoomService {
       throw new BadRequestException(err.message);
     }
   }
-
+  
 }
+
+
