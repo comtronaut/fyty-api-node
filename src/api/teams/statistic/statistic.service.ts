@@ -27,8 +27,8 @@ export class TeamStatisticService {
 
     async getMatches(teamId: string){
       try {
-        let hostedMatches = this.matchHistoryModel.findBy({hostId: teamId});
-        let guestedmatches = this.matchHistoryModel.findBy({guestId: teamId});
+        let hostedMatches = await this.matchHistoryModel.findBy({hostId: teamId});
+        let guestedmatches = await this.matchHistoryModel.findBy({guestId: teamId});
 
         // find both that ur make a matches on host and guest
 

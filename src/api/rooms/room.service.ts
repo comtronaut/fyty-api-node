@@ -172,7 +172,8 @@ export class RoomService {
 
         // create match history right here
 
-
+        // remove appointment
+        await this.appointmentModel.delete({ roomId: room.id });
 
         const res = await this.roomModel.delete(room.id);
         if(res.affected !== 0) {
@@ -247,6 +248,9 @@ export class RoomService {
       // update room status
       room.status = RoomStatus.AVAILABLE;
       await this.roomModel.update({ id: room.id }, room);
+
+      // remove appointment
+      await this.appointmentModel.delete({ roomId: room.id });
 
       // remove participant from the room
       
