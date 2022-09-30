@@ -8,7 +8,7 @@ export class CreateLineUpDto {
     teamId: string;
 
     @ApiPropertyOptional()
-    isDefault: boolean;
+    isDefault: any;
 
     @ApiPropertyOptional()
     @IsNotEmpty()
