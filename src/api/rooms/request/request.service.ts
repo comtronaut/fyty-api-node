@@ -15,6 +15,11 @@ export class RoomRequestService {
 
   async create(roomId: string, body: CreateRoomRequestDto){
     try{
+        
+        if(await this.roomRequestModel.countBy({ roomId: roomId, teamId: body.teamId }) !==  0){
+          throw new Error("Your team already send the request");
+        }
+
         const board = await this.roomLineUpBoardModel.save({});
         const lineUps = body.teamlineUpIds.split(",");
         
