@@ -97,8 +97,6 @@ export class RoomService {
       const request = await this.roomRequestModel.findBy({ teamId: teamId });
       const requested = await this.roomModel.findBy({ id: In (request.map(e => e.roomId)) });
 
-      console.log(requested);
-
       return {
         joined: joined,
         requested: requested
@@ -253,7 +251,7 @@ export class RoomService {
       const room = await this.roomModel.findOneByOrFail({ id: parti.roomId });
 
       // update participant count
-      await this.roomModel.update({ id: room.id }, { teamCount: room.teamCount - 1 });
+      room.teamCount -= 1; 
 
       // update room status
       room.status = RoomStatus.AVAILABLE;
