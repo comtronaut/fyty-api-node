@@ -54,15 +54,12 @@ export class RoomRequestService {
 
   async delete(requestId: string, userId: string){
     try{
-        if(await this.validateUser(requestId, userId)){
-            console.log(requestId);
-            const res = await this.roomRequestModel.delete({ id: requestId });
-            if(res.affected === 1){
-                return HttpStatus.NO_CONTENT;
-            }
-            else{
-                return Error("can't delete request Id: " + { requestId });
-            }
+        const res = await this.roomRequestModel.delete({ id: requestId });
+        if(res.affected === 1){
+            return HttpStatus.NO_CONTENT;
+        }
+        else{
+            return Error("can't delete request Id: " + { requestId });
         }
     }
     catch(err){
