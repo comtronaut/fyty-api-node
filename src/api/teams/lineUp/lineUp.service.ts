@@ -34,8 +34,6 @@ export class LineUpService {
   async update(user: User, lineUpId: string, req: UpdateLineUpDto){
       try{
         const teamMember = await this.memberModel.findOneOrFail({ where: { userId: user.id } });
-        const team = await this.teamModel.findOneByOrFail({ id: teamMember.teamId});
-        const lineup = await this.lineUpModel.findOneByOrFail({ id: lineUpId });
 
         if((teamMember.role === "Manager" || teamMember.role === "Leader")){ // cheack if you are Manager
           await this.lineUpModel.update({ id: lineUpId }, req);

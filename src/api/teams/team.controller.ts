@@ -148,15 +148,14 @@ export class TeamController {
   async createInvitation(
     @Body() req: CreateTeamPendingDto,
   ) {
-    // this.subject.next({ req });
     return await this.teampendingService.createTeamInvitation(req);
   }
 
   @Put("/pending/:id")
   async updateStatusTeampending(
     @Param("id") teampendingId: string,
-    @Body() req: UpdateTeamPendingDto,) {
-    // this.subject.next({ req });
+    @Body() req: UpdateTeamPendingDto,
+  ) {
     return await this.teampendingService.updateStatus(teampendingId,req);
   }
 
