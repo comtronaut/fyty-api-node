@@ -5,7 +5,6 @@ import { Team } from "src/model/sql-entity/team/team.entity";
 import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
 import { User } from "src/model/sql-entity/user/user.entity";
 import { In, Repository } from "typeorm";
-import e from "express";
 
 @Injectable()
 export class TeamService {

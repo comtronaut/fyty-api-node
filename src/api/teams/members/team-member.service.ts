@@ -63,15 +63,11 @@ export class TeamMemberService {
     }
   }
 
-  async leaveTeam(teammemberId: string) {
+  async leaveTeam(teamMemberId: string) {
     try {
-      const teamMember = await this.memberModel.findOneOrFail({ where: { id: teammemberId } });
+      const teamMember = await this.memberModel.findOneOrFail({ where: { id: teamMemberId } });
       const countManager = await this.memberModel.findAndCount({ where: { role: "Manager", teamId: teamMember.teamId } });
-      const res = await this.memberModel.delete({ id: teammemberId });
-
-      if (res.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT)
-      }
+      await this.memberModel.delete({ id: teamMemberId });
 
       const countMember = await this.memberModel.countBy({ teamId: teamMember.teamId });
 
