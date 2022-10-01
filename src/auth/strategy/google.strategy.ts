@@ -8,7 +8,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
     super({
       clientID: "104576599206-2vtuoc5d1ua4vq1a40j46s1qljdv4pj0.apps.googleusercontent.com", 
       clientSecret: "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",                                  
-      callbackURL: "http://fyty-esport.com/auth/user/google",                                  
+      callbackURL: "https://fyty-api-obt.herokuapp.com/auth/user/google",                                  
       scope: [ "email", "profile" ]
     });
   }
