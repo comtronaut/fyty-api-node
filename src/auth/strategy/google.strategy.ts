@@ -6,9 +6,9 @@ import { Injectable } from "@nestjs/common";
 export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
   constructor() {
     super({
-      clientID: "104576599206-ibbgib9d0jeddhdjecqflr7bcelkm0pc.apps.googleusercontent.com", // yes same as facebook
-      clientSecret: "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",                                  // 
-      callbackURL: "https://comafyty.herokuapp.com/login",                                  //
+      clientID: "104576599206-2vtuoc5d1ua4vq1a40j46s1qljdv4pj0.apps.googleusercontent.com", 
+      clientSecret: "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",                                  
+      callbackURL: "http://fyty-esport.com/auth/user/google",                                  
       scope: [ "email", "profile" ]
     });
   }
