@@ -39,9 +39,9 @@ export class AuthController {
 
     // ok try to imprement functions on AuthService and use them here
 
-    // const res = await this.authService.getUserByOAuth(req.user as Response.OAuthResult);
+    const res = await this.authService.getUserByOAuth(req.user);
 
-    // return res;
+    return res;
   }
 
   @Get("/user/facebook")

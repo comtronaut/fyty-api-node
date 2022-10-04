@@ -13,25 +13,25 @@ export class AuthService {
     @InjectRepository(User) private userModel: Repository<User>,
   ) {}
 
-  // async getUserByOAuth(user: Response.OAuthResult) {
-  //   try {
-  //     if (user.email) {
-  //       const res = await this.getUserByUsername(user.email);
+  async getUserByOAuth(user: any) {
+    try {
+      if (user.email) {
+        const res = await this.getUserByUsername(user.email);
   
-  //       return this.getAccessToken(res.username);
-  //     }
-  //   }
-  //   catch (err) {}
+        return this.getAccessToken(res.username);
+      }
+    }
+    catch (err) {}
 
-  //   return {
-  //     requiredRegister: true,
-  //     user
-  //   };
-  // }
+    return {
+      requiredRegister: true,
+      user
+    };
+  }
 
-  // async getUserByUsername(username: User["username"]): Promise<User> {
-  //   return await this.usersRepository.findOneOrFail({ where: { username }}); 
-  // }
+  async getUserByUsername(username: User["username"]): Promise<User> {
+    return await this.userModel.findOneOrFail({ where: { username }}); 
+  }
 
   // async getUserByEmail(email: User["email"]): Promise<User> {
   //   return await this.usersRepository.findOneOrFail({ where: { email }}); 
