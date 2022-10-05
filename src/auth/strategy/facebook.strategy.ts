@@ -8,7 +8,7 @@ export class FacebookStrategy extends PassportStrategy(Strategy, "facebook") {
     super({
       clientID: "633711121656488",                         // need to change
       clientSecret: "7eb0bdd030f31c027c027f818abb4be6",    // this too
-      callbackURL: "https://fyty-api-obt.herokuapp.com/auth/user/facebook", // yes, of course; so use localhost:xxxx for test
+      callbackURL: "https://fyty-esport.com/login", // yes, of course; so use localhost:xxxx for test
       scope: "email",
       profileFields: [ "name", "photos", "emails" ]
     });
