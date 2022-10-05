@@ -30,7 +30,7 @@ export class Team extends AbstractModel {
   gameId: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @Column({ type: "uuid", unique: true })
+  @Column({ type: "uuid" })
   ownerId: string;
 
   @CreateDateColumn()

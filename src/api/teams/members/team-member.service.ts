@@ -54,36 +54,29 @@ export class TeamMemberService {
         if (res.affected === 0) {
           return new HttpException("", HttpStatus.NO_CONTENT)
         }
-        console.log(res);
-        return;
+        return HttpStatus.OK;
       }else{
-        console.log("Can't kick member");
-        return;
+        throw new Error("Permission denined");
       }
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async leaveTeam(teammemberId: string) {
+  async leaveTeam(teamMemberId: string) {
     try {
-      const teamMember = await this.memberModel.findOneOrFail({ where: { id: teammemberId } });
+      const teamMember = await this.memberModel.findOneOrFail({ where: { id: teamMemberId } });
       const countManager = await this.memberModel.findAndCount({ where: { role: "Manager", teamId: teamMember.teamId } });
-      const res = await this.memberModel.delete({ id: teammemberId });
-
-      if (res.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT)
-      }
+      await this.memberModel.delete({ id: teamMemberId });
 
       const countMember = await this.memberModel.countBy({ teamId: teamMember.teamId });
 
       if(countMember == 0){
         await this.teamModel.delete({ id: teamMember.teamId });
-        return "Delete empty team";
+        return HttpStatus.NO_CONTENT;
       }
 
       if(teamMember.role == "Manager" && countManager[1] == 1){
-        console.log(countManager[1])
         await this.teamModel.delete({ id: teamMember.teamId });
       }
 
@@ -94,29 +87,4 @@ export class TeamMemberService {
     }
   }
 
-  // async promoteOrDemoteMember(req: Record<string, any>) {
-  //   try {
-
-  //   } catch(err) {
-  //     throw new BadRequestException(err.message);
-  //   }
-  // }
-
-  //   async getTeamsByGameId(gameId: string) {
-  //     return await this.teamModel.find({ where: { gameId }});
-  //   }
-
-
-
-  // async delete(gameId: string) {
-  //   try {
-  //     const res = await this.memberModel.delete(gameId);
-  //     if(res.affected === 0) {
-  //       return new HttpException("", HttpStatus.NO_CONTENT)
-  //     }
-  //     return;
-  //   } catch (err) {
-  //     throw new BadRequestException(err.message);
-  //   }
-  // }
 }

@@ -47,7 +47,7 @@ export class TeampendingService{
   }
 
   async createTeamInvitation(req: CreateTeamPendingDto) {
-    req.status ='invitation';
+    req.status = 'invitation';
     return await this.teampendingModel.save(req);
   }
 
@@ -65,13 +65,13 @@ export class TeampendingService{
     }
   }
 
-  async discard(teampendingId: string) {
+  async discard(teamPendingId: string) {
     try {
-      const res = await this.teampendingModel.delete({id:teampendingId});
+      const res = await this.teampendingModel.delete({id: teamPendingId});
       if(res.affected === 0) {
         return new HttpException("", HttpStatus.NO_CONTENT)
       }
-      return;
+      return HttpStatus.OK;
     } catch (err) {
       throw new BadRequestException(err.message);
     }

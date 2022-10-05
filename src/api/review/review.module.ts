@@ -10,10 +10,10 @@ import { UserAvatar } from "src/model/sql-entity/user/userAvatar.entity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ User,Review ,UserAvatar ])
+    TypeOrmModule.forFeature([ User, Review , UserAvatar ])
   ],
   controllers: [ ReviewController ],
-  providers: [ ReviewService,UserAvatarService ]
+  providers: [ ReviewService, UserAvatarService ]
 })
 
 export class ReviewModule { }

@@ -6,9 +6,9 @@ import { Injectable } from "@nestjs/common";
 export class FacebookStrategy extends PassportStrategy(Strategy, "facebook") {
   constructor() {
     super({
-      clientID: "327208906123145",                         // need to change
-      clientSecret: "8598db27bae5da694dbe506dc6b3750e",    // this too
-      callbackURL: "https://comafyty.herokuapp.com/login", // yes, of course; so use localhost:xxxx for test
+      clientID: "633711121656488",                         // need to change
+      clientSecret: "7eb0bdd030f31c027c027f818abb4be6",    // this too
+      callbackURL: "https://fyty-esport.com/login", // yes, of course; so use localhost:xxxx for test
       scope: "email",
       profileFields: [ "name", "photos", "emails" ]
     });

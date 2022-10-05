@@ -34,12 +34,15 @@ export class LineUpService {
   async update(user: User, lineUpId: string, req: UpdateLineUpDto){
       try{
         const teamMember = await this.memberModel.findOneOrFail({ where: { userId: user.id } });
-        const team = await this.teamModel.findOneByOrFail({ id: teamMember.teamId});
-        const lineup = await this.lineUpModel.findOneByOrFail({ id: lineUpId });
-
-        if((teamMember.role === "Manager" || teamMember.role === "Leader") && team.id === lineup.teamId){ // cheack if you are Manager
-          const res = await this.lineUpModel.update({ id: lineUpId }, req);
-          console.log(res);
+        
+        if(req.isDefault === "true"){
+          req.isDefault = true;
+        }else if(req.isDefault === "false"){
+          req.isDefault = false;
+        }
+        
+        if((teamMember.role === "Manager" || teamMember.role === "Leader")){ // cheack if you are Manager
+          await this.lineUpModel.update({ id: lineUpId }, req);
           return req;
         }
         else{

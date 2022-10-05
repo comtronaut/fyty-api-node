@@ -95,8 +95,7 @@ export class UserController {
   async getUserAvatarBygameId(
     @Subject() user: User,
     @Param("id") gameId: string) {
-      console.log(gameId);
-    return this.avatarService.getUserAvatarByGameId(gameId, user);
+    return await this.avatarService.getUserAvatarByGameId(gameId, user);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -104,19 +103,19 @@ export class UserController {
   async getUserAvatar(
     @Query("userId") userId: string,
     @Query("gameId") gameId: string) {
-    return this.avatarService.getUserAvatar(userId, gameId);
+    return await this.avatarService.getUserAvatar(userId, gameId);
   }
 
   @Put("/avatar/:id")
   async updateUserAvatar(
     @Param("id") avatarId: string,
     @Body() req: UpdateUserAvatarDto) {
-    return this.avatarService.update(avatarId, req);
+    return await this.avatarService.update(avatarId, req);
   }
 
   @Delete("/avatar/:id")
   async daleteUserAvatar(
     @Param("id") avatarId: string) {
-    return this.avatarService.deleteUserAvatar(avatarId);
+    return await this.avatarService.deleteUserAvatar(avatarId);
   }
 }

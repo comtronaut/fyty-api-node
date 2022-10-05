@@ -15,6 +15,11 @@ export class RoomRequestService {
 
   async create(roomId: string, body: CreateRoomRequestDto){
     try{
+        
+        if(await this.roomRequestModel.countBy({ roomId: roomId, teamId: body.teamId }) !==  0){
+          throw new Error("Your team already send the request");
+        }
+
         const board = await this.roomLineUpBoardModel.save({});
         const lineUps = body.teamlineUpIds.split(",");
         
@@ -36,7 +41,7 @@ export class RoomRequestService {
   
   async getRoomRequest(roomId: string){
     try{
-        return this.roomRequestModel.findBy({ roomId: roomId });
+        return await this.roomRequestModel.findBy({ roomId: roomId });
     }
     catch(err){
         throw new BadRequestException(err.message);
@@ -45,7 +50,7 @@ export class RoomRequestService {
 
   async getRoomRequestByTeamId(teamId: string){
     try{
-      return this.roomRequestModel.findBy({ teamId: teamId });
+      return await this.roomRequestModel.findBy({ teamId: teamId });
     }
     catch(err){
       throw new BadRequestException(err.message);
@@ -54,16 +59,13 @@ export class RoomRequestService {
 
   async delete(requestId: string, userId: string){
     try{
-        if(await this.validateUser(requestId, userId)){
-            const res = await this.roomRequestModel.delete({ id: requestId });
-            if(res.affected === 1){
-                return HttpStatus.NO_CONTENT;
-            }
-            else{
-                return Error("can't delete request Id: " + { requestId });
-            }
+        const res = await this.roomRequestModel.delete({ id: requestId });
+        if(res.affected === 1){
+            return HttpStatus.NO_CONTENT;
         }
-        
+        else{
+            return Error("can't delete request Id: " + { requestId });
+        }
     }
     catch(err){
         throw new BadRequestException(err.message);
