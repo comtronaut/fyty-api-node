@@ -15,27 +15,31 @@ export class AuthService {
 
   async getUserByOAuth(user: any) {
     try {
-      if (user.email) {
-        const res = await this.getUserByUsername(user.email);
-  
-        return this.getAccessToken(res.username);
-      }
-    }
-    catch (err) {}
 
-    return {
-      requiredRegister: true,
-      user
-    };
+      const res = await this.userModel.findOneBy({ email: user.email });
+      if(res !== null)
+        return this.getAccessToken(res.id);
+
+      else{
+        return {
+          requiredRegister: true,
+          user
+        };
+      }
+      
+    }
+    catch (err) {
+      throw new Error(err.message);
+    }
   }
 
   async getUserByUsername(username: User["username"]): Promise<User> {
     return await this.userModel.findOneOrFail({ where: { username }}); 
   }
 
-  // async getUserByEmail(email: User["email"]): Promise<User> {
-  //   return await this.usersRepository.findOneOrFail({ where: { email }}); 
-  // }
+  async getUserByEmail(email: User["email"]): Promise<User> {
+    return await this.userModel.findOneOrFail({ where: { email }}); 
+  }
 
   async getUserById(id: User["id"]) {
     return await this.userModel.findOneOrFail({ where: { id }})
