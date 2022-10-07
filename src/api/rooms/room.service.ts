@@ -10,6 +10,8 @@ import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.en
 import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
 import { RoomRequest } from "src/model/sql-entity/room/request.entity";
 import { Room } from "src/model/sql-entity/room/room.entity";
+import { MatchDetail } from "src/model/sql-entity/team/statistic/matchDetail.entity";
+import { MatchHistory } from "src/model/sql-entity/team/statistic/matchHistory.entity";
 import { Between, In, LessThanOrEqual, Repository } from "typeorm";
 import { ChatService } from "../chats/chat.service";
 
@@ -21,9 +23,15 @@ export class RoomService {
     @InjectRepository(RoomParticipant) private participantModel: Repository<RoomParticipant>,
     @InjectRepository(RoomLineupBoard) private roomLineUpBoardModel: Repository<RoomLineupBoard>,
     @InjectRepository(RoomLineup) private roomLineUpModel: Repository<RoomLineup>,
+
     @InjectRepository(Game) private gameModel: Repository<Game>,
+
     @InjectRepository(Appointment) private appointmentModel: Repository<Appointment>,
     @InjectRepository(AppointmentMember) private appointmentMemberModel: Repository<AppointmentMember>,
+
+    @InjectRepository(MatchHistory) private matchHistoryModel: Repository<MatchHistory>,
+    @InjectRepository(MatchDetail) private matchDetailModel: Repository<MatchDetail>,
+
     private readonly chatService: ChatService,
   ) { }
   
@@ -184,6 +192,41 @@ export class RoomService {
 
         // // remove appointment
         // await this.appointmentModel.delete({ roomId: room.id });
+
+        // check if teams already appointed
+        const appointment = await this.appointmentModel.findOneByOrFail({ roomId: room.id });
+        
+        if(appointment != null){
+          const participants = await this.participantModel.findBy({ roomId: room.id });
+          let matchHistory, hostBoardId, guestBoardId;
+
+          if(participants[0].teamId == teamId) {
+            matchHistory = await this.matchHistoryModel.save({ hostId: teamId, guestId: participants[1].teamId });
+
+            hostBoardId = participants[0].roomLineUpBoardId;
+            guestBoardId = participants[1].roomLineUpBoardId;
+          }
+          else{
+            matchHistory = await this.matchHistoryModel.save({ hostId: teamId, guestId: participants[1].teamId });
+
+            hostBoardId = participants[1].roomLineUpBoardId;
+            guestBoardId = participants[0].roomLineUpBoardId;
+          }
+
+          const matchData = this.matchDetailModel.create({
+            matchHistoryId: matchHistory.id,
+            hostBoardId: hostBoardId,
+            guestBoardId: guestBoardId,
+            startAt: room.startAt,
+            endAt: room.endAt,
+            createAt: room.createdAt,
+            note: room.note
+          });
+            
+          await this.matchDetailModel.save(matchData);
+          
+        }
+
         
         const res = await this.roomModel.delete(room.id);
         if(res.affected !== 0) {

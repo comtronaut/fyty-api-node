@@ -5,12 +5,14 @@ import { Team } from "src/model/sql-entity/team/team.entity";
 import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
 import { User } from "src/model/sql-entity/user/user.entity";
 import { In, Repository } from "typeorm";
+import { TeamStatistic } from "src/model/sql-entity/team/statistic/stat.entity";
 
 @Injectable()
 export class TeamService {
   constructor(
     @InjectRepository(Team) private teamModel: Repository<Team>,
     @InjectRepository(TeamMember) private memberModel: Repository<TeamMember>,
+    @InjectRepository(TeamStatistic) private statisticModel: Repository<TeamStatistic>,
   ) { }
   
   // CRUD
@@ -24,6 +26,10 @@ export class TeamService {
       req.ownerId = user.id; // set the team's owner
       const team = await this.teamModel.save(req);
 
+      // create statistic
+      await this.statisticModel.save({ id: team.id });
+
+      // create member 
       await this.memberModel.save({ teamId: team.id, userId: user.id, role: "Manager" });
       return team;
     }

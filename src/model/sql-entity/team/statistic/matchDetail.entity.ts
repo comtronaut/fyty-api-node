@@ -2,7 +2,6 @@ import { IsNotEmpty } from "class-validator";
 import { Column, CreateDateColumn, Entity, ManyToOne } from "typeorm";
 import { RoomLineupBoard } from "../../room/Lineup.entity";
 import { AbstractModel } from "../../_model";
-import { Team } from "../team.entity";
 import { MatchHistory } from "./matchHistory.entity";
 
 
@@ -32,4 +31,7 @@ export class MatchDetail extends AbstractModel {
 
   @CreateDateColumn()
   createAt: Date;
+
+  @Column({ default: "" })
+  note: string;
 }
