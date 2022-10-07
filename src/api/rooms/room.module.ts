@@ -22,13 +22,14 @@ import { Appointment, AppointmentMember } from "src/model/sql-entity/appointment
 import { ScheduleModule } from "@nestjs/schedule";
 import { MatchHistory } from "src/model/sql-entity/team/statistic/matchHistory.entity";
 import { MatchDetail } from "src/model/sql-entity/team/statistic/matchDetail.entity";
+import { TeamStatistic } from "src/model/sql-entity/team/statistic/stat.entity";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([ Room, RoomParticipant, Chat, Team, TeamMember, Game, RoomNote, 
                                 RoomRequest, RoomLineup, RoomLineupBoard, Appointment, AppointmentMember,
-                                  MatchHistory, MatchDetail ]),
-                                  
+                                  MatchHistory, MatchDetail, TeamStatistic ]),
+
     ChatModule,ScheduleModule.forRoot()
   ],
   controllers: [ RoomController ],
