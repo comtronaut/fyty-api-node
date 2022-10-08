@@ -25,8 +25,8 @@ export class SelectorService {
 
   async getMe(me: User){
     try{
-        const member = await this.teamMemberModel.findOneByOrFail({ userId: me.id });
-        const myTeams = await this.teamModel.findBy({ id: member.teamId });
+        const member = await this.teamMemberModel.findOneBy({ userId: me.id });
+        const myTeams = await this.teamModel.findBy({ id: member?.teamId });
         return {
           user: me,
           teams: myTeams
