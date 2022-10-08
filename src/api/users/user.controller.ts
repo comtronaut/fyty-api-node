@@ -15,7 +15,9 @@ export class UserController {
     private readonly avatarService: UserAvatarService) { }
 
   @Post()
-  async addUser(@Body() user: CreateUserDto) {
+  async addUser(
+    @Body() user: CreateUserDto
+    ) {
     return await this.userService.create(user);
   }
 
