@@ -23,11 +23,11 @@ export class TeamService {
       if(teamCount > 0)
         throw new Error("You already have team");
 
-      req.ownerId = user.id; // set the team's owner
       const team = await this.teamModel.save(req);
+      console.log(team.id);
 
       // create statistic
-      await this.statisticModel.save({ id: team.id });
+      await this.statisticModel.save({ teamId: team.id });
 
       // create member 
       await this.memberModel.save({ teamId: team.id, userId: user.id, role: "Manager" });
@@ -72,14 +72,19 @@ export class TeamService {
     return await this.teamModel.find();
   }
 
-  async update(ownerId: string, req: UpdateTeamDto): Promise <Team> {
+  async update(userId: string, req: UpdateTeamDto): Promise <Team> {
     try {
-      const updateRes = await this.teamModel.update({ ownerId: ownerId }, req);
-
-      if(updateRes.affected === 0) {
-        throw new HttpException("", HttpStatus.NO_CONTENT);
+      const member = await this.memberModel.findOneByOrFail({ userId: userId });
+      if(member.role == "Manager"){
+        const updateRes = await this.teamModel.update({ id: member.teamId }, req);
+        if(updateRes.affected === 0) {
+          throw new HttpException("", HttpStatus.NO_CONTENT);
+        }
+        return await this.teamModel.findOneByOrFail({ id: member.teamId });
       }
-      return await this.teamModel.findOneByOrFail({ ownerId: ownerId });
+      else{
+        throw new Error("only Manager can edit team");
+      }
     } 
     catch (err) {
       throw new BadRequestException(err.message);
