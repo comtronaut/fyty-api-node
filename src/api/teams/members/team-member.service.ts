@@ -15,7 +15,12 @@ export class TeamMemberService {
 
   async create(req: CreateTeamMemberDto) {
     try {
+      const memberCount = await this.memberModel.countBy({ userId: req.userId })
+      if(memberCount > 0){
+        throw new Error("This user already joined team")
+      }
       req.role = "Member";
+      
       return await this.memberModel.save(req);
     }
     catch (err) {
