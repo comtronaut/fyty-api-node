@@ -63,11 +63,8 @@ export class AppointmentService {
   async getAppointmentByUserId(userId: string) {
     try{
         const member = await this.memberModel.findOneBy({ userId: userId });
-        if(member === null){
-          return {
-            team: [],
-            appointment: []
-          }
+        if(member == null){
+          return [];
         }
         const appointmentMember = await this.appointmentMemberModel.findBy({ teamId: member.teamId });
         const appointments = await this.appointmentModel.findBy({ id: In (appointmentMember.map(e => e.appointId )), isDel: false });
