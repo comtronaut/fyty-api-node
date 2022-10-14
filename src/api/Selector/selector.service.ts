@@ -48,7 +48,7 @@ export class SelectorService {
   async getChat(roomId: string){
     try{
         const chat = await this.chatModel.findOneByOrFail({ roomId: roomId });
-        const message = await this.messageModel.findBy({ chatId: chat.id })
+        const message = await this.messageModel.findBy({ chatId: chat.id });
         return {
           chat: chat,
           messages: message
