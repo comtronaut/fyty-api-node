@@ -139,10 +139,12 @@ rules:
     - consistent
 
   # vanilla default
-  indent:
+  "@typescript-eslint/indent":
     - warn
     - 2
-    - SwitchCase: 1
+    - ignoredNodes:
+      - PropertyDefinition
+  indent: off
   linebreak-style:
     - error
     - unix
