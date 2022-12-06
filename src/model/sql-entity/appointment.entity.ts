@@ -37,9 +37,8 @@ export class AppointmentMember extends AbstractModel {
   @Column({ type: "uuid" })
   teamId: string;
 
-  @IsNotEmpty()
-  @ManyToOne(() => Appointment, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
-  @Column({ type: "uuid" })
+  @ManyToOne(() => Appointment, {  })
+  @Column({ type: "uuid", nullable: true })
   appointId: string;
   
 }
