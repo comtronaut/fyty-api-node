@@ -3,7 +3,7 @@ import { start } from "repl";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Debug } from "src/common/debug.decorator";
 import { Subject } from "src/common/subject.decorator";
-import { CreateParticipantDto, CreateRoomDto, CreateRoomNoteDto, UpdateParticipantDto, UpdateRoomDto, UpdateRoomNoteDto } from "src/model/dto/room/room.dto";
+import { CreateParticipantDto, CreateRoomDto, CreateRoomNoteDto, DeleteRoomDto, UpdateParticipantDto, UpdateRoomDto, UpdateRoomNoteDto } from "src/model/dto/room/room.dto";
 import { User } from "src/model/sql-entity/user/user.entity";
 import { RoomService } from "./room.service";
 import { RoomNoteService } from "./note/note.service";
@@ -79,6 +79,15 @@ export class RoomController {
     @Param("id") teamId: string,
   ) {
     return await this.roomService.getJoinedRoom(teamId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete("/disband")
+  async deleteRoom(
+    @Body() req: DeleteRoomDto,
+    ) 
+  {
+    return await this.roomService.disband(req);
   }
 
 // room note

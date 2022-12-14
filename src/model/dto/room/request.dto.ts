@@ -6,7 +6,7 @@ export class CreateRoomRequestDto {
     @IsUUID()
     teamId: string;
 
-    @IsNotEmpty()
+    // @IsNotEmpty()
     teamlineUpIds: string;
 
 }

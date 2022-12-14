@@ -11,8 +11,8 @@ export class RoomLineup extends AbstractModel {
 
   @IsNotEmpty()
   @ManyToOne(() => TeamLineUp, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-  @Column({ type: "uuid" })
-  teamLineUpId: string;
+  @Column({ type: "uuid" , nullable : true})
+  teamLineUpId: string | null;
 
   @IsNotEmpty()
   @ManyToOne(() => RoomLineupBoard, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })

@@ -12,7 +12,7 @@ export class CreateRoomDto {
   @ApiPropertyOptional()
   endAt: Date;
 
-  @IsNotEmpty()
+  // @IsNotEmpty()
   teamlineUpIds: string;
 
   @IsNotEmpty()
@@ -67,3 +67,12 @@ export class CreateRoomNoteDto  {
 
 }
 
+export class DeleteRoomDto {
+
+  @IsNotEmpty()
+  roomId: string;
+
+  @IsNotEmpty()
+  teamId: string;
+
+}

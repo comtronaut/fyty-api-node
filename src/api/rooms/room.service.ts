@@ -47,14 +47,31 @@ export class RoomService {
   // CRUD
   async create(req: CreateRoomDto) {
     try {
+
       const room = await this.roomModel.save(req);
 
       const board = await this.roomLineUpBoardModel.save({});
       
-      const lineUps = req.teamlineUpIds.split(",");
+      if(req.teamlineUpIds !== undefined){
+        
+        const lineUps = req.teamlineUpIds.split(",");
 
-      for(let i = 0; i < lineUps.length; i++){
+        for(let i = 0; i < lineUps.length; i++){
+
           await this.roomLineUpModel.save({ roomLineUpBoardId: board.id, teamLineUpId: lineUps[i] });
+
+        }
+        
+      }else{
+        
+        const game = await this.gameModel.findOneByOrFail({ id: req.gameId });
+
+        for(let i = 0; i < game.lineupCap ; i++){
+          
+          await this.roomLineUpModel.save({ roomLineUpBoardId: board.id, teamLineUpId: null});
+
+        }
+
       }
 
       const participantData = { roomId: room.id, teamId: req.hostId, gameId: req.gameId, roomLineUpBoardId: board.id };
@@ -182,11 +199,10 @@ export class RoomService {
 
       if(room.hostId === teamId){
 
-        // // remove appointment
-        // await this.appointmentModel.delete({ roomId: room.id });
-        
+        const appoint = await this.appointmentModel.update({ roomId: room.id },{isDel: true});      
         const res = await this.roomModel.delete(room.id);
-        if(res.affected !== 0) {
+
+        if(res.affected !== 0 && appoint.affected !== 0) {
 
           return {
             roomId: room.id
