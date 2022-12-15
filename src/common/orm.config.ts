@@ -5,11 +5,7 @@ export function getConfig(rawUrl: string): TypeOrmModuleOptions {
 
   return {
     type: "postgres",
-    host: url.hostname,
-    port: parseInt(url.port),
-    username: url.username,
-    password: url.password,
-    database: url.pathname.slice(1),
+    url: rawUrl,
     entities: [ `${__dirname}/../**/*.entity{.ts,.js}` ],
     synchronize: true,
     ...(url.hostname === "localhost" ? {} : {

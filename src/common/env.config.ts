@@ -1,7 +1,16 @@
 import nonNull from "non-null";
 import { config } from "dotenv";
+import * as fs from "fs";
 
-config();
+function loadEnv() {
+  process.env["HOST"] === "0.0.0.0"
+    ? fs.copyFileSync("env/.env.prod", ".env")
+    : fs.copyFileSync("env/.env.dev", ".env");
+
+  config();
+}
+
+loadEnv();
 
 const env = {
 //   DATABASE_URL: grant("DATABASE_URL")

@@ -1,4 +1,7 @@
-REMOTE_HOST := root@188.166.235.255
+remote_host := 159.223.80.31
+app_name := fyty-api
+
+# usage example: make git m="your message"
 
 git:
 	git add .
@@ -7,13 +10,22 @@ git:
 push-dev:
 	git push heroku main
 build-deploy:
-	docker build -t $t .
-	docker save $t > $t.tar
-	docker rmi $t
-	scp ./$t.tar ${REMOTE_HOST}:/root/
-	rm ./$t.tar
-	ssh -t ${REMOTE_HOST} 'docker rm $$(docker ps -aq) -f \
+	docker build -t ${app_name} .
+	docker save ${app_name} > ${app_name}.tar
+	docker rmi ${app_name}
+	scp ./${app_name}.tar ${remote_host}:/root/
+	rm ./${app_name}.tar
+	ssh -t ${remote_host} 'docker rm $$(docker ps -aq) -f \
     &&  docker rmi $$(docker images -aq) \
-    &&  docker load < /root/$t.tar \
-    &&  rm /root/$t.tar \
-    &&  docker run -d -p 80:80 -t $t'
+    &&  docker load < /root/${app_name}.tar \
+    &&  rm /root/${app_name}.tar \
+    &&  docker run -d -p 80:80 -p 443:443 -t ${app_name}'
+init-deploy:
+	docker build -t ${app_name} .
+	docker save ${app_name} > ${app_name}.tar
+	docker rmi ${app_name}
+	scp ./${app_name}.tar ${remote_host}:/root/
+	rm ./${app_name}.tar
+	ssh -t ${remote_host} 'docker load < /root/${app_name}.tar \
+    &&  rm /root/${app_name}.tar \
+    &&  docker run -d -p 80:80 -p 443:443 -t ${app_name}'

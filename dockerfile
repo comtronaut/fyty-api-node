@@ -1,12 +1,16 @@
 FROM node:16-alpine as build
 WORKDIR /app
 COPY . .
-RUN npm install \
+RUN npm install --omit=optional \
     && npm run build
 
-ENV PORT=80
+FROM node:16-alpine as prod
+
+WORKDIR /app
+COPY --from=build /app/ .
+
 ENV HOST=0.0.0.0
 
-CMD ["node", "./dist/main.js"]
+EXPOSE 80 443
 
-EXPOSE 80
+CMD ["node", "dist/main.js"]
