@@ -5,25 +5,25 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import express, { json, urlencoded } from "express";
 import fs from "fs";
 import http from "http";
-import https from "https";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
   if (process.env["HOST"] === "0.0.0.0") {
-    const httpsOptions = {
-      key: fs.readFileSync("cert/ssl.key"),
-      cert: fs.readFileSync("cert/ssl.crt")
-    };
-
     const expressApp = express();
-    const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter(expressApp), { cors: true });
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter(expressApp), {
+      httpsOptions: {
+        key: fs.readFileSync("cert/ssl.key"),
+        cert: fs.readFileSync("cert/ssl.crt")
+      },
+      cors: true
+    });
 
     extendApp(app);
 
     await app.init();
 
     http.createServer(expressApp).listen(80);
-    https.createServer(httpsOptions, expressApp).listen(443);
+    await app.listen(443);
   }
   else {
     const app = await NestFactory.create<NestExpressApplication>(AppModule, { cors: true });
