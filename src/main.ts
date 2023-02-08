@@ -22,8 +22,13 @@ async function bootstrap() {
 
     await app.init();
 
-    http.createServer(expressApp).listen(80);
-    await app.listen(443);
+    if (process.env["PORT"] === "8080") {
+      await app.listen(8080);
+    }
+    else {
+      http.createServer(expressApp).listen(80);
+      await app.listen(443);
+    }
   }
   else {
     const app = await NestFactory.create<NestExpressApplication>(AppModule, { cors: true });
