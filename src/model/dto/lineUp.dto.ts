@@ -11,7 +11,6 @@ export class CreateLineUpDto {
     isDefault: any;
 
     @ApiPropertyOptional()
-    @IsNotEmpty()
     inGameId: string;
 
     @ApiPropertyOptional()

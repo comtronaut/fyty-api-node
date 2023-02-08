@@ -17,8 +17,7 @@ export class TeamLineUp extends AbstractModel {
   @Column({ type: "uuid", nullable: true })
   avatarId: string;
 
-  @IsNotEmpty()
-  @Column()
+  @Column({ nullable: true })
   inGameId: string;
 
   @IsNotEmpty()

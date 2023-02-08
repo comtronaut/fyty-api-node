@@ -31,12 +31,11 @@ export class RoomService {
   async handleCron() {
     try {
       var time = Date.now();
-      let timestramp = new Date(time);
-      // console.log(timestramp);
-      timestramp = moment(timestramp).add(391, 'm').toDate();
+      let timestamp = new Date(time);
+      timestamp = moment(timestamp).add(1, 'm').toDate();
 
-      await this.roomModel.delete({endAt:LessThanOrEqual(timestramp)});
-      // console.log(timestramp)
+      await this.roomModel.delete({endAt:LessThanOrEqual(timestamp)});
+  
       return ;
 
       }catch (err) {
@@ -108,11 +107,13 @@ export class RoomService {
 
   async getJoinedRoom(teamId: string) {  // new
     try{
+
       const participants = await this.participantModel.findBy({ teamId: teamId });
       const joined = await this.roomModel.findBy({ id: In (participants.map(e => e.roomId ))});
 
       const request = await this.roomRequestModel.findBy({ teamId: teamId });
       const requested = await this.roomModel.findBy({ id: In (request.map(e => e.roomId)) });
+
 
       return {
         joined: joined,
@@ -219,35 +220,42 @@ export class RoomService {
 
   async joinRoom(teamId: string, roomId: string) {
     try {
+      var time = Date.now();
+      let timestamp = new Date(time);
+
       const room = await this.roomModel.findOneByOrFail({ id: roomId });
       const game = await this.gameModel.findOneByOrFail({ id: room.gameId });
 
-      // check is room available
-      if(room.status === RoomStatus.UNAVAILABLE || room.status === RoomStatus.FULL) {
-        throw new Error("room is not available");
-      }
+      if(timestamp <= room.endAt){ 
+        // check is room available
+        if(room.status === RoomStatus.UNAVAILABLE || room.status === RoomStatus.FULL) {
+          throw new Error("room is not available");
+        }
 
-      // update room status
-      await this.updateStatus(room);
+        // update room status
+        await this.updateStatus(room);
 
-      //find room request
-      const request = await this.roomRequestModel.findOneByOrFail({ teamId: teamId, roomId: roomId });
+        //find room request
+        const request = await this.roomRequestModel.findOneByOrFail({ teamId: teamId, roomId: roomId });
+
+        // add participant to the room
+        const participantData = { roomId: room.id, teamId: teamId, gameId: game.id, roomLineUpBoardId: request.roomLineUpBoardId };
+        const participant = await this.participantModel.save(participantData);
+
+        // add appointment
+        const appointmentData = { startAt: room.startAt, endAt: room.endAt, roomId: room.id, status: "WAITING", isDel: false };
+        const appointment = await this.appointmentModel.save(appointmentData);
+
+        await this.appointmentMemberModel.save({ teamId: teamId, appointId: appointment.id });  // for guest
+        await this.appointmentMemberModel.save({ teamId: room.hostId, appointId: appointment.id }); // for host
+        await this.roomRequestModel.delete({ id: request.id });
       
-      // add participant to the room
-      const participantData = { roomId: room.id, teamId: teamId, gameId: game.id, roomLineUpBoardId: request.roomLineUpBoardId };
-      const participant = await this.participantModel.save(participantData);
-
-      // add appointment
-      const appointmentData = { startAt: room.startAt, endAt: room.endAt, roomId: room.id, status: "WAITING", isDel: false };
-      const appointment = await this.appointmentModel.save(appointmentData);
-
-      await this.appointmentMemberModel.save({ teamId: teamId, appointId: appointment.id });  // for guest
-      await this.appointmentMemberModel.save({ teamId: room.hostId, appointId: appointment.id }); // for host
-      await this.roomRequestModel.delete({ id: request.id });
-
-      return {
-        roomParticipant: participant
-      };
+        return {
+          roomParticipant: participant
+        };
+      }else{
+        throw new BadRequestException("this room has expired");
+      }
       
     } catch(err) {
       throw new BadRequestException(err.message);
