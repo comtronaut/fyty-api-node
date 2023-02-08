@@ -202,7 +202,7 @@ export class RoomService {
         const appoint = await this.appointmentModel.update({ roomId: room.id },{isDel: true});      
         const res = await this.roomModel.delete(room.id);
 
-        if(res.affected !== 0 && appoint.affected !== 0) {
+        if(res.affected !== 0) {
 
           return {
             roomId: room.id
