@@ -16,7 +16,7 @@ docker-deploy:
 	docker rmi ${app_name}
 	scp ./${app_name}.tar ${remote_host}:/root/
 	rm ./${app_name}.tar
-	ssh -t ${remote_host} 'docker rm -f $$(docker ps -f name=${app_name} -q) 2>/dev/null || true \
+	ssh -t ${remote_host} 'docker rm -f $$(docker ps -f name=^/${app_name}$$ -q) 2>/dev/null || true \
     &&  docker rmi -f ${app_name}:latest 2>/dev/null || true \
     &&  docker load < /root/${app_name}.tar \
     &&  rm /root/${app_name}.tar \
@@ -27,7 +27,7 @@ docker-deploy-dev:
 	docker rmi ${app_name_dev}
 	scp ./${app_name_dev}.tar ${remote_host}:/root/
 	rm ./${app_name_dev}.tar
-	ssh -t ${remote_host} 'docker rm -f $$(docker ps -f name=${app_name_dev} -q) 2>/dev/null || true \
+	ssh -t ${remote_host} 'docker rm -f $$(docker ps -f name=^/${app_name_dev}$$ -q) 2>/dev/null || true \
     &&  docker rmi -f ${app_name_dev}:latest 2>/dev/null || true \
     &&  docker load < /root/${app_name_dev}.tar \
     &&  rm /root/${app_name_dev}.tar \

@@ -1,6 +1,8 @@
 FROM node:16-alpine as build
 WORKDIR /app
 COPY . .
+COPY ./env/.env.staging ./env/.env.prod
+
 RUN npm install --omit=optional \
     && npm run build
 
