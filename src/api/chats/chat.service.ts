@@ -1,22 +1,14 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Chat } from "src/model/sql-entity/chat.entity";
-import { Message } from "src/model/sql-entity/message.entity";
-import { Repository } from "typeorm";
+import { Prisma } from ".prisma/client";
+import { BadRequestException, Injectable } from "@nestjs/common";
+import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class ChatService {
-  constructor(@InjectRepository(Chat) private chatModel: Repository<Chat>) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  // CRUD
-  async create(req: Record<string, any>) {
+  async create(req: Prisma.ChatCreateInput) {
     try {
-      return await this.chatModel.save(req);
+      return await this.prisma.chat.create({ data: req });
     } catch (err) {
       throw new BadRequestException(err.message);
     }

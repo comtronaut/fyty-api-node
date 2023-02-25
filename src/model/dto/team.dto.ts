@@ -1,7 +1,8 @@
 import { PartialType } from "@nestjs/mapped-types";
-import { IsNotEmpty, IsUrl } from "class-validator";
+import { Prisma } from "@prisma/client";
+import { IsNotEmpty, IsUUID } from "class-validator";
 
-export class CreateTeamDto {
+export class CreateTeamDto implements Prisma.TeamUncheckedCreateInput {
   @IsNotEmpty()
   name: string;
 
@@ -11,18 +12,21 @@ export class CreateTeamDto {
 
   lineupCount: number;
 
-  @IsNotEmpty()
+  @IsUUID()
   gameId: string;
 
   // @IsNotEmpty()
   ownerId: string;
-
-  createdAt: Date;
 }
 
-export class UpdateTeamDto extends PartialType(CreateTeamDto) {}
+export class UpdateTeamDto extends PartialType(CreateTeamDto) {
+  @IsNotEmpty()
+  id: string;
+}
 
-export class CreateTeamMemberDto {
+export class CreateTeamMemberDto
+implements Prisma.TeamMemberUncheckedCreateInput
+{
   role: string;
 
   @IsNotEmpty()
@@ -30,13 +34,13 @@ export class CreateTeamMemberDto {
 
   @IsNotEmpty()
   userId: string;
-
-  joinedAt: Date;
 }
 
 export class UpdateTeamMemberDto extends PartialType(CreateTeamMemberDto) {}
 
-export class CreateTeamPendingDto {
+export class CreateTeamPendingDto
+implements Prisma.TeamPendingUncheckedCreateInput
+{
   @IsNotEmpty()
   teamId: string;
 
@@ -45,8 +49,6 @@ export class CreateTeamPendingDto {
 
   @IsNotEmpty()
   status: string;
-
-  createdAt: Date;
 }
 
 export class UpdateTeamPendingDto extends PartialType(CreateTeamPendingDto) {}

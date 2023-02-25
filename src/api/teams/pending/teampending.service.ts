@@ -1,27 +1,17 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
 import {
   CreateTeamPendingDto,
   UpdateTeamPendingDto
 } from "src/model/dto/team.dto";
-import { TeamPending } from "src/model/sql-entity/team/pending.entity";
-import { Repository } from "typeorm";
+import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class TeampendingService {
-  constructor(
-    @InjectRepository(TeamPending)
-    private teampendingModel: Repository<TeamPending>
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getTeamPendingByUser(userId: string) {
     try {
-      return await this.teampendingModel.find({
+      return await this.prisma.teamPending.findMany({
         where: { userId, status: "pending" }
       });
     } catch (err) {
@@ -31,7 +21,7 @@ export class TeampendingService {
 
   async getTeamInvitationByUser(userId: string) {
     try {
-      return await this.teampendingModel.find({
+      return await this.prisma.teamPending.findMany({
         where: { userId, status: "invitation" }
       });
     } catch (err) {
@@ -41,7 +31,7 @@ export class TeampendingService {
 
   async getTeamPending(teamId: string) {
     try {
-      return await this.teampendingModel.find({
+      return await this.prisma.teamPending.findMany({
         where: { teamId, status: "pending" }
       });
     } catch (err) {
@@ -51,7 +41,7 @@ export class TeampendingService {
 
   async getTeamInvitation(teamId: string) {
     try {
-      return await this.teampendingModel.find({
+      return await this.prisma.teamPending.findMany({
         where: { teamId, status: "invitation" }
       });
     } catch (err) {
@@ -60,23 +50,23 @@ export class TeampendingService {
   }
 
   async createTeamPending(req: CreateTeamPendingDto) {
-    return await this.teampendingModel.save(req);
+    return await this.prisma.teamPending.create({ data: req });
   }
 
   async createTeamInvitation(req: CreateTeamPendingDto) {
-    req.status = "invitation";
-    return await this.teampendingModel.save(req);
+    return await this.prisma.teamPending.create({
+      data: { ...req, status: "invitation" }
+    });
   }
 
   async updateStatus(teampendingId: string, req: UpdateTeamPendingDto) {
     try {
-      const updateRes = await this.teampendingModel.update(teampendingId, req);
+      const updateRes = await this.prisma.teamPending.update({
+        where: { id: teampendingId },
+        data: req
+      });
 
-      if (updateRes.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT);
-      }
-
-      return await this.teampendingModel.findOneOrFail({
+      return await this.prisma.teamPending.findFirstOrThrow({
         where: { id: teampendingId }
       });
     } catch (err) {
@@ -86,10 +76,10 @@ export class TeampendingService {
 
   async discard(teamPendingId: string) {
     try {
-      const res = await this.teampendingModel.delete({ id: teamPendingId });
-      if (res.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT);
-      }
+      const res = await this.prisma.teamPending.delete({
+        where: { id: teamPendingId }
+      });
+
       return HttpStatus.OK;
     } catch (err) {
       throw new BadRequestException(err.message);

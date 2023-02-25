@@ -9,13 +9,13 @@ import {
   Query,
   UseGuards
 } from "@nestjs/common";
+import { User } from "@prisma/client";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Subject } from "src/common/subject.decorator";
 import {
   CreateAppointmentDto,
   UpdateAppointmentDto
 } from "src/model/dto/appointment.dto";
-import { User } from "src/model/sql-entity/user/user.entity";
 import { AppointmentService } from "./appointment.service";
 
 @Controller("api/appointments")

@@ -9,10 +9,10 @@ import {
   Query,
   UseGuards
 } from "@nestjs/common";
+import { User } from "@prisma/client";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Subject } from "src/common/subject.decorator";
 import { CreateLineUpDto, UpdateLineUpDto } from "src/model/dto/lineUp.dto";
-import { User } from "src/model/sql-entity/user/user.entity";
 import { LineUpService } from "./lineUp.service";
 
 @Controller("api/lineups")
@@ -62,6 +62,6 @@ export class LineUpController {
   @UseGuards(JwtAuthGuard)
   @Delete("/:id")
   async delateLineUp(@Subject() user: User, @Param("id") lineUpId: string) {
-    return this.lineUpService.deleteLineById(user.id, lineUpId);
+    return this.lineUpService.deleteById(user.id, lineUpId);
   }
 }

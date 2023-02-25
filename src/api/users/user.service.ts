@@ -1,54 +1,56 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
+import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
-import { Repository } from "typeorm";
-import { PhoneNumber } from "src/model/sql-entity/phoneNumber.entity";
-import { User } from "src/model/sql-entity/user/user.entity";
 import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
+import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(User) private userModel: Repository<User>,
-    @InjectRepository(PhoneNumber)
-    private phoneNumberModel: Repository<PhoneNumber>
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  // CRUD
   async getUserById(id: string) {
-    return await this.userModel.findOneOrFail({ where: { id } });
+    return await this.prisma.user.findUniqueOrThrow({ where: { id } });
   }
 
-  async searchUsers(searchString: string, teamId: string) {
-    return await this.userModel
-      .createQueryBuilder("user")
-      .where(
-        "user.displayName like :displayName OR user.username like :username",
-        { displayName: `%${searchString}%`, username: `%${searchString}%` }
-      )
-      .getMany();
+  async searchUsers(searchString: string, teamId?: string) {
+    this.prisma.user.findMany({
+      where: {
+        OR: [
+          {
+            displayName: {
+              contains: searchString
+            }
+          },
+          {
+            username: {
+              contains: searchString
+            }
+          }
+        ]
+      }
+    });
   }
 
   async create(req: CreateUserDto) {
     try {
       const [ hashedPassword, hashedPhoneNumber ] = await Promise.all([
-        // parallel promise
-        bcrypt.hashSync(req.password, 12),
-        bcrypt.hashSync(req.phoneNumber, 12)
+        bcrypt.hash(req.password, 12),
+        bcrypt.hash(req.phoneNumber, 12)
       ]);
 
       const { phoneNumber, ...rest } = req;
       const createdContent = { ...rest, password: hashedPassword };
 
-      await this.phoneNumberModel.save({ phoneNumber: hashedPhoneNumber });
-      const { password, ...userData } = await this.userModel.save(
-        createdContent
-      );
+      await this.prisma.phoneNumber.create({
+        data: {
+          phoneNumber: hashedPhoneNumber
+        }
+      });
+
+      const { password, ...userData } = await this.prisma.user.create({
+        data: createdContent
+      });
+
       return userData;
     } catch (err) {
       throw new BadRequestException(err.message);
@@ -58,13 +60,21 @@ export class UserService {
   async update(user: User, req: UpdateUserDto) {
     try {
       const { password, phoneNumber, ...updateData } = req;
-      const updateRes = await this.userModel.update(user.id, updateData);
 
-      if (updateRes.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT);
-      }
+      const updateRes = await this.prisma.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          ...updateData,
+          ...(password && { password: bcrypt.hashSync(password, 12) })
+        }
+      });
 
-      const res = await this.userModel.findOneByOrFail({ id: user.id });
+      const res = await this.prisma.user.findUniqueOrThrow({
+        where: { id: user.id }
+      });
+
       const flatten = (userInfo: User) => {
         const { password, ...rest } = userInfo;
         return rest;
@@ -79,13 +89,15 @@ export class UserService {
   async updatePassword(user: User, password: string) {
     try {
       const hashedPassword = bcrypt.hashSync(password, 12);
-      const updateRes = await this.userModel.update(user.id, {
-        password: hashedPassword
-      });
 
-      if (updateRes.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT);
-      }
+      await this.prisma.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          password: hashedPassword
+        }
+      });
 
       return HttpStatus.OK;
     } catch (err) {
@@ -95,10 +107,7 @@ export class UserService {
 
   async delete(id: string) {
     try {
-      const res = await this.userModel.delete(id);
-      if (res.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT);
-      }
+      const res = await this.prisma.user.delete({ where: { id } });
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -111,7 +120,7 @@ export class UserService {
 
     for (const [ key, value ] of Object.entries(payload)) {
       res[key] = Boolean(
-        await this.userModel.findOne({ where: { [key]: value } })
+        await this.prisma.user.findFirst({ where: { [key]: value } })
       );
     }
 

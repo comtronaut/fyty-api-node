@@ -14,7 +14,6 @@ import {
 import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
 import { Subject } from "src/common/subject.decorator";
 import { UserService } from "./user.service";
-import { User } from "src/model/sql-entity/user/user.entity";
 import {
   CreateUserAvatarDto,
   UpdateUserAvatarDto
@@ -22,6 +21,7 @@ import {
 import { UserAvatarService } from "./user-avatars/avatar.service";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Debug } from "src/common/debug.decorator";
+import { User } from "@prisma/client";
 
 @Controller("api/users")
 export class UserController {

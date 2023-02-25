@@ -1,7 +1,7 @@
 import { Controller, Get, HttpStatus, Param, UseGuards } from "@nestjs/common";
+import { User } from "@prisma/client";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Subject } from "src/common/subject.decorator";
-import { User } from "src/model/sql-entity/user/user.entity";
 import { SelectorService } from "./selector.service";
 
 @Controller("api/selector")
@@ -12,12 +12,6 @@ export class SelectorController {
   @Get("room/:id")
   async getMyRoom(@Param("id") id: string) {
     return this.selectorService.getRoom(id);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get("team/:id")
-  async getMyTeams(@Param("id") id: string) {
-    return this.selectorService.getTeam(id);
   }
 
   @UseGuards(JwtAuthGuard)

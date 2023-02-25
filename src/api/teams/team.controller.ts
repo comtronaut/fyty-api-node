@@ -6,27 +6,22 @@ import {
   Param,
   Post,
   Put,
-  Query,
-  Sse,
-  UseGuards,
-  MessageEvent
+  UseGuards
 } from "@nestjs/common";
-import { Debug } from "src/common/debug.decorator";
-import { TeamService } from "./team.service";
-import {
-  CreateTeamDto,
-  UpdateTeamDto,
-  UpdateTeamMemberDto,
-  CreateTeamMemberDto,
-  CreateTeamPendingDto,
-  UpdateTeamPendingDto
-} from "src/model/dto/team.dto";
+import { User } from "@prisma/client";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Subject } from "src/common/subject.decorator";
-import { User } from "src/model/sql-entity/user/user.entity";
+import {
+  CreateTeamDto,
+  CreateTeamMemberDto,
+  CreateTeamPendingDto,
+  UpdateTeamDto,
+  UpdateTeamMemberDto,
+  UpdateTeamPendingDto
+} from "src/model/dto/team.dto";
 import { TeamMemberService } from "./members/team-member.service";
 import { TeampendingService } from "./pending/teampending.service";
-import { map, Observable, Subject as SJ } from "rxjs";
+import { TeamService } from "./team.service";
 
 @Controller("api/teams")
 export class TeamController {

@@ -9,23 +9,20 @@ import {
   Query,
   UseGuards
 } from "@nestjs/common";
+import { User } from "@prisma/client";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Debug } from "src/common/debug.decorator";
 import { Subject } from "src/common/subject.decorator";
+import { CreateRoomRequestDto } from "src/model/dto/room/request.dto";
 import {
-  CreateParticipantDto,
   CreateRoomDto,
   CreateRoomNoteDto,
   DeleteRoomDto,
-  UpdateParticipantDto,
-  UpdateRoomDto,
   UpdateRoomNoteDto
 } from "src/model/dto/room/room.dto";
-import { User } from "src/model/sql-entity/user/user.entity";
-import { RoomService } from "./room.service";
 import { RoomNoteService } from "./note/note.service";
 import { RoomRequestService } from "./request/request.service";
-import { CreateRoomRequestDto } from "src/model/dto/room/request.dto";
+import { RoomService } from "./room.service";
 
 @Controller("api/rooms")
 export class RoomController {

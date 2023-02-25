@@ -1,11 +1,10 @@
 import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { Game } from "src/model/sql-entity/game.entity";
+import { PrismaService } from "src/services/prisma.service";
 import { GameController } from "./game.controller";
 import { GameService } from "./game.service";
 
 @Module({
-  imports: [ TypeOrmModule.forFeature([ Game ]) ],
+  imports: [ PrismaService ],
   controllers: [ GameController ],
   providers: [ GameService ]
 })

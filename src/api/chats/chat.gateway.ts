@@ -7,9 +7,6 @@ import {
   OnGatewayDisconnect
 } from "@nestjs/websockets";
 import { Socket, Server } from "socket.io";
-import { CreateMessageDto } from "src/model/dto/chat.dto";
-import { Chat } from "src/model/sql-entity/chat.entity";
-import { ChatService } from "./chat.service";
 import { MessageService } from "./messages/message.service";
 
 @WebSocketGateway({

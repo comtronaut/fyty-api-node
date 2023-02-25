@@ -1,7 +1,8 @@
+import { Prisma } from ".prisma/client";
 import { PartialType } from "@nestjs/mapped-types";
 import { IsNotEmpty, IsNumberString, IsString, IsUrl } from "class-validator";
 
-export class CreateGameDto {
+export class CreateGameDto implements Prisma.GameUncheckedCreateInput {
   @IsNotEmpty()
   @IsString()
   name: string;

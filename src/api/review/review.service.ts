@@ -1,48 +1,40 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Double, Repository } from "typeorm";
-import { Review } from "src/model/sql-entity/user/review.entity";
-import { User } from "src/model/sql-entity/user/user.entity";
-import { UserAvatar } from "src/model/sql-entity/user/userAvatar.entity";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { CreateReviewDto, UpdateReviewDto } from "src/model/dto/review.dto";
-import { UserAvatarService } from "../users/user-avatars/avatar.service";
+import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class ReviewService {
-  constructor(
-    @InjectRepository(Review) private reviewModel: Repository<Review>,
-    @InjectRepository(UserAvatar) private avatarModel: Repository<UserAvatar>,
-    private readonly avatarService: UserAvatarService
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   // CRUD
   async createReview(req: CreateReviewDto) {
     try {
-      const review = await this.reviewModel.save(req);
+      const review = await this.prisma.review.create({ data: req });
+
       const [ useravatar, reviewscore ] = await Promise.all([
-        this.avatarModel.findOneOrFail({
+        this.prisma.userAvatar.findFirstOrThrow({
           where: { userId: req.revieweeId, gameId: req.gameId }
         }),
-        this.reviewModel.findAndCount({
+        this.prisma.review.findMany({
           where: { revieweeId: req.revieweeId, gameId: req.gameId }
         })
       ]);
-      const count = reviewscore[1];
-      let nowscore = 0;
-      // console.log(count);
-      // console.log(nowscore);
-      reviewscore[0].map((score) => {
-        nowscore = nowscore + Number(score.ratingScore);
-        // console.log(nowscore);
+
+      let nowscore = reviewscore.reduce(
+        (acc, score) => acc + Number(score.ratingScore),
+        0
+      );
+      nowscore = nowscore / reviewscore.length;
+
+      await this.prisma.userAvatar.update({
+        where: {
+          id: useravatar.id
+        },
+        data: {
+          ratingScore: nowscore
+        }
       });
-      nowscore = nowscore / count;
-      useravatar.ratingScore = nowscore;
-      await this.avatarService.update(useravatar.id, useravatar);
+
       return review;
     } catch (err) {
       throw new BadRequestException(err.message);
@@ -50,11 +42,11 @@ export class ReviewService {
   }
 
   async getReviewFilter(filter: UpdateReviewDto) {
-    return await this.reviewModel.find({ where: { ...filter } });
+    return await this.prisma.review.findMany({ where: { ...filter } });
   }
 
   async getReviewById(id: string) {
-    return await this.reviewModel.find({ where: { id } });
+    return await this.prisma.review.findMany({ where: { id } });
   }
 
   // update
