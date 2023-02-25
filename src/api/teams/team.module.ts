@@ -8,8 +8,14 @@ import { TeamController } from "./team.controller";
 import { TeamService } from "./team.service";
 
 @Module({
-  imports: [ PrismaService ],
+  imports: [],
   controllers: [ TeamController, LineUpController ],
-  providers: [ TeamService, LineUpService, TeamMemberService, TeampendingService ]
+  providers: [
+    TeamService,
+    LineUpService,
+    TeamMemberService,
+    TeampendingService,
+    PrismaService
+  ]
 })
 export class TeamModule {}

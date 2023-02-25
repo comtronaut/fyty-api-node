@@ -4,8 +4,8 @@ import { GameController } from "./game.controller";
 import { GameService } from "./game.service";
 
 @Module({
-  imports: [ PrismaService ],
+  imports: [],
   controllers: [ GameController ],
-  providers: [ GameService ]
+  providers: [ GameService, PrismaService ]
 })
 export class GameModule {}

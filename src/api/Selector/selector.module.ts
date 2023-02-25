@@ -4,8 +4,8 @@ import { SelectorController } from "./selector.controller";
 import { SelectorService } from "./selector.service";
 
 @Module({
-  imports: [ PrismaService ],
+  imports: [],
   controllers: [ SelectorController ],
-  providers: [ SelectorService ]
+  providers: [ SelectorService, PrismaService ]
 })
 export class SelectorModule {}

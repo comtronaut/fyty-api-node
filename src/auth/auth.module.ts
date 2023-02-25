@@ -15,10 +15,9 @@ import { PrismaService } from "src/services/prisma.service";
     JwtModule.register({
       secret: env.JWT_SECRET,
       signOptions: { expiresIn: "10800s" }
-    }),
-    PrismaService
+    })
   ],
   controllers: [ AuthController ],
-  providers: [ AuthService, JwtStrategy, FacebookStrategy, GoogleStrategy ]
+  providers: [ AuthService, JwtStrategy, FacebookStrategy, GoogleStrategy, PrismaService ]
 })
 export class AuthModule {}
