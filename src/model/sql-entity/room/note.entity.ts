@@ -5,9 +5,8 @@ import { Room } from "./room.entity";
 
 @Entity()
 export class RoomNote extends AbstractModel {
-  
   @IsNotEmpty()
-  @ManyToOne(() => Room, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @ManyToOne(() => Room, { onDelete: "CASCADE", onUpdate: "CASCADE" })
   @Column({ type: "uuid" })
   roomId: string;
 
@@ -20,5 +19,4 @@ export class RoomNote extends AbstractModel {
 
   @CreateDateColumn()
   createdAt: Date;
-
 }

@@ -1,0 +1,299 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// enums
+enum RoomStatus {
+  AVAILABLE
+  UNAVAILABLE
+  CONFIRMED
+  FULL
+}
+
+enum MemberRole {
+  LEADER
+  MANAGER
+  MEMBER
+}
+
+// game
+model Game {
+  id        String @id @default(uuid())
+  name      String @unique
+  teamCap   Int
+  lineupCap Int
+  logoUrl   String
+  coverUrl  String
+  desc      String @default("")
+  abbr      String
+
+  teams            Team[]
+  rooms            Room[]
+  userAvatars      UserAvatar[]
+  reviews          Review[]
+  roomParticipants RoomParticipant[]
+}
+
+// room
+model Room {
+  id        String     @id @default(uuid())
+  name      String
+  status    RoomStatus @default(AVAILABLE)
+  option    String     @default("")
+  startAt   DateTime
+  endAt     DateTime
+  teamCount Int        @default(1)
+  note      String     @default("")
+  game      Game       @relation(fields: [gameId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  gameId    String
+  host      User       @relation(fields: [hostId], references: [id], onUpdate: Cascade)
+  hostId    String
+  createdAt DateTime   @default(now())
+
+  notes        RoomNote[]
+  requests     RoomRequest[]
+  participants RoomParticipant[]
+  chats        Chat[]
+  appointments Appointment[]
+}
+
+model RoomParticipant {
+  id                String          @id @default(uuid())
+  team              Team            @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId            String
+  room              Room            @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomId            String
+  game              Game            @relation(fields: [gameId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  gameId            String
+  roomLineUpBoard   RoomLineupBoard @relation(fields: [roomLineUpBoardId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomLineUpBoardId String
+  joinedAt          DateTime        @default(now())
+}
+
+model RoomNote {
+  id        String   @id @default(uuid())
+  room      Room     @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomId    String
+  topic     String
+  body      String   @default("")
+  createdAt DateTime @default(now())
+}
+
+model RoomLineup {
+  id                String          @id @default(uuid())
+  teamLineUp        TeamLineUp?     @relation(fields: [teamLineUpId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamLineUpId      String?
+  roomLineUpBoard   RoomLineupBoard @relation(fields: [roomLineUpBoardId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomLineUpBoardId String
+}
+
+model RoomLineupBoard {
+  id String @id @default(uuid())
+
+  roomRequests     RoomRequest[]
+  roomLineUps      RoomLineup[]
+  roomParticipants RoomParticipant[]
+}
+
+model RoomRequest {
+  id                String          @id @default(uuid())
+  team              Team            @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId            String
+  room              Room            @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomId            String
+  roomLineUpBoard   RoomLineupBoard @relation(fields: [roomLineUpBoardId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomLineUpBoardId String
+  joinedAt          DateTime        @default(now())
+}
+
+// team
+model Team {
+  id          String   @id @default(uuid())
+  name        String
+  coverUrl    String   @default("")
+  logoUrl     String   @default("")
+  lineupCount Int      @default(0)
+  tier        String   @default("")
+  game        Game     @relation(fields: [gameId], references: [id], onUpdate: Cascade)
+  gameId      String
+  owner       User     @relation(fields: [ownerId], references: [id], onUpdate: Cascade)
+  ownerId     String
+  createdAt   DateTime @default(now())
+
+  lineups            TeamLineUp[]
+  pending            TeamPending[]
+  members            TeamMember[]
+  roomRequests       RoomRequest[]
+  roomParticipants   RoomParticipant[]
+  messages           Message[]
+  appointmentMembers AppointmentMember[]
+  matchHistoryHosts  MatchHistory[]      @relation("host")
+  matchHistoryGuests MatchHistory[]      @relation("guest")
+  statistic          TeamStatistic[]
+}
+
+model TeamMember {
+  id       String   @id @default(uuid())
+  role     String
+  team     Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId   String
+  user     User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId   String
+  joinedAt DateTime @default(now())
+}
+
+model TeamLineUp {
+  id         String      @id @default(uuid())
+  team       Team        @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId     String
+  avatar     UserAvatar? @relation(fields: [avatarId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  avatarId   String?
+  inGameId   String?
+  isDefault  Boolean     @default(false)
+  profileUrl String      @default("")
+  imageUrl   String      @default("")
+  name       String      @default("new player")
+  note       String      @default("")
+
+  roomLineUps RoomLineup[]
+}
+
+model TeamPending {
+  id       String   @id @default(uuid())
+  team     Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId   String
+  user     User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId   String
+  status   String   @default("pending")
+  createAt DateTime @default(now())
+}
+
+// user
+model User {
+  id          String   @id @default(uuid())
+  username    String   @unique
+  password    String
+  displayName String
+  description String   @default("")
+  email       String   @unique
+  bio         String   @default("")
+  portraitUrl String   @default("")
+  coverUrl    String   @default("")
+  createdAt   DateTime @default(now())
+
+  teamOwners  Team[]
+  teamPending TeamPending[]
+  teamMembers TeamMember[]
+  roomHosts   Room[]
+  avatars     UserAvatar[]
+  reviewers   Review[]      @relation("reviewer")
+  reviewees   Review[]      @relation("reviewee")
+  messages    Message[]
+}
+
+model UserAvatar {
+  id            String  @id @default(uuid())
+  ingameId      String
+  characterName String  @default("player 1")
+  rank          String
+  ratingScore   Decimal @default(0.0)
+  game          Game    @relation(fields: [gameId], references: [id], onUpdate: Cascade)
+  gameId        String
+  user          User    @relation(fields: [userId], references: [id], onUpdate: Cascade)
+  userId        String
+
+  teamLineups TeamLineUp[]
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  content     String
+  ratingScore Decimal  @default(0.0)
+  reviewer    User     @relation(fields: [reviewerId], references: [id], onUpdate: Cascade, onDelete: Cascade, name: "reviewer")
+  reviewerId  String
+  reviewee    User     @relation(fields: [revieweeId], references: [id], onUpdate: Cascade, onDelete: Cascade, name: "reviewee")
+  revieweeId  String
+  game        Game     @relation(fields: [gameId], references: [id], onUpdate: Cascade)
+  gameId      String
+  createdAt   DateTime @default(now())
+}
+
+// appointment
+model Appointment {
+  id      String   @id @default(uuid())
+  startAt DateTime
+  endAt   DateTime
+  status  String   @default("")
+  isDel   Boolean  @default(false)
+  room    Room     @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomId  String
+
+  members AppointmentMember[]
+}
+
+model AppointmentMember {
+  id        String       @id @default(uuid())
+  team      Team         @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId    String
+  appoint   Appointment? @relation(fields: [appointId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  appointId String?
+}
+
+// chat
+model Chat {
+  id     String @id @default(uuid())
+  room   Room   @relation(fields: [roomId], references: [id], onUpdate: Cascade)
+  roomId String
+
+  messages Message[]
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  chat      Chat     @relation(fields: [chatId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  chatId    String
+  team      Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId    String
+  sender    User     @relation(fields: [senderId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  senderId  String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+// stats
+model MatchHistory {
+  id       String @id @default(uuid())
+  host     Team   @relation(fields: [hostId], references: [id], onUpdate: Cascade, onDelete: Cascade, name: "host")
+  hostId   String
+  guest    Team   @relation(fields: [guestId], references: [id], onUpdate: Cascade, onDelete: Cascade, name: "guest")
+  guestId  String
+  hostWin  Int    @default(0)
+  hostlose Int    @default(0)
+  result   String @default("tie")
+}
+
+model TeamStatistic {
+  id       String   @id @default(uuid())
+  team     Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId   String
+  matches  Int      @default(0)
+  win      Int      @default(0)
+  lose     Int      @default(0)
+  tie      Int      @default(0)
+  updateAt DateTime @updatedAt
+}
+
+// misc.
+model Image {
+  id String @id @default(uuid())
+}
+
+model PhoneNumber {
+  id          String @id @default(uuid())
+  phoneNumber String @unique
+}

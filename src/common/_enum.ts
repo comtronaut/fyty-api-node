@@ -1,7 +1,7 @@
 export enum MemberRole {
   LEADER = "leader",
   MANAGER = "manager",
-  MEMBER = "member"
+  MEMBER = "member",
 }
 
 export enum RoomStatus {
@@ -10,4 +10,3 @@ export enum RoomStatus {
   CONFIRMED = "comfirmed",
   FULL = "full",
 }
-

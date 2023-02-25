@@ -16,17 +16,45 @@ import { RoomGateway } from "./room.gateway";
 import { RoomService } from "./room.service";
 import { RoomNoteService } from "./note/note.service";
 import { RoomRequest } from "src/model/sql-entity/room/request.entity";
-import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.entity";
+import {
+  RoomLineup,
+  RoomLineupBoard
+} from "src/model/sql-entity/room/Lineup.entity";
 import { RoomRequestService } from "./request/request.service";
-import { Appointment, AppointmentMember } from "src/model/sql-entity/appointment.entity";
+import {
+  Appointment,
+  AppointmentMember
+} from "src/model/sql-entity/appointment.entity";
 import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ Room, RoomParticipant, Chat, Team, TeamMember, Game, RoomNote, RoomRequest, RoomLineup, RoomLineupBoard, Appointment, AppointmentMember ]),
-    ChatModule,ScheduleModule.forRoot()
+    TypeOrmModule.forFeature([
+      Room,
+      RoomParticipant,
+      Chat,
+      Team,
+      TeamMember,
+      Game,
+      RoomNote,
+      RoomRequest,
+      RoomLineup,
+      RoomLineupBoard,
+      Appointment,
+      AppointmentMember
+    ]),
+    ChatModule,
+    ScheduleModule.forRoot()
   ],
   controllers: [ RoomController ],
-  providers: [ RoomService, RoomGateway, ChatService, TeamService, RoomNoteService, RoomParticipantService, RoomRequestService ]
+  providers: [
+    RoomService,
+    RoomGateway,
+    ChatService,
+    TeamService,
+    RoomNoteService,
+    RoomParticipantService,
+    RoomRequestService
+  ]
 })
-export class RoomModule { }
+export class RoomModule {}

@@ -1,12 +1,23 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common";
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable
+} from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
 import moment from "moment";
 import { RoomStatus } from "src/common/_enum";
 import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room/room.dto";
-import { Appointment, AppointmentMember } from "src/model/sql-entity/appointment.entity";
+import {
+  Appointment,
+  AppointmentMember
+} from "src/model/sql-entity/appointment.entity";
 import { Game } from "src/model/sql-entity/game.entity";
-import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.entity";
+import {
+  RoomLineup,
+  RoomLineupBoard
+} from "src/model/sql-entity/room/Lineup.entity";
 import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
 import { RoomRequest } from "src/model/sql-entity/room/request.entity";
 import { Room } from "src/model/sql-entity/room/room.entity";
@@ -17,28 +28,33 @@ import { ChatService } from "../chats/chat.service";
 export class RoomService {
   constructor(
     @InjectRepository(Room) private roomModel: Repository<Room>,
-    @InjectRepository(RoomRequest) private roomRequestModel: Repository<RoomRequest>,
-    @InjectRepository(RoomParticipant) private participantModel: Repository<RoomParticipant>,
-    @InjectRepository(RoomLineupBoard) private roomLineUpBoardModel: Repository<RoomLineupBoard>,
-    @InjectRepository(RoomLineup) private roomLineUpModel: Repository<RoomLineup>,
+    @InjectRepository(RoomRequest)
+    private roomRequestModel: Repository<RoomRequest>,
+    @InjectRepository(RoomParticipant)
+    private participantModel: Repository<RoomParticipant>,
+    @InjectRepository(RoomLineupBoard)
+    private roomLineUpBoardModel: Repository<RoomLineupBoard>,
+    @InjectRepository(RoomLineup)
+    private roomLineUpModel: Repository<RoomLineup>,
     @InjectRepository(Game) private gameModel: Repository<Game>,
-    @InjectRepository(Appointment) private appointmentModel: Repository<Appointment>,
-    @InjectRepository(AppointmentMember) private appointmentMemberModel: Repository<AppointmentMember>,
-    private readonly chatService: ChatService,
-  ) { }
-  
-  @Cron('* */30 * * * *')
+    @InjectRepository(Appointment)
+    private appointmentModel: Repository<Appointment>,
+    @InjectRepository(AppointmentMember)
+    private appointmentMemberModel: Repository<AppointmentMember>,
+    private readonly chatService: ChatService
+  ) {}
+
+  @Cron("* */30 * * * *")
   async handleCron() {
     try {
-      var time = Date.now();
+      const time = Date.now();
       let timestamp = new Date(time);
-      timestamp = moment(timestamp).add(1, 'm').toDate();
+      timestamp = moment(timestamp).add(1, "m").toDate();
 
-      await this.roomModel.delete({endAt:LessThanOrEqual(timestamp)});
-  
-      return ;
+      await this.roomModel.delete({ endAt: LessThanOrEqual(timestamp) });
 
-      }catch (err) {
+      return;
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
@@ -46,45 +62,46 @@ export class RoomService {
   // CRUD
   async create(req: CreateRoomDto) {
     try {
-
       const room = await this.roomModel.save(req);
 
       const board = await this.roomLineUpBoardModel.save({});
-      
-      if(req.teamlineUpIds !== undefined){
-        
+
+      if (req.teamlineUpIds !== undefined) {
         const lineUps = req.teamlineUpIds.split(",");
 
-        for(let i = 0; i < lineUps.length; i++){
-
-          await this.roomLineUpModel.save({ roomLineUpBoardId: board.id, teamLineUpId: lineUps[i] });
-
+        for (let i = 0; i < lineUps.length; i++) {
+          await this.roomLineUpModel.save({
+            roomLineUpBoardId: board.id,
+            teamLineUpId: lineUps[i]
+          });
         }
-        
-      }else{
-        
+      } else {
         const game = await this.gameModel.findOneByOrFail({ id: req.gameId });
 
-        for(let i = 0; i < game.lineupCap ; i++){
-          
-          await this.roomLineUpModel.save({ roomLineUpBoardId: board.id, teamLineUpId: null});
-
+        for (let i = 0; i < game.lineupCap; i++) {
+          await this.roomLineUpModel.save({
+            roomLineUpBoardId: board.id,
+            teamLineUpId: null
+          });
         }
-
       }
 
-      const participantData = { roomId: room.id, teamId: req.hostId, gameId: req.gameId, roomLineUpBoardId: board.id };
-      
+      const participantData = {
+        roomId: room.id,
+        teamId: req.hostId,
+        gameId: req.gameId,
+        roomLineUpBoardId: board.id
+      };
+
       // generate chat and participant
       const res = this.participantModel.create(participantData);
       await this.participantModel.save(res);
       await this.chatService.create({ roomId: room.id });
-      
+
       return {
-        room: room
+        room
       };
-    }
-    catch(err) {
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
@@ -93,102 +110,108 @@ export class RoomService {
     try {
       const updateRes = await this.roomModel.update(roomId, req);
 
-      if(updateRes.affected === 0) {
+      if (updateRes.affected === 0) {
         return new HttpException("", HttpStatus.NO_CONTENT);
       }
 
       return {
-        room: await this.roomModel.findOneOrFail({ where: { id: roomId }})
-      }
+        room: await this.roomModel.findOneOrFail({ where: { id: roomId } })
+      };
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async getJoinedRoom(teamId: string) {  // new
-    try{
+  async getJoinedRoom(teamId: string) {
+    // new
+    try {
+      const participants = await this.participantModel.findBy({ teamId });
+      const joined = await this.roomModel.findBy({
+        id: In(participants.map((e) => e.roomId))
+      });
 
-      const participants = await this.participantModel.findBy({ teamId: teamId });
-      const joined = await this.roomModel.findBy({ id: In (participants.map(e => e.roomId ))});
-
-      const request = await this.roomRequestModel.findBy({ teamId: teamId });
-      const requested = await this.roomModel.findBy({ id: In (request.map(e => e.roomId)) });
-
+      const request = await this.roomRequestModel.findBy({ teamId });
+      const requested = await this.roomModel.findBy({
+        id: In(request.map((e) => e.roomId))
+      });
 
       return {
-        joined: joined,
-        requested: requested
+        joined,
+        requested
       };
-    }
-    catch(err){
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
-    
   }
 
-  async getRoomsByGameId(gameId: string) {  // new
-    try{
-      return this.roomModel.findBy({ gameId: gameId });
-    }
-    catch(err){
+  async getRoomsByGameId(gameId: string) {
+    // new
+    try {
+      return this.roomModel.findBy({ gameId });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
-    
   }
 
-  async getRoomsById(roomId: string) {  
-    try{
+  async getRoomsById(roomId: string) {
+    try {
       return await this.roomModel.findBy({ id: roomId });
-    }
-    catch(err){
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
-    
   }
 
-  async getRoomByHostId(teamId: string) {  // hostId is also teamId
-    try{
+  async getRoomByHostId(teamId: string) {
+    // hostId is also teamId
+    try {
       return await this.roomModel.findBy({ hostId: teamId });
-    }
-    catch(err){
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
-    
   }
 
-  async getRoomsByDate(date: string, gameId: string){ // date format is yyyy-mm-dd just like 2020-5-27 and we need output that at input day
-    try{
+  async getRoomsByDate(date: string, gameId: string) {
+    // date format is yyyy-mm-dd just like 2020-5-27 and we need output that at input day
+    try {
       const today = new Date(date);
-      let tomorrow = new Date(date);
+      const tomorrow = new Date(date);
       tomorrow.setDate(tomorrow.getDate() + 1);
-      return await this.roomModel.findBy({ startAt: Between(today, tomorrow),  gameId: gameId});
-    }
-    catch(err){
+      return await this.roomModel.findBy({
+        startAt: Between(today, tomorrow),
+        gameId
+      });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async getAllRooms(gameId: string, roomName?: string, date?: any) { // new 
-
-    try{
-      if(roomName && date){
+  async getAllRooms(gameId: string, roomName?: string, date?: any) {
+    // new
+    try {
+      if (roomName && date) {
         const today = new Date(date);
-        let tomorrow = new Date(date);
+        const tomorrow = new Date(date);
         tomorrow.setDate(tomorrow.getDate() + 1);
-        return await this.roomModel.findBy({ name: roomName, startAt: Between(today, tomorrow), gameId: gameId });
+        return await this.roomModel.findBy({
+          name: roomName,
+          startAt: Between(today, tomorrow),
+          gameId
+        });
       }
-      if(roomName){
-        return await this.roomModel.findBy({ name: roomName, gameId: gameId });
+      if (roomName) {
+        return await this.roomModel.findBy({ name: roomName, gameId });
       }
-      if(date){
+      if (date) {
         const today = new Date(date);
-        let tomorrow = new Date(date);
+        const tomorrow = new Date(date);
         tomorrow.setDate(tomorrow.getDate() + 1);
-        return await this.roomModel.findBy({ startAt: Between(today, tomorrow), gameId: gameId });
+        return await this.roomModel.findBy({
+          startAt: Between(today, tomorrow),
+          gameId
+        });
       }
-      return await this.roomModel.findBy({ gameId: gameId });
-    }
-    catch(err){
+      return await this.roomModel.findBy({ gameId });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
@@ -198,13 +221,14 @@ export class RoomService {
       const teamId = payload.teamId;
       const room = await this.roomModel.findOneByOrFail({ id: payload.roomId });
 
-      if(room.hostId === teamId){
-
-        const appoint = await this.appointmentModel.update({ roomId: room.id },{isDel: true});      
+      if (room.hostId === teamId) {
+        const appoint = await this.appointmentModel.update(
+          { roomId: room.id },
+          { isDel: true }
+        );
         const res = await this.roomModel.delete(room.id);
 
-        if(res.affected !== 0) {
-
+        if (res.affected !== 0) {
           return {
             roomId: room.id
           };
@@ -212,7 +236,6 @@ export class RoomService {
         throw new Error("room is not deleted");
       }
       throw new Error("Only host can disband the room");
-      
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -220,62 +243,85 @@ export class RoomService {
 
   async joinRoom(teamId: string, roomId: string) {
     try {
-      var time = Date.now();
-      let timestamp = new Date(time);
+      const time = Date.now();
+      const timestamp = new Date(time);
 
       const room = await this.roomModel.findOneByOrFail({ id: roomId });
       const game = await this.gameModel.findOneByOrFail({ id: room.gameId });
 
-      if(timestamp <= room.endAt){ 
+      if (timestamp <= room.endAt) {
         // check is room available
-        if(room.status === RoomStatus.UNAVAILABLE || room.status === RoomStatus.FULL) {
+        if (
+          room.status === RoomStatus.UNAVAILABLE
+          || room.status === RoomStatus.FULL
+        ) {
           throw new Error("room is not available");
         }
 
         // update room status
         await this.updateStatus(room);
 
-        //find room request
-        const request = await this.roomRequestModel.findOneByOrFail({ teamId: teamId, roomId: roomId });
+        // find room request
+        const request = await this.roomRequestModel.findOneByOrFail({
+          teamId,
+          roomId
+        });
 
         // add participant to the room
-        const participantData = { roomId: room.id, teamId: teamId, gameId: game.id, roomLineUpBoardId: request.roomLineUpBoardId };
+        const participantData = {
+          roomId: room.id,
+          teamId,
+          gameId: game.id,
+          roomLineUpBoardId: request.roomLineUpBoardId
+        };
         const participant = await this.participantModel.save(participantData);
 
         // add appointment
-        const appointmentData = { startAt: room.startAt, endAt: room.endAt, roomId: room.id, status: "WAITING", isDel: false };
+        const appointmentData = {
+          startAt: room.startAt,
+          endAt: room.endAt,
+          roomId: room.id,
+          status: "WAITING",
+          isDel: false
+        };
         const appointment = await this.appointmentModel.save(appointmentData);
 
-        await this.appointmentMemberModel.save({ teamId: teamId, appointId: appointment.id });  // for guest
-        await this.appointmentMemberModel.save({ teamId: room.hostId, appointId: appointment.id }); // for host
+        await this.appointmentMemberModel.save({
+          teamId,
+          appointId: appointment.id
+        }); // for guest
+        await this.appointmentMemberModel.save({
+          teamId: room.hostId,
+          appointId: appointment.id
+        }); // for host
         await this.roomRequestModel.delete({ id: request.id });
-      
+
         return {
           roomParticipant: participant
         };
-      }else{
+      } else {
         throw new BadRequestException("this room has expired");
       }
-      
-    } catch(err) {
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async updateStatus(room: Room){
-      room.status = RoomStatus.UNAVAILABLE;
-      room.teamCount ++;
-      await this.roomModel.update({ id: room.id }, room);
+  async updateStatus(room: Room) {
+    room.status = RoomStatus.UNAVAILABLE;
+    room.teamCount++;
+    await this.roomModel.update({ id: room.id }, room);
   }
 
   async leaveRoom(participantId: string) {
     try {
-      
-      const parti = await this.participantModel.findOneByOrFail({ id: participantId });
+      const parti = await this.participantModel.findOneByOrFail({
+        id: participantId
+      });
       const room = await this.roomModel.findOneByOrFail({ id: parti.roomId });
 
       // update participant count
-      room.teamCount -= 1; 
+      room.teamCount -= 1;
 
       // update room status
       room.status = RoomStatus.AVAILABLE;
@@ -285,22 +331,18 @@ export class RoomService {
       await this.appointmentModel.delete({ roomId: room.id });
 
       // remove participant from the room
-      
+
       const res = await this.participantModel.delete({ id: participantId });
-      console.log(res.affected + " participants has been delete");
-      
+      console.log(`${res.affected} participants has been delete`);
+
       return {
         res: {
           roomParticipant: parti
         },
         roomId: room.id
       };
-
-    } catch(err) {
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
-  
 }
-
-

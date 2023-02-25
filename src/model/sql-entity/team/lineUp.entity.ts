@@ -4,12 +4,10 @@ import { Team } from "./team.entity";
 import { AbstractModel } from "../_model";
 import { UserAvatar } from "../user/userAvatar.entity";
 
-
 @Entity()
 export class TeamLineUp extends AbstractModel {
-    
   @IsNotEmpty()
-  @ManyToOne(() => Team, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Team, { onDelete: "CASCADE" })
   @Column({ type: "uuid" })
   teamId: string;
 
@@ -30,7 +28,7 @@ export class TeamLineUp extends AbstractModel {
 
   @IsUrl()
   @Column({ default: "" })
-  imageUrl: string
+  imageUrl: string;
 
   @IsNotEmpty()
   @Column({ default: "new player" })
@@ -38,5 +36,4 @@ export class TeamLineUp extends AbstractModel {
 
   @Column({ default: "" })
   note: string;
-
 }

@@ -11,17 +11,17 @@ import { CreateMessageDto } from "src/model/dto/chat.dto";
 import { Chat } from "src/model/sql-entity/chat.entity";
 import { ChatService } from "./chat.service";
 import { MessageService } from "./messages/message.service";
-  
-  @WebSocketGateway({
-    cors: {
-      origin: "*"
-    }
-  })
-  
+
+@WebSocketGateway({
+  cors: {
+    origin: "*"
+  }
+})
 export class ChatGateway
-implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(private messageService: MessageService) {}
-  
+
   @WebSocketServer() server: Server;
 
   @SubscribeMessage("message")

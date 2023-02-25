@@ -22,4 +22,4 @@ import { UtilModule } from "./utils/util.module";
   controllers: [],
   providers: []
 })
-export class ApiModule { }
+export class ApiModule {}

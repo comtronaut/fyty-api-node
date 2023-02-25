@@ -8,7 +8,6 @@ import { AbstractModel } from "../_model";
 
 @Entity()
 export class Room extends AbstractModel {
-
   @IsNotEmpty()
   @Column()
   name: string;
@@ -35,16 +34,15 @@ export class Room extends AbstractModel {
   note: string;
 
   @IsNotEmpty()
-  @ManyToOne(() => Game, { onUpdate: 'CASCADE' })
+  @ManyToOne(() => Game, { onUpdate: "CASCADE" })
   @Column({ type: "uuid" })
   gameId: string;
 
   @IsNotEmpty()
-  @ManyToOne(() => Team, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+  @ManyToOne(() => Team, { onUpdate: "CASCADE", onDelete: "CASCADE" })
   @Column({ type: "uuid" })
   hostId: string;
-        
+
   @CreateDateColumn()
   createdAt: Date;
-
 }

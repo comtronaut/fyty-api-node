@@ -11,16 +11,15 @@ export class TeamMember extends AbstractModel {
   role: string;
 
   @IsNotEmpty()
-  @ManyToOne(() => Team, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+  @ManyToOne(() => Team, { onUpdate: "CASCADE", onDelete: "CASCADE" })
   @Column({ type: "uuid" })
   teamId: string;
 
   @IsNotEmpty()
-  @ManyToOne(() => User, { onUpdate: 'CASCADE', onDelete: 'CASCADE'})
+  @ManyToOne(() => User, { onUpdate: "CASCADE", onDelete: "CASCADE" })
   @Column({ type: "uuid" })
   userId: string;
 
   @CreateDateColumn()
   joinedAt: Date;
 }
-

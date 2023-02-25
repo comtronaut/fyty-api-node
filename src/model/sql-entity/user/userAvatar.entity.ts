@@ -19,21 +19,19 @@ export class UserAvatar extends AbstractModel {
   rank: string;
 
   @IsNotEmpty()
-  @Column({ type:"decimal",default: 0.00 })
+  @Column({ type: "decimal", default: 0.0 })
   ratingScore: number;
 
   @IsNotEmpty()
-  @ManyToOne(() => Game, { onUpdate: 'CASCADE' })
+  @ManyToOne(() => Game, { onUpdate: "CASCADE" })
   @Column({ type: "uuid" })
   gameId: string;
 
   @IsNotEmpty()
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @Column({ type: "uuid"})
+  @ManyToOne(() => User, { onDelete: "CASCADE" })
+  @Column({ type: "uuid" })
   userId: string;
 
   @CreateDateColumn()
   createdAt: Date;
 }
-
-

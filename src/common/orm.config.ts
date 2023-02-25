@@ -8,13 +8,15 @@ export function getConfig(rawUrl: string): TypeOrmModuleOptions {
     url: rawUrl,
     entities: [ `${__dirname}/../**/*.entity{.ts,.js}` ],
     synchronize: true,
-    ...(url.hostname === "localhost" ? {} : {
-      extra: {
-        connectionLimit: 10,
-        ssl: {
-          rejectUnauthorized: false
+    ...(url.hostname === "localhost"
+      ? {}
+      : {
+        extra: {
+          connectionLimit: 10,
+          ssl: {
+            rejectUnauthorized: false
+          }
         }
-      }
-    })
+      })
   };
 }

@@ -1,13 +1,26 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards
+} from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Subject } from "src/common/subject.decorator";
-import { CreateAppointmentDto, UpdateAppointmentDto } from "src/model/dto/appointment.dto";
+import {
+  CreateAppointmentDto,
+  UpdateAppointmentDto
+} from "src/model/dto/appointment.dto";
 import { User } from "src/model/sql-entity/user/user.entity";
 import { AppointmentService } from "./appointment.service";
 
 @Controller("api/appointments")
 export class AppointmentController {
-  constructor(private readonly appointmentService: AppointmentService) { }
+  constructor(private readonly appointmentService: AppointmentService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -17,35 +30,28 @@ export class AppointmentController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async get(
-    @Query("roomId") roomId: string,
-    @Query("teamId") teamId: string
-  ) {
+  async get(@Query("roomId") roomId: string, @Query("teamId") teamId: string) {
     return this.appointmentService.getAppointment(roomId, teamId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get("/me")
-  async getUserAppointmnet(
-    @Subject() user: User
-  ) {
+  async getUserAppointmnet(@Subject() user: User) {
     return await this.appointmentService.getAppointmentByUserId(user.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Put(":id")
   async update(
-    @Param("id") appiontmentId: string, 
-    @Body() req: UpdateAppointmentDto,
-    ) {
+    @Param("id") appiontmentId: string,
+    @Body() req: UpdateAppointmentDto
+  ) {
     return await this.appointmentService.update(appiontmentId, req);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
-  async delete(
-    @Param("id") appiontmentId: string
-    ) {    
+  async delete(@Param("id") appiontmentId: string) {
     return await this.appointmentService.delete(appiontmentId);
   }
 }

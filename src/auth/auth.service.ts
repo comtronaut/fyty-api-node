@@ -6,43 +6,36 @@ import env from "src/common/env.config";
 import { User } from "src/model/sql-entity/user/user.entity";
 import { Repository } from "typeorm";
 
-
 @Injectable()
 export class AuthService {
-  constructor(
-    @InjectRepository(User) private userModel: Repository<User>,
-  ) {}
+  constructor(@InjectRepository(User) private userModel: Repository<User>) {}
 
   async getUserByOAuth(user: any) {
     try {
-
       const res = await this.userModel.findOneBy({ email: user.email });
-      if(res !== null)
+      if (res !== null) {
         return this.getAccessToken(res.id);
-
-      else{
+      } else {
         return {
           requiredRegister: true,
           user
         };
       }
-      
-    }
-    catch (err) {
+    } catch (err) {
       throw new Error(err.message);
     }
   }
 
   async getUserByUsername(username: User["username"]): Promise<User> {
-    return await this.userModel.findOneOrFail({ where: { username }}); 
+    return await this.userModel.findOneOrFail({ where: { username } });
   }
 
   async getUserByEmail(email: User["email"]): Promise<User> {
-    return await this.userModel.findOneOrFail({ where: { email }}); 
+    return await this.userModel.findOneOrFail({ where: { email } });
   }
 
   async getUserById(id: User["id"]) {
-    return await this.userModel.findOneOrFail({ where: { id }})
+    return await this.userModel.findOneOrFail({ where: { id } });
   }
 
   async localLogin(userName: string, password: string) {
@@ -51,7 +44,7 @@ export class AuthService {
       await this.validateLogin(user, password);
 
       return this.getAccessToken(user.id);
-    } catch(err) {
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
@@ -66,7 +59,7 @@ export class AuthService {
 
   private getAccessToken(id: User["id"]) {
     const payload = { sub: id };
-    const accessToken = jwt.sign(payload, env.JWT_SECRET);    
+    const accessToken = jwt.sign(payload, env.JWT_SECRET);
 
     return { accessToken };
   }

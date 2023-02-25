@@ -8,7 +8,6 @@ import { AbstractModel } from "./_model";
 
 @Entity()
 export class Appointment extends AbstractModel {
-
   @CreateDateColumn()
   startAt: Date;
 
@@ -23,7 +22,7 @@ export class Appointment extends AbstractModel {
   isDel: boolean;
 
   @Column()
-  @OneToOne(() => Room, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+  @OneToOne(() => Room, { onUpdate: "CASCADE", onDelete: "CASCADE" })
   roomId: string;
 }
 
@@ -31,14 +30,12 @@ export class Appointment extends AbstractModel {
 
 @Entity()
 export class AppointmentMember extends AbstractModel {
-
   @IsNotEmpty()
-  @ManyToOne(() => Team, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+  @ManyToOne(() => Team, { onUpdate: "CASCADE", onDelete: "CASCADE" })
   @Column({ type: "uuid" })
   teamId: string;
 
-  @ManyToOne(() => Appointment, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+  @ManyToOne(() => Appointment, { onUpdate: "CASCADE", onDelete: "CASCADE" })
   @Column({ type: "uuid", nullable: true })
   appointId: string;
-  
 }

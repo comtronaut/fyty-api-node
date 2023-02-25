@@ -5,10 +5,8 @@ import { GameController } from "./game.controller";
 import { GameService } from "./game.service";
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ Game ])
-  ],
+  imports: [ TypeOrmModule.forFeature([ Game ]) ],
   controllers: [ GameController ],
   providers: [ GameService ]
 })
-export class GameModule { }
+export class GameModule {}

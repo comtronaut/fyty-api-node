@@ -30,4 +30,4 @@ export class CreateGameDto {
   abbr: string;
 }
 
-export class UpdateGameDto extends PartialType(CreateGameDto) { }
+export class UpdateGameDto extends PartialType(CreateGameDto) {}

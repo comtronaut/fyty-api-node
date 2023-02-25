@@ -1,4 +1,9 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreateMessageDto } from "src/model/dto/chat.dto";
 import { Chat } from "src/model/sql-entity/chat.entity";
@@ -8,13 +13,13 @@ import { Repository } from "typeorm";
 @Injectable()
 export class MessageService {
   constructor(
-    @InjectRepository(Message) private messageModel: Repository<Message>,
-  ) { }
+    @InjectRepository(Message) private messageModel: Repository<Message>
+  ) {}
 
   async getMesssagesFromChatId(chatId: string) {
     try {
       return await this.messageModel.find({ where: { chatId } });
-    } catch(err) {
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }

@@ -1,17 +1,11 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ApiModule } from './api/api.module';
-import { AuthModule } from './auth/auth.module';
-import env from './common/env.config';
-import { getConfig } from './common/orm.config';
+import { Module } from "@nestjs/common";
+import { ApiModule } from "./api/api.module";
+import { AuthModule } from "./auth/auth.module";
+import { PrismaService } from "./services/prisma.service";
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot(getConfig(env.POSTGRES_URL)),
-    ApiModule,
-    AuthModule,
-  ],
+  imports: [ PrismaService, ApiModule, AuthModule ],
   controllers: [],
-  providers: [],
+  providers: []
 })
 export class AppModule {}

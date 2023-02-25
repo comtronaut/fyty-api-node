@@ -3,44 +3,43 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEmail, IsNotEmpty, MinLength } from "class-validator";
 
 export class CreateUserDto {
-    @ApiProperty()
-    @IsNotEmpty()
-    username: string;
-  
-    @ApiProperty()
-    @IsNotEmpty()
-    @MinLength(6)
-    password: string;
-  
-    @ApiProperty()
-    @IsNotEmpty()
-    displayName: string;
-  
-    @ApiProperty()
-    @IsEmail()
-    @IsNotEmpty()
-    email: string;
-  
-    @ApiPropertyOptional()
-    bio: string;
-  
-    @ApiPropertyOptional()
-    portraitUrl: string;
-  
-    @ApiPropertyOptional()
-    coverUrl: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  username: string;
 
-    @IsNotEmpty()
-    phoneNumber: string;
-  
-    @ApiPropertyOptional({ description: "auto generated" })
-    createdAt: Date;
-  }
+  @ApiProperty()
+  @IsNotEmpty()
+  @MinLength(6)
+  password: string;
 
-export class UpdateUserDto extends PartialType(CreateUserDto) { }
+  @ApiProperty()
+  @IsNotEmpty()
+  displayName: string;
+
+  @ApiProperty()
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @ApiPropertyOptional()
+  bio: string;
+
+  @ApiPropertyOptional()
+  portraitUrl: string;
+
+  @ApiPropertyOptional()
+  coverUrl: string;
+
+  @IsNotEmpty()
+  phoneNumber: string;
+
+  @ApiPropertyOptional({ description: "auto generated" })
+  createdAt: Date;
+}
+
+export class UpdateUserDto extends PartialType(CreateUserDto) {}
 
 export class CreateUserAvatarDto {
-
   @IsNotEmpty()
   characterName: string;
 
@@ -61,4 +60,4 @@ export class CreateUserAvatarDto {
   createdAt: Date;
 }
 
-export class UpdateUserAvatarDto extends PartialType(CreateUserAvatarDto) { }
+export class UpdateUserAvatarDto extends PartialType(CreateUserAvatarDto) {}

@@ -1,11 +1,23 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors
+} from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Debug } from "src/common/debug.decorator";
 import { ImageService } from "./image.service";
 
 @Controller("/api/images")
 export class ImageController {
-  constructor(private readonly imageService: ImageService) { }
+  constructor(private readonly imageService: ImageService) {}
 
   @Get()
   @Debug()

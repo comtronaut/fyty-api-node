@@ -9,4 +9,4 @@ import { ImageService } from "./image.service";
   controllers: [ ImageController ],
   providers: [ ImageService ]
 })
-export class ImageModule { }
+export class ImageModule {}

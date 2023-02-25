@@ -5,6 +5,6 @@ import { AbstractModel } from "./_model";
 @Entity()
 export class Chat extends AbstractModel {
   @Column()
-  @OneToOne(() => Room, { onUpdate: 'CASCADE' })
+  @OneToOne(() => Room, { onUpdate: "CASCADE" })
   roomId: string;
 }

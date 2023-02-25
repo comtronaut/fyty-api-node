@@ -1,10 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put
+} from "@nestjs/common";
 import { Debug } from "src/common/debug.decorator";
 import { MessageService } from "./messages/message.service";
 
 @Controller("api/chats")
 export class ChatController {
-  constructor(private readonly messageService: MessageService) { }
+  constructor(private readonly messageService: MessageService) {}
 
   @Get("/:chatId")
   async getMesssagesFromChatId(@Param("chatId") chatId: string) {

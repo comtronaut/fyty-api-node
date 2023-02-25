@@ -3,19 +3,17 @@ import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IsNotEmpty, IsUrl, IsUUID } from "class-validator";
 
 export class CreateLineUpDto {
+  @IsUUID()
+  teamId: string;
 
-    @IsUUID()
-    teamId: string;
+  @ApiPropertyOptional()
+  isDefault: any;
 
-    @ApiPropertyOptional()
-    isDefault: any;
+  @ApiPropertyOptional()
+  inGameId: string;
 
-    @ApiPropertyOptional()
-    inGameId: string;
-
-    @ApiPropertyOptional()
-    imageUrl: string;
-
+  @ApiPropertyOptional()
+  imageUrl: string;
 }
 
-export class UpdateLineUpDto extends PartialType(CreateLineUpDto) { }
+export class UpdateLineUpDto extends PartialType(CreateLineUpDto) {}

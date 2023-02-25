@@ -8,7 +8,7 @@ export class CreateRoomDto {
 
   @ApiPropertyOptional()
   startAt: Date;
-  
+
   @ApiPropertyOptional()
   endAt: Date;
 
@@ -22,10 +22,9 @@ export class CreateRoomDto {
 
   @IsNotEmpty()
   hostId: string;
-
 }
 
-export class UpdateRoomDto extends PartialType(CreateRoomDto) { }
+export class UpdateRoomDto extends PartialType(CreateRoomDto) {}
 
 // participant
 
@@ -33,7 +32,7 @@ export class CreateParticipantDto {
   @IsNotEmpty()
   @IsUUID()
   teamId: string;
-  
+
   @IsNotEmpty()
   @IsUUID()
   roomId: string;
@@ -43,19 +42,17 @@ export class CreateParticipantDto {
   gameId: string;
 }
 
-export class UpdateParticipantDto extends PartialType(CreateParticipantDto) { }
+export class UpdateParticipantDto extends PartialType(CreateParticipantDto) {}
 
 // RoomNote
 
 export class UpdateRoomNoteDto {
-
   topic: string;
 
   body: string;
 }
 
-export class CreateRoomNoteDto  {
-  
+export class CreateRoomNoteDto {
   @ApiPropertyOptional()
   roomId: string;
 
@@ -64,15 +61,12 @@ export class CreateRoomNoteDto  {
 
   @ApiPropertyOptional()
   body: string;
-
 }
 
 export class DeleteRoomDto {
-
   @IsNotEmpty()
   roomId: string;
 
   @IsNotEmpty()
   teamId: string;
-
 }

@@ -10,95 +10,87 @@ import { User } from "src/model/sql-entity/user/user.entity";
 import { In, Repository } from "typeorm";
 import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
 
-
 @Injectable()
 export class SelectorService {
   constructor(
     @InjectRepository(Team) private teamModel: Repository<Team>,
-    @InjectRepository(TeamMember) private teamMemberModel: Repository<TeamMember>,
+    @InjectRepository(TeamMember)
+    private teamMemberModel: Repository<TeamMember>,
     @InjectRepository(Room) private roomModel: Repository<Room>,
-    @InjectRepository(RoomParticipant) private participantModel: Repository<RoomParticipant>,
+    @InjectRepository(RoomParticipant)
+    private participantModel: Repository<RoomParticipant>,
     @InjectRepository(TeamLineUp) private lineUpModel: Repository<TeamLineUp>,
     @InjectRepository(Chat) private chatModel: Repository<Chat>,
-    @InjectRepository(Message) private messageModel: Repository<Message>,
-  ) { }
+    @InjectRepository(Message) private messageModel: Repository<Message>
+  ) {}
 
-  async getMe(me: User){
-    try{
-        const myTeams = await this.teamModel.findBy({ ownerId: me.id });
-        return {
-          user: me,
-          teams: myTeams
-        };
-    }
-    catch(err){
-        throw new BadRequestException(err.message);
-    }
-  }
-
-  async getAppointment(me: User){
-    try{
-        const myTeams = await this.teamMemberModel.findBy({ userId: me.id });
-    }
-    catch(err){
-        throw new BadRequestException(err.message);
+  async getMe(me: User) {
+    try {
+      const myTeams = await this.teamModel.findBy({ ownerId: me.id });
+      return {
+        user: me,
+        teams: myTeams
+      };
+    } catch (err) {
+      throw new BadRequestException(err.message);
     }
   }
 
-  async getChat(roomId: string){
-    try{
-        const chat = await this.chatModel.findOneByOrFail({ roomId: roomId });
-        const message = await this.messageModel.findBy({ chatId: chat.id });
-        return {
-          chat: chat,
-          messages: message
-        };
-    }
-    catch(err){
-        throw new BadRequestException(err.message);
+  async getAppointment(me: User) {
+    try {
+      const myTeams = await this.teamMemberModel.findBy({ userId: me.id });
+    } catch (err) {
+      throw new BadRequestException(err.message);
     }
   }
 
-
-  async getRoom(roomId: string){        // not sure for map without await
-    try{
-        const room = await this.roomModel.findOneByOrFail({ id: roomId });
-        const participants = await this.participantModel.findBy({ roomId: roomId });
-
-        const teams = await this.teamModel.findBy({ id: In (participants.map(e => e.teamId ))})
-
-        // const teams = participants.map(e => this.teamModel.findOneByOrFail({ id: e.teamId })) // good? maybe not 
-        // console.log(teams);
-
-        return {
-            room: room,
-            roomParticipants: participants,
-            teams: teams
-        }
-    }
-    
-    catch(err){
-        throw new BadRequestException(err.message);
+  async getChat(roomId: string) {
+    try {
+      const chat = await this.chatModel.findOneByOrFail({ roomId });
+      const message = await this.messageModel.findBy({ chatId: chat.id });
+      return {
+        chat,
+        messages: message
+      };
+    } catch (err) {
+      throw new BadRequestException(err.message);
     }
   }
 
-  async getTeam(teamId: string){
-    try{
+  async getRoom(roomId: string) {
+    // not sure for map without await
+    try {
+      const room = await this.roomModel.findOneByOrFail({ id: roomId });
+      const participants = await this.participantModel.findBy({ roomId });
+
+      const teams = await this.teamModel.findBy({
+        id: In(participants.map((e) => e.teamId))
+      });
+
+      // const teams = participants.map(e => this.teamModel.findOneByOrFail({ id: e.teamId })) // good? maybe not
+      // console.log(teams);
+
+      return {
+        room,
+        roomParticipants: participants,
+        teams
+      };
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async getTeam(teamId: string) {
+    try {
       const team = await this.teamModel.findOneByOrFail({ id: teamId });
-      const lineUps = await this.lineUpModel.findBy({ teamId: teamId });
+      const lineUps = await this.lineUpModel.findBy({ teamId });
 
-      return{
-        team: team,
+      return {
+        team,
         teamLineup: lineUps
       };
-      
-    }
-  
-  catch(err){
+    } catch (err) {
       throw new BadRequestException(err.message);
+    }
   }
-  }
-
-
-
 }

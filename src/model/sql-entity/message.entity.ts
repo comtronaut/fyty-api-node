@@ -7,15 +7,15 @@ import { AbstractModel } from "./_model";
 @Entity()
 export class Message extends AbstractModel {
   @Column()
-  @OneToOne(() => Chat, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+  @OneToOne(() => Chat, { onUpdate: "CASCADE", onDelete: "CASCADE" })
   chatId: string;
 
-  @ManyToOne(() => Team, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+  @ManyToOne(() => Team, { onUpdate: "CASCADE", onDelete: "CASCADE" })
   @Column({ nullable: true })
   teamId: string;
 
   @Column()
-  @OneToOne(() => User, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+  @OneToOne(() => User, { onUpdate: "CASCADE", onDelete: "CASCADE" })
   senderId: string;
 
   @Column()

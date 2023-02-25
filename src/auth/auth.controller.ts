@@ -1,4 +1,12 @@
-import { Controller, Get, HttpStatus, NotAcceptableException, Query, Req, UseGuards } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  NotAcceptableException,
+  Query,
+  Req,
+  UseGuards
+} from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { Request } from "express";
 import { Debug } from "src/common/debug.decorator";
@@ -7,23 +15,23 @@ import { JwtAuthGuard } from "./guard/jwt-auth.guard";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Get("login")
   async login(
     @Query("username") username: string,
     @Query("password") password: string
-  ) {   
+  ) {
     return await this.authService.localLogin(username, password);
   }
 
   @Debug()
   @UseGuards(JwtAuthGuard)
   @Get("profile")
-  async getProfile(@Req() req: Request) {        
+  async getProfile(@Req() req: Request) {
     if (!req.user && typeof req.user !== "string") {
       throw new NotAcceptableException();
-    }    
+    }
 
     return req.user;
   }
@@ -70,5 +78,4 @@ export class AuthController {
   async facebookLogin(): Promise<any> {
     return HttpStatus.OK;
   }
-
 }

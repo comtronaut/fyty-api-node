@@ -20,10 +20,9 @@ export class CreateTeamDto {
   createdAt: Date;
 }
 
-export class UpdateTeamDto extends PartialType(CreateTeamDto) { }
+export class UpdateTeamDto extends PartialType(CreateTeamDto) {}
 
 export class CreateTeamMemberDto {
-
   role: string;
 
   @IsNotEmpty()
@@ -33,13 +32,11 @@ export class CreateTeamMemberDto {
   userId: string;
 
   joinedAt: Date;
-
 }
 
-export class UpdateTeamMemberDto extends PartialType(CreateTeamMemberDto) { }
+export class UpdateTeamMemberDto extends PartialType(CreateTeamMemberDto) {}
 
 export class CreateTeamPendingDto {
-  
   @IsNotEmpty()
   teamId: string;
 
@@ -48,9 +45,8 @@ export class CreateTeamPendingDto {
 
   @IsNotEmpty()
   status: string;
-  
-  createdAt: Date;
 
+  createdAt: Date;
 }
 
-export class UpdateTeamPendingDto extends PartialType(CreateTeamPendingDto) { }
+export class UpdateTeamPendingDto extends PartialType(CreateTeamPendingDto) {}
