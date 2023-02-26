@@ -1,14 +1,15 @@
 import { PassportStrategy } from "@nestjs/passport";
 import { Strategy } from "passport-facebook";
 import { Injectable } from "@nestjs/common";
+import env from "src/common/env.config";
 
 @Injectable()
 export class FacebookStrategy extends PassportStrategy(Strategy, "facebook") {
   constructor() {
     super({
-      clientID: "633711121656488", // need to change
-      clientSecret: "7eb0bdd030f31c027c027f818abb4be6", // this too
-      callbackURL: "https://fyty-esport.com/login", // yes, of course; so use localhost:xxxx for test
+      clientID: env.FACEBOOK_CLIENT_ID, // need to change
+      clientSecret: env.FACEBOOK_CLIENT_SECRET, // this too
+      callbackURL: env.FACEBOOK_REDIRECT_URI, // yes, of course; so use localhost:xxxx for test
       scope: "email",
       profileFields: [ "name", "photos", "emails" ]
     });

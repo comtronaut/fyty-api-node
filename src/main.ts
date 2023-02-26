@@ -56,7 +56,7 @@ async function bootstrap() {
     Logger.log(`server listening: ${await app.getUrl()}`);
   }
 }
-bootstrap();
+void bootstrap();
 
 function extendApp(app: NestExpressApplication) {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));

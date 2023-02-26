@@ -1,7 +1,9 @@
-import { PartialType } from "@nestjs/mapped-types";
-import { IsNotEmpty, IsUrl, IsUUID } from "class-validator";
+import { Prisma } from "@prisma/client";
+import { IsNotEmpty, IsUUID } from "class-validator";
 
-export class CreateParticipantDto {
+export class CreateParticipantDto
+implements Prisma.RoomParticipantUncheckedCreateInput
+{
   @IsNotEmpty()
   @IsUUID()
   teamId: string;
@@ -13,4 +15,8 @@ export class CreateParticipantDto {
   @IsNotEmpty()
   @IsUUID()
   gameId: string;
+
+  @IsNotEmpty()
+  @IsUUID()
+  roomLineUpBoardId: string;
 }

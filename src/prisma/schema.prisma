@@ -21,16 +21,19 @@ enum MemberRole {
   MEMBER
 }
 
+enum AdminRole {
+  MANAGEMENT
+}
+
 // game
 model Game {
-  id        String @id @default(uuid())
+  id        String @id
   name      String @unique
   teamCap   Int
   lineupCap Int
   logoUrl   String
   coverUrl  String
   desc      String @default("")
-  abbr      String
 
   teams            Team[]
   rooms            Room[]
@@ -175,31 +178,49 @@ model TeamPending {
 
 // user
 model User {
-  id          String   @id @default(uuid())
-  username    String   @unique
-  password    String
-  displayName String
-  description String   @default("")
-  email       String   @unique
-  bio         String   @default("")
-  portraitUrl String   @default("")
-  coverUrl    String   @default("")
-  createdAt   DateTime @default(now())
+  id                String    @id @default(uuid())
+  username          String    @unique
+  updatedUsernameAt DateTime?
+  password          String
+  displayName       String
+  email             String?   @unique
+  updatedEmailAt    DateTime?
+  bio               String    @default("")
+  portraitUrl       String    @default("")
+  coverUrl          String    @default("")
+  facebookId        String?   @unique
+  googleId          String?   @unique
+  lineId            String?   @unique
+  firstLoginAt      DateTime?
+  lastLoginAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  teamOwners  Team[]
-  teamPending TeamPending[]
-  teamMembers TeamMember[]
-  roomHosts   Room[]
-  avatars     UserAvatar[]
-  reviewers   Review[]      @relation("reviewer")
-  reviewees   Review[]      @relation("reviewee")
-  messages    Message[]
+  teamOwners   Team[]
+  teamPending  TeamPending[]
+  teamMembers  TeamMember[]
+  roomHosts    Room[]
+  avatars      UserAvatar[]
+  reviewers    Review[]       @relation("reviewer")
+  reviewees    Review[]       @relation("reviewee")
+  messages     Message[]
+  userSettings UserSettings[]
+}
+
+model UserSettings {
+  id             String  @id
+  user           User    @relation(fields: [userId], references: [id], onUpdate: Cascade)
+  userId         String
+  isTeamNotified Boolean @default(true)
+  isMeNotified   Boolean @default(true)
+  isRoomNotified Boolean @default(true)
+  lang           String
 }
 
 model UserAvatar {
   id            String  @id @default(uuid())
   ingameId      String
-  characterName String  @default("player 1")
+  characterName String  @default("")
   rank          String
   ratingScore   Decimal @default(0.0)
   game          Game    @relation(fields: [gameId], references: [id], onUpdate: Cascade)
@@ -296,4 +317,14 @@ model Image {
 model PhoneNumber {
   id          String @id @default(uuid())
   phoneNumber String @unique
+}
+
+// admin
+model Admin {
+  id       String    @id
+  email    String
+  password String
+  role     AdminRole @default(MANAGEMENT)
+  createAt DateTime  @default(now())
+  updateAt DateTime  @updatedAt
 }

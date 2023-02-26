@@ -9,8 +9,8 @@ import {
   UseGuards
 } from "@nestjs/common";
 import { User } from "@prisma/client";
-import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
-import { Subject } from "src/common/subject.decorator";
+import { UserJwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
+import { UserSubject } from "src/common/subject.decorator";
 import {
   CreateTeamDto,
   CreateTeamMemberDto,
@@ -31,13 +31,13 @@ export class TeamController {
     private readonly teampendingService: TeampendingService
   ) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Post()
-  async createTeam(@Subject() user: User, @Body() req: CreateTeamDto) {
+  async createTeam(@UserSubject() user: User, @Body() req: CreateTeamDto) {
     return await this.teamService.create(user, req);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Get()
   async getTeamsByGameId(@Param("gameId") gameId: string) {
     if (gameId) {
@@ -46,33 +46,33 @@ export class TeamController {
     return await this.teamService.getAllTeam();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Get("/me")
-  async getMyTeam(@Subject() user: User) {
+  async getMyTeam(@UserSubject() user: User) {
     return await this.teamService.getMyTeam(user.id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Get("/:id")
   async getTeamById(@Param("id") id: string) {
     return await this.teamService.getTeam(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Put(":id")
-  async updateTeam(@Subject() user: User, @Body() req: UpdateTeamDto) {
+  async updateTeam(@UserSubject() user: User, @Body() req: UpdateTeamDto) {
     return await this.teamService.update(user.id, req);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Delete(":id")
-  async deleteTeam(@Subject() user: User, @Param("id") teamId: string) {
+  async deleteTeam(@UserSubject() user: User, @Param("id") teamId: string) {
     return await this.teamService.delete(user.id, teamId);
   }
 
   // team member
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Get(":id/members")
   async getMembersByTeamId(@Param("id") teamId: string) {
     return await this.teammemberService.getMemberByTeamId(teamId);
@@ -91,9 +91,9 @@ export class TeamController {
     return await this.teammemberService.update(teamMemberId, req);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Delete("/members/:id")
-  async kickMember(@Param("id") teamMemberId: string, @Subject() user: User) {
+  async kickMember(@Param("id") teamMemberId: string, @UserSubject() user: User) {
     return await this.teammemberService.kickMember(teamMemberId, user);
   }
 
@@ -114,15 +114,15 @@ export class TeamController {
     return await this.teampendingService.getTeamInvitation(teamId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Get("/pending/me")
-  async getPendingByUserId(@Subject() user: User) {
+  async getPendingByUserId(@UserSubject() user: User) {
     return await this.teampendingService.getTeamPendingByUser(user.id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Get("/invitation/me")
-  async getInvitationByUserId(@Subject() user: User) {
+  async getInvitationByUserId(@UserSubject() user: User) {
     return await this.teampendingService.getTeamInvitationByUser(user.id);
   }
 

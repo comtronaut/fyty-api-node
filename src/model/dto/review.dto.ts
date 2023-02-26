@@ -1,7 +1,8 @@
 import { PartialType } from "@nestjs/mapped-types";
+import { Prisma } from "@prisma/client";
 import { IsNotEmpty } from "class-validator";
 
-export class CreateReviewDto {
+export class CreateReviewDto implements Prisma.ReviewUncheckedCreateInput {
   @IsNotEmpty()
   content: string;
 

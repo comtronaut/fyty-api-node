@@ -18,6 +18,12 @@ import { PrismaService } from "src/services/prisma.service";
     })
   ],
   controllers: [ AuthController ],
-  providers: [ AuthService, JwtStrategy, FacebookStrategy, GoogleStrategy, PrismaService ]
+  providers: [
+    AuthService,
+    JwtStrategy,
+    FacebookStrategy,
+    GoogleStrategy,
+    PrismaService
+  ]
 })
 export class AuthModule {}

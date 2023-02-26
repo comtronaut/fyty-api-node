@@ -10,8 +10,8 @@ import {
   UseGuards
 } from "@nestjs/common";
 import { User } from "@prisma/client";
-import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
-import { Subject } from "src/common/subject.decorator";
+import { UserJwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
+import { UserSubject } from "src/common/subject.decorator";
 import { CreateLineUpDto, UpdateLineUpDto } from "src/model/dto/lineUp.dto";
 import { LineUpService } from "./lineUp.service";
 
@@ -19,49 +19,49 @@ import { LineUpService } from "./lineUp.service";
 export class LineUpController {
   constructor(private readonly lineUpService: LineUpService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Post()
   async addLineUp(@Body() req: CreateLineUpDto) {
-    return this.lineUpService.create(req);
+    return await this.lineUpService.create(req);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Put("/:id")
   async updateLineUp(
-    @Subject() user: User,
+    @UserSubject() user: User,
     @Param("id") lineUpId: string,
     @Body() req: UpdateLineUpDto
   ) {
-    return this.lineUpService.update(user, lineUpId, req);
+    return await this.lineUpService.update(user, lineUpId, req);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Get()
   async getAllLineups(@Query("teamId") teamId: string) {
     return await this.lineUpService.getLineUps(teamId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Get("/:id")
   async getLineup(@Param("id") lineUpId: string) {
     return await this.lineUpService.getLineUpById(lineUpId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Get("participant/:id")
   async getLineups(@Param("id") participantId: string) {
     return await this.lineUpService.getLineUpsByParti(participantId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Delete()
-  async delateLineUps(@Subject() user: User, @Param("teamId") teamId: string) {
+  async delateLineUps(@UserSubject() user: User, @Param("teamId") teamId: string) {
     return this.lineUpService.deleteAllLineUps(user.id, teamId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Delete("/:id")
-  async delateLineUp(@Subject() user: User, @Param("id") lineUpId: string) {
+  async delateLineUp(@UserSubject() user: User, @Param("id") lineUpId: string) {
     return this.lineUpService.deleteById(user.id, lineUpId);
   }
 }

@@ -1,8 +1,9 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import { IsDate, IsEnum, IsNotEmpty, IsUUID } from "class-validator";
+import { Prisma } from "@prisma/client";
+import { IsNotEmpty, IsUUID } from "class-validator";
 
-export class CreateRoomDto {
+export class CreateRoomDto implements Prisma.RoomUncheckedCreateInput {
   @IsNotEmpty()
   name: string;
 
@@ -28,7 +29,9 @@ export class UpdateRoomDto extends PartialType(CreateRoomDto) {}
 
 // participant
 
-export class CreateParticipantDto {
+export class CreateParticipantDto
+implements Prisma.RoomParticipantUncheckedCreateInput
+{
   @IsNotEmpty()
   @IsUUID()
   teamId: string;
@@ -40,6 +43,10 @@ export class CreateParticipantDto {
   @IsNotEmpty()
   @IsUUID()
   gameId: string;
+
+  @IsNotEmpty()
+  @IsUUID()
+  roomLineUpBoardId: string;
 }
 
 export class UpdateParticipantDto extends PartialType(CreateParticipantDto) {}

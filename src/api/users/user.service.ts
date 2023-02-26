@@ -1,4 +1,4 @@
-import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
@@ -8,12 +8,12 @@ import { PrismaService } from "src/services/prisma.service";
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getUserById(id: string) {
+  async getUserById(id: string): Promise<User> {
     return await this.prisma.user.findUniqueOrThrow({ where: { id } });
   }
 
-  async searchUsers(searchString: string, teamId?: string) {
-    this.prisma.user.findMany({
+  async searchUsers(searchString: string, teamId?: string): Promise<User[]> {
+    return await this.prisma.user.findMany({
       where: {
         OR: [
           {
@@ -31,14 +31,14 @@ export class UserService {
     });
   }
 
-  async create(req: CreateUserDto) {
+  async create(data: CreateUserDto) {
     try {
       const [ hashedPassword, hashedPhoneNumber ] = await Promise.all([
-        bcrypt.hash(req.password, 12),
-        bcrypt.hash(req.phoneNumber, 12)
+        bcrypt.hash(data.password, 12),
+        bcrypt.hash(data.phoneNumber, 12)
       ]);
 
-      const { phoneNumber, ...rest } = req;
+      const { phoneNumber, ...rest } = data;
       const createdContent = { ...rest, password: hashedPassword };
 
       await this.prisma.phoneNumber.create({
@@ -86,26 +86,7 @@ export class UserService {
     }
   }
 
-  async updatePassword(user: User, password: string) {
-    try {
-      const hashedPassword = bcrypt.hashSync(password, 12);
-
-      await this.prisma.user.update({
-        where: {
-          id: user.id
-        },
-        data: {
-          password: hashedPassword
-        }
-      });
-
-      return HttpStatus.OK;
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
-  }
-
-  async delete(id: string) {
+  async delete(id: string): Promise<void> {
     try {
       const res = await this.prisma.user.delete({ where: { id } });
     } catch (err) {

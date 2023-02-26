@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { Room, RoomStatus } from "@prisma/client";
-import moment from "moment";
+import dayjs from "dayjs";
 import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room/room.dto";
 import { PrismaService } from "src/services/prisma.service";
 
@@ -12,9 +12,7 @@ export class RoomService {
   @Cron("* */30 * * * *")
   async handleCron() {
     try {
-      const time = Date.now();
-      let timestamp = new Date(time);
-      timestamp = moment(timestamp).add(1, "m").toDate();
+      const timestamp = dayjs().add(1, "m").toDate();
 
       await this.prisma.room.deleteMany({
         where: {
@@ -29,28 +27,24 @@ export class RoomService {
   }
 
   // CRUD
-  async create(req: CreateRoomDto) {
+  async create(data: CreateRoomDto) {
     try {
-      const room = await this.prisma.room.create({ data: req });
+      const room = await this.prisma.room.create({ data });
       const board = await this.prisma.roomLineupBoard.create({ data: {} });
 
-      const lineUps = req.teamlineUpIds.split(",");
+      const lineUps = data.teamlineUpIds.split(",");
 
-      Promise.all(
-        lineUps.map((lineup) =>
-          this.prisma.roomLineup.create({
-            data: {
-              roomLineUpBoardId: board.id,
-              teamLineUpId: lineup
-            }
-          })
-        )
-      );
+      await this.prisma.roomLineup.createMany({
+        data: lineUps.map((lineup) => ({
+          roomLineUpBoardId: board.id,
+          teamLineUpId: lineup
+        }))
+      });
 
       const participantData = {
         roomId: room.id,
-        teamId: req.hostId,
-        gameId: req.gameId,
+        teamId: data.hostId,
+        gameId: data.gameId,
         roomLineUpBoardId: board.id
       };
 
@@ -141,8 +135,8 @@ export class RoomService {
     try {
       const today = new Date(date);
 
-      const dayStart = moment(today).startOf("day").toDate();
-      const dayEnd = moment(today).endOf("day").toDate();
+      const dayStart = dayjs(today).startOf("day").toDate();
+      const dayEnd = dayjs(today).endOf("day").toDate();
 
       return await this.prisma.room.findMany({
         where: {
@@ -162,8 +156,8 @@ export class RoomService {
     try {
       const today = new Date(date);
 
-      const dayStart = moment(today).startOf("day").toDate();
-      const dayEnd = moment(today).endOf("day").toDate();
+      const dayStart = dayjs(today).startOf("day").toDate();
+      const dayEnd = dayjs(today).endOf("day").toDate();
 
       return await this.prisma.room.findMany({
         where: {

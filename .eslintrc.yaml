@@ -138,6 +138,9 @@ rules:
     - error
     - consistent
 
+  # typescript
+  "@typescript-eslint/no-floating-promises": error
+
   # vanilla default
   "@typescript-eslint/indent":
     - warn

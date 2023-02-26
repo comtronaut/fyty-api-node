@@ -1,14 +1,6 @@
 import { Prisma } from ".prisma/client";
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import {
-  IsISO8601,
-  IsNotEmpty,
-  IsNumberString,
-  IsOptional,
-  IsString,
-  IsUrl,
-  IsUUID
-} from "class-validator";
+import { IsISO8601, IsNotEmpty, IsOptional, IsUUID } from "class-validator";
 
 export class CreateAppointmentDto
 implements Prisma.AppointmentUncheckedCreateInput

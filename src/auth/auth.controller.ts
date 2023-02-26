@@ -5,13 +5,14 @@ import {
   NotAcceptableException,
   Query,
   Req,
+  UnauthorizedException,
   UseGuards
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { Request } from "express";
 import { Debug } from "src/common/debug.decorator";
 import { AuthService } from "./auth.service";
-import { JwtAuthGuard } from "./guard/jwt-auth.guard";
+import { UserJwtAuthGuard } from "./guard/jwt-auth.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -26,7 +27,7 @@ export class AuthController {
   }
 
   @Debug()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Get("profile")
   async getProfile(@Req() req: Request) {
     if (!req.user && typeof req.user !== "string") {
@@ -40,31 +41,20 @@ export class AuthController {
   @UseGuards(AuthGuard("google"))
   async getUser(@Req() req: Request) {
     if (!req.user) {
-      return {
-        message: "no user from google"
-      };
+      throw new UnauthorizedException();
     }
 
-    // ok try to imprement functions on AuthService and use them here
-
-    const res = await this.authService.getUserByOAuth(req.user);
-
-    return res;
+    return await this.authService.retrieveUserAccessToken(req.user);
   }
 
   @Get("/user/facebook")
   @UseGuards(AuthGuard("facebook"))
-  async facebookLoginRedirect(@Req() req: any): Promise<any> {
+  async facebookLoginRedirect(@Req() req: Request): Promise<any> {
     if (!req.user) {
-      return {
-        message: "no user from facebook"
-      };
+      throw new UnauthorizedException();
     }
-    // yes, this shit too it's can be the same function i guess
 
-    const res = await this.authService.getUserByOAuth(req.user);
-
-    return res;
+    return await this.authService.retrieveUserAccessToken(req.user);
   }
 
   @Get("/google")

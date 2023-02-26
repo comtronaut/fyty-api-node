@@ -7,9 +7,9 @@ import { PrismaService } from "src/services/prisma.service";
 export class LineUpService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(req: CreateLineUpDto) {
+  async create(data: CreateLineUpDto) {
     try {
-      return await this.prisma.teamLineUp.create({ data: req });
+      return await this.prisma.teamLineUp.create({ data });
     } catch (err) {
       throw new BadRequestException(err.message);
     }

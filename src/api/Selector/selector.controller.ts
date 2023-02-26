@@ -1,28 +1,28 @@
-import { Controller, Get, HttpStatus, Param, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, UseGuards } from "@nestjs/common";
 import { User } from "@prisma/client";
-import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
-import { Subject } from "src/common/subject.decorator";
+import { UserJwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
+import { UserSubject } from "src/common/subject.decorator";
 import { SelectorService } from "./selector.service";
 
 @Controller("api/selector")
 export class SelectorController {
   constructor(private readonly selectorService: SelectorService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Get("room/:id")
   async getMyRoom(@Param("id") id: string) {
     return this.selectorService.getRoom(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Get("room/:id/chat")
   async getchat(@Param("id") roomId: string) {
     return this.selectorService.getChat(roomId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(UserJwtAuthGuard)
   @Get("me")
-  async getMySelf(@Subject() user: User) {
+  async getMySelf(@UserSubject() user: User) {
     return this.selectorService.getMe(user);
   }
 }

@@ -1,8 +1,9 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { Prisma } from "@prisma/client";
 import { IsEmail, IsNotEmpty, MinLength } from "class-validator";
 
-export class CreateUserDto {
+export class CreateUserDto implements Prisma.UserUncheckedCreateInput {
   @IsNotEmpty()
   @ApiProperty()
   username: string;
@@ -39,7 +40,9 @@ export class CreateUserDto {
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
 
-export class CreateUserAvatarDto {
+export class CreateUserAvatarDto
+implements Prisma.UserAvatarUncheckedCreateInput
+{
   @IsNotEmpty()
   characterName: string;
 

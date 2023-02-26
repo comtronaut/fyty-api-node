@@ -60,7 +60,7 @@ export class ImageService {
             reject(error);
           },
           () => {
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
+            void getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
               resolve(downloadURL)
             );
           }

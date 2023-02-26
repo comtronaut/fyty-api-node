@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
@@ -9,7 +9,7 @@ import { PrismaService } from "src/services/prisma.service";
 export class AuthService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getUserByOAuth(user: any) {
+  async retrieveUserAccessToken(user: any) {
     try {
       const res = await this.prisma.user.findFirst({
         where: { email: user.email }
@@ -39,25 +39,30 @@ export class AuthService {
     return await this.prisma.user.findFirstOrThrow({ where: { id } });
   }
 
-  async localLogin(userName: string, password: string) {
+  async localLogin(usernameOrEmail: string, password: string) {
     try {
       const user = await this.prisma.user.findFirstOrThrow({
-        where: { username: userName }
+        where: {
+          OR: [
+            { username: usernameOrEmail },
+            { email: usernameOrEmail }
+          ]
+        }
       });
       await this.validateLogin(user, password);
 
       return this.getAccessToken(user.id);
     } catch (err) {
-      throw new BadRequestException(err.message);
+      throw new UnauthorizedException(err.message);
     }
   }
 
-  private async validateLogin(user: User, password: User["password"]) {
-    if (user && bcrypt.compareSync(password, user.password)) {
+  private async validateLogin(user: User, inPassword: User["password"]) {
+    if (user && bcrypt.compareSync(inPassword, user.password)) {
       const { password, ...result } = user;
       return result;
     }
-    throw new BadRequestException("username or password is incorrect.");
+    throw new UnauthorizedException("username or password is incorrect.");
   }
 
   private getAccessToken(id: User["id"]) {
