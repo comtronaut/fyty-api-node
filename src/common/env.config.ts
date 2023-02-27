@@ -3,7 +3,7 @@ import { config } from "dotenv";
 import * as fs from "fs";
 
 function loadEnv() {
-  process.env["NODE_ENV"] === "production"
+  process.env["HOST"] === "0.0.0.0"
     ? fs.copyFileSync("env/.env.prod", ".env")
     : fs.copyFileSync("env/.env.dev", ".env");
 

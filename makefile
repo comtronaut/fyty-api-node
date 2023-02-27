@@ -32,3 +32,5 @@ docker-deploy-dev:
     &&  docker load < /root/${app_name_dev}.tar \
     &&  rm /root/${app_name_dev}.tar \
     &&  docker run -d -p 8080:8080 --name ${app_name_dev} -t ${app_name_dev}'
+remote-ssh:
+	ssh -t ${remote_host} '$m'
