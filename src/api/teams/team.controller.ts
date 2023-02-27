@@ -93,7 +93,10 @@ export class TeamController {
 
   @UseGuards(UserJwtAuthGuard)
   @Delete("/members/:id")
-  async kickMember(@Param("id") teamMemberId: string, @UserSubject() user: User) {
+  async kickMember(
+    @Param("id") teamMemberId: string,
+    @UserSubject() user: User
+  ) {
     return await this.teammemberService.kickMember(teamMemberId, user);
   }
 

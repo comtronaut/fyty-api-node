@@ -57,12 +57,6 @@ export class UserController {
     return user;
   }
 
-  @Get(":id")
-  @UseGuards(UserJwtAuthGuard)
-  async getById(@UserSubject() user: User, @Param("id") id: string) {
-    return await this.userService.getUserById(id);
-  }
-
   @Put("me")
   @UseGuards(UserJwtAuthGuard)
   async updateUser(@UserSubject() user: User, @Body() req: UpdateUserDto) {
@@ -74,6 +68,12 @@ export class UserController {
   @Delete("me")
   async deleteUser(@UserSubject() user: User) {
     return await this.userService.delete(user.id);
+  }
+
+  @Get(":id")
+  @UseGuards(UserJwtAuthGuard)
+  async getById(@UserSubject() user: User, @Param("id") id: string) {
+    return await this.userService.getById(id);
   }
 
   // UserAvatar

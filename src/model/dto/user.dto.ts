@@ -34,6 +34,10 @@ export class CreateUserDto implements Prisma.UserUncheckedCreateInput {
   @IsNotEmpty()
   phoneNumber: string;
 
+  lastLoginAt: Date;
+
+  firstLoginAt: Date;
+
   @ApiPropertyOptional({ description: "auto generated" })
   createdAt: Date;
 }

@@ -6,16 +6,15 @@ import { PrismaService } from "src/services/prisma.service";
 export class GameService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // CRUD
-  async create(req: CreateGameDto) {
+  async create(data: CreateGameDto) {
     try {
-      return await this.prisma.game.create({ data: req });
+      return await this.prisma.game.create({ data });
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async getAllGames() {
+  async getAll() {
     return await this.prisma.game.findMany();
   }
 

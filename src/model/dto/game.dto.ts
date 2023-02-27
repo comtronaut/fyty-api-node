@@ -3,6 +3,10 @@ import { PartialType } from "@nestjs/mapped-types";
 import { IsNotEmpty, IsNumberString, IsString, IsUrl } from "class-validator";
 
 export class CreateGameDto implements Prisma.GameUncheckedCreateInput {
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+
   @IsNotEmpty()
   @IsString()
   name: string;
@@ -25,10 +29,6 @@ export class CreateGameDto implements Prisma.GameUncheckedCreateInput {
 
   @IsString()
   desc: string;
-
-  @IsString()
-  @IsNotEmpty()
-  abbr: string;
 }
 
 export class UpdateGameDto extends PartialType(CreateGameDto) {}

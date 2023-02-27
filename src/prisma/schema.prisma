@@ -208,7 +208,7 @@ model User {
 }
 
 model UserSettings {
-  id             String  @id
+  id             String  @id @default(uuid())
   user           User    @relation(fields: [userId], references: [id], onUpdate: Cascade)
   userId         String
   isTeamNotified Boolean @default(true)

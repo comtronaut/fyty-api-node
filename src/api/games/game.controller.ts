@@ -24,7 +24,7 @@ export class GameController {
 
   @Get()
   async getGame() {
-    return this.gameService.getAllGames();
+    return this.gameService.getAll();
   }
 
   // only admin can edit game

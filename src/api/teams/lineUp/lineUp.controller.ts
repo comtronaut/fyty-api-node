@@ -55,7 +55,10 @@ export class LineUpController {
 
   @UseGuards(UserJwtAuthGuard)
   @Delete()
-  async delateLineUps(@UserSubject() user: User, @Param("teamId") teamId: string) {
+  async delateLineUps(
+    @UserSubject() user: User,
+    @Param("teamId") teamId: string
+  ) {
     return this.lineUpService.deleteAllLineUps(user.id, teamId);
   }
 

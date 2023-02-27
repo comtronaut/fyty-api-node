@@ -1,15 +1,34 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  CACHE_MANAGER,
+  Inject,
+  Injectable
+} from "@nestjs/common";
 import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
+import { Cache } from "cache-manager";
 import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
 import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
+  ) {}
 
-  async getUserById(id: string): Promise<User> {
-    return await this.prisma.user.findUniqueOrThrow({ where: { id } });
+  async getById(id: string): Promise<User> {
+    const cachedUser = await this.cacheManager.get<User>(`user:${id}`);
+
+    if (cachedUser) {
+      return cachedUser;
+    }
+
+    const user = await this.prisma.user.findUniqueOrThrow({ where: { id } });
+
+    await this.cacheManager.set(`user:${id}`, user);
+
+    return user;
   }
 
   async searchUsers(searchString: string, teamId?: string): Promise<User[]> {
@@ -50,6 +69,12 @@ export class UserService {
       const { password, ...userData } = await this.prisma.user.create({
         data: createdContent
       });
+      await this.prisma.userSettings.create({
+        data: {
+          userId: userData.id,
+          lang: "th"
+        }
+      });
 
       return userData;
     } catch (err) {
@@ -75,6 +100,8 @@ export class UserService {
         where: { id: user.id }
       });
 
+      await this.cacheManager.set(`user:${user.id}`, res);
+
       const flatten = (userInfo: User) => {
         const { password, ...rest } = userInfo;
         return rest;
@@ -89,6 +116,8 @@ export class UserService {
   async delete(id: string): Promise<void> {
     try {
       const res = await this.prisma.user.delete({ where: { id } });
+
+      await this.cacheManager.del(`user:${id}`);
     } catch (err) {
       throw new BadRequestException(err.message);
     }
