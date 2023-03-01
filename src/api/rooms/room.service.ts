@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { Cron } from "@nestjs/schedule";
+import { Cron, CronExpression } from "@nestjs/schedule";
 import { Room, RoomStatus } from "@prisma/client";
 import dayjs from "dayjs";
 import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room/room.dto";
@@ -9,10 +9,22 @@ import { PrismaService } from "src/services/prisma.service";
 export class RoomService {
   constructor(private readonly prisma: PrismaService) {}
 
-  @Cron("* */30 * * * *")
+  @Cron(CronExpression.EVERY_MINUTE)
   async handleCron() {
     try {
       const timestamp = dayjs().add(1, "m").toDate();
+
+      const rooms = await this.prisma.room.findMany({
+        where: {
+          endAt: {
+            lte: timestamp
+          }
+        }
+      });
+
+      if (!rooms.length) {
+        return;
+      }
 
       await this.prisma.room.deleteMany({
         where: {
@@ -20,6 +32,13 @@ export class RoomService {
             lte: timestamp
           }
         }
+      });
+
+      await this.prisma.appointment.updateMany({
+        where: { roomId: {
+          in: rooms.map((room) => room.id)
+        } },
+        data: { isDel: true }
       });
     } catch (err) {
       throw new BadRequestException(err.message);
@@ -184,7 +203,7 @@ export class RoomService {
           data: { isDel: true }
         });
 
-        const res = await this.prisma.room.delete({ where: { id: room.id } });
+        await this.prisma.room.delete({ where: { id: room.id } });
 
         return {
           roomId: room.id

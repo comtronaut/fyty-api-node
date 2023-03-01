@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException
-} from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";

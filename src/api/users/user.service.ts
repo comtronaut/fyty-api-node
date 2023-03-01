@@ -84,20 +84,18 @@ export class UserService {
 
   async update(user: User, req: UpdateUserDto) {
     try {
-      const { password, phoneNumber, ...updateData } = req;
+      const { password, phoneNumber, email, username, ...updateData } = req;
 
-      const updateRes = await this.prisma.user.update({
+      const res = await this.prisma.user.update({
         where: {
           id: user.id
         },
         data: {
           ...updateData,
+          ...(email && { updatedEmailAt: new Date() }),
+          ...(username && { updatedUsernameAt: new Date() }),
           ...(password && { password: bcrypt.hashSync(password, 12) })
         }
-      });
-
-      const res = await this.prisma.user.findUniqueOrThrow({
-        where: { id: user.id }
       });
 
       await this.cacheManager.set(`user:${user.id}`, res);

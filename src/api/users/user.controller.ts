@@ -20,11 +20,14 @@ import { UserAvatarService } from "./user-avatars/avatar.service";
 import { UserJwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Debug } from "src/common/debug.decorator";
 import { User } from "@prisma/client";
+import { UserSettingsService } from "./user-settings/user-settings.service";
+import { UpdateUserSettingsDto } from "src/model/dto/user-settings.dto";
 
 @Controller("api/users")
 export class UserController {
   constructor(
     private readonly userService: UserService,
+    private readonly settingsService: UserSettingsService,
     private readonly avatarService: UserAvatarService
   ) {}
 
@@ -70,14 +73,29 @@ export class UserController {
     return await this.userService.delete(user.id);
   }
 
+  @Get("me/settings")
+  @UseGuards(UserJwtAuthGuard)
+  async getSelfSettings(@UserSubject() user: User) {
+    return await this.settingsService.getByUserId(user.id);
+  }
+
+  @Put("me/settings")
+  @UseGuards(UserJwtAuthGuard)
+  async updateUserSettings(
+    @UserSubject() user: User,
+    @Body() payload: UpdateUserSettingsDto
+  ) {
+    return await this.settingsService.updateByUserId(user.id, payload);
+  }
+
   @Get(":id")
   @UseGuards(UserJwtAuthGuard)
   async getById(@UserSubject() user: User, @Param("id") id: string) {
     return await this.userService.getById(id);
   }
 
-  // UserAvatar
   @Post("avatar")
+  @UseGuards(UserJwtAuthGuard)
   async createUserAvatar(@Body() req: CreateUserAvatarDto) {
     return this.avatarService.createUserAvatar(req);
   }
@@ -92,7 +110,7 @@ export class UserController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Get("/avatar/other") // new
+  @Get("avatar/other") // new
   async getUserAvatar(
     @Query("userId") userId: string,
     @Query("gameId") gameId: string
@@ -100,7 +118,7 @@ export class UserController {
     return await this.avatarService.getUserAvatar(userId, gameId);
   }
 
-  @Put("/avatar/:id")
+  @Put("avatar/:id")
   async updateUserAvatar(
     @Param("id") avatarId: string,
     @Body() req: UpdateUserAvatarDto
