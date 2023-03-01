@@ -91,7 +91,7 @@ export class AuthService {
 
       await this.userService.update(user, {
         lastLoginAt: new Date(),
-        ...(user.firstLoginAt && { firstLoginAt: new Date() })
+        ...(!user.firstLoginAt && { firstLoginAt: new Date() })
       });
 
       if (!this.isValidPassword(user, password)) {

@@ -122,13 +122,20 @@ export class UserService {
   }
 
   async getDuplicationResult(
-    payload: UpdateUserDto
+    { phoneNumber, ...payload }: UpdateUserDto
   ): Promise<Record<string, boolean>> {
     const res = {} as Record<string, boolean>;
 
     for (const [ key, value ] of Object.entries(payload)) {
       res[key] = Boolean(
         await this.prisma.user.findFirst({ where: { [key]: value } })
+      );
+    }
+
+    if (phoneNumber) {
+      const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12);
+      res[phoneNumber] = Boolean(
+        await this.prisma.phoneNumber.findUnique({ where: { phoneNumber: hashedPhoneNumber } })
       );
     }
 

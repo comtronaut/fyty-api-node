@@ -39,9 +39,10 @@ export class UserController {
   @Get("utils/validation")
   async validateUserDuplication(
     @Query("username") username?: string,
+    @Query("phoneNumber") phoneNumber?: string,
     @Query("email") email?: string
   ) {
-    return await this.userService.getDuplicationResult({ username, email });
+    return await this.userService.getDuplicationResult({ username, email, phoneNumber });
   }
 
   @Get()
