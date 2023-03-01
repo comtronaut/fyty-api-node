@@ -205,7 +205,7 @@ export class RoomService {
           data: { isDel: true }
         });
 
-        await this.prisma.room.delete({ where: room });
+        await this.prisma.room.delete({ where: { id: room.id } });
 
         return {
           roomId: room.id

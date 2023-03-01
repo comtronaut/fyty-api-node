@@ -24,7 +24,8 @@ implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
   @SubscribeMessage("message")
   async handleSendMessage(client: Socket, payload: any): Promise<void> {
     const createdMessage = await this.messageService.create(payload.data);
-    this.server.emit(`res/chat/${payload.data.chatId}`, { ...createdMessage, waitingKey: payload.waitingKey });
+
+    this.server.emit(`res/chat/${payload.data.chatId}`, { data: createdMessage, waitingKey: payload.waitingKey });
   }
 
   afterInit(server: Server) {
