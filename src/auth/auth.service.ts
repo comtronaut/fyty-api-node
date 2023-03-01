@@ -1,6 +1,7 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { CACHE_MANAGER, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
+import { Cache } from "cache-manager";
 import * as jwt from "jsonwebtoken";
 import { UserService } from "src/api/users/user.service";
 import env from "src/common/env.config";
@@ -12,7 +13,8 @@ import { GoogleInfo } from "./guard/google.guard";
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   async loginFacebook(user: FacebookInfo) {
@@ -89,14 +91,16 @@ export class AuthService {
         }
       });
 
-      await this.userService.update(user, {
+      if (!this.isValidPassword(user, password)) {
+        throw new UnauthorizedException("username or password is incorrect.");
+      }
+
+      const updatedUser = await this.userService.update(user, {
         lastLoginAt: new Date(),
         ...(!user.firstLoginAt && { firstLoginAt: new Date() })
       });
 
-      if (!this.isValidPassword(user, password)) {
-        throw new UnauthorizedException("username or password is incorrect.");
-      }
+      await this.cacheManager.set(`user:${updatedUser.id}`, updatedUser);
 
       return this.getAccessToken(user.id);
     } catch (err) {
