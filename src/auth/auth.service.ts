@@ -1,7 +1,6 @@
-import { CACHE_MANAGER, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
-import { Cache } from "cache-manager";
 import * as jwt from "jsonwebtoken";
 import { UserService } from "src/api/users/user.service";
 import env from "src/common/env.config";
@@ -13,8 +12,7 @@ import { GoogleInfo } from "./guard/google.guard";
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly userService: UserService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
+    private readonly userService: UserService
   ) {}
 
   async loginFacebook(user: FacebookInfo) {
@@ -99,8 +97,6 @@ export class AuthService {
         lastLoginAt: new Date(),
         ...(!user.firstLoginAt && { firstLoginAt: new Date() })
       });
-
-      await this.cacheManager.set(`user:${updatedUser.id}`, updatedUser);
 
       return this.getAccessToken(user.id);
     } catch (err) {

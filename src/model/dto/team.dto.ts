@@ -1,6 +1,6 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { Prisma } from "@prisma/client";
-import { IsNotEmpty, IsUUID } from "class-validator";
+import { IsNotEmpty } from "class-validator";
 
 export class CreateTeamDto implements Prisma.TeamUncheckedCreateInput {
   @IsNotEmpty()
@@ -12,7 +12,7 @@ export class CreateTeamDto implements Prisma.TeamUncheckedCreateInput {
 
   lineupCount: number;
 
-  @IsUUID()
+  @IsNotEmpty()
   gameId: string;
 
   // @IsNotEmpty()

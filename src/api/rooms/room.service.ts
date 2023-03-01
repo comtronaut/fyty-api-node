@@ -35,9 +35,11 @@ export class RoomService {
       });
 
       await this.prisma.appointment.updateMany({
-        where: { roomId: {
-          in: rooms.map((room) => room.id)
-        } },
+        where: {
+          roomId: {
+            in: rooms.map((room) => room.id)
+          }
+        },
         data: { isDel: true }
       });
     } catch (err) {
@@ -46,17 +48,17 @@ export class RoomService {
   }
 
   // CRUD
-  async create(data: CreateRoomDto) {
+  async create({ teamlineUpIds, ...data }: CreateRoomDto) {
     try {
       const room = await this.prisma.room.create({ data });
       const board = await this.prisma.roomLineupBoard.create({ data: {} });
 
-      const lineUps = data.teamlineUpIds.split(",");
+      const lineUps = teamlineUpIds?.split(",") ?? [];
 
       await this.prisma.roomLineup.createMany({
-        data: lineUps.map((lineup) => ({
+        data: lineUps.map((teamLineUpId) => ({
           roomLineUpBoardId: board.id,
-          teamLineUpId: lineup
+          teamLineUpId
         }))
       });
 
@@ -198,12 +200,12 @@ export class RoomService {
       });
 
       if (room.hostId === teamId) {
-        const appoint = await this.prisma.appointment.updateMany({
+        await this.prisma.appointment.updateMany({
           where: { roomId: room.id },
           data: { isDel: true }
         });
 
-        await this.prisma.room.delete({ where: { id: room.id } });
+        await this.prisma.room.delete({ where: room });
 
         return {
           roomId: room.id

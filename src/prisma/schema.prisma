@@ -54,14 +54,14 @@ model Room {
   note      String     @default("")
   game      Game       @relation(fields: [gameId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   gameId    String
-  host      User       @relation(fields: [hostId], references: [id], onUpdate: Cascade)
+  host      Team       @relation(fields: [hostId], references: [id], onUpdate: Cascade)
   hostId    String
   createdAt DateTime   @default(now())
 
   notes        RoomNote[]
   requests     RoomRequest[]
   participants RoomParticipant[]
-  chats        Chat[]
+  chat         Chat?
   appointments Appointment[]
 }
 
@@ -131,6 +131,7 @@ model Team {
   lineups            TeamLineUp[]
   pending            TeamPending[]
   members            TeamMember[]
+  roomHosts          Room[]
   roomRequests       RoomRequest[]
   roomParticipants   RoomParticipant[]
   messages           Message[]
@@ -199,10 +200,9 @@ model User {
   teamOwners           Team[]
   teamPending          TeamPending[]
   teamMembers          TeamMember[]
-  roomHosts            Room[]
   avatars              UserAvatar[]
-  reviewers            Review[]             @relation("reviewer")
-  reviewees            Review[]             @relation("reviewee")
+  reviewers            Review[]              @relation("reviewer")
+  reviewees            Review[]              @relation("reviewee")
   messages             Message[]
   userSettings         UserSettings?
   passwordResetSession PasswordResetSession?
@@ -280,8 +280,8 @@ model AppointmentMember {
 // chat
 model Chat {
   id     String @id @default(uuid())
-  room   Room   @relation(fields: [roomId], references: [id], onUpdate: Cascade)
-  roomId String
+  room   Room   @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomId String @unique
 
   messages Message[]
 }

@@ -82,9 +82,9 @@ export class UserService {
     }
   }
 
-  async update(user: User, req: UpdateUserDto) {
+  async update(user: User, data: UpdateUserDto) {
     try {
-      const { password, phoneNumber, email, username, ...updateData } = req;
+      const { phoneNumber, ...updateData } = data;
 
       const res = await this.prisma.user.update({
         where: {
@@ -92,20 +92,17 @@ export class UserService {
         },
         data: {
           ...updateData,
-          ...(email && { updatedEmailAt: new Date() }),
-          ...(username && { updatedUsernameAt: new Date() }),
-          ...(password && { password: bcrypt.hashSync(password, 12) })
+          ...(updateData.email && { updatedEmailAt: new Date() }),
+          ...(updateData.username && { updatedUsernameAt: new Date() }),
+          ...(updateData.password && {
+            password: bcrypt.hashSync(updateData.password, 12)
+          })
         }
       });
 
       await this.cacheManager.set(`user:${user.id}`, res);
 
-      const flatten = (userInfo: User) => {
-        const { password, ...rest } = userInfo;
-        return rest;
-      };
-
-      return flatten(res);
+      return res;
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -121,9 +118,10 @@ export class UserService {
     }
   }
 
-  async getDuplicationResult(
-    { phoneNumber, ...payload }: UpdateUserDto
-  ): Promise<Record<string, boolean>> {
+  async getDuplicationResult({
+    phoneNumber,
+    ...payload
+  }: UpdateUserDto): Promise<Record<string, boolean>> {
     const res = {} as Record<string, boolean>;
 
     for (const [ key, value ] of Object.entries(payload)) {
@@ -135,7 +133,9 @@ export class UserService {
     if (phoneNumber) {
       const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12);
       res[phoneNumber] = Boolean(
-        await this.prisma.phoneNumber.findUnique({ where: { phoneNumber: hashedPhoneNumber } })
+        await this.prisma.phoneNumber.findUnique({
+          where: { phoneNumber: hashedPhoneNumber }
+        })
       );
     }
 

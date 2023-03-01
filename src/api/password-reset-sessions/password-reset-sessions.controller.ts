@@ -7,9 +7,7 @@ export class PasswordResetSessionController {
   constructor(private readonly service: PasswordResetSessionService) {}
 
   @Get("info")
-  async getInfo(
-    @Query() query: Prisma.PasswordResetSessionWhereUniqueInput
-  ) {
+  async getInfo(@Query() query: Prisma.PasswordResetSessionWhereUniqueInput) {
     return await this.service.get(query);
   }
 

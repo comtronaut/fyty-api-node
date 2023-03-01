@@ -42,7 +42,11 @@ export class UserController {
     @Query("phoneNumber") phoneNumber?: string,
     @Query("email") email?: string
   ) {
-    return await this.userService.getDuplicationResult({ username, email, phoneNumber });
+    return await this.userService.getDuplicationResult({
+      username,
+      email,
+      phoneNumber
+    });
   }
 
   @Get()

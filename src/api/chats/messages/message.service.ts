@@ -14,8 +14,11 @@ export class MessageService {
     }
   }
 
-  async create(dto: CreateMessageDto) {
-    return await this.prisma.message.create({ data: dto });
+  async create({
+    waitingKey,
+    ...data
+  }: CreateMessageDto & { waitingKey: string }) {
+    return await this.prisma.message.create({ data });
   }
 
   // async update(gameId: string, req: object) {

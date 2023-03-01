@@ -41,7 +41,6 @@ implements Prisma.RoomParticipantUncheckedCreateInput
   roomId: string;
 
   @IsNotEmpty()
-  @IsUUID()
   gameId: string;
 
   @IsNotEmpty()
