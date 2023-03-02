@@ -1,5 +1,5 @@
 import { PartialType } from "@nestjs/mapped-types";
-import { Prisma } from "@prisma/client";
+import { MemberRole, Prisma } from "@prisma/client";
 import { IsNotEmpty } from "class-validator";
 
 export class CreateTeamDto implements Prisma.TeamUncheckedCreateInput {
@@ -27,7 +27,7 @@ export class UpdateTeamDto extends PartialType(CreateTeamDto) {
 export class CreateTeamMemberDto
 implements Prisma.TeamMemberUncheckedCreateInput
 {
-  role: string;
+  role: MemberRole;
 
   @IsNotEmpty()
   teamId: string;

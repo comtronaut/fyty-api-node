@@ -1,6 +1,6 @@
 import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
 import { CreateLineUpDto, UpdateLineUpDto } from "src/model/dto/lineUp.dto";
-import { User } from "@prisma/client";
+import { MemberRole, User } from "@prisma/client";
 import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
@@ -27,7 +27,7 @@ export class LineUpService {
         req.isDefault = false;
       }
 
-      if (teamMember.role === "Manager" || teamMember.role === "Leader") {
+      if (teamMember.role === MemberRole.MANAGER || teamMember.role === MemberRole.LEADER) {
         // cheack if you are Manager
         await this.prisma.teamLineUp.update({
           where: { id: lineUpId },
@@ -100,7 +100,7 @@ export class LineUpService {
       const member = await this.prisma.teamMember.findFirstOrThrow({
         where: { teamId, userId }
       });
-      if (member.role === "Manager" || member.id === "Leader") {
+      if (member.role === MemberRole.MANAGER || member.role === MemberRole.LEADER) {
         await this.prisma.teamLineUp.deleteMany({ where: { teamId } });
         return HttpStatus.NO_CONTENT;
       }
@@ -121,7 +121,7 @@ export class LineUpService {
         where: { userId, teamId: team.id }
       });
 
-      if (member.role === "Manager" || member.role === "Leader") {
+      if (member.role === MemberRole.MANAGER || member.role === MemberRole.LEADER) {
         await this.prisma.teamLineUp.delete({ where: { id: lineupId } });
         return HttpStatus.NO_CONTENT;
       }

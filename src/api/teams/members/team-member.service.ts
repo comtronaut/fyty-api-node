@@ -3,7 +3,7 @@ import {
   CreateTeamMemberDto,
   UpdateTeamMemberDto
 } from "src/model/dto/team.dto";
-import { User } from "@prisma/client";
+import { MemberRole, User } from "@prisma/client";
 import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
@@ -20,7 +20,7 @@ export class TeamMemberService {
       }
 
       return await this.prisma.teamMember.create({
-        data: { ...req, role: "Member" }
+        data: { ...req, role: MemberRole.MEMBER }
       });
     } catch (err) {
       throw new BadRequestException(err.message);
@@ -55,7 +55,7 @@ export class TeamMemberService {
       const member = await this.prisma.teamMember.findFirstOrThrow({
         where: { userId: user.id }
       });
-      if (member.role === "Manager" || member.role === "Leader") {
+      if (member.role === MemberRole.MANAGER || member.role === MemberRole.LEADER) {
         const res = await this.prisma.teamMember.delete({
           where: { id: teammemberId }
         });
@@ -75,7 +75,7 @@ export class TeamMemberService {
         where: { id: teamMemberId }
       });
       const countManager = await this.prisma.teamMember.findMany({
-        where: { role: "Manager", teamId: teamMember.teamId }
+        where: { role: MemberRole.MANAGER, teamId: teamMember.teamId }
       });
       await this.prisma.teamMember.delete({ where: { id: teamMemberId } });
 
@@ -88,7 +88,7 @@ export class TeamMemberService {
         return HttpStatus.NO_CONTENT;
       }
 
-      if (teamMember.role === "Manager" && countManager.length === 1) {
+      if (teamMember.role === MemberRole.MANAGER && countManager.length === 1) {
         await this.prisma.team.delete({ where: { id: teamMember.teamId } });
       }
 

@@ -1,5 +1,5 @@
 import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
-import { Team, User } from "@prisma/client";
+import { MemberRole, Team, User } from "@prisma/client";
 import { CreateTeamDto, UpdateTeamDto } from "src/model/dto/team.dto";
 import { PrismaService } from "src/services/prisma.service";
 
@@ -21,7 +21,7 @@ export class TeamService {
       const team = await this.prisma.team.create({ data: req });
 
       await this.prisma.teamMember.create({
-        data: { teamId: team.id, userId: user.id, role: "Manager" }
+        data: { teamId: team.id, userId: user.id, role: MemberRole.MANAGER }
       });
       return team;
     } catch (err) {
@@ -86,7 +86,7 @@ export class TeamService {
       const member = await this.prisma.teamMember.findFirstOrThrow({
         where: { userId, teamId }
       });
-      if (member.role === "Manager") {
+      if (member.role === MemberRole.MANAGER) {
         await this.prisma.teamMember.deleteMany({ where: { teamId } });
       } else {
         throw new Error("Only Manager can delete team");
