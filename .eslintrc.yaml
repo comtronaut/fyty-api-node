@@ -138,11 +138,15 @@ rules:
     - error
     - consistent
 
+  # typescript
+  "@typescript-eslint/no-floating-promises": error
+
   # vanilla default
   "@typescript-eslint/indent":
     - warn
     - 2
     - ignoredNodes:
+      - FunctionExpression
       - PropertyDefinition
   indent: off
   linebreak-style:

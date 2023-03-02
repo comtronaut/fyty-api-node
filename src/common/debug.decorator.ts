@@ -1,4 +1,10 @@
-import { Injectable, CanActivate, ExecutionContext, UseGuards, applyDecorators } from "@nestjs/common";
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UseGuards,
+  applyDecorators
+} from "@nestjs/common";
 import { Observable } from "rxjs";
 import env from "./env.config";
 
@@ -12,7 +18,5 @@ class DebugGuard implements CanActivate {
 }
 
 export function Debug() {
-  return applyDecorators(
-    UseGuards(DebugGuard)
-  );
+  return applyDecorators(UseGuards(DebugGuard));
 }

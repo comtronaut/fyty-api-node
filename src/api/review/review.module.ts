@@ -1,19 +1,12 @@
 import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { User } from "src/model/sql-entity/user/user.entity";
-import { Review } from "src/model/sql-entity/user/review.entity";
 import { ReviewController } from "./review.controller";
 import { ReviewService } from "./review.service";
 import { UserAvatarService } from "../users/user-avatars/avatar.service";
-import { UserAvatar } from "src/model/sql-entity/user/userAvatar.entity";
-
+import { PrismaService } from "src/services/prisma.service";
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ User, Review , UserAvatar ])
-  ],
+  imports: [],
   controllers: [ ReviewController ],
-  providers: [ ReviewService, UserAvatarService ]
+  providers: [ ReviewService, UserAvatarService, PrismaService ]
 })
-
-export class ReviewModule { }
+export class ReviewModule {}

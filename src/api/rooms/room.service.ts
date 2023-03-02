@@ -1,194 +1,193 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common";
-import { Cron } from "@nestjs/schedule";
-import { InjectRepository } from "@nestjs/typeorm";
-import moment from "moment";
-import { RoomStatus } from "src/common/_enum";
+import { BadRequestException, Injectable } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { Room, RoomStatus } from "@prisma/client";
+import dayjs from "dayjs";
 import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room/room.dto";
-import { Appointment, AppointmentMember } from "src/model/sql-entity/appointment.entity";
-import { Game } from "src/model/sql-entity/game.entity";
-import { RoomLineup, RoomLineupBoard } from "src/model/sql-entity/room/Lineup.entity";
-import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
-import { RoomRequest } from "src/model/sql-entity/room/request.entity";
-import { Room } from "src/model/sql-entity/room/room.entity";
-import { Between, In, LessThanOrEqual, Repository } from "typeorm";
-import { ChatService } from "../chats/chat.service";
+import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class RoomService {
-  constructor(
-    @InjectRepository(Room) private roomModel: Repository<Room>,
-    @InjectRepository(RoomRequest) private roomRequestModel: Repository<RoomRequest>,
-    @InjectRepository(RoomParticipant) private participantModel: Repository<RoomParticipant>,
-    @InjectRepository(RoomLineupBoard) private roomLineUpBoardModel: Repository<RoomLineupBoard>,
-    @InjectRepository(RoomLineup) private roomLineUpModel: Repository<RoomLineup>,
-    @InjectRepository(Game) private gameModel: Repository<Game>,
-    @InjectRepository(Appointment) private appointmentModel: Repository<Appointment>,
-    @InjectRepository(AppointmentMember) private appointmentMemberModel: Repository<AppointmentMember>,
-    private readonly chatService: ChatService,
-  ) { }
-  
-  @Cron('* */30 * * * *')
+  constructor(private readonly prisma: PrismaService) {}
+
+  @Cron(CronExpression.EVERY_MINUTE)
   async handleCron() {
     try {
-      var time = Date.now();
-      let timestamp = new Date(time);
-      timestamp = moment(timestamp).add(1, 'm').toDate();
+      const timestamp = dayjs().add(1, "m").toDate();
 
-      await this.roomModel.delete({endAt:LessThanOrEqual(timestamp)});
-  
-      return ;
+      const rooms = await this.prisma.room.findMany({
+        where: {
+          endAt: {
+            lte: timestamp
+          }
+        }
+      });
 
-      }catch (err) {
+      if (!rooms.length) {
+        return;
+      }
+
+      await this.prisma.room.deleteMany({
+        where: {
+          endAt: {
+            lte: timestamp
+          }
+        }
+      });
+
+      await this.prisma.appointment.updateMany({
+        where: {
+          roomId: {
+            in: rooms.map((room) => room.id)
+          }
+        },
+        data: { isDel: true }
+      });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
   // CRUD
-  async create(req: CreateRoomDto) {
+  async create({ teamlineUpIds, ...data }: CreateRoomDto) {
     try {
+      const room = await this.prisma.room.create({ data });
+      const board = await this.prisma.roomLineupBoard.create({ data: {} });
 
-      const room = await this.roomModel.save(req);
+      const lineUps = teamlineUpIds?.split(",") ?? [];
 
-      const board = await this.roomLineUpBoardModel.save({});
-      
-      if(req.teamlineUpIds !== undefined){
-        
-        const lineUps = req.teamlineUpIds.split(",");
+      await this.prisma.roomLineup.createMany({
+        data: lineUps.map((teamLineUpId) => ({
+          roomLineUpBoardId: board.id,
+          teamLineUpId
+        }))
+      });
 
-        for(let i = 0; i < lineUps.length; i++){
-
-          await this.roomLineUpModel.save({ roomLineUpBoardId: board.id, teamLineUpId: lineUps[i] });
-
-        }
-        
-      }else{
-        
-        const game = await this.gameModel.findOneByOrFail({ id: req.gameId });
-
-        for(let i = 0; i < game.lineupCap ; i++){
-          
-          await this.roomLineUpModel.save({ roomLineUpBoardId: board.id, teamLineUpId: null});
-
-        }
-
-      }
-
-      const participantData = { roomId: room.id, teamId: req.hostId, gameId: req.gameId, roomLineUpBoardId: board.id };
-      
-      // generate chat and participant
-      const res = this.participantModel.create(participantData);
-      await this.participantModel.save(res);
-      await this.chatService.create({ roomId: room.id });
-      
-      return {
-        room: room
+      const participantData = {
+        roomId: room.id,
+        teamId: data.hostId,
+        gameId: data.gameId,
+        roomLineUpBoardId: board.id
       };
-    }
-    catch(err) {
+
+      await Promise.all([
+        this.prisma.roomParticipant.create({ data: participantData }),
+        this.prisma.chat.create({ data: { roomId: room.id } })
+      ]);
+
+      return {
+        room
+      };
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
   async update(roomId: string, req: UpdateRoomDto) {
     try {
-      const updateRes = await this.roomModel.update(roomId, req);
-
-      if(updateRes.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT);
-      }
+      const updateRes = await this.prisma.room.update({
+        where: {
+          id: roomId
+        },
+        data: req
+      });
 
       return {
-        room: await this.roomModel.findOneOrFail({ where: { id: roomId }})
-      }
+        room: await this.prisma.room.findUniqueOrThrow({
+          where: { id: roomId }
+        })
+      };
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async getJoinedRoom(teamId: string) {  // new
-    try{
+  async getJoinedRoom(teamId: string) {
+    // new
+    try {
+      const participants = await this.prisma.roomParticipant.findMany({
+        where: { teamId }
+      });
+      const joined = await this.prisma.room.findMany({
+        where: { id: { in: participants.map((e) => e.roomId) } }
+      });
 
-      const participants = await this.participantModel.findBy({ teamId: teamId });
-      const joined = await this.roomModel.findBy({ id: In (participants.map(e => e.roomId ))});
-
-      const request = await this.roomRequestModel.findBy({ teamId: teamId });
-      const requested = await this.roomModel.findBy({ id: In (request.map(e => e.roomId)) });
-
+      const request = await this.prisma.roomRequest.findMany({
+        where: { teamId }
+      });
+      const requested = await this.prisma.room.findMany({
+        where: { id: { in: request.map((e) => e.roomId) } }
+      });
 
       return {
-        joined: joined,
-        requested: requested
+        joined,
+        requested
       };
-    }
-    catch(err){
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
-    
   }
 
-  async getRoomsByGameId(gameId: string) {  // new
-    try{
-      return this.roomModel.findBy({ gameId: gameId });
-    }
-    catch(err){
+  async getRoomsByGameId(gameId: string) {
+    try {
+      return this.prisma.room.findMany({ where: { gameId } });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
-    
   }
 
-  async getRoomsById(roomId: string) {  
-    try{
-      return await this.roomModel.findBy({ id: roomId });
-    }
-    catch(err){
+  async getRoomsById(roomId: string) {
+    try {
+      return await this.prisma.room.findMany({ where: { id: roomId } });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
-    
   }
 
-  async getRoomByHostId(teamId: string) {  // hostId is also teamId
-    try{
-      return await this.roomModel.findBy({ hostId: teamId });
-    }
-    catch(err){
+  async getRoomByHostId(teamId: string) {
+    try {
+      return await this.prisma.room.findMany({ where: { hostId: teamId } });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
-    
   }
 
-  async getRoomsByDate(date: string, gameId: string){ // date format is yyyy-mm-dd just like 2020-5-27 and we need output that at input day
-    try{
+  async getRoomsByDate(date: string, gameId: string) {
+    // date format is yyyy-mm-dd just like 2020-5-27 and we need output that at input day
+    try {
       const today = new Date(date);
-      let tomorrow = new Date(date);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      return await this.roomModel.findBy({ startAt: Between(today, tomorrow),  gameId: gameId});
-    }
-    catch(err){
+
+      const dayStart = dayjs(today).startOf("day").toDate();
+      const dayEnd = dayjs(today).endOf("day").toDate();
+
+      return await this.prisma.room.findMany({
+        where: {
+          startAt: {
+            gte: dayStart,
+            lte: dayEnd
+          },
+          gameId
+        }
+      });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async getAllRooms(gameId: string, roomName?: string, date?: any) { // new 
+  async getAllRooms(gameId: string, roomName?: string, date?: any) {
+    try {
+      const today = new Date(date);
 
-    try{
-      if(roomName && date){
-        const today = new Date(date);
-        let tomorrow = new Date(date);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        return await this.roomModel.findBy({ name: roomName, startAt: Between(today, tomorrow), gameId: gameId });
-      }
-      if(roomName){
-        return await this.roomModel.findBy({ name: roomName, gameId: gameId });
-      }
-      if(date){
-        const today = new Date(date);
-        let tomorrow = new Date(date);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        return await this.roomModel.findBy({ startAt: Between(today, tomorrow), gameId: gameId });
-      }
-      return await this.roomModel.findBy({ gameId: gameId });
-    }
-    catch(err){
+      const dayStart = dayjs(today).startOf("day").toDate();
+      const dayEnd = dayjs(today).endOf("day").toDate();
+
+      return await this.prisma.room.findMany({
+        where: {
+          ...(roomName && { name: roomName }),
+          ...(date && { startAt: { gte: dayStart, lte: dayEnd } }),
+          gameId
+        }
+      });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
@@ -196,23 +195,23 @@ export class RoomService {
   async disband(payload: any) {
     try {
       const teamId = payload.teamId;
-      const room = await this.roomModel.findOneByOrFail({ id: payload.roomId });
+      const room = await this.prisma.room.findUniqueOrThrow({
+        where: { id: payload.roomId }
+      });
 
-      if(room.hostId === teamId){
+      if (room.hostId === teamId) {
+        await this.prisma.appointment.updateMany({
+          where: { roomId: room.id },
+          data: { isDel: true }
+        });
 
-        const appoint = await this.appointmentModel.update({ roomId: room.id },{isDel: true});      
-        const res = await this.roomModel.delete(room.id);
+        await this.prisma.room.delete({ where: { id: room.id } });
 
-        if(res.affected !== 0) {
-
-          return {
-            roomId: room.id
-          };
-        }
-        throw new Error("room is not deleted");
+        return {
+          roomId: room.id
+        };
       }
       throw new Error("Only host can disband the room");
-      
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -220,87 +219,126 @@ export class RoomService {
 
   async joinRoom(teamId: string, roomId: string) {
     try {
-      var time = Date.now();
-      let timestamp = new Date(time);
+      const timestamp = new Date();
 
-      const room = await this.roomModel.findOneByOrFail({ id: roomId });
-      const game = await this.gameModel.findOneByOrFail({ id: room.gameId });
+      const room = await this.prisma.room.findUniqueOrThrow({
+        where: { id: roomId }
+      });
+      const game = await this.prisma.game.findUniqueOrThrow({
+        where: { id: room.gameId }
+      });
 
-      if(timestamp <= room.endAt){ 
+      if (timestamp <= room.endAt) {
         // check is room available
-        if(room.status === RoomStatus.UNAVAILABLE || room.status === RoomStatus.FULL) {
+        if (
+          room.status === RoomStatus.UNAVAILABLE
+          || room.status === RoomStatus.FULL
+        ) {
           throw new Error("room is not available");
         }
 
         // update room status
         await this.updateStatus(room);
 
-        //find room request
-        const request = await this.roomRequestModel.findOneByOrFail({ teamId: teamId, roomId: roomId });
+        // find room request
+        const request = await this.prisma.roomRequest.findFirstOrThrow({
+          where: { teamId, roomId }
+        });
 
         // add participant to the room
-        const participantData = { roomId: room.id, teamId: teamId, gameId: game.id, roomLineUpBoardId: request.roomLineUpBoardId };
-        const participant = await this.participantModel.save(participantData);
+        const participantData = {
+          roomId: room.id,
+          teamId,
+          gameId: game.id,
+          roomLineUpBoardId: request.roomLineUpBoardId
+        };
+        const participant = await this.prisma.roomParticipant.create({
+          data: participantData
+        });
 
         // add appointment
-        const appointmentData = { startAt: room.startAt, endAt: room.endAt, roomId: room.id, status: "WAITING", isDel: false };
-        const appointment = await this.appointmentModel.save(appointmentData);
+        const appointmentData = {
+          startAt: room.startAt,
+          endAt: room.endAt,
+          roomId: room.id,
+          status: "WAITING",
+          isDel: false
+        };
+        const appointment = await this.prisma.appointment.create({
+          data: appointmentData
+        });
 
-        await this.appointmentMemberModel.save({ teamId: teamId, appointId: appointment.id });  // for guest
-        await this.appointmentMemberModel.save({ teamId: room.hostId, appointId: appointment.id }); // for host
-        await this.roomRequestModel.delete({ id: request.id });
-      
+        await this.prisma.appointmentMember.createMany({
+          data: [
+            { teamId, appointId: appointment.id }, // for guest
+            { teamId: room.hostId, appointId: appointment.id } // for host
+          ]
+        });
+
         return {
           roomParticipant: participant
         };
-      }else{
+      } else {
         throw new BadRequestException("this room has expired");
       }
-      
-    } catch(err) {
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async updateStatus(room: Room){
-      room.status = RoomStatus.UNAVAILABLE;
-      room.teamCount ++;
-      await this.roomModel.update({ id: room.id }, room);
+  async updateStatus(room: Room) {
+    await this.prisma.room.update({
+      where: {
+        id: room.id
+      },
+      data: {
+        ...room,
+        status: RoomStatus.UNAVAILABLE,
+        teamCount: {
+          increment: 1
+        }
+      }
+    });
   }
 
   async leaveRoom(participantId: string) {
     try {
-      
-      const parti = await this.participantModel.findOneByOrFail({ id: participantId });
-      const room = await this.roomModel.findOneByOrFail({ id: parti.roomId });
+      const parti = await this.prisma.roomParticipant.findUniqueOrThrow({
+        where: { id: participantId }
+      });
+      const room = await this.prisma.room.findUniqueOrThrow({
+        where: { id: parti.roomId }
+      });
 
-      // update participant count
-      room.teamCount -= 1; 
-
-      // update room status
-      room.status = RoomStatus.AVAILABLE;
-      await this.roomModel.update({ id: room.id }, room);
+      await this.prisma.room.update({
+        where: { id: room.id },
+        data: {
+          ...room,
+          // update participant count
+          teamCount: {
+            decrement: 1
+          },
+          // update room status
+          status: RoomStatus.AVAILABLE
+        }
+      });
 
       // remove appointment
-      await this.appointmentModel.delete({ roomId: room.id });
+      await this.prisma.appointment.deleteMany({ where: { roomId: room.id } });
 
       // remove participant from the room
-      
-      const res = await this.participantModel.delete({ id: participantId });
-      console.log(res.affected + " participants has been delete");
-      
+      await this.prisma.roomParticipant.delete({
+        where: { id: participantId }
+      });
+
       return {
         res: {
           roomParticipant: parti
         },
         roomId: room.id
       };
-
-    } catch(err) {
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
-  
 }
-
-

@@ -1,19 +1,21 @@
 import { ConflictException, Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
 import { initializeApp } from "firebase/app";
-import { getDownloadURL, getStorage, ref, uploadBytesResumable, deleteObject } from "firebase/storage";
-import { Image } from "src/model/sql-entity/image.entity";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  deleteObject
+} from "firebase/storage";
 import env from "src/common/env.config";
-import type { Repository } from "typeorm";
+import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class ImageService {
   private app: ReturnType<typeof initializeApp>;
   private storage: ReturnType<typeof getStorage>;
 
-  constructor(
-    @InjectRepository(Image) private readonly imageRepo: Repository<Image>
-  ) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async onModuleInit(): Promise<void> {
     this.app = initializeApp({
@@ -28,11 +30,11 @@ export class ImageService {
   }
 
   async __getAllImageUrls() {
-    return await this.imageRepo.find();
+    return await this.prisma.image.findMany();
   }
 
   async uploadImageBlob(file: any) {
-    const tempImg = await this.imageRepo.save({});
+    const tempImg = await this.prisma.image.create({ data: {} });
 
     const url = `/img/${tempImg.id}`;
     const storageRef = ref(this.storage, url);
@@ -44,13 +46,13 @@ export class ImageService {
         uploadTask.on(
           "state_changed",
           (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            const progress
+              = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log(`Upload is ${progress}% done`);
 
             if (snapshot.state === "paused") {
               console.log("Upload is paused");
-            }
-            else if (snapshot.state === "running") {
+            } else if (snapshot.state === "running") {
               console.log("Upload is running");
             }
           },
@@ -58,16 +60,16 @@ export class ImageService {
             reject(error);
           },
           () => {
-            getDownloadURL(uploadTask.snapshot.ref)
-              .then((downloadURL) => resolve(downloadURL));
+            void getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
+              resolve(downloadURL)
+            );
           }
         );
       });
 
       return uploadedUrl;
-    }
-    catch (err) {
-      await this.imageRepo.delete(tempImg);
+    } catch (err) {
+      await this.prisma.image.delete({ where: tempImg });
 
       throw new ConflictException(err);
     }
@@ -78,6 +80,6 @@ export class ImageService {
     const storageRef = ref(this.storage, url);
 
     await deleteObject(storageRef);
-    await this.imageRepo.delete(id);
+    await this.prisma.image.delete({ where: { id } });
   }
 }

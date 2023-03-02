@@ -1,21 +1,11 @@
 import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { Chat } from "src/model/sql-entity/chat.entity";
-import { TeamLineUp } from "src/model/sql-entity/team/lineUp.entity";
-import { Message } from "src/model/sql-entity/message.entity";
-import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
-import { Room } from "src/model/sql-entity/room/room.entity";
-import { Team } from "src/model/sql-entity/team/team.entity";
-import { User } from "src/model/sql-entity/user/user.entity";
+import { PrismaService } from "src/services/prisma.service";
 import { SelectorController } from "./selector.controller";
-import { SelectorService } from "./selector.service"
-import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
+import { SelectorService } from "./selector.service";
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ Team, TeamLineUp, User, Room, RoomParticipant, Message, Chat ,TeamMember])
-  ],
+  imports: [],
   controllers: [ SelectorController ],
-  providers: [ SelectorService ]
+  providers: [ SelectorService, PrismaService ]
 })
-export class SelectorModule { }
+export class SelectorModule {}

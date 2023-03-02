@@ -1,48 +1,39 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import { BadRequestException, Injectable } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { CreateParticipantDto } from "src/model/dto/room/participant.dto";
-import { RoomParticipant } from "src/model/sql-entity/room/participant.entity";
-import { In, Repository } from "typeorm";
+import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class RoomParticipantService {
-  constructor(
-    @InjectRepository(RoomParticipant) private participantModel: Repository<RoomParticipant>,
-  ) { }
-  
-  // CRUD
-  async create(req: CreateParticipantDto) {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(req: Prisma.RoomParticipantCreateInput) {
     try {
-      const participant = this.participantModel.create(req);
-      
-      return await this.participantModel.save(participant);
-    }
-    catch(err) {
+      return await this.prisma.roomParticipant.create({ data: req });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
   async getParticipantByRoomId(roomId: string) {
-    return this.participantModel.find({ where: { roomId }});
+    return this.prisma.roomParticipant.findMany({ where: { roomId } });
   }
 
-  async countTeamGame(teamId: string, gameId: string){
-    try{
-      const res = await this.participantModel.findAndCountBy({ teamId: teamId, gameId: gameId });
-      return res[1];
-    }
-    catch(err){
+  async countTeamGame(teamId: string, gameId: string) {
+    try {
+      return await this.prisma.roomParticipant.count({
+        where: { teamId, gameId }
+      });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
   async delete(req: CreateParticipantDto) {
     try {
-      const res = await this.participantModel.delete({ teamId: req.teamId, roomId: req.roomId });
-      if(res.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT)
-      }
-      return;
+      return await this.prisma.roomParticipant.deleteMany({
+        where: { teamId: req.teamId, roomId: req.roomId }
+      });
     } catch (err) {
       throw new BadRequestException(err.message);
     }

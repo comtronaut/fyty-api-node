@@ -20,9 +20,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       if (!payload.sub) {
         throw new UnauthorizedException("invalid token format");
       }
-      
+
       return await this.authService.getUserById(payload.sub);
-    } catch(err) {
+    } catch (err) {
       throw new UnauthorizedException();
     }
   }

@@ -1,26 +1,24 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { CreateMessageDto } from "src/model/dto/chat.dto";
-import { Chat } from "src/model/sql-entity/chat.entity";
-import { Message } from "src/model/sql-entity/message.entity";
-import { Repository } from "typeorm";
+import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class MessageService {
-  constructor(
-    @InjectRepository(Message) private messageModel: Repository<Message>,
-  ) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async getMesssagesFromChatId(chatId: string) {
     try {
-      return await this.messageModel.find({ where: { chatId } });
-    } catch(err) {
+      return await this.prisma.message.findMany({ where: { chatId } });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async create(dto: CreateMessageDto) {
-    return await this.messageModel.save(dto);
+  async create({
+    waitingKey,
+    ...data
+  }: CreateMessageDto & { waitingKey: string }) {
+    return await this.prisma.message.create({ data });
   }
 
   // async update(gameId: string, req: object) {

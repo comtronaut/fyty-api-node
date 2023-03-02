@@ -1,99 +1,100 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
+import { MemberRole, Team, User } from "@prisma/client";
 import { CreateTeamDto, UpdateTeamDto } from "src/model/dto/team.dto";
-import { Team } from "src/model/sql-entity/team/team.entity";
-import { TeamMember } from "src/model/sql-entity/team/team-member.entity";
-import { User } from "src/model/sql-entity/user/user.entity";
-import { In, Repository } from "typeorm";
+import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class TeamService {
-  constructor(
-    @InjectRepository(Team) private teamModel: Repository<Team>,
-    @InjectRepository(TeamMember) private memberModel: Repository<TeamMember>,
-  ) { }
-  
-  // CRUD
-  async create(user: User, req: CreateTeamDto) { // for manager only version
-    try {
+  constructor(private readonly prisma: PrismaService) {}
 
-      const teamCount = await this.memberModel.countBy({ userId: user.id });
-      if(teamCount > 0)
+  // CRUD
+  async create(user: User, req: CreateTeamDto) {
+    try {
+      const teamCount = await this.prisma.teamMember.count({
+        where: { userId: user.id }
+      });
+      if (teamCount > 0) {
         throw new Error("You already have team");
+      }
 
       req.ownerId = user.id; // set the team's owner
-      const team = await this.teamModel.save(req);
+      const team = await this.prisma.team.create({ data: req });
 
-      await this.memberModel.save({ teamId: team.id, userId: user.id, role: "Manager" });
+      await this.prisma.teamMember.create({
+        data: { teamId: team.id, userId: user.id, role: MemberRole.MANAGER }
+      });
       return team;
-    }
-    catch(err) {
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
   async getTeam(teamId: string) {
-    try{
-      
-      return await this.teamModel.findOneByOrFail({ id: teamId });
-    }
-    catch(err){
+    try {
+      return await this.prisma.team.findUniqueOrThrow({
+        where: { id: teamId }
+      });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
   async getMyTeam(userId: string) {
-    try{
-      const members = await this.memberModel.findBy({ userId: userId });
-      return await this.teamModel.findBy({ id: In (members.map (e => e.teamId)) });
-    }
-    catch(err){
+    try {
+      const members = await this.prisma.teamMember.findMany({
+        where: { userId }
+      });
+      return await this.prisma.team.findMany({
+        where: { id: { in: members.map((e) => e.teamId) } }
+      });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
   async getTeamsByGameId(gameId: string) {
-    try{
-      return await this.teamModel.findBy({ gameId: gameId });
-    }
-    catch(err){
+    try {
+      return await this.prisma.team.findMany({ where: { gameId } });
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
-    
   }
 
   async getAllTeam() {
-    return await this.teamModel.find();
+    return await this.prisma.team.findMany();
   }
 
-  async update(ownerId: string, req: UpdateTeamDto): Promise <Team> {
+  async update(ownerId: string, req: UpdateTeamDto): Promise<Team> {
     try {
-      const updateRes = await this.teamModel.update({ ownerId: ownerId }, req);
+      const updateRes = await this.prisma.team.update({
+        where: { id: req.id },
+        data: req
+      });
 
-      if(updateRes.affected === 0) {
-        throw new HttpException("", HttpStatus.NO_CONTENT);
-      }
-      return await this.teamModel.findOneByOrFail({ ownerId: ownerId });
-    } 
-    catch (err) {
+      const udpatedTeam = await this.prisma.team.findFirstOrThrow({
+        where: { id: req.id }
+      });
+
+      return udpatedTeam;
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
   async delete(userId: string, teamId: string) {
     try {
-      const member = await this.memberModel.findOneByOrFail({ userId: userId, teamId: teamId });
-      if(member.role === "Manager")
-        await this.teamModel.delete(teamId);
-      else{
+      const member = await this.prisma.teamMember.findFirstOrThrow({
+        where: { userId, teamId }
+      });
+      if (member.role === MemberRole.MANAGER) {
+        await this.prisma.teamMember.deleteMany({ where: { teamId } });
+      } else {
         throw new Error("Only Manager can delete team");
       }
 
       return HttpStatus.OK;
-    }
-     catch (err) {
+    } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
-
 }

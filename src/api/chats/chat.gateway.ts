@@ -7,27 +7,25 @@ import {
   OnGatewayDisconnect
 } from "@nestjs/websockets";
 import { Socket, Server } from "socket.io";
-import { CreateMessageDto } from "src/model/dto/chat.dto";
-import { Chat } from "src/model/sql-entity/chat.entity";
-import { ChatService } from "./chat.service";
 import { MessageService } from "./messages/message.service";
-  
-  @WebSocketGateway({
-    cors: {
-      origin: "*"
-    }
-  })
-  
+
+@WebSocketGateway({
+  cors: {
+    origin: "*"
+  }
+})
 export class ChatGateway
-implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(private messageService: MessageService) {}
-  
+
   @WebSocketServer() server: Server;
 
   @SubscribeMessage("message")
   async handleSendMessage(client: Socket, payload: any): Promise<void> {
-    await this.messageService.create(payload.data);
-    this.server.emit(`res/chat/${payload.data.chatId}`, payload);
+    const createdMessage = await this.messageService.create(payload.data);
+
+    this.server.emit(`res/chat/${payload.data.chatId}`, { data: createdMessage, waitingKey: payload.waitingKey });
   }
 
   afterInit(server: Server) {

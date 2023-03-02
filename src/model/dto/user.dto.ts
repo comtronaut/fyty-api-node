@@ -1,46 +1,52 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { Prisma } from "@prisma/client";
 import { IsEmail, IsNotEmpty, MinLength } from "class-validator";
 
-export class CreateUserDto {
-    @ApiProperty()
-    @IsNotEmpty()
-    username: string;
-  
-    @ApiProperty()
-    @IsNotEmpty()
-    @MinLength(6)
-    password: string;
-  
-    @ApiProperty()
-    @IsNotEmpty()
-    displayName: string;
-  
-    @ApiProperty()
-    @IsEmail()
-    @IsNotEmpty()
-    email: string;
-  
-    @ApiPropertyOptional()
-    bio: string;
-  
-    @ApiPropertyOptional()
-    portraitUrl: string;
-  
-    @ApiPropertyOptional()
-    coverUrl: string;
+export class CreateUserDto implements Prisma.UserUncheckedCreateInput {
+  @IsNotEmpty()
+  @ApiProperty()
+  username: string;
 
-    @IsNotEmpty()
-    phoneNumber: string;
-  
-    @ApiPropertyOptional({ description: "auto generated" })
-    createdAt: Date;
-  }
+  @IsNotEmpty()
+  @MinLength(6)
+  @ApiProperty()
+  password: string;
 
-export class UpdateUserDto extends PartialType(CreateUserDto) { }
+  @IsNotEmpty()
+  @ApiProperty()
+  displayName: string;
 
-export class CreateUserAvatarDto {
+  @IsEmail()
+  @IsNotEmpty()
+  @ApiProperty()
+  email: string;
 
+  @ApiPropertyOptional()
+  bio: string;
+
+  @ApiPropertyOptional()
+  portraitUrl: string;
+
+  @ApiPropertyOptional()
+  coverUrl: string;
+
+  @IsNotEmpty()
+  phoneNumber: string;
+
+  lastLoginAt: Date;
+
+  firstLoginAt: Date;
+
+  @ApiPropertyOptional({ description: "auto generated" })
+  createdAt: Date;
+}
+
+export class UpdateUserDto extends PartialType(CreateUserDto) {}
+
+export class CreateUserAvatarDto
+implements Prisma.UserAvatarUncheckedCreateInput
+{
   @IsNotEmpty()
   characterName: string;
 
@@ -61,4 +67,4 @@ export class CreateUserAvatarDto {
   createdAt: Date;
 }
 
-export class UpdateUserAvatarDto extends PartialType(CreateUserAvatarDto) { }
+export class UpdateUserAvatarDto extends PartialType(CreateUserAvatarDto) {}

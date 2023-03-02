@@ -1,6 +1,9 @@
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
-import { ExpressAdapter, NestExpressApplication } from "@nestjs/platform-express";
+import {
+  ExpressAdapter,
+  NestExpressApplication
+} from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import express, { json, urlencoded } from "express";
 import fs from "fs";
@@ -10,13 +13,17 @@ import { AppModule } from "./app.module";
 async function bootstrap() {
   if (process.env["HOST"] === "0.0.0.0") {
     const expressApp = express();
-    const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter(expressApp), {
-      httpsOptions: {
-        key: fs.readFileSync("cert/ssl.key"),
-        cert: fs.readFileSync("cert/ssl.crt")
-      },
-      cors: true
-    });
+    const app = await NestFactory.create<NestExpressApplication>(
+      AppModule,
+      new ExpressAdapter(expressApp),
+      {
+        httpsOptions: {
+          key: fs.readFileSync("cert/ssl.key"),
+          cert: fs.readFileSync("cert/ssl.crt")
+        },
+        cors: true
+      }
+    );
 
     extendApp(app);
 
@@ -24,15 +31,15 @@ async function bootstrap() {
 
     if (process.env["PORT"] === "8080") {
       await app.listen(8080);
-    }
-    else {
+    } else {
       http.createServer(expressApp).listen(80);
       await app.listen(443);
     }
-  }
-  else {
-    const app = await NestFactory.create<NestExpressApplication>(AppModule, { cors: true });
-    
+  } else {
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+      cors: true
+    });
+
     extendApp(app);
 
     // swagger api document
@@ -49,7 +56,7 @@ async function bootstrap() {
     Logger.log(`server listening: ${await app.getUrl()}`);
   }
 }
-bootstrap();
+void bootstrap();
 
 function extendApp(app: NestExpressApplication) {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));

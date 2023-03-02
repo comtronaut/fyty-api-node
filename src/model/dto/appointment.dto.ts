@@ -1,28 +1,34 @@
+import { Prisma } from ".prisma/client";
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumberString, IsString, IsUrl, IsUUID } from "class-validator";
+import { IsISO8601, IsNotEmpty, IsOptional, IsUUID } from "class-validator";
 
-export class CreateAppointmentDto {
+export class CreateAppointmentDto
+implements Prisma.AppointmentUncheckedCreateInput
+{
+  @IsNotEmpty()
+  teamIds: string;
 
-    @IsNotEmpty()
-    teamIds: string;
+  @IsNotEmpty()
+  @IsUUID()
+  roomId: string;
 
-    @IsNotEmpty()
-    @IsUUID()
-    roomId: string;
+  @IsISO8601()
+  startAt: Date;
 
-    @ApiPropertyOptional()
-    startAt: Date;
-
-    @ApiPropertyOptional()
-    endAt: Date;
+  @IsISO8601()
+  endAt: Date;
 }
 
-export class UpdateAppointmentDto { 
+export class UpdateAppointmentDto
+implements Prisma.AppointmentUncheckedUpdateInput
+{
+  @IsOptional()
+  @IsISO8601()
+  @ApiPropertyOptional()
+  startAt?: Date;
 
-    @ApiPropertyOptional()
-    startAt: Date;
-
-    @ApiPropertyOptional()
-    endAt: Date;
-
+  @IsOptional()
+  @IsISO8601()
+  @ApiPropertyOptional()
+  endAt?: Date;
 }

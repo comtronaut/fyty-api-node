@@ -1,103 +1,144 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import {
+  BadRequestException,
+  CACHE_MANAGER,
+  Inject,
+  Injectable
+} from "@nestjs/common";
+import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
-import { Repository } from "typeorm";
-import { PhoneNumber } from "src/model/sql-entity/phoneNumber.entity";
-import { User } from "src/model/sql-entity/user/user.entity";
+import { Cache } from "cache-manager";
 import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
+import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User) private userModel: Repository<User>,
-    @InjectRepository(PhoneNumber) private phoneNumberModel: Repository<PhoneNumber>
-  ) { }
-  
-  // CRUD
-  async getUserById(id: string) {
-    return await this.userModel.findOneOrFail({ where: { id } });
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
+  ) {}
+
+  async getById(id: string): Promise<User> {
+    const cachedUser = await this.cacheManager.get<User>(`user:${id}`);
+
+    if (cachedUser) {
+      return cachedUser;
+    }
+
+    const user = await this.prisma.user.findUniqueOrThrow({ where: { id } });
+
+    await this.cacheManager.set(`user:${id}`, user);
+
+    return user;
   }
 
-  async searchUsers(searchString: string, teamId: string) {
-    return await this.userModel.createQueryBuilder("user")
-      .where("user.displayName like :displayName OR user.username like :username", { displayName: `%${searchString}%`, username: `%${searchString}%` })
-      .getMany();
+  async searchUsers(searchString: string, teamId?: string): Promise<User[]> {
+    return await this.prisma.user.findMany({
+      where: {
+        OR: [
+          {
+            displayName: {
+              contains: searchString
+            }
+          },
+          {
+            username: {
+              contains: searchString
+            }
+          }
+        ]
+      }
+    });
   }
 
-  async create(req: CreateUserDto) {
+  async create(data: CreateUserDto) {
     try {
-      const [ hashedPassword, hashedPhoneNumber ] = await Promise.all([ // parallel promise
-        bcrypt.hashSync(req.password, 12),
-        bcrypt.hashSync(req.phoneNumber, 12)
+      const [ hashedPassword, hashedPhoneNumber ] = await Promise.all([
+        bcrypt.hash(data.password, 12),
+        bcrypt.hash(data.phoneNumber, 12)
       ]);
 
-      const { phoneNumber, ...rest } = req;
+      const { phoneNumber, ...rest } = data;
       const createdContent = { ...rest, password: hashedPassword };
-      
-      await this.phoneNumberModel.save({ phoneNumber: hashedPhoneNumber });
-      const { password, ...userData } = await this.userModel.save(createdContent);
+
+      await this.prisma.phoneNumber.create({
+        data: {
+          phoneNumber: hashedPhoneNumber
+        }
+      });
+
+      const { password, ...userData } = await this.prisma.user.create({
+        data: createdContent
+      });
+      await this.prisma.userSettings.create({
+        data: {
+          userId: userData.id,
+          lang: "th"
+        }
+      });
+
       return userData;
-    }
-    catch(err) {
-      throw new BadRequestException(err.message);
-    }
-  }
-
-  async update(user: User, req: UpdateUserDto) {
-    try {
-      const { password, phoneNumber, ...updateData } = req;
-      const updateRes = await this.userModel.update(user.id, updateData);
-
-      if(updateRes.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT);
-      }
-
-      const res = await this.userModel.findOneByOrFail({ id: user.id });
-      const flatten = (userInfo: User) => {
-        const { password, ...rest } = userInfo;
-        return rest; 
-      }
-
-      return flatten(res);
-
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async updatePassword(user: User, password: string){
+  async update(user: User, data: UpdateUserDto) {
     try {
-      const hashedPassword = bcrypt.hashSync(password, 12)
-      const updateRes = await this.userModel.update(user.id, { password: hashedPassword });
+      const { phoneNumber, ...updateData } = data;
 
-      if(updateRes.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT);
-      }
-       
-      return HttpStatus.OK;
+      const res = await this.prisma.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          ...updateData,
+          ...(updateData.email && { updatedEmailAt: new Date() }),
+          ...(updateData.username && { updatedUsernameAt: new Date() }),
+          ...(updateData.password && {
+            password: bcrypt.hashSync(updateData.password, 12)
+          })
+        }
+      });
+
+      await this.cacheManager.set(`user:${user.id}`, res);
+
+      return res;
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async delete(id: string) {
+  async delete(id: string): Promise<void> {
     try {
-      const res = await this.userModel.delete(id);
-      if(res.affected === 0) {
-        return new HttpException("", HttpStatus.NO_CONTENT);
-      }
+      const res = await this.prisma.user.delete({ where: { id } });
+
+      await this.cacheManager.del(`user:${id}`);
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async getDuplicationResult(payload: UpdateUserDto): Promise<Record<string, boolean>> {
+  async getDuplicationResult({
+    phoneNumber,
+    ...payload
+  }: UpdateUserDto): Promise<Record<string, boolean>> {
     const res = {} as Record<string, boolean>;
 
     for (const [ key, value ] of Object.entries(payload)) {
-      res[key] = Boolean(await this.userModel.findOne({ where: { [key]: value }}));
+      res[key] = Boolean(
+        await this.prisma.user.findFirst({ where: { [key]: value } })
+      );
     }
-    
+
+    if (phoneNumber) {
+      const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12);
+      res[phoneNumber] = Boolean(
+        await this.prisma.phoneNumber.findUnique({
+          where: { phoneNumber: hashedPhoneNumber }
+        })
+      );
+    }
+
     return res;
   }
 }

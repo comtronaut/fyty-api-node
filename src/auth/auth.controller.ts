@@ -1,74 +1,92 @@
-import { Controller, Get, HttpStatus, NotAcceptableException, Query, Req, UseGuards } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
-import { Request } from "express";
-import { Debug } from "src/common/debug.decorator";
+import {
+  Controller,
+  Get,
+  Query,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards
+} from "@nestjs/common";
+import { Request, Response } from "express";
+import env from "src/common/env.config";
+import { UserSubject } from "src/common/subject.decorator";
+import URI from "urijs";
 import { AuthService } from "./auth.service";
-import { JwtAuthGuard } from "./guard/jwt-auth.guard";
+import { FacebookAuthGuard, FacebookInfo } from "./guard/facebook.guard";
+import { GoogleAuthGuard, GoogleInfo } from "./guard/google.guard";
+
+type OAuthQuery = {
+  state: string;
+  code_challenge: string;
+  code_challenge_method: string;
+  nonce: string;
+};
 
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Get("login")
   async login(
     @Query("username") username: string,
     @Query("password") password: string
-  ) {   
-    return await this.authService.localLogin(username, password);
-  }
-
-  @Debug()
-  @UseGuards(JwtAuthGuard)
-  @Get("profile")
-  async getProfile(@Req() req: Request) {        
-    if (!req.user && typeof req.user !== "string") {
-      throw new NotAcceptableException();
-    }    
-
-    return req.user;
+  ) {
+    return await this.authService.loginLocal(username, password);
   }
 
   @Get("/user/google")
-  @UseGuards(AuthGuard("google"))
-  async getUser(@Req() req: Request) {
-    if (!req.user) {
-      return {
-        message: "no user from google"
-      };
+  @UseGuards(GoogleAuthGuard)
+  async getUser(@UserSubject() user: GoogleInfo) {
+    if (!user) {
+      throw new UnauthorizedException();
     }
 
-    // ok try to imprement functions on AuthService and use them here
-
-    const res = await this.authService.getUserByOAuth(req.user);
-
-    return res;
+    return await this.authService.loginGoogle(user);
   }
 
   @Get("/user/facebook")
-  @UseGuards(AuthGuard("facebook"))
-  async facebookLoginRedirect(@Req() req: any): Promise<any> {
-    if (!req.user) {
-      return {
-        message: "no user from facebook"
-      };
+  @UseGuards(FacebookAuthGuard)
+  async facebookLoginRedirect(@UserSubject() user: FacebookInfo) {
+    if (!user) {
+      throw new UnauthorizedException();
     }
-    // yes, this shit too it's can be the same function i guess
 
-    const res = await this.authService.getUserByOAuth(req.user);
-
-    return res;
+    return await this.authService.loginFacebook(user);
   }
 
   @Get("/google")
-  @UseGuards(AuthGuard("google"))
-  async googleLogin() {
-    return HttpStatus.OK;
+  async redirectToGoogle(
+    @Res() res: Response,
+    @Query() query: Partial<OAuthQuery>
+  ) {
+    const url = URI("https://accounts.google.com/o/oauth2/v2/auth")
+      .query({
+        response_type: "code",
+        client_id: env.GOOGLE_CLIENT_ID,
+        redirect_uri: env.GOOGLE_REDIRECT_URI,
+        scope: [ "openid", "profile", "email" ].join(" "),
+        ...query
+      })
+      .href();
+
+    return res.redirect(url);
   }
 
   @Get("/facebook")
-  @UseGuards(AuthGuard("facebook"))
-  async facebookLogin(): Promise<any> {
-    return HttpStatus.OK;
-  }
+  async redirectToFacebook(
+    @Res() res: Response,
+    @Query() query: Partial<OAuthQuery>
+  ) {
+    const url = URI("https://www.facebook.com/v16.0/dialog/oauth")
+      .query({
+        response_type: "code",
+        client_id: env.FACEBOOK_CLIENT_ID,
+        redirect_uri: env.FACEBOOK_REDIRECT_URI,
+        scope: [ "public_profile", "email" ].join(" "),
+        ...query
+      })
+      .href();
 
+    return res.redirect(url);
+  }
 }
