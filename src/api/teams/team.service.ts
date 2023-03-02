@@ -64,18 +64,18 @@ export class TeamService {
     return await this.prisma.team.findMany();
   }
 
-  async update(ownerId: string, req: UpdateTeamDto): Promise<Team> {
+  async update(ownerId: string, data: UpdateTeamDto): Promise<Team> {
     try {
-      const updateRes = await this.prisma.team.update({
-        where: { id: req.id },
-        data: req
+      await this.prisma.team.update({
+        where: { id: data.id },
+        data
       });
 
-      const udpatedTeam = await this.prisma.team.findFirstOrThrow({
-        where: { id: req.id }
+      const updatedTeam = await this.prisma.team.findFirstOrThrow({
+        where: { id: data.id }
       });
 
-      return udpatedTeam;
+      return updatedTeam;
     } catch (err) {
       throw new BadRequestException(err.message);
     }

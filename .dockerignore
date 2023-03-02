@@ -1,2 +1,4 @@
 /node_modules
+/migration
 /dist
+.env

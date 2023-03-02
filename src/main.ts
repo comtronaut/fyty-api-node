@@ -9,6 +9,7 @@ import express, { json, urlencoded } from "express";
 import fs from "fs";
 import http from "http";
 import { AppModule } from "./app.module";
+import env from "./common/env.config";
 
 async function bootstrap() {
   if (process.env["HOST"] === "0.0.0.0") {
@@ -55,6 +56,8 @@ async function bootstrap() {
     await app.listen(port);
     Logger.log(`server listening: ${await app.getUrl()}`);
   }
+
+  Logger.log(env.POSTGRES_URL);
 }
 void bootstrap();
 

@@ -1,6 +1,8 @@
 FROM node:16-alpine as build
 WORKDIR /app
 COPY . .
+COPY ./env/.env.prod ./.env
+
 RUN npm install --omit=optional \
     && npm run prisma:migrate \
     && npm run build
