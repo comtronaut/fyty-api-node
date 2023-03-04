@@ -28,7 +28,7 @@ export class AuthService {
         data: {
           facebookId: user.id,
           lastLoginAt: new Date(),
-          ...(dbUser.firstLoginAt && { firstLoginAt: new Date() })
+          ...(!dbUser.firstLoginAt && { firstLoginAt: new Date() })
         }
       });
 
@@ -59,7 +59,7 @@ export class AuthService {
         data: {
           googleId: user.sub,
           lastLoginAt: new Date(),
-          ...(dbUser.firstLoginAt && { firstLoginAt: new Date() })
+          ...(!dbUser.firstLoginAt && { firstLoginAt: new Date() })
         }
       });
 
