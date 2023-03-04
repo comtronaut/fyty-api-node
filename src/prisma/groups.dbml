@@ -1,0 +1,48 @@
+TableGroup game {
+  Game
+}
+
+TableGroup user {
+  User
+  UserSettings
+  PasswordResetSession
+  UserAvatar
+  Review
+}
+
+TableGroup team {
+  Team
+  TeamMember
+  TeamLineUp
+  TeamPending
+}
+
+TableGroup room {
+  Room
+  RoomParticipant
+  RoomNote
+  RoomLineup
+  RoomLineupBoard
+  RoomRequest
+  Chat
+  Message
+}
+
+TableGroup appointment {
+  Appointment
+  AppointmentMember
+}
+
+TableGroup stats {
+  MatchHistory
+  TeamStatistic
+}
+
+TableGroup admin {
+  Admin
+}
+
+TableGroup other {
+  Image
+  PhoneNumber
+}

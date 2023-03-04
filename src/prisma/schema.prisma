@@ -7,6 +7,14 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator dbml {
+  provider = "prisma-dbml-generator"
+  output   = "./"
+  outputName = "schema.dbml"
+  projectName = "FyTy Core Database"
+  includeRelationFields = false
+}
+
 // enums
 enum RoomStatus {
   AVAILABLE
