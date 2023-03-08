@@ -223,7 +223,7 @@ Table PhoneNumber {
 
 Table Admin {
   id String [pk]
-  email String [not null]
+  email String [unique, not null]
   password String [not null]
   role AdminRole [not null, default: 'MANAGEMENT']
   createAt DateTime [default: `now()`, not null]

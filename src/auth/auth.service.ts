@@ -1,7 +1,9 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { User } from "@prisma/client";
+import { BadRequestException } from "@nestjs/common/exceptions";
+import { Admin, User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
+import { AdminService } from "src/api/admin/admin.service";
 import { UserService } from "src/api/users/user.service";
 import env from "src/common/env.config";
 import { PrismaService } from "src/services/prisma.service";
@@ -12,8 +14,9 @@ import { GoogleInfo } from "./guard/google.guard";
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly userService: UserService
-  ) {}
+    private readonly userService: UserService,
+    private readonly adminService: AdminService,
+  ) { }
 
   async loginFacebook(user: FacebookInfo) {
     const dbUser = await this.prisma.user.findFirst({
@@ -81,6 +84,33 @@ export class AuthService {
     return await this.userService.getById(id);
   }
 
+  async getAdminById(adminId: Admin["id"]) {
+    return await this.adminService.getAdminById(adminId);
+  }
+
+  async adminLogin(email: Admin["email"], password: Admin["password"]) {
+    try{
+      const admin = await this.prisma.admin.findUniqueOrThrow({
+        where: {
+          email: email
+        }
+      });
+
+      if(admin && bcrypt.compareSync(password, admin.password)) {
+        const {password, ...adminData} = admin;
+        const accessToken = this.getAdminAccessToken(adminData.id);
+        return {...adminData, ...accessToken} ;
+      }
+      else{
+        throw new UnauthorizedException("email or password is incorrect.");
+      }
+
+    }
+    catch(error){
+      throw new BadRequestException(error.message);
+    }
+  };
+
   async loginLocal(usernameOrEmail: string, password: string) {
     try {
       const user = await this.prisma.user.findFirstOrThrow({
@@ -111,6 +141,13 @@ export class AuthService {
   private getAccessToken(id: string) {
     const payload = { sub: id };
     const accessToken = jwt.sign(payload, env.JWT_SECRET);
+
+    return { accessToken };
+  }
+
+  private getAdminAccessToken(id: string) {
+    const payload = { sub: id };
+    const accessToken = jwt.sign(payload, env.JWT_ADMIN_SECRET);
 
     return { accessToken };
   }
