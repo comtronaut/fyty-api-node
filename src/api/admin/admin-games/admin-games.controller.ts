@@ -3,14 +3,14 @@ import { AdminJwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { CreateGameDto, UpdateGameDto } from 'src/model/dto/game.dto';
 import { AdminGamesService } from './admin-games.service';
 
-@Controller('admins/games')
+@Controller('admins/api/games')
 export class GamesController {
   constructor(private readonly adminGamesService: AdminGamesService) {}
 
   @UseGuards(AdminJwtAuthGuard)
   @Post()
   async addGame(@Body() req: CreateGameDto) {
-    return this.adminGamesService.create(req);
+    return await this.adminGamesService.create(req);
   }
 
   @UseGuards(AdminJwtAuthGuard)
