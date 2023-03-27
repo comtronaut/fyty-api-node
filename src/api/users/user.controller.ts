@@ -31,16 +31,6 @@ export class UserController {
     private readonly avatarService: UserAvatarService
   ) {}
 
-  //admin
-
-  @Get("all")
-  @UseGuards(AdminJwtAuthGuard)
-  async getAllUser(){
-    return this.userService.getAllUser();
-  }
-
-
-
   //user
   @Post()
   async addUser(@Body() user: CreateUserDto) {

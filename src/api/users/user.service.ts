@@ -142,14 +142,4 @@ export class UserService {
     return res;
   }
 
-  //admin
-
-  async getAllUser(){
-    try{
-      return this.prisma.user.findMany();
-    }
-    catch(error){
-      throw new BadRequestException(error.message);
-    }
-  }
 }
