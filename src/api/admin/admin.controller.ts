@@ -5,7 +5,7 @@ import { AdminJwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { CreateAdminDto, UpdateAdminDto } from 'src/model/dto/admin.dto';
 import { AdminService } from './admin.service';
 
-@Controller('admin')
+@Controller('admins')
 export class AdminController {
     constructor(private readonly addminService: AdminService) { }
 
