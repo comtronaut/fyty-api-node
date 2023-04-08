@@ -1,10 +1,13 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
+import { NotifyService } from "src/api/line_notify/lineNotify.service";
 import { CreateMessageDto } from "src/model/dto/chat.dto";
 import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class MessageService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly lineNotify: NotifyService) {}
 
   async getMesssagesFromChatId(chatId: string) {
     try {
@@ -18,6 +21,9 @@ export class MessageService {
     waitingKey,
     ...data
   }: CreateMessageDto & { waitingKey: string }) {
+
+    this.lineNotify.searchUserForChatNotify(data.chatId,data.teamId);
+
     return await this.prisma.message.create({ data });
   }
 
