@@ -1,10 +1,13 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { CreateRoomRequestDto } from "src/model/dto/room/request.dto";
 import { PrismaService } from "src/services/prisma.service";
+import { NotifyService } from "src/api/line_notify/lineNotify.service";
 
 @Injectable()
 export class RoomRequestService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly lineNotify: NotifyService,) {}
 
   async create(roomId: string, body: CreateRoomRequestDto) {
     try {
@@ -32,6 +35,9 @@ export class RoomRequestService {
           roomId
         }
       });
+
+      
+      this.lineNotify.searchUserForRequestNotify(roomId);
 
       return request;
     } catch (err) {

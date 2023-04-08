@@ -12,10 +12,10 @@ implements Prisma.RoomRequestUncheckedCreateInput
   @IsUUID()
   roomId: string;
 
-  @IsNotEmpty()
-  @IsUUID()
+  // @IsNotEmpty()
+  // @IsUUID()
   roomLineUpBoardId: string;
 
-  // @IsNotEmpty()
+  @IsNotEmpty()
   teamlineUpIds: string;
 }
