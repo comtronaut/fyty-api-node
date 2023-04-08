@@ -6,6 +6,7 @@ import { TeamMemberService } from "./members/team-member.service";
 import { TeampendingService } from "./pending/teampending.service";
 import { TeamController } from "./team.controller";
 import { TeamService } from "./team.service";
+import { NotifyService } from "../line_notify/lineNotify.service";
 
 @Module({
   imports: [],
@@ -15,7 +16,8 @@ import { TeamService } from "./team.service";
     LineUpService,
     TeamMemberService,
     TeampendingService,
-    PrismaService
+    PrismaService,
+    NotifyService
   ]
 })
 export class TeamModule {}

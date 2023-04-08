@@ -10,6 +10,7 @@ import { RoomNoteService } from "./note/note.service";
 import { RoomRequestService } from "./request/request.service";
 import { ScheduleModule } from "@nestjs/schedule";
 import { PrismaService } from "src/services/prisma.service";
+import { NotifyService } from "../line_notify/lineNotify.service";
 
 @Module({
   imports: [ ChatModule, ScheduleModule.forRoot() ],
@@ -22,7 +23,8 @@ import { PrismaService } from "src/services/prisma.service";
     RoomNoteService,
     RoomParticipantService,
     RoomRequestService,
-    PrismaService
+    PrismaService,
+    NotifyService
   ]
 })
 export class RoomModule {}

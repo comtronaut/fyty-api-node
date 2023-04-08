@@ -10,6 +10,7 @@ import { TeamModule } from "./teams/team.module";
 import { UserModule } from "./users/user.module";
 import { UtilModule } from "./utils/util.module";
 import { AdminModule } from './admin/admin.module';
+import { NotifyModule } from "./line_notify/lineNotify.module"
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { AdminModule } from './admin/admin.module';
     ReviewModule,
     UtilModule,
     DebugModule,
-    AdminModule
+    AdminModule,
+    NotifyModule
   ],
   controllers: [],
   providers: []

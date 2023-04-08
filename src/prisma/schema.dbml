@@ -119,6 +119,7 @@ Table User {
   facebookId String [unique]
   googleId String [unique]
   lineId String [unique]
+  lineToken String [unique]
   firstLoginAt DateTime
   lastLoginAt DateTime
   createdAt DateTime [default: `now()`, not null]

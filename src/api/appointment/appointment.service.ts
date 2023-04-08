@@ -5,10 +5,14 @@ import {
   UpdateAppointmentDto
 } from "src/model/dto/appointment.dto";
 import { PrismaService } from "src/services/prisma.service";
+import { NotifyService } from "../line_notify/lineNotify.service";
 
 @Injectable()
 export class AppointmentService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly lineNotify: NotifyService
+  ) {}
 
   // CRUD
   async create(req: CreateAppointmentDto) {
@@ -20,7 +24,10 @@ export class AppointmentService {
       // create appointment
       req.startAt = room.startAt;
       req.endAt = room.endAt;
-      const res = await this.prisma.appointment.create({ data: req });
+
+      const {teamIds,...data} = req
+      
+      const res = await this.prisma.appointment.create({ data });
 
       // create appointment member
       const memberIds = req.teamIds.split(",");
@@ -31,6 +38,9 @@ export class AppointmentService {
           teamId: memberId
         }))
       });
+
+      // send line notify
+      this.lineNotify.searchUserForAppointmentNotify(memberIds);
 
       return res;
     } catch (err) {
@@ -173,4 +183,5 @@ export class AppointmentService {
       throw new BadRequestException(err.message);
     }
   }
+
 }

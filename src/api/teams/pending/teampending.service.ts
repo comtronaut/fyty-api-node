@@ -1,4 +1,5 @@
 import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
+import { NotifyService } from "src/api/line_notify/lineNotify.service";
 import {
   CreateTeamPendingDto,
   UpdateTeamPendingDto
@@ -7,7 +8,9 @@ import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class TeampendingService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly lineNotify: NotifyService) {}
 
   async getTeamPendingByUser(userId: string) {
     try {
@@ -50,10 +53,14 @@ export class TeampendingService {
   }
 
   async createTeamPending(req: CreateTeamPendingDto) {
+    //send line notify
+    this.lineNotify.searchUserForTeamPendingNotify(req.teamId,req.userId,'pending');
     return await this.prisma.teamPending.create({ data: req });
   }
 
   async createTeamInvitation(req: CreateTeamPendingDto) {
+    //send line notify
+    this.lineNotify.searchUserForTeamPendingNotify(req.teamId,req.userId,'invitation');
     return await this.prisma.teamPending.create({
       data: { ...req, status: "invitation" }
     });
