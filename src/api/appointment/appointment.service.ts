@@ -25,8 +25,8 @@ export class AppointmentService {
       req.startAt = room.startAt;
       req.endAt = room.endAt;
 
-      const {teamIds,...data} = req
-      
+      const { teamIds, ...data } = req;
+
       const res = await this.prisma.appointment.create({ data });
 
       // create appointment member
@@ -183,5 +183,4 @@ export class AppointmentService {
       throw new BadRequestException(err.message);
     }
   }
-
 }

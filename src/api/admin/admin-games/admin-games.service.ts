@@ -1,6 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateGameDto } from 'src/model/dto/game.dto';
-import { PrismaService } from 'src/services/prisma.service';
+import { BadRequestException, Injectable } from "@nestjs/common";
+import { CreateGameDto } from "src/model/dto/game.dto";
+import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class AdminGamesService {
@@ -34,5 +34,4 @@ export class AdminGamesService {
       throw new BadRequestException(err.message);
     }
   }
-  
 }

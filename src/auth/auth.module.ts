@@ -18,6 +18,13 @@ import { AdminService } from "src/api/admin/admin.service";
     })
   ],
   controllers: [ AuthController ],
-  providers: [ AuthService, JwtStrategy, JwtStrategyAdmin, UserService, PrismaService, AdminService ]
+  providers: [
+    AuthService,
+    JwtStrategy,
+    JwtStrategyAdmin,
+    UserService,
+    PrismaService,
+    AdminService
+  ]
 })
 export class AuthModule {}

@@ -55,7 +55,10 @@ export class TeamMemberService {
       const member = await this.prisma.teamMember.findFirstOrThrow({
         where: { userId: user.id }
       });
-      if (member.role === MemberRole.MANAGER || member.role === MemberRole.LEADER) {
+      if (
+        member.role === MemberRole.MANAGER
+        || member.role === MemberRole.LEADER
+      ) {
         const res = await this.prisma.teamMember.delete({
           where: { id: teammemberId }
         });

@@ -1,14 +1,10 @@
-import {
-  Injectable
-} from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import fs from "fs";
 import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
 export class DebugService {
-  constructor(
-    private readonly prisma: PrismaService
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   private prune(str: string) {
     if (str.startsWith("\"") && str.endsWith("\"")) {
@@ -40,12 +36,15 @@ export class DebugService {
 
     const formattedRow = rows.map((rawRow) => {
       const colEntries = rawRow.split(",").map((col, i) => {
-        return [ this.prune(headerCols[i]), this.formatCol(this.prune(col), table) ];
+        return [
+          this.prune(headerCols[i]),
+          this.formatCol(this.prune(col), table)
+        ];
       });
 
       return Object.fromEntries(colEntries);
     });
-    
+
     if (table === "user") {
       await this.prisma.user.createMany({
         data: formattedRow

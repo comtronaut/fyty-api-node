@@ -1,6 +1,4 @@
-import {
-  Controller, Param, Post
-} from "@nestjs/common";
+import { Controller, Param, Post } from "@nestjs/common";
 import { Debug } from "src/common/debug.decorator";
 import { DebugService } from "./debug.service";
 

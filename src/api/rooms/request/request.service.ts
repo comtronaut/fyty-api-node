@@ -7,7 +7,8 @@ import { NotifyService } from "src/api/line_notify/lineNotify.service";
 export class RoomRequestService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly lineNotify: NotifyService,) {}
+    private readonly lineNotify: NotifyService
+  ) {}
 
   async create(roomId: string, body: CreateRoomRequestDto) {
     try {
@@ -36,8 +37,7 @@ export class RoomRequestService {
         }
       });
 
-      
-      this.lineNotify.searchUserForRequestNotify(roomId);
+      void this.lineNotify.searchUserForRequestNotify(roomId);
 
       return request;
     } catch (err) {

@@ -1,9 +1,17 @@
-import { Body, Controller, Delete, Param, Post, Put, UseGuards } from '@nestjs/common';
-import { AdminJwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
-import { CreateGameDto, UpdateGameDto } from 'src/model/dto/game.dto';
-import { AdminGamesService } from './admin-games.service';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Post,
+  Put,
+  UseGuards
+} from "@nestjs/common";
+import { AdminJwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
+import { CreateGameDto, UpdateGameDto } from "src/model/dto/game.dto";
+import { AdminGamesService } from "./admin-games.service";
 
-@Controller('admins/api/games')
+@Controller("admins/api/games")
 export class GamesController {
   constructor(private readonly adminGamesService: AdminGamesService) {}
 
@@ -24,5 +32,4 @@ export class GamesController {
   async deleteGame(@Param("id") gameId: string) {
     return await this.adminGamesService.delete(gameId);
   }
-
 }

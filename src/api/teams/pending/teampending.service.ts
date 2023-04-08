@@ -10,7 +10,8 @@ import { PrismaService } from "src/services/prisma.service";
 export class TeampendingService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly lineNotify: NotifyService) {}
+    private readonly lineNotify: NotifyService
+  ) {}
 
   async getTeamPendingByUser(userId: string) {
     try {
@@ -53,14 +54,22 @@ export class TeampendingService {
   }
 
   async createTeamPending(req: CreateTeamPendingDto) {
-    //send line notify
-    this.lineNotify.searchUserForTeamPendingNotify(req.teamId,req.userId,'pending');
+    // send line notify
+    void this.lineNotify.searchUserForTeamPendingNotify(
+      req.teamId,
+      req.userId,
+      "pending"
+    );
     return await this.prisma.teamPending.create({ data: req });
   }
 
   async createTeamInvitation(req: CreateTeamPendingDto) {
-    //send line notify
-    this.lineNotify.searchUserForTeamPendingNotify(req.teamId,req.userId,'invitation');
+    // send line notify
+    void this.lineNotify.searchUserForTeamPendingNotify(
+      req.teamId,
+      req.userId,
+      "invitation"
+    );
     return await this.prisma.teamPending.create({
       data: { ...req, status: "invitation" }
     });

@@ -6,7 +6,7 @@ import type { JwtPayload } from "jsonwebtoken";
 import { AuthService } from "../auth.service";
 
 @Injectable()
-export class JwtStrategyAdmin extends PassportStrategy(Strategy,"jwt-admin") {
+export class JwtStrategyAdmin extends PassportStrategy(Strategy, "jwt-admin") {
   constructor(private readonly authService: AuthService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -22,11 +22,10 @@ export class JwtStrategyAdmin extends PassportStrategy(Strategy,"jwt-admin") {
       }
 
       const admin = await this.authService.getAdminById(payload.sub);
-      if (!admin || admin.role !== "MANAGEMENT"){
-        throw new UnauthorizedException("Your are not admin.")
+      if (!admin || admin.role !== "MANAGEMENT") {
+        throw new UnauthorizedException("Your are not admin.");
       }
-      return admin
-
+      return admin;
     } catch (err) {
       throw new UnauthorizedException();
     }

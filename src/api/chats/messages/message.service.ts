@@ -7,7 +7,8 @@ import { PrismaService } from "src/services/prisma.service";
 export class MessageService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly lineNotify: NotifyService) {}
+    private readonly lineNotify: NotifyService
+  ) {}
 
   async getMesssagesFromChatId(chatId: string) {
     try {
@@ -21,8 +22,7 @@ export class MessageService {
     waitingKey,
     ...data
   }: CreateMessageDto & { waitingKey: string }) {
-
-    this.lineNotify.searchUserForChatNotify(data.chatId,data.teamId);
+    this.lineNotify.searchUserForChatNotify(data.chatId, data.teamId);
 
     return await this.prisma.message.create({ data });
   }

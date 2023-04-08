@@ -1,12 +1,20 @@
-import { Body, Controller, Delete, Get, Param, Put, UseGuards } from '@nestjs/common';
-import { User } from '@prisma/client';
-import { AdminJwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
-import { UpdateUserDto } from 'src/model/dto/user.dto';
-import { AdminUsersService } from './admin-users.service';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Put,
+  UseGuards
+} from "@nestjs/common";
+import { User } from "@prisma/client";
+import { AdminJwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
+import { UpdateUserDto } from "src/model/dto/user.dto";
+import { AdminUsersService } from "./admin-users.service";
 
-@Controller('admins/api/users')
+@Controller("admins/api/users")
 export class AdminUsersController {
-  constructor(private readonly adminUsersService: AdminUsersService) { }
+  constructor(private readonly adminUsersService: AdminUsersService) {}
 
   @Get()
   @UseGuards(AdminJwtAuthGuard)
@@ -35,5 +43,4 @@ export class AdminUsersController {
   // async deleteUser(@Param("id") userId: User["id"]){
   //   return await this.adminUsersService.deleteUser(userId);
   // }
-
 }

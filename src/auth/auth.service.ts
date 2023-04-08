@@ -15,8 +15,8 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
-    private readonly adminService: AdminService,
-  ) { }
+    private readonly adminService: AdminService
+  ) {}
 
   async loginFacebook(user: FacebookInfo) {
     const dbUser = await this.prisma.user.findFirst({
@@ -89,27 +89,24 @@ export class AuthService {
   }
 
   async adminLogin(email: Admin["email"], password: Admin["password"]) {
-    try{
+    try {
       const admin = await this.prisma.admin.findUniqueOrThrow({
         where: {
-          email: email
+          email
         }
       });
 
-      if(admin && bcrypt.compareSync(password, admin.password)) {
-        const {password, ...adminData} = admin;
+      if (admin && bcrypt.compareSync(password, admin.password)) {
+        const { password, ...adminData } = admin;
         const accessToken = this.getAdminAccessToken(adminData.id);
-        return {...adminData, ...accessToken} ;
-      }
-      else{
+        return { ...adminData, ...accessToken };
+      } else {
         throw new UnauthorizedException("email or password is incorrect.");
       }
-
-    }
-    catch(error){
+    } catch (error) {
       throw new BadRequestException(error.message);
     }
-  };
+  }
 
   async loginLocal(usernameOrEmail: string, password: string) {
     try {

@@ -27,7 +27,10 @@ export class LineUpService {
         req.isDefault = false;
       }
 
-      if (teamMember.role === MemberRole.MANAGER || teamMember.role === MemberRole.LEADER) {
+      if (
+        teamMember.role === MemberRole.MANAGER
+        || teamMember.role === MemberRole.LEADER
+      ) {
         // cheack if you are Manager
         await this.prisma.teamLineUp.update({
           where: { id: lineUpId },
@@ -100,7 +103,10 @@ export class LineUpService {
       const member = await this.prisma.teamMember.findFirstOrThrow({
         where: { teamId, userId }
       });
-      if (member.role === MemberRole.MANAGER || member.role === MemberRole.LEADER) {
+      if (
+        member.role === MemberRole.MANAGER
+        || member.role === MemberRole.LEADER
+      ) {
         await this.prisma.teamLineUp.deleteMany({ where: { teamId } });
         return HttpStatus.NO_CONTENT;
       }
@@ -121,7 +127,10 @@ export class LineUpService {
         where: { userId, teamId: team.id }
       });
 
-      if (member.role === MemberRole.MANAGER || member.role === MemberRole.LEADER) {
+      if (
+        member.role === MemberRole.MANAGER
+        || member.role === MemberRole.LEADER
+      ) {
         await this.prisma.teamLineUp.delete({ where: { id: lineupId } });
         return HttpStatus.NO_CONTENT;
       }

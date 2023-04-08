@@ -9,6 +9,12 @@ import { NotifyService } from "../line_notify/lineNotify.service";
 @Module({
   imports: [],
   controllers: [ ChatController ],
-  providers: [ ChatService, MessageService, ChatGateway, PrismaService, NotifyService ]
+  providers: [
+    ChatService,
+    MessageService,
+    ChatGateway,
+    PrismaService,
+    NotifyService
+  ]
 })
 export class ChatModule {}

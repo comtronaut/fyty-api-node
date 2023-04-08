@@ -9,5 +9,4 @@ export class GameService {
   async getAll() {
     return await this.prisma.game.findMany();
   }
-
 }
