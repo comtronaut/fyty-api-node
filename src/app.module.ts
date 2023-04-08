@@ -10,7 +10,7 @@ import { PrismaService } from "./services/prisma.service";
     CacheModule.register({
       ttl: 1000 * 60 * 60,
       isGlobal: true
-    })
+    }),
   ],
   controllers: [],
   providers: [ PrismaService ]

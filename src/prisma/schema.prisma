@@ -8,10 +8,10 @@ generator client {
 }
 
 generator dbml {
-  provider = "prisma-dbml-generator"
-  output   = "./"
-  outputName = "schema.dbml"
-  projectName = "FyTy Core Database"
+  provider              = "prisma-dbml-generator"
+  output                = "./"
+  outputName            = "schema.dbml"
+  projectName           = "FyTy Core Database"
   includeRelationFields = false
 }
 
@@ -341,8 +341,8 @@ model PhoneNumber {
 
 // admin
 model Admin {
-  id       String    @id
-  email    String
+  id       String    @id @default(uuid())
+  email    String    @unique
   password String
   role     AdminRole @default(MANAGEMENT)
   createAt DateTime  @default(now())

@@ -34,6 +34,14 @@ export class AuthController {
     return await this.authService.loginLocal(username, password);
   }
 
+  @Get("admin/login")
+  async adminLogin(
+    @Query("email") email: string,
+    @Query("password") password: string
+  ) {
+    return await this.authService.adminLogin(email, password);
+  }
+
   @Get("/user/google")
   @UseGuards(GoogleAuthGuard)
   async getUser(@UserSubject() user: GoogleInfo) {

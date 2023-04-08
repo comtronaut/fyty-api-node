@@ -9,7 +9,8 @@ import { SelectorModule } from "./Selector/selector.module";
 import { TeamModule } from "./teams/team.module";
 import { UserModule } from "./users/user.module";
 import { UtilModule } from "./utils/util.module";
-import {NotifyModule} from "./line_notify/lineNotify.module"
+import { AdminModule } from './admin/admin.module';
+import { NotifyModule } from "./line_notify/lineNotify.module"
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import {NotifyModule} from "./line_notify/lineNotify.module"
     ReviewModule,
     UtilModule,
     DebugModule,
+    AdminModule,
     NotifyModule
   ],
   controllers: [],

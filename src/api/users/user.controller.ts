@@ -17,7 +17,7 @@ import {
   UpdateUserAvatarDto
 } from "src/model/dto/user.dto";
 import { UserAvatarService } from "./user-avatars/avatar.service";
-import { UserJwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
+import { AdminJwtAuthGuard, UserJwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { Debug } from "src/common/debug.decorator";
 import { User } from "@prisma/client";
 import { UserSettingsService } from "./user-settings/user-settings.service";
@@ -31,6 +31,7 @@ export class UserController {
     private readonly avatarService: UserAvatarService
   ) {}
 
+  //user
   @Post()
   async addUser(@Body() user: CreateUserDto) {
     return await this.userService.create(user);
