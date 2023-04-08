@@ -38,9 +38,9 @@ export class AdminUsersController {
   }
 
   // constraint
-  // @Delete(":id")
-  // @UseGuards(AdminJwtAuthGuard)
-  // async deleteUser(@Param("id") userId: User["id"]){
-  //   return await this.adminUsersService.deleteUser(userId);
-  // }
+  @Delete(":id")
+  @UseGuards(AdminJwtAuthGuard)
+  async deleteUser(@Param("id") userId: User["id"]){
+    return await this.adminUsersService.deleteUser(userId);
+  }
 }
