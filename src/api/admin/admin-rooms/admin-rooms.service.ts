@@ -65,7 +65,7 @@ export class AdminRoomsService {
     try {
       return await this.prisma.roomParticipant.findMany({
         where: {
-          roomId: roomId
+          roomId
         }
       });
     } catch (err) {
@@ -75,17 +75,18 @@ export class AdminRoomsService {
 
   async getRoomLineUp(roomId: string) {
     try {
-
       const roomParticipant = await this.prisma.roomParticipant.findMany({
         where: {
-          roomId: roomId
+          roomId
         }
-      })
-      
+      });
+
       return await this.prisma.roomLineup.findMany({
         where: {
-          roomLineUpBoardId:{
-            in: roomParticipant.flatMap((e) => (e.roomLineUpBoardId ? [ e.roomLineUpBoardId ] : []))
+          roomLineUpBoardId: {
+            in: roomParticipant.flatMap((e) =>
+              e.roomLineUpBoardId ? [ e.roomLineUpBoardId ] : []
+            )
           }
         }
       });
@@ -102,7 +103,6 @@ export class AdminRoomsService {
         },
         data: req
       });
-
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -110,12 +110,9 @@ export class AdminRoomsService {
 
   async delete(roomId: string) {
     try {
-
-        return await this.prisma.room.delete({ where: { id: roomId } });
-
+      return await this.prisma.room.delete({ where: { id: roomId } });
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
-
 }

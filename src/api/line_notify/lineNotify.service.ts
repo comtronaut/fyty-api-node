@@ -161,7 +161,9 @@ export class NotifyService {
       const manager = await this.prisma.user.findMany({
         where: {
           id: {
-            in: member.flatMap((e) => (e.role === MemberRole.MANAGER ? [ e.userId ] : []))
+            in: member.flatMap((e) =>
+              e.role === MemberRole.MANAGER ? [ e.userId ] : []
+            )
           }
         }
       });

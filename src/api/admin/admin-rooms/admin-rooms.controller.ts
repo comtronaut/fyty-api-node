@@ -10,57 +10,51 @@ import {
   UseGuards
 } from "@nestjs/common";
 import { AdminJwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
-import {
-  CreateRoomDto,
-  UpdateRoomDto,
-} from "src/model/dto/room/room.dto";
+import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room/room.dto";
 import { AdminRoomsService } from "./admin-rooms.service";
-
 
 @Controller("api/rooms")
 export class AdminRoomsController {
-  constructor(
-    private readonly roomService: AdminRoomsService,
-  ) {}
+  constructor(private readonly roomService: AdminRoomsService) {}
 
   @UseGuards(AdminJwtAuthGuard)
   @Get()
   async getRooms() {
-    return await this.roomService.getAllRooms();  
+    return await this.roomService.getAllRooms();
   }
 
-  //CRUD
+  // CRUD
   // @UseGuards(AdminJwtAuthGuard)
   // @Post()
   // async createRoom(@Body() req: CreateRoomDto) {
   //   return await this.roomService.create(req);
   // }
 
-
   @UseGuards(AdminJwtAuthGuard)
   @Get("/:id")
   async getRoomsById(@Param("id") roomId: string) {
-    return await this.roomService.getRoom(roomId);  
+    return await this.roomService.getRoom(roomId);
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @Get("/:id/participants")
   async getRoomParticipantsById(@Param("id") roomId: string) {
-    return await this.roomService.getRoomParticipants(roomId);  
+    return await this.roomService.getRoomParticipants(roomId);
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @Get("/:id/roomlineup")
   async getRoomLineUpById(@Param("id") roomId: string) {
-    return await this.roomService.getRoomLineUp(roomId);  
+    return await this.roomService.getRoomLineUp(roomId);
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @Put("/:id")
   async updateRoomsById(
     @Param("id") roomId: string,
-    @Body() payload: UpdateRoomDto ) {
-    return await this.roomService.update(roomId, payload);  
+    @Body() payload: UpdateRoomDto
+  ) {
+    return await this.roomService.update(roomId, payload);
   }
 
   @UseGuards(AdminJwtAuthGuard)
@@ -68,5 +62,4 @@ export class AdminRoomsController {
   async deleteRoom(@Param("id") roomId: string) {
     return await this.roomService.delete(roomId);
   }
-
 }

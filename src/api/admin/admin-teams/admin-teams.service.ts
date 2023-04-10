@@ -32,7 +32,6 @@ export class AdminTeamsService {
         where: { id: teamId },
         data: payload
       });
-  
     } catch (error) {
       throw new BadRequestException(error.message);
     }

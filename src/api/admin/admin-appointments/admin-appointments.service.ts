@@ -1,7 +1,10 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
-import { CreateAppointmentDto, UpdateAppointmentDto } from "src/model/dto/appointment.dto";
+import {
+  CreateAppointmentDto,
+  UpdateAppointmentDto
+} from "src/model/dto/appointment.dto";
 import { UpdateUserDto } from "src/model/dto/user.dto";
 import { PrismaService } from "src/services/prisma.service";
 
@@ -17,7 +20,7 @@ export class AdminAppointmentsService {
     }
   }
 
-  //CRUD
+  // CRUD
   async create(req: CreateAppointmentDto) {
     try {
       const room = await this.prisma.room.findUniqueOrThrow({
@@ -69,7 +72,6 @@ export class AdminAppointmentsService {
       throw new BadRequestException(error.message);
     }
   }
-
 
   async update(appointmentId: string, payload: UpdateAppointmentDto) {
     try {

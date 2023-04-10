@@ -33,13 +33,13 @@ export class AdminTeamsController {
     @Param("id") teamId: string,
     @Body() payload: UpdateTeamDto
   ) {
-    return await this.adminTeamsService.updateTeamDetail(teamId,payload);
+    return await this.adminTeamsService.updateTeamDetail(teamId, payload);
   }
 
   // constraint
   @Delete(":id")
   @UseGuards(AdminJwtAuthGuard)
-  async deleteTeam(@Param("id") teamId: string){
+  async deleteTeam(@Param("id") teamId: string) {
     return await this.adminTeamsService.deleteTeam(teamId);
   }
 }

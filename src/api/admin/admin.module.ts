@@ -11,6 +11,12 @@ import { AdminAppoinmentsModule } from "./admin-appointments/admin-appointments.
 @Module({
   controllers: [ AdminController ],
   providers: [ AdminService, PrismaService ],
-  imports: [ AdminGamesModule, AdminUsersModule, AdminTeamsModule, AdminRoomrsModule, AdminAppoinmentsModule ]
+  imports: [
+    AdminGamesModule,
+    AdminUsersModule,
+    AdminTeamsModule,
+    AdminRoomrsModule,
+    AdminAppoinmentsModule
+  ]
 })
 export class AdminModule {}

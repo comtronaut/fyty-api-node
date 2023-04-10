@@ -1,4 +1,6 @@
 remote_host := 159.223.80.31
+prod_port := 8001
+dev_port := 8002
 app_name := fyty-api
 app_name_dev := fyty-api-dev
 
@@ -20,7 +22,7 @@ docker-deploy:
     &&  docker rmi -f ${app_name}:latest 2>/dev/null || true \
     &&  docker load < /root/${app_name}.tar \
     &&  rm /root/${app_name}.tar \
-    &&  docker run -d -p 80:80 -p 443:443 --name ${app_name} -t ${app_name}'
+    &&  docker run -d -p ${prod_port}:${prod_port} --name ${app_name} -t ${app_name}'
 docker-deploy-dev:
 	docker build -t ${app_name_dev} -f ./docker/dockerfile.dev .
 	docker save ${app_name_dev} > ${app_name_dev}.tar
@@ -31,6 +33,6 @@ docker-deploy-dev:
     &&  docker rmi -f ${app_name_dev}:latest 2>/dev/null || true \
     &&  docker load < /root/${app_name_dev}.tar \
     &&  rm /root/${app_name_dev}.tar \
-    &&  docker run -d -p 8080:8080 --name ${app_name_dev} -t ${app_name_dev}'
+    &&  docker run -d -p ${dev_port}:${dev_port} --name ${app_name_dev} -t ${app_name_dev}'
 remote-ssh:
 	ssh -t ${remote_host} '$m'

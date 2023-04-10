@@ -7,10 +7,13 @@ import {
   Put,
   Post,
   UseGuards
-} from "@nestjs/common";;
+} from "@nestjs/common";
 import { AdminJwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { AdminAppointmentsService } from "./admin-appointments.service";
-import { CreateAppointmentDto, UpdateAppointmentDto } from "src/model/dto/appointment.dto";
+import {
+  CreateAppointmentDto,
+  UpdateAppointmentDto
+} from "src/model/dto/appointment.dto";
 
 @Controller("admins/api/users")
 export class AdminAppointmentsController {
@@ -22,7 +25,7 @@ export class AdminAppointmentsController {
     return this.appointmentService.getAllAppointment();
   }
 
-  //CRUD
+  // CRUD
   // @UseGuards(AdminJwtAuthGuard)
   // @Post()
   // async crate(@Body() req: CreateAppointmentDto) {
@@ -40,8 +43,6 @@ export class AdminAppointmentsController {
   async getAppointmentMember(@Param("id") appointmentId: string) {
     return this.appointmentService.getAppointmentMember(appointmentId);
   }
-
-
 
   @UseGuards(AdminJwtAuthGuard)
   @Put(":id")
