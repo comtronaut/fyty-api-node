@@ -9,10 +9,10 @@ import { PrismaService } from "src/services/prisma.service";
 export class RoomService {
   constructor(private readonly prisma: PrismaService) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_MINUTE, { timeZone: "Asia/Bangkok" })
   async handleCron() {
     try {
-      const timestamp = dayjs().add(1, "m").toDate();
+      const timestamp = dayjs().add(30, "second").toDate();
 
       const rooms = await this.prisma.room.findMany({
         where: {
@@ -26,24 +26,25 @@ export class RoomService {
         return;
       }
 
-      await this.prisma.room.deleteMany({
-        where: {
-          endAt: {
-            lte: timestamp
+      await Promise.all([
+        this.prisma.room.deleteMany({
+          where: {
+            endAt: {
+              lte: timestamp
+            }
           }
-        }
-      });
-
-      await this.prisma.appointment.updateMany({
-        where: {
-          roomId: {
-            in: rooms.map((room) => room.id)
-          }
-        },
-        data: { isDel: true }
-      });
+        }),
+        this.prisma.appointment.updateMany({
+          where: {
+            roomId: {
+              in: rooms.map((room) => room.id)
+            }
+          },
+          data: { isDel: true }
+        })
+      ]);
     } catch (err) {
-      throw new BadRequestException(err.message);
+      console.error(err.message);
     }
   }
 

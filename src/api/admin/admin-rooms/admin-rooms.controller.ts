@@ -13,7 +13,7 @@ import { AdminJwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
 import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room/room.dto";
 import { AdminRoomsService } from "./admin-rooms.service";
 
-@Controller("api/rooms")
+@Controller("admins/api/rooms")
 export class AdminRoomsController {
   constructor(private readonly roomService: AdminRoomsService) {}
 
