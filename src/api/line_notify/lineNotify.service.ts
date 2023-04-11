@@ -28,7 +28,7 @@ export class NotifyService {
   ): Promise<void> {
     const clientId = "pyQHEFXVPWHQhVXee6dFEv";
     // callback url
-    const callbackUri = "http://localhost:3000/callback";
+    const callbackUri = "https://www.fyty-esport.com/line-notify-callback";
 
     const queryParams = new URLSearchParams({
       response_type: "code",
@@ -65,7 +65,7 @@ export class NotifyService {
 
   async callback(code: string, state: string) {
     // callback url
-    const redirectUri = "http://localhost:3000/callback";
+    const redirectUri = "https://www.fyty-esport.com/line-notify-callback";
     const CLIENT_ID = "pyQHEFXVPWHQhVXee6dFEv";
     const CLIENT_SECRET = "BWH2rJcYWeTco1A7c76I7tlYfPmyeDs8htlEiyjQzrf";
 
