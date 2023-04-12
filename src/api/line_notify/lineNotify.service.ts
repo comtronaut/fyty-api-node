@@ -1,16 +1,16 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException
-} from "@nestjs/common";
+import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { MemberRole } from "@prisma/client";
 import axios from "axios";
 import env from "src/common/env.config";
 import { PrismaService } from "src/services/prisma.service";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class NotifyService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
+  ) {}
 
   async sendNotification(message: string, token: string): Promise<void> {
     const url = "https://notify-api.line.me/api/notify";
@@ -19,7 +19,7 @@ export class NotifyService {
     try {
       await axios.postForm(url, { message }, { headers });
     } catch (error) {
-      throw new BadRequestException("Failed to send notification");
+      throw new Error("Failed to send notification");
     }
   }
 
@@ -55,9 +55,9 @@ export class NotifyService {
     try {
       // get lineNotify token
       const token = await this.authenticate(code);
-
+      
       // update line_token in user
-      await this.prisma.user.update({
+      const res = await this.prisma.user.update({
         where: {
           id: state
         },
@@ -65,8 +65,10 @@ export class NotifyService {
           lineToken: token.access_token
         }
       });
+
+      await this.cacheManager.set(`user:${state}`, res);
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      console.error(error);
     }
   }
 

@@ -82,13 +82,13 @@ export class UserService {
     }
   }
 
-  async update(user: User, data: UpdateUserDto) {
+  async update(id: string, data: UpdateUserDto) {
     try {
       const { phoneNumber, ...updateData } = data;
 
       const res = await this.prisma.user.update({
         where: {
-          id: user.id
+          id
         },
         data: {
           ...updateData,
@@ -100,7 +100,7 @@ export class UserService {
         }
       });
 
-      await this.cacheManager.set(`user:${user.id}`, res);
+      await this.cacheManager.set(`user:${id}`, res);
 
       return res;
     } catch (err) {

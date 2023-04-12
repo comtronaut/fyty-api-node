@@ -120,7 +120,7 @@ export class AuthService {
         throw new UnauthorizedException("username or password is incorrect.");
       }
 
-      await this.userService.update(user, {
+      await this.userService.update(user.id, {
         lastLoginAt: new Date(),
         ...(!user.firstLoginAt && { firstLoginAt: new Date() })
       });

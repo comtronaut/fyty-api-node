@@ -34,6 +34,8 @@ export class CreateUserDto implements Prisma.UserUncheckedCreateInput {
   @IsNotEmpty()
   phoneNumber: string;
 
+  lineToken?: string | null;
+
   lastLoginAt: Date;
 
   firstLoginAt: Date;
