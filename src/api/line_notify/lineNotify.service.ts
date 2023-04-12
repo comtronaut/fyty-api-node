@@ -1,6 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException
+} from "@nestjs/common";
 import { MemberRole } from "@prisma/client";
 import axios from "axios";
+import env from "src/common/env.config";
 import { PrismaService } from "src/services/prisma.service";
 
 @Injectable()
@@ -12,74 +17,47 @@ export class NotifyService {
     const headers = { Authorization: `Bearer ${token}` };
 
     try {
-      // use lineNotify API
       await axios.postForm(url, { message }, { headers });
-      console.log("success");
     } catch (error) {
-      console.error(error);
-      console.log("error");
-      throw new Error("Failed to send notification");
+      throw new BadRequestException("Failed to send notification");
     }
   }
 
-  async getLine(
-    res: { redirect: (arg0: string) => void },
-    userId: string
-  ): Promise<void> {
-    const clientId = "pyQHEFXVPWHQhVXee6dFEv";
-    // callback url
-    const callbackUri = "https://www.fyty-esport.com/line-notify-callback";
-
+  async getAuthorizeUrl(userId: string): Promise<string> {
     const queryParams = new URLSearchParams({
       response_type: "code",
-      client_id: clientId,
-      redirect_uri: callbackUri,
+      client_id: env.LINE_NOTIFY_CLIENT_ID,
+      redirect_uri: env.LINE_NOTIFY_REDIRECT_URI,
       scope: "notify",
       state: userId
     });
 
-    const authorizeUrl = `https://notify-bot.line.me/oauth/authorize?${queryParams.toString()}`;
-    res.redirect(authorizeUrl);
+    return `https://notify-bot.line.me/oauth/authorize?${queryParams.toString()}`;
   }
 
-  async authenticate(
-    code: string,
-    clientId: string,
-    clientSecret: string,
-    redirectUri: string
-  ) {
+  async authenticate(code: string) {
     // use lineNotify API
     const response = await axios.postForm(
       "https://notify-bot.line.me/oauth/token",
       {
         grant_type: "authorization_code",
         code,
-        redirect_uri: redirectUri,
-        client_id: clientId,
-        client_secret: clientSecret
+        redirect_uri: env.LINE_NOTIFY_REDIRECT_URI,
+        client_id: env.LINE_NOTIFY_CLIENT_ID,
+        client_secret: env.LINE_NOTIFY_CLIENT_SECRET
       }
     );
 
     return response.data;
   }
 
-  async callback(code: string, state: string) {
-    // callback url
-    const redirectUri = "https://www.fyty-esport.com/line-notify-callback";
-    const CLIENT_ID = "pyQHEFXVPWHQhVXee6dFEv";
-    const CLIENT_SECRET = "BWH2rJcYWeTco1A7c76I7tlYfPmyeDs8htlEiyjQzrf";
-
+  async callback(code: string, state: string): Promise<void> {
     try {
       // get lineNotify token
-      const token = await this.authenticate(
-        code,
-        CLIENT_ID,
-        CLIENT_SECRET,
-        redirectUri
-      );
+      const token = await this.authenticate(code);
 
       // update line_token in user
-      const res = await this.prisma.user.update({
+      await this.prisma.user.update({
         where: {
           id: state
         },
@@ -87,10 +65,8 @@ export class NotifyService {
           lineToken: token.access_token
         }
       });
-
-      return res;
     } catch (error) {
-      console.error("Error occurred while authenticating:", error);
+      throw new InternalServerErrorException(error);
     }
   }
 
@@ -113,7 +89,7 @@ export class NotifyService {
 
     users.map((e) => {
       if (e.lineToken !== null) {
-        this.sendNotification("คุณได้รับการนัดหมายแล้ว", e.lineToken);
+        void this.sendNotification("คุณได้รับการนัดหมายแล้ว", e.lineToken);
       }
     });
   }
@@ -141,7 +117,7 @@ export class NotifyService {
 
     users.map((e) => {
       if (e.lineToken !== null) {
-        this.sendNotification("คุณได้รับการร้องขอเข้าห้อง", e.lineToken);
+        void this.sendNotification("คุณได้รับการร้องขอเข้าห้อง", e.lineToken);
       }
     });
   }
@@ -151,7 +127,7 @@ export class NotifyService {
     userId: string,
     status: string
   ) {
-    if (status == "pending") {
+    if (status === "pending") {
       const member = await this.prisma.teamMember.findMany({
         where: {
           teamId
@@ -171,18 +147,21 @@ export class NotifyService {
       if (manager.length > 1) {
         manager.map((e) => {
           if (e.lineToken !== null) {
-            this.sendNotification("คุณได้รับการร้องขอเข้าทีม", e.lineToken);
+            void this.sendNotification(
+              "คุณได้รับการร้องขอเข้าทีม",
+              e.lineToken
+            );
           }
         });
       } else {
         if (manager !== null && manager[0].lineToken !== null) {
-          this.sendNotification(
+          void this.sendNotification(
             "คุณได้รับการร้องขอเข้าทีม",
             manager[0].lineToken
           );
         }
       }
-    } else if (status == "invitation") {
+    } else if (status === "invitation") {
       const user = await this.prisma.user.findFirst({
         where: {
           id: userId
@@ -190,7 +169,7 @@ export class NotifyService {
       });
 
       if (user !== null && user.lineToken !== null) {
-        this.sendNotification("คุณได้รับการเชิญเข้าทีม", user.lineToken);
+        void this.sendNotification("คุณได้รับการเชิญเข้าทีม", user.lineToken);
       }
     }
   }
@@ -237,7 +216,7 @@ export class NotifyService {
 
     users.map((e) => {
       if (e.lineToken !== null) {
-        this.sendNotification("คุณได้รับข้อความใหม่", e.lineToken);
+        void this.sendNotification("คุณได้รับข้อความใหม่", e.lineToken);
       }
     });
   }

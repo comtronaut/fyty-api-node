@@ -1,22 +1,14 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Res,
-  UseGuards,
-  Query
-} from "@nestjs/common";
+import { Body, Controller, Get, Post, Query, Res } from "@nestjs/common";
+import { Response } from "express";
 import { NotifyService } from "./lineNotify.service";
-import { UserJwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
-import { UserSubject } from "src/common/subject.decorator";
-import { User } from "@prisma/client";
+import { Debug } from "src/common/debug.decorator";
 
 @Controller("notify")
 export class LineNotifyController {
   constructor(private lineNotifyService: NotifyService) {}
 
   @Post()
+  @Debug()
   async sendNotification(
     @Body("message") message: string,
     @Body("token") token: string
@@ -26,9 +18,10 @@ export class LineNotifyController {
 
   @Get()
   async getLine(
-    @Res() res: any,
+    @Res() res: Response,
     @Query("user_id") state: string
   ): Promise<void> {
-    await this.lineNotifyService.getLine(res, state);
+    const url = await this.lineNotifyService.getAuthorizeUrl(state);
+    res.redirect(url);
   }
 }

@@ -9,22 +9,20 @@ import {
   Query,
   UseGuards
 } from "@nestjs/common";
-import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
+import { User } from "@prisma/client";
+import { UserJwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
+import { Debug } from "src/common/debug.decorator";
 import { UserSubject } from "src/common/subject.decorator";
-import { UserService } from "./user.service";
+import { UpdateUserSettingsDto } from "src/model/dto/user-settings.dto";
 import {
   CreateUserAvatarDto,
-  UpdateUserAvatarDto
+  CreateUserDto,
+  UpdateUserAvatarDto,
+  UpdateUserDto
 } from "src/model/dto/user.dto";
 import { UserAvatarService } from "./user-avatars/avatar.service";
-import {
-  AdminJwtAuthGuard,
-  UserJwtAuthGuard
-} from "src/auth/guard/jwt-auth.guard";
-import { Debug } from "src/common/debug.decorator";
-import { User } from "@prisma/client";
 import { UserSettingsService } from "./user-settings/user-settings.service";
-import { UpdateUserSettingsDto } from "src/model/dto/user-settings.dto";
+import { UserService } from "./user.service";
 
 @Controller("api/users")
 export class UserController {
