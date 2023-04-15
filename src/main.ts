@@ -11,7 +11,9 @@ async function bootstrap() {
     cors: true
   });
 
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({ transform: true, forbidNonWhitelisted: true })
+  );
   app.use(json({ limit: "50mb" }));
   app.use(urlencoded({ extended: true, limit: "50mb" }));
 

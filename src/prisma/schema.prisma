@@ -16,6 +16,11 @@ generator dbml {
 }
 
 // enums
+enum Lang {
+  TH
+  EN
+}
+
 enum RoomStatus {
   AVAILABLE
   UNAVAILABLE
@@ -29,25 +34,43 @@ enum MemberRole {
   MEMBER
 }
 
+enum MatchingResult {
+  WIN
+  LOSE
+  TIE
+}
+
+enum PendingStatus {
+  INCOMING
+  OUTGOING
+}
+
+enum AppointmentStatus {
+  WAITING
+  TRAINING
+  DISMISSED
+  DONE
+}
+
 enum AdminRole {
   MANAGEMENT
 }
 
 // game
 model Game {
-  id        String @id
-  name      String @unique
+  id        String  @id
+  name      String  @unique
   teamCap   Int
   lineupCap Int
   logoUrl   String
   coverUrl  String
-  desc      String @default("")
+  isActive  Boolean @default(true)
+  desc      String  @default("")
 
-  teams            Team[]
-  rooms            Room[]
-  userAvatars      UserAvatar[]
-  reviews          Review[]
-  roomParticipants RoomParticipant[]
+  teams       Team[]
+  rooms       Room[]
+  userAvatars UserAvatar[]
+  reviews     Review[]
 }
 
 // room
@@ -58,68 +81,58 @@ model Room {
   option    String     @default("")
   startAt   DateTime
   endAt     DateTime
+  isPrivate Boolean    @default(false)
   teamCount Int        @default(1)
   note      String     @default("")
-  game      Game       @relation(fields: [gameId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  game      Game       @relation(fields: [gameId], references: [id], onUpdate: Cascade)
   gameId    String
   host      Team       @relation(fields: [hostId], references: [id], onUpdate: Cascade)
   hostId    String
+  updatedAt DateTime   @updatedAt
   createdAt DateTime   @default(now())
 
-  notes        RoomNote[]
-  requests     RoomRequest[]
-  participants RoomParticipant[]
+  pendings     RoomPending[]
+  participants RoomMember[]
   chat         Chat?
-  appointments Appointment[]
+  appointment  Appointment?
+  lineups      RoomLineup[]
+  settings     RoomSettings?
 }
 
-model RoomParticipant {
-  id                String          @id @default(uuid())
-  team              Team            @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  teamId            String
-  room              Room            @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  roomId            String
-  game              Game            @relation(fields: [gameId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  gameId            String
-  roomLineUpBoard   RoomLineupBoard @relation(fields: [roomLineUpBoardId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  roomLineUpBoardId String
-  joinedAt          DateTime        @default(now())
+model RoomSettings {
+  id     String @id @default(uuid())
+  room   Room   @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomId String @unique
 }
 
-model RoomNote {
-  id        String   @id @default(uuid())
-  room      Room     @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  roomId    String
-  topic     String
-  body      String   @default("")
-  createdAt DateTime @default(now())
+model RoomMember {
+  id       String   @id @default(uuid())
+  team     Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId   String
+  room     Room     @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomId   String
+  joinedAt DateTime @default(now())
+
+  roomLineups RoomLineup[]
 }
 
 model RoomLineup {
-  id                String          @id @default(uuid())
-  teamLineUp        TeamLineUp?     @relation(fields: [teamLineUpId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  teamLineUpId      String?
-  roomLineUpBoard   RoomLineupBoard @relation(fields: [roomLineUpBoardId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  roomLineUpBoardId String
+  id           String     @id @default(uuid())
+  teamLineup   TeamLineup @relation(fields: [teamLineupId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamLineupId String
+  roomMember   RoomMember @relation(fields: [roomMemberId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomMemberId String
+  room         Room       @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomId       String
 }
 
-model RoomLineupBoard {
-  id String @id @default(uuid())
-
-  roomRequests     RoomRequest[]
-  roomLineUps      RoomLineup[]
-  roomParticipants RoomParticipant[]
-}
-
-model RoomRequest {
-  id                String          @id @default(uuid())
-  team              Team            @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  teamId            String
-  room              Room            @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  roomId            String
-  roomLineUpBoard   RoomLineupBoard @relation(fields: [roomLineUpBoardId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  roomLineUpBoardId String
-  joinedAt          DateTime        @default(now())
+model RoomPending {
+  id     String        @id @default(uuid())
+  team   Team          @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId String
+  room   Room          @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomId String
+  status PendingStatus @default(INCOMING)
 }
 
 // team
@@ -131,21 +144,30 @@ model Team {
   tier      String   @default("")
   game      Game     @relation(fields: [gameId], references: [id], onUpdate: Cascade)
   gameId    String
-  owner     User     @relation(fields: [ownerId], references: [id], onUpdate: Cascade)
-  ownerId   String
+  owner     User?    @relation(fields: [ownerId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  ownerId   String?
+  isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  lineups            TeamLineUp[]
-  pending            TeamPending[]
+  lineups            TeamLineup[]
+  pendings           TeamPending[]
   members            TeamMember[]
   roomHosts          Room[]
-  roomRequests       RoomRequest[]
-  roomParticipants   RoomParticipant[]
+  roomPendings       RoomPending[]
+  roomMembers        RoomMember[]
   messages           Message[]
   appointmentMembers AppointmentMember[]
-  matchHistoryHosts  MatchHistory[]      @relation("host")
-  matchHistoryGuests MatchHistory[]      @relation("guest")
-  statistic          TeamStatistic[]
+  matchingHosts      Matching[]          @relation("host")
+  matchingGuests     Matching[]          @relation("guest")
+  stats              TeamStats?
+  settings           TeamSettings?
+}
+
+model TeamSettings {
+  id               String  @id @default(uuid())
+  team             Team    @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId           String  @unique
+  isJoiningEnabled Boolean @default(true)
 }
 
 model TeamMember {
@@ -158,7 +180,7 @@ model TeamMember {
   joinedAt DateTime   @default(now())
 }
 
-model TeamLineUp {
+model TeamLineup {
   id         String      @id @default(uuid())
   team       Team        @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   teamId     String
@@ -171,23 +193,24 @@ model TeamLineUp {
   name       String      @default("new player")
   note       String      @default("")
 
-  roomLineUps RoomLineup[]
+  roomLineups RoomLineup[]
 }
 
 model TeamPending {
-  id       String   @id @default(uuid())
-  team     Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  teamId   String
-  user     User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  userId   String
-  status   String   @default("pending")
-  createAt DateTime @default(now())
+  id        String        @id @default(uuid())
+  team      Team          @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId    String
+  user      User          @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId    String
+  status    PendingStatus @default(INCOMING)
+  createdAt DateTime      @default(now())
 }
 
 // user
 model User {
   id                String    @id @default(uuid())
   username          String    @unique
+  phoneNumber       String    @unique
   updatedUsernameAt DateTime?
   password          String
   displayName       String
@@ -199,7 +222,7 @@ model User {
   facebookId        String?   @unique
   googleId          String?   @unique
   lineId            String?   @unique
-  lineToken        String?   @unique
+  lineToken         String?   @unique
   firstLoginAt      DateTime?
   lastLoginAt       DateTime?
   createdAt         DateTime  @default(now())
@@ -212,7 +235,7 @@ model User {
   reviewers            Review[]              @relation("reviewer")
   reviewees            Review[]              @relation("reviewee")
   messages             Message[]
-  userSettings         UserSettings?
+  settings             UserSettings?
   passwordResetSession PasswordResetSession?
 }
 
@@ -223,7 +246,7 @@ model UserSettings {
   isTeamNotified Boolean @default(true)
   isMeNotified   Boolean @default(true)
   isRoomNotified Boolean @default(true)
-  lang           String
+  lang           Lang    @default(TH)
 }
 
 model PasswordResetSession {
@@ -239,24 +262,24 @@ model PasswordResetSession {
 
 model UserAvatar {
   id            String  @id @default(uuid())
-  ingameId      String
+  inGameId      String
   characterName String  @default("")
   rank          String
   ratingScore   Decimal @default(0.0)
   game          Game    @relation(fields: [gameId], references: [id], onUpdate: Cascade)
   gameId        String
-  user          User    @relation(fields: [userId], references: [id], onUpdate: Cascade)
+  user          User    @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userId        String
 
-  teamLineups TeamLineUp[]
+  teamLineups TeamLineup[]
 }
 
 model Review {
   id          String   @id @default(uuid())
   content     String
   ratingScore Decimal  @default(0.0)
-  reviewer    User     @relation(fields: [reviewerId], references: [id], onUpdate: Cascade, onDelete: Cascade, name: "reviewer")
-  reviewerId  String
+  reviewer    User?    @relation(fields: [reviewerId], references: [id], onUpdate: Cascade, onDelete: SetNull, name: "reviewer")
+  reviewerId  String?
   reviewee    User     @relation(fields: [revieweeId], references: [id], onUpdate: Cascade, onDelete: Cascade, name: "reviewee")
   revieweeId  String
   game        Game     @relation(fields: [gameId], references: [id], onUpdate: Cascade)
@@ -266,23 +289,25 @@ model Review {
 
 // appointment
 model Appointment {
-  id      String   @id @default(uuid())
-  startAt DateTime
-  endAt   DateTime
-  status  String   @default("")
-  isDel   Boolean  @default(false)
-  room    Room?    @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: SetNull)
-  roomId  String?
+  id        String            @id @default(uuid())
+  startAt   DateTime
+  endAt     DateTime
+  status    AppointmentStatus @default(WAITING)
+  isDeleted Boolean           @default(false)
+  room      Room?             @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  roomId    String?           @unique
+  createdAt DateTime          @default(now())
 
-  members AppointmentMember[]
+  members  AppointmentMember[]
+  matching Matching?
 }
 
 model AppointmentMember {
-  id        String       @id @default(uuid())
-  team      Team         @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  teamId    String
-  appoint   Appointment? @relation(fields: [appointId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  appointId String?
+  id            String       @id @default(uuid())
+  team          Team         @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId        String
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  appointmentId String?
 }
 
 // chat
@@ -307,21 +332,35 @@ model Message {
 }
 
 // stats
-model MatchHistory {
-  id       String @id @default(uuid())
-  host     Team   @relation(fields: [hostId], references: [id], onUpdate: Cascade, onDelete: Cascade, name: "host")
-  hostId   String
-  guest    Team   @relation(fields: [guestId], references: [id], onUpdate: Cascade, onDelete: Cascade, name: "guest")
-  guestId  String
-  hostWin  Int    @default(0)
-  hostlose Int    @default(0)
-  result   String @default("tie")
+model Matching {
+  id            String         @id @default(uuid())
+  appointment   Appointment    @relation(fields: [appointmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  appointmentId String         @unique
+  host          Team?          @relation(fields: [hostId], references: [id], onUpdate: Cascade, onDelete: SetNull, name: "host")
+  hostId        String?
+  guest         Team?          @relation(fields: [guestId], references: [id], onUpdate: Cascade, onDelete: SetNull, name: "guest")
+  guestId       String?
+  hostWinCount  Int            @default(0)
+  hostLoseCount Int            @default(0)
+  result        MatchingResult @default(TIE)
+
+  reports MathingReport[]
 }
 
-model TeamStatistic {
+model MathingReport {
+  id         String   @id @default(uuid())
+  matching   Matching @relation(fields: [matchingId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  matchingId String   @unique
+  heading    String
+  content    String
+  images     String[]
+  createdAt  DateTime @default(now())
+}
+
+model TeamStats {
   id       String   @id @default(uuid())
   team     Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  teamId   String
+  teamId   String   @unique
   matches  Int      @default(0)
   win      Int      @default(0)
   lose     Int      @default(0)
@@ -332,11 +371,6 @@ model TeamStatistic {
 // misc.
 model Image {
   id String @id @default(uuid())
-}
-
-model PhoneNumber {
-  id          String @id @default(uuid())
-  phoneNumber String @unique
 }
 
 // admin
