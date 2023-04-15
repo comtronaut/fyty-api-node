@@ -17,7 +17,7 @@ export class TeamService {
         throw new Error("You already have team");
       }
 
-      req.ownerId = user.id; // set the team's owner
+      req.founderId = user.id; // set the team's owner
       const team = await this.prisma.team.create({ data: req });
 
       await this.prisma.teamMember.create({
@@ -64,15 +64,15 @@ export class TeamService {
     return await this.prisma.team.findMany();
   }
 
-  async update(ownerId: string, data: UpdateTeamDto): Promise<Team> {
+  async update(payload: UpdateTeamDto): Promise<Team> {
     try {
       await this.prisma.team.update({
-        where: { id: data.id },
-        data
+        where: { id: payload.id },
+        data: payload
       });
 
       const updatedTeam = await this.prisma.team.findFirstOrThrow({
-        where: { id: data.id }
+        where: { id: payload.id }
       });
 
       return updatedTeam;

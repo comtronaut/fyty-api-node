@@ -5,15 +5,9 @@ import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class MessageService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly lineNotify: NotifyService
-  ) {}
+  constructor(private readonly prisma: PrismaService, private readonly lineNotify: NotifyService) {}
 
-  async create({
-    waitingKey,
-    ...data
-  }: CreateMessageDto & { waitingKey: string }) {
+  async create({ waitingKey, ...data }: CreateMessageDto & { waitingKey: string }) {
     void this.lineNotify.searchUserForChatNotify(data.chatId, data.teamId);
 
     return await this.prisma.message.create({ data });

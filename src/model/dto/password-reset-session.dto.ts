@@ -16,8 +16,6 @@ implements Prisma.PasswordResetSessionUncheckedCreateInput
   expiredAt: Date;
 }
 
-export class UpdatePasswordResetSessionDto extends PartialType(
-  CreatePasswordResetSessionDto
-) {}
+export class UpdatePasswordResetSessionDto extends PartialType(CreatePasswordResetSessionDto) {}
 
 export const schemas = validationMetadatasToSchemas();

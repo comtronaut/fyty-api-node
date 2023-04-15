@@ -3,9 +3,7 @@ import { Lang, Prisma } from "@prisma/client";
 import { IsEnum, IsNotEmpty, IsOptional, IsUUID } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateUserSettingsDto
-implements Prisma.UserSettingsUncheckedCreateInput
-{
+export class CreateUserSettingsDto implements Prisma.UserSettingsUncheckedCreateInput {
   @IsNotEmpty()
   @IsUUID()
   userId: string;

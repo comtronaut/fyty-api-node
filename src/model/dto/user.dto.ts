@@ -1,6 +1,14 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { Prisma } from "@prisma/client";
-import { IsEmail, IsISO8601, IsMobilePhone, IsNotEmpty, IsOptional, IsUrl, MinLength } from "class-validator";
+import {
+  IsEmail,
+  IsISO8601,
+  IsMobilePhone,
+  IsNotEmpty,
+  IsOptional,
+  IsUrl,
+  MinLength
+} from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
 export class CreateUserDto implements Prisma.UserUncheckedCreateInput {

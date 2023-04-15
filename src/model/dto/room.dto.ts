@@ -7,9 +7,10 @@ import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 export class CreateRoomDto implements Prisma.RoomUncheckedCreateInput {
   @IsNotEmpty()
   name: string;
-  
+
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === "true")
   isPrivate: boolean;
 
   @IsNotEmpty()
@@ -32,7 +33,7 @@ export class CreateRoomDto implements Prisma.RoomUncheckedCreateInput {
 
   @IsNotEmpty()
   @IsUUID()
-  hostId: string;
+  hostTeamId: string;
 }
 
 export class UpdateRoomDto extends PartialType(CreateRoomDto) {}

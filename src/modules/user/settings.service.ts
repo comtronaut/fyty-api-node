@@ -1,9 +1,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
+import { Lang } from "@prisma/client";
 
-import {
-  CreateUserSettingsDto,
-  UpdateUserSettingsDto
-} from "src/model/dto/user-settings.dto";
+import { CreateUserSettingsDto, UpdateUserSettingsDto } from "src/model/dto/user-settings.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
@@ -16,11 +14,7 @@ export class UserSettingsService {
         where: { userId }
       });
 
-      if (!userSettings) {
-        return await this.create({ userId, lang: "th" });
-      }
-
-      return userSettings;
+      return userSettings ?? (await this.create({ userId, lang: Lang.TH }));
     } catch (err) {
       throw new BadRequestException(err.message);
     }

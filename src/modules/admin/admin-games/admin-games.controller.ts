@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Param,
-  Post,
-  Put,
-  UseGuards
-} from "@nestjs/common";
+import { Body, Controller, Delete, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { CreateGameDto, UpdateGameDto } from "src/model/dto/game.dto";
 import { AdminGamesService } from "./admin-games.service";

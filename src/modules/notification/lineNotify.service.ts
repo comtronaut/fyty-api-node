@@ -1,5 +1,5 @@
 import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
-import { MemberRole } from "@prisma/client";
+import { MemberRole, PendingStatus } from "@prisma/client";
 import axios from "axios";
 import env from "src/common/env.config";
 import { PrismaService } from "src/prisma/prisma.service";
@@ -37,16 +37,13 @@ export class NotifyService {
 
   async authenticate(code: string) {
     // use lineNotify API
-    const response = await axios.postForm(
-      "https://notify-bot.line.me/oauth/token",
-      {
-        grant_type: "authorization_code",
-        code,
-        redirect_uri: env.LINE_NOTIFY_REDIRECT_URI,
-        client_id: env.LINE_NOTIFY_CLIENT_ID,
-        client_secret: env.LINE_NOTIFY_CLIENT_SECRET
-      }
-    );
+    const response = await axios.postForm("https://notify-bot.line.me/oauth/token", {
+      grant_type: "authorization_code",
+      code,
+      redirect_uri: env.LINE_NOTIFY_REDIRECT_URI,
+      client_id: env.LINE_NOTIFY_CLIENT_ID,
+      client_secret: env.LINE_NOTIFY_CLIENT_SECRET
+    });
 
     return response.data;
   }
@@ -78,92 +75,88 @@ export class NotifyService {
         teamId: {
           in: memberIds
         }
-      }
-    });
-
-    const users = await this.prisma.user.findMany({
-      where: {
-        id: {
-          in: member.flatMap((e) => (e.userId ? [ e.userId ] : []))
+      },
+      select: {
+        user: {
+          select: {
+            lineToken: true
+          }
         }
       }
     });
 
-    users.map((e) => {
-      if (e.lineToken !== null) {
-        void this.sendNotification("คุณได้รับการนัดหมายแล้ว", e.lineToken);
+    const tokens = member.map((e) => e.user.lineToken);
+
+    for (const token of tokens) {
+      if (token) {
+        void this.sendNotification("คุณได้รับการนัดหมายแล้ว", token);
       }
-    });
+    }
   }
 
   async searchUserForRequestNotify(roomId: string) {
-    const team = await this.prisma.room.findFirst({
+    const roomRes = await this.prisma.room.findFirst({
       where: {
         id: roomId
-      }
-    });
-
-    const member = await this.prisma.teamMember.findMany({
-      where: {
-        teamId: team?.hostId
-      }
-    });
-
-    const users = await this.prisma.user.findMany({
-      where: {
-        id: {
-          in: member.flatMap((e) => (e.userId ? [ e.userId ] : []))
+      },
+      select: {
+        hostTeam: {
+          select: {
+            members: {
+              select: {
+                user: {
+                  select: {
+                    lineToken: true
+                  }
+                }
+              }
+            }
+          }
         }
       }
     });
 
-    users.map((e) => {
-      if (e.lineToken !== null) {
-        void this.sendNotification("คุณได้รับการร้องขอเข้าห้อง", e.lineToken);
+    const tokens = roomRes?.hostTeam.members.map((e) => e.user.lineToken) ?? [];
+
+    for (const token of tokens) {
+      if (token) {
+        void this.sendNotification("คุณได้รับการร้องขอเข้าห้อง", token);
       }
-    });
+    }
   }
 
-  async searchUserForTeamPendingNotify(
-    teamId: string,
-    userId: string,
-    status: string
-  ) {
-    if (status === "pending") {
+  async searchUserForTeamPendingNotify(teamId: string, userId: string, status: string) {
+    if (status === PendingStatus.INCOMING) {
       const member = await this.prisma.teamMember.findMany({
         where: {
-          teamId
-        }
-      });
-
-      const manager = await this.prisma.user.findMany({
-        where: {
-          id: {
-            in: member.flatMap((e) =>
-              e.role === MemberRole.MANAGER ? [ e.userId ] : []
-            )
+          teamId,
+          role: {
+            in: [ MemberRole.MANAGER, MemberRole.LEADER ]
+          }
+        },
+        select: {
+          user: {
+            select: {
+              lineToken: true
+            }
           }
         }
       });
 
-      if (manager.length > 1) {
-        manager.map((e) => {
+      const managerUsers = member.map((e) => e.user);
+
+      if (managerUsers.length > 1) {
+        managerUsers.map((e) => {
           if (e.lineToken !== null) {
-            void this.sendNotification(
-              "คุณได้รับการร้องขอเข้าทีม",
-              e.lineToken
-            );
+            void this.sendNotification("คุณได้รับการร้องขอเข้าทีม", e.lineToken);
           }
         });
       } else {
-        if (manager !== null && manager[0].lineToken !== null) {
-          void this.sendNotification(
-            "คุณได้รับการร้องขอเข้าทีม",
-            manager[0].lineToken
-          );
+        if (managerUsers !== null && managerUsers[0].lineToken !== null) {
+          void this.sendNotification("คุณได้รับการร้องขอเข้าทีม", managerUsers[0].lineToken);
         }
       }
-    } else if (status === "invitation") {
+    } else if (status === PendingStatus.OUTGOING) {
       const user = await this.prisma.user.findFirst({
         where: {
           id: userId
@@ -183,43 +176,36 @@ export class NotifyService {
       }
     });
 
-    const roomParticipant = await this.prisma.roomParticipant.findMany({
+    const roomMemberRes = await this.prisma.roomMember.findMany({
       where: {
-        roomId: chat?.roomId
-      }
-    });
-
-    const teams = await this.prisma.team.findMany({
-      where: {
-        id: {
-          in: roomParticipant.flatMap((e) => (e.teamId ? [ e.teamId ] : []))
-        },
-        NOT: {
-          id: teamId
+        roomId: chat?.roomId,
+        NOT: { teamId }
+      },
+      select: {
+        team: {
+          select: {
+            members: {
+              select: {
+                user: {
+                  select: {
+                    lineToken: true
+                  }
+                }
+              }
+            }
+          }
         }
       }
     });
 
-    const member = await this.prisma.teamMember.findMany({
-      where: {
-        teamId: {
-          in: teams.flatMap((e) => (e.id ? [ e.id ] : []))
-        }
-      }
-    });
+    const lineTokenOfOtherUsers = roomMemberRes.flatMap((e) =>
+      e.team.members.map((e) => e.user.lineToken)
+    );
 
-    const users = await this.prisma.user.findMany({
-      where: {
-        id: {
-          in: member.flatMap((e) => (e.userId ? [ e.userId ] : []))
-        }
+    for (const token of lineTokenOfOtherUsers) {
+      if (token) {
+        void this.sendNotification("คุณได้รับข้อความใหม่", token);
       }
-    });
-
-    users.map((e) => {
-      if (e.lineToken !== null) {
-        void this.sendNotification("คุณได้รับข้อความใหม่", e.lineToken);
-      }
-    });
+    }
   }
 }

@@ -14,9 +14,7 @@ import { MessageService } from "./message.service";
     origin: "*"
   }
 })
-export class ChatGateway
-implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   constructor(private messageService: MessageService) {}
 
   @WebSocketServer() server: Server;

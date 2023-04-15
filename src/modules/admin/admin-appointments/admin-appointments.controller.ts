@@ -1,19 +1,7 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Put,
-  Post,
-  UseGuards
-} from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Put, Post, UseGuards } from "@nestjs/common";
 import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { AdminAppointmentsService } from "./admin-appointments.service";
-import {
-  CreateAppointmentDto,
-  UpdateAppointmentDto
-} from "src/model/dto/appointment.dto";
+import { CreateAppointmentDto, UpdateAppointmentDto } from "src/model/dto/appointment.dto";
 
 @Controller("admins/api/users")
 export class AdminAppointmentsController {
@@ -46,10 +34,7 @@ export class AdminAppointmentsController {
 
   @UseGuards(AdminJwtAuthGuard)
   @Put(":id")
-  async update(
-    @Param("id") appiontmentId: string,
-    @Body() req: UpdateAppointmentDto
-  ) {
+  async update(@Param("id") appiontmentId: string, @Body() req: UpdateAppointmentDto) {
     return await this.appointmentService.update(appiontmentId, req);
   }
 

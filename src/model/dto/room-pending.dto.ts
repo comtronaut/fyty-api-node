@@ -3,9 +3,7 @@ import { Transform } from "class-transformer";
 import { IsNotEmpty, IsUUID } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateRoomPendingDto
-implements Prisma.RoomPendingUncheckedCreateInput
-{
+export class CreateRoomPendingDto implements Prisma.RoomPendingUncheckedCreateInput {
   @IsNotEmpty()
   @IsUUID()
   teamId: string;

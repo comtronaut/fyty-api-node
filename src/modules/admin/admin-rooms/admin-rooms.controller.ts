@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-  UseGuards
-} from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
 import { AdminRoomsService } from "./admin-rooms.service";
@@ -45,15 +35,12 @@ export class AdminRoomsController {
   @UseGuards(AdminJwtAuthGuard)
   @Get(":id/roomlineup")
   async getRoomLineUpById(@Param("id") roomId: string) {
-    return await this.roomService.getRoomLineUp(roomId);
+    return await this.roomService.getLineupsByRoomId(roomId);
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @Put(":id")
-  async updateRoomsById(
-    @Param("id") roomId: string,
-    @Body() payload: UpdateRoomDto
-  ) {
+  async updateRoomsById(@Param("id") roomId: string, @Body() payload: UpdateRoomDto) {
     return await this.roomService.update(roomId, payload);
   }
 

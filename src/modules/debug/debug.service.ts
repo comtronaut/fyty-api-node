@@ -36,10 +36,7 @@ export class DebugService {
 
     const formattedRow = rows.map((rawRow) => {
       const colEntries = rawRow.split(",").map((col, i) => {
-        return [
-          this.prune(headerCols[i]),
-          this.formatCol(this.prune(col), table)
-        ];
+        return [ this.prune(headerCols[i]), this.formatCol(this.prune(col), table) ];
       });
 
       return Object.fromEntries(colEntries);
@@ -54,7 +51,7 @@ export class DebugService {
         data: formattedRow
       });
     } else if (table === "team_line_up") {
-      await this.prisma.teamLineUp.createMany({
+      await this.prisma.teamLineup.createMany({
         data: formattedRow
       });
     } else if (table === "team_member") {

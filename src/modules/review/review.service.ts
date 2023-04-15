@@ -20,10 +20,7 @@ export class ReviewService {
         })
       ]);
 
-      let nowscore = reviewscore.reduce(
-        (acc, score) => acc + Number(score.ratingScore),
-        0
-      );
+      let nowscore = reviewscore.reduce((acc, score) => acc + Number(score.ratingScore), 0);
       nowscore = nowscore / reviewscore.length;
 
       await this.prisma.userAvatar.update({

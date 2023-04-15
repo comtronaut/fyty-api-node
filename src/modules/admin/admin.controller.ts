@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put
-} from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
 import { UseGuards } from "@nestjs/common/decorators";
 import { Admin } from "@prisma/client";
 import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
@@ -36,10 +28,7 @@ export class AdminController {
 
   @UseGuards(AdminJwtAuthGuard)
   @Put(":id")
-  async updateAdminData(
-    @Param("id") adminId: Admin["id"],
-    @Body() payload: UpdateAdminDto
-  ) {
+  async updateAdminData(@Param("id") adminId: Admin["id"], @Body() payload: UpdateAdminDto) {
     return await this.addminService.updateAdminData(adminId, payload);
   }
 

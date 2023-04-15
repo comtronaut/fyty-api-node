@@ -2,7 +2,7 @@ import { Controller, Param, Post } from "@nestjs/common";
 import { Debug } from "src/common/debug.decorator";
 import { DebugService } from "./debug.service";
 
-@Controller("api/debug")
+@Controller("debug")
 export class DebugController {
   constructor(private readonly debugService: DebugService) {}
 

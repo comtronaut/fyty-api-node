@@ -20,9 +20,13 @@ export class CreateTeamDto implements Prisma.TeamUncheckedCreateInput {
 
   @IsNotEmpty()
   @IsUUID()
-  ownerId: string;
+  founderId: string;
 }
 
-export class UpdateTeamDto extends PartialType(CreateTeamDto) {}
+export class UpdateTeamDto extends PartialType(CreateTeamDto) {
+  @IsNotEmpty()
+  @IsUUID()
+  id: string;
+}
 
 export const schemas = validationMetadatasToSchemas();

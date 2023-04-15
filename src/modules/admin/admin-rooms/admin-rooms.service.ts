@@ -14,41 +14,6 @@ export class AdminRoomsService {
     }
   }
 
-  // CRUD
-  async create({ teamlineupIds: teamlineUpIds, ...data }: CreateRoomDto) {
-    try {
-      const room = await this.prisma.room.create({ data });
-      const board = await this.prisma.roomLineupBoard.create({ data: {} });
-
-      const lineUps = teamlineUpIds?.split(",") ?? [];
-
-      await this.prisma.roomLineup.createMany({
-        data: lineUps.map((teamLineUpId) => ({
-          roomLineUpBoardId: board.id,
-          teamLineUpId
-        }))
-      });
-
-      const participantData = {
-        roomId: room.id,
-        teamId: data.hostId,
-        gameId: data.gameId,
-        roomLineUpBoardId: board.id
-      };
-
-      await Promise.all([
-        this.prisma.roomParticipant.create({ data: participantData }),
-        this.prisma.chat.create({ data: { roomId: room.id } })
-      ]);
-
-      return {
-        room
-      };
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
-  }
-
   async getRoom(roomId: string) {
     try {
       return await this.prisma.room.findUniqueOrThrow({
@@ -63,7 +28,7 @@ export class AdminRoomsService {
 
   async getRoomParticipants(roomId: string) {
     try {
-      return await this.prisma.roomParticipant.findMany({
+      return await this.prisma.roomMember.findMany({
         where: {
           roomId
         }
@@ -73,23 +38,18 @@ export class AdminRoomsService {
     }
   }
 
-  async getRoomLineUp(roomId: string) {
+  async getLineupsByRoomId(roomId: string) {
     try {
-      const roomParticipant = await this.prisma.roomParticipant.findMany({
+      const roomParticipant = await this.prisma.roomMember.findFirst({
         where: {
           roomId
+        },
+        select: {
+          roomLineups: true
         }
       });
 
-      return await this.prisma.roomLineup.findMany({
-        where: {
-          roomLineUpBoardId: {
-            in: roomParticipant.flatMap((e) =>
-              e.roomLineUpBoardId ? [ e.roomLineUpBoardId ] : []
-            )
-          }
-        }
-      });
+      return roomParticipant?.roomLineups ?? [];
     } catch (err) {
       throw new BadRequestException(err.message);
     }

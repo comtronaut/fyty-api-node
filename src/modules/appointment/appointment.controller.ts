@@ -1,32 +1,13 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-  UseGuards
-} from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Put, Query, UseGuards } from "@nestjs/common";
 import { User } from "@prisma/client";
-import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { UserSubject } from "src/common/subject.decorator";
-import {
-  CreateAppointmentDto,
-  UpdateAppointmentDto
-} from "src/model/dto/appointment.dto";
+import { UpdateAppointmentDto } from "src/model/dto/appointment.dto";
+import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { AppointmentService } from "./appointment.service";
 
-@Controller("api/appointments")
+@Controller("appointments")
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
-
-  @UseGuards(UserJwtAuthGuard)
-  @Post()
-  async add(@Body() req: CreateAppointmentDto) {
-    return this.appointmentService.create(req);
-  }
 
   @UseGuards(UserJwtAuthGuard)
   @Get()
@@ -42,10 +23,7 @@ export class AppointmentController {
 
   @UseGuards(UserJwtAuthGuard)
   @Put(":id")
-  async update(
-    @Param("id") appiontmentId: string,
-    @Body() req: UpdateAppointmentDto
-  ) {
+  async update(@Param("id") appiontmentId: string, @Body() req: UpdateAppointmentDto) {
     return await this.appointmentService.update(appiontmentId, req);
   }
 

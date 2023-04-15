@@ -1,10 +1,5 @@
-import {
-  BadRequestException,
-  CACHE_MANAGER,
-  Inject,
-  Injectable
-} from "@nestjs/common";
-import { User } from "@prisma/client";
+import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
+import { Lang, User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { Cache } from "cache-manager";
 import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
@@ -52,19 +47,9 @@ export class UserService {
 
   async create(data: CreateUserDto) {
     try {
-      const [ hashedPassword, hashedPhoneNumber ] = await Promise.all([
-        bcrypt.hash(data.password, 12),
-        bcrypt.hash(data.phoneNumber, 12)
-      ]);
+      const [ hashedPassword ] = await Promise.all([ bcrypt.hash(data.password, 12) ]);
 
-      const { phoneNumber, ...rest } = data;
-      const createdContent = { ...rest, password: hashedPassword };
-
-      await this.prisma.phoneNumber.create({
-        data: {
-          phoneNumber: hashedPhoneNumber
-        }
-      });
+      const createdContent = { ...data, password: hashedPassword };
 
       const { password, ...userData } = await this.prisma.user.create({
         data: createdContent
@@ -72,7 +57,7 @@ export class UserService {
       await this.prisma.userSettings.create({
         data: {
           userId: userData.id,
-          lang: "th"
+          lang: Lang.TH
         }
       });
 
@@ -84,18 +69,16 @@ export class UserService {
 
   async update(id: string, data: UpdateUserDto) {
     try {
-      const { phoneNumber, ...updateData } = data;
-
       const res = await this.prisma.user.update({
         where: {
           id
         },
         data: {
-          ...updateData,
-          ...(updateData.email && { updatedEmailAt: new Date() }),
-          ...(updateData.username && { updatedUsernameAt: new Date() }),
-          ...(updateData.password && {
-            password: bcrypt.hashSync(updateData.password, 12)
+          ...data,
+          ...(data.email && { updatedEmailAt: new Date() }),
+          ...(data.username && { updatedUsernameAt: new Date() }),
+          ...(data.password && {
+            password: bcrypt.hashSync(data.password, 12)
           })
         }
       });
@@ -118,25 +101,11 @@ export class UserService {
     }
   }
 
-  async getDuplicationResult({
-    phoneNumber,
-    ...payload
-  }: UpdateUserDto): Promise<Record<string, boolean>> {
+  async getDuplicationResult(data: UpdateUserDto): Promise<Record<string, boolean>> {
     const res = {} as Record<string, boolean>;
 
-    for (const [ key, value ] of Object.entries(payload)) {
-      res[key] = Boolean(
-        await this.prisma.user.findFirst({ where: { [key]: value } })
-      );
-    }
-
-    if (phoneNumber) {
-      const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12);
-      res[phoneNumber] = Boolean(
-        await this.prisma.phoneNumber.findUnique({
-          where: { phoneNumber: hashedPhoneNumber }
-        })
-      );
+    for (const [ key, value ] of Object.entries(data)) {
+      res[key] = Boolean(await this.prisma.user.findFirst({ where: { [key]: value } }));
     }
 
     return res;

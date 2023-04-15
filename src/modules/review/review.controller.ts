@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { CreateReviewDto, UpdateReviewDto } from "src/model/dto/review.dto";
 import { ReviewService } from "./review.service";
 
-@Controller("api/review")
+@Controller("review")
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 

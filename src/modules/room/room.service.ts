@@ -1,7 +1,8 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { AppointmentStatus, Room, RoomStatus } from "@prisma/client";
+import { PendingStatus, RoomStatus } from "@prisma/client";
 import dayjs from "dayjs";
+import { CreateRoomMemberDto } from "src/model/dto/room-member.dto";
 import { CreateRoomDto, DeleteRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 
@@ -40,7 +41,9 @@ export class RoomService {
               in: rooms.map((room) => room.id)
             }
           },
-          data: { isDel: true }
+          data: {
+            isDeleted: true
+          }
         })
       ]);
     } catch (err) {
@@ -48,32 +51,53 @@ export class RoomService {
     }
   }
 
-  // CRUD
-  async create({ teamlineupIds: teamlineUpIds, ...data }: CreateRoomDto) {
+  async create({ teamLineupIds, ...data }: CreateRoomDto) {
     try {
-      const room = await this.prisma.room.create({ data });
-      const board = await this.prisma.roomLineupBoard.create({ data: {} });
-
-      const lineUps = teamlineUpIds?.split(",") ?? [];
+      // create room
+      const {
+        members: [ member ],
+        ...room
+      } = await this.prisma.room.create({
+        data: {
+          ...data,
+          members: {
+            create: {
+              teamId: data.hostTeamId
+            }
+          },
+          settings: {
+            create: {}
+          },
+          chat: {
+            create: {}
+          }
+        },
+        include: {
+          members: true
+        }
+      });
 
       await this.prisma.roomLineup.createMany({
-        data: lineUps.map((teamLineUpId) => ({
-          roomLineUpBoardId: board.id,
-          teamLineUpId
+        data: teamLineupIds.map((teamLineupId) => ({
+          teamLineupId,
+          roomMemberId: member.id,
+          roomId: room.id
         }))
       });
 
-      const participantData = {
-        roomId: room.id,
-        teamId: data.hostId,
-        gameId: data.gameId,
-        roomLineUpBoardId: board.id
-      };
-
-      await Promise.all([
-        this.prisma.roomParticipant.create({ data: participantData }),
-        this.prisma.chat.create({ data: { roomId: room.id } })
-      ]);
+      // create room appointment
+      await this.prisma.appointment.create({
+        data: {
+          startAt: data.startAt,
+          endAt: data.endAt,
+          roomId: room.id,
+          members: {
+            create: {
+              teamId: data.hostTeamId
+            }
+          }
+        }
+      });
 
       return {
         room
@@ -83,41 +107,34 @@ export class RoomService {
     }
   }
 
-  async update(roomId: string, req: UpdateRoomDto) {
+  async update(roomId: string, data: UpdateRoomDto) {
     try {
-      const updateRes = await this.prisma.room.update({
+      return await this.prisma.room.update({
         where: {
           id: roomId
         },
-        data: req
+        data
       });
-
-      return {
-        room: await this.prisma.room.findUniqueOrThrow({
-          where: { id: roomId }
-        })
-      };
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async getJoinedRoom(teamId: string) {
-    // new
+  async getRoomsByTeamId(teamId: string) {
     try {
-      const participants = await this.prisma.roomParticipant.findMany({
-        where: { teamId }
-      });
-      const joined = await this.prisma.room.findMany({
-        where: { id: { in: participants.map((e) => e.roomId) } }
-      });
+      const [ participants, request ] = await Promise.all([
+        this.prisma.roomMember.findMany({
+          where: { teamId },
+          include: { room: true }
+        }),
+        this.prisma.roomPending.findMany({
+          where: { teamId, status: PendingStatus.INCOMING },
+          include: { room: true }
+        })
+      ]);
 
-      const request = await this.prisma.roomRequest.findMany({
-        where: { teamId }
-      });
-      const requested = await this.prisma.room.findMany({
-        where: { id: { in: request.map((e) => e.roomId) } }
-      });
+      const joined = participants.map((e) => e.room);
+      const requested = request.map((e) => e.room);
 
       return {
         joined,
@@ -129,143 +146,79 @@ export class RoomService {
   }
 
   async getRoomsByGameId(gameId: string) {
-    try {
-      return this.prisma.room.findMany({ where: { gameId } });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    return this.prisma.room.findMany({ where: { gameId } });
   }
 
   async getRoomsById(roomId: string) {
-    try {
-      return await this.prisma.room.findMany({ where: { id: roomId } });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    return await this.prisma.room.findMany({ where: { id: roomId } });
   }
 
   async getRoomByHostId(teamId: string) {
-    try {
-      return await this.prisma.room.findMany({ where: { hostId: teamId } });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    return await this.prisma.room.findMany({ where: { hostTeamId: teamId } });
   }
 
   async getAllRooms(gameId: string, roomName?: string, date?: any) {
-    try {
-      const today = new Date(date);
+    const today = new Date(date);
 
-      const dayStart = dayjs(today).startOf("day").toDate();
-      const dayEnd = dayjs(today).endOf("day").toDate();
+    const dayStart = dayjs(today).startOf("day").toDate();
+    const dayEnd = dayjs(today).endOf("day").toDate();
 
-      return await this.prisma.room.findMany({
-        where: {
-          ...(roomName && { name: roomName }),
-          ...(date && { startAt: { gte: dayStart, lte: dayEnd } }),
-          gameId
-        }
-      });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    return await this.prisma.room.findMany({
+      where: {
+        ...(roomName && { name: roomName }),
+        ...(date && { startAt: { gte: dayStart, lte: dayEnd } }),
+        gameId
+      }
+    });
   }
 
   async disband(payload: DeleteRoomDto) {
-    try {
-      const teamId = payload.teamId;
-      const room = await this.prisma.room.findUniqueOrThrow({
-        where: { id: payload.roomId }
+    const teamId = payload.teamId;
+    const room = await this.prisma.room.findUniqueOrThrow({
+      where: { id: payload.roomId }
+    });
+
+    if (room.hostTeamId === teamId) {
+      await this.prisma.appointment.updateMany({
+        where: { roomId: room.id },
+        data: { isDeleted: true }
       });
 
-      if (room.hostId === teamId) {
-        await this.prisma.appointment.updateMany({
-          where: { roomId: room.id },
-          data: { isDeleted: true }
-        });
+      await this.prisma.room.delete({ where: { id: room.id } });
 
-        await this.prisma.room.delete({ where: { id: room.id } });
-
-        return {
-          roomId: room.id
-        };
-      }
-      throw new Error("Only host can disband the room");
-    } catch (err) {
-      throw new BadRequestException(err.message);
+      return {
+        roomId: room.id
+      };
     }
+
+    throw new Error("Only host can disband the room");
   }
 
-  async joinRoom(teamId: string, roomId: string) {
-    try {
-      const timestamp = new Date();
+  async acceptRoomRequest({ roomId, teamId }: CreateRoomMemberDto) {
+    const { appointment, ...room } = await this.prisma.room.findUniqueOrThrow({
+      where: { id: roomId },
+      include: { appointment: true }
+    });
+    const { lineups, ...pendings } = await this.prisma.roomPending.findFirstOrThrow({
+      where: { teamId, roomId },
+      include: { lineups: true }
+    });
 
-      const room = await this.prisma.room.findUniqueOrThrow({
-        where: { id: roomId }
-      });
-      const game = await this.prisma.game.findUniqueOrThrow({
-        where: { id: room.gameId }
-      });
-
-      if (timestamp <= room.endAt) {
-        // check is room available
-        if (
-          room.status === RoomStatus.UNAVAILABLE
-          || room.status === RoomStatus.FULL
-        ) {
-          throw new Error("room is not available");
-        }
-
-        // update room status
-        await this.updateStatus(room);
-
-        // find room request
-        const request = await this.prisma.roomPending.findFirstOrThrow({
-          where: { teamId, roomId }
-        });
-
-        // add participant to the room
-        const participantData = {
-          roomId: room.id,
-          teamId,
-          gameId: game.id,
-          roomLineUpBoardId: request.roomLineUpBoardId
-        };
-        const participant = await this.prisma.roomMember.create({
-          data: participantData
-        });
-
-        // add appointment
-        const appointmentData = {
-          startAt: room.startAt,
-          endAt: room.endAt,
-          roomId: room.id,
-          status: AppointmentStatus.WAITING,
-          isDel: false
-        };
-        const appointment = await this.prisma.appointment.create({
-          data: appointmentData
-        });
-
-        await this.prisma.appointmentMember.createMany({
-          data: [
-            { teamId, appointId: appointment.id }, // for guest
-            { teamId: room.hostId, appointId: appointment.id } // for host
-          ]
-        });
-
-        return {
-          roomParticipant: participant
-        };
-      } else {
-        throw new BadRequestException("this room has expired");
-      }
-    } catch (err) {
-      throw new BadRequestException(err.message);
+    if ([ RoomStatus.UNAVAILABLE, RoomStatus.FULL ].some((status) => status === room.status)) {
+      throw new ConflictException("room is not available");
     }
-  }
+    if (new Date() > room.endAt) {
+      throw new BadRequestException("this room has expired");
+    }
 
-  async updateStatus(room: Room) {
+    // create joining data
+    const newRoomMember = await this.prisma.roomMember.create({
+      data: {
+        roomId,
+        teamId
+      }
+    });
+
     await this.prisma.room.update({
       where: {
         id: room.id
@@ -275,37 +228,74 @@ export class RoomService {
         status: RoomStatus.UNAVAILABLE,
         teamCount: {
           increment: 1
+        },
+        // add room lineups
+        lineups: {
+          create: lineups.map((teamLineup) => ({
+            roomMemberId: newRoomMember.id,
+            teamLineupId: teamLineup.id
+          }))
+        },
+        // add to appointment
+        appointment: {
+          update: {
+            id: appointment?.id,
+            members: {
+              create: {
+                teamId
+              }
+            }
+          }
+        },
+        // delete the request
+        pendings: {
+          delete: {
+            id: pendings.id
+          }
         }
       }
     });
+
+    return {
+      teamId,
+      roomId
+    };
   }
 
-  async leaveRoom(participantId: string) {
+  async leaveRoom(roomMemberId: string) {
     try {
-      const { room, ...parti } = await this.prisma.roomParticipant.findUniqueOrThrow({
-        where: { id: participantId },
-        include: { room: true }
-      });
-
-      await this.prisma.room.update({
-        where: { id: room.id },
+      const { room, ...parti } = await this.prisma.roomMember.update({
+        where: { id: roomMemberId },
         data: {
-          ...room,
-          // update participant count
-          teamCount: {
-            decrement: 1
-          },
-          // update room status
-          status: RoomStatus.AVAILABLE
+          room: {
+            update: {
+              // update participant count
+              teamCount: {
+                decrement: 1
+              },
+              // update room status
+              status: RoomStatus.AVAILABLE
+            }
+          }
+        },
+        include: {
+          room: true
         }
       });
 
       // remove appointment
-      await this.prisma.appointment.deleteMany({ where: { roomId: room.id } });
+      if (room.teamCount === 0) {
+        await this.prisma.appointment.update({
+          where: { roomId: room.id },
+          data: {
+            isDeleted: true
+          }
+        });
+      }
 
       // remove participant from the room
-      await this.prisma.roomParticipant.delete({
-        where: { id: participantId }
+      await this.prisma.roomMember.delete({
+        where: { id: roomMemberId }
       });
 
       return {
@@ -323,7 +313,7 @@ export class RoomService {
     try {
       const [ room, participants ] = await Promise.all([
         this.prisma.room.findUniqueOrThrow({ where: { id: roomId } }),
-        this.prisma.roomParticipant.findMany({ where: { roomId } })
+        this.prisma.roomMember.findMany({ where: { roomId } })
       ]);
 
       const teams = await this.prisma.team.findMany({

@@ -1,29 +1,15 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  UseGuards
-} from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { UserSubject } from "src/common/subject.decorator";
-import {
-  CreateTeamDto,
-  CreateTeamMemberDto,
-  CreateTeamPendingDto,
-  UpdateTeamDto,
-  UpdateTeamMemberDto,
-  UpdateTeamPendingDto
-} from "src/model/dto/team.dto";
+import { CreateTeamDto, UpdateTeamDto } from "src/model/dto/team.dto";
 import { TeamMemberService } from "./member.service";
 import { TeampendingService } from "./pending.service";
 import { TeamService } from "./team.service";
+import { CreateTeamMemberDto, UpdateTeamMemberDto } from "src/model/dto/team-member";
+import { CreateTeamPendingDto, UpdateTeamPendingDto } from "src/model/dto/team-pending";
 
-@Controller("api/teams")
+@Controller("teams")
 export class TeamController {
   constructor(
     private readonly teamService: TeamService,
@@ -60,8 +46,8 @@ export class TeamController {
 
   @UseGuards(UserJwtAuthGuard)
   @Put(":id")
-  async updateTeam(@UserSubject() user: User, @Body() req: UpdateTeamDto) {
-    return await this.teamService.update(user.id, req);
+  async updateTeam(@UserSubject() user: User, @Body() payload: UpdateTeamDto) {
+    return await this.teamService.update(payload);
   }
 
   @UseGuards(UserJwtAuthGuard)
@@ -84,19 +70,13 @@ export class TeamController {
   }
 
   @Put("members/:id")
-  async updateMemberRole(
-    @Param("id") teamMemberId: string,
-    @Body() req: UpdateTeamMemberDto
-  ) {
+  async updateMemberRole(@Param("id") teamMemberId: string, @Body() req: UpdateTeamMemberDto) {
     return await this.teammemberService.update(teamMemberId, req);
   }
 
   @UseGuards(UserJwtAuthGuard)
   @Delete("members/:id")
-  async kickMember(
-    @Param("id") teamMemberId: string,
-    @UserSubject() user: User
-  ) {
+  async kickMember(@Param("id") teamMemberId: string, @UserSubject() user: User) {
     return await this.teammemberService.kickMember(teamMemberId, user);
   }
 
@@ -130,36 +110,25 @@ export class TeamController {
   }
 
   @Post("pending")
-  async createPending(@Body() req: CreateTeamPendingDto) {
-    // this.subject.next({ req });
-    return await this.teampendingService.createTeamPending(req);
+  async createPending(@Body() payload: CreateTeamPendingDto) {
+    return await this.teampendingService.createTeamPending(payload);
   }
 
   @Post("invitation")
-  async createInvitation(@Body() req: CreateTeamPendingDto) {
-    return await this.teampendingService.createTeamInvitation(req);
+  async createInvitation(@Body() payload: CreateTeamPendingDto) {
+    return await this.teampendingService.createTeamInvitation(payload);
   }
 
   @Put("pending/:id")
   async updateStatusTeampending(
     @Param("id") teampendingId: string,
-    @Body() req: UpdateTeamPendingDto
+    @Body() payload: UpdateTeamPendingDto
   ) {
-    return await this.teampendingService.updateStatus(teampendingId, req);
+    return await this.teampendingService.updateStatus(teampendingId, payload);
   }
 
   @Delete("pending/:id")
   async discardpending(@Param("id") teampendingId: string) {
-    // this.subject.next({ teampendingId });
     return await this.teampendingService.discard(teampendingId);
   }
-
-  // server sending
-  // @Sse("sse")
-  // sse(): Observable<MessageEvent> {
-  //   console.log("see activated");
-  //   return this.subject.pipe(
-  //     map((data: any) => ({ data }))
-  //   );
-  // }
 }

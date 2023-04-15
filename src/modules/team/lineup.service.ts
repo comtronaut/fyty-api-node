@@ -1,45 +1,31 @@
-import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
-import {
-  CreateTeamLineupDto,
-  UpdateLineUpDto
-} from "src/model/dto/team-lineup.dto";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { MemberRole, User } from "@prisma/client";
+import { CreateTeamLineupDto, UpdateLineUpDto } from "src/model/dto/team-lineup.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
-export class LineUpService {
+export class LineupService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateTeamLineupDto) {
     try {
-      return await this.prisma.teamLineUp.create({ data });
+      return await this.prisma.teamLineup.create({ data });
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async update(user: User, lineUpId: string, req: UpdateLineUpDto) {
+  async update(user: User, lineUpId: string, data: UpdateLineUpDto) {
     try {
       const teamMember = await this.prisma.teamMember.findFirstOrThrow({
         where: { userId: user.id }
       });
 
-      if (req.isDefault === "true") {
-        req.isDefault = true;
-      } else if (req.isDefault === "false") {
-        req.isDefault = false;
-      }
-
-      if (
-        teamMember.role === MemberRole.MANAGER
-        || teamMember.role === MemberRole.LEADER
-      ) {
-        // cheack if you are Manager
-        await this.prisma.teamLineUp.update({
+      if ([ MemberRole.MANAGER, MemberRole.LEADER ].some((role) => role === teamMember.role)) {
+        return await this.prisma.teamLineup.update({
           where: { id: lineUpId },
-          data: req
+          data
         });
-        return req;
       } else {
         throw new Error("Only team's Manager can edit lineUps");
       }
@@ -48,11 +34,11 @@ export class LineUpService {
     }
   }
 
-  async getLineUps(teamId?: string) {
+  async getLineupsByTeamId(teamId: string) {
     try {
-      return teamId
-        ? await this.prisma.teamLineUp.findMany({ where: { teamId } })
-        : await this.prisma.teamLineUp.findMany({ where: { teamId } });
+      return await this.prisma.teamLineup.findFirstOrThrow({
+        where: { teamId }
+      });
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -60,7 +46,7 @@ export class LineUpService {
 
   async getLineUpById(lineUpId: string) {
     try {
-      return await this.prisma.teamLineUp.findUniqueOrThrow({
+      return await this.prisma.teamLineup.findUniqueOrThrow({
         where: { id: lineUpId }
       });
     } catch (err) {
@@ -68,31 +54,17 @@ export class LineUpService {
     }
   }
 
-  async getLineUpsByParti(participantId: string) {
+  async getTeamLineupsByRoomMemberId(participantId: string) {
     try {
-      const parti = await this.prisma.roomParticipant.findUniqueOrThrow({
-        where: { id: participantId }
+      const { roomLineups } = await this.prisma.roomMember.findUniqueOrThrow({
+        where: { id: participantId },
+        include: { roomLineups: true }
       });
-      const lineUpBoard = await this.prisma.roomLineupBoard.findUniqueOrThrow({
-        where: { id: parti.roomLineUpBoardId }
-      });
-      return await this.getLineUpsByBoard(lineUpBoard.id);
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
-  }
 
-  async getLineUpsByBoard(roomLineUpBoardId: string) {
-    try {
-      const roomLineUps = await this.prisma.roomLineup.findMany({
-        where: { roomLineUpBoardId }
-      });
-      return await this.prisma.teamLineUp.findMany({
+      return await this.prisma.teamLineup.findMany({
         where: {
           id: {
-            in: roomLineUps.flatMap((e) =>
-              e.teamLineUpId ? [ e.teamLineUpId ] : []
-            )
+            in: roomLineups.map((e) => e.teamLineupId)
           }
         }
       });
@@ -101,17 +73,14 @@ export class LineUpService {
     }
   }
 
-  async deleteAllLineUps(userId: string, teamId: string) {
+  async deleteAllLineups(userId: string, teamId: string) {
     try {
       const member = await this.prisma.teamMember.findFirstOrThrow({
         where: { teamId, userId }
       });
-      if (
-        member.role === MemberRole.MANAGER
-        || member.role === MemberRole.LEADER
-      ) {
-        await this.prisma.teamLineUp.deleteMany({ where: { teamId } });
-        return HttpStatus.NO_CONTENT;
+
+      if ([ MemberRole.MANAGER, MemberRole.LEADER ].some((role) => role === member.role)) {
+        await this.prisma.teamLineup.deleteMany({ where: { teamId } });
       }
     } catch (err) {
       throw new BadRequestException(err.message);
@@ -120,22 +89,16 @@ export class LineUpService {
 
   async deleteById(userId: string, lineupId: string) {
     try {
-      const targetedLineUp = await this.prisma.teamLineUp.findUniqueOrThrow({
-        where: { id: lineupId }
-      });
-      const team = await this.prisma.team.findUniqueOrThrow({
-        where: { id: targetedLineUp.teamId }
+      const { team } = await this.prisma.teamLineup.findUniqueOrThrow({
+        where: { id: lineupId },
+        include: { team: true }
       });
       const member = await this.prisma.teamMember.findFirstOrThrow({
         where: { userId, teamId: team.id }
       });
 
-      if (
-        member.role === MemberRole.MANAGER
-        || member.role === MemberRole.LEADER
-      ) {
-        await this.prisma.teamLineUp.delete({ where: { id: lineupId } });
-        return HttpStatus.NO_CONTENT;
+      if ([ MemberRole.MANAGER, MemberRole.LEADER ].some((role) => role === member.role)) {
+        await this.prisma.teamLineup.delete({ where: { id: lineupId } });
       }
     } catch (err) {
       throw new BadRequestException(err.message);

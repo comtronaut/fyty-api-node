@@ -1,58 +1,18 @@
-import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { Appointment } from "@prisma/client";
-import {
-  CreateAppointmentDto,
-  UpdateAppointmentDto
-} from "src/model/dto/appointment.dto";
+import { UpdateAppointmentDto } from "src/model/dto/appointment.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { NotifyService } from "../notification/lineNotify.service";
 
 @Injectable()
 export class AppointmentService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly lineNotify: NotifyService
-  ) {}
-
-  // CRUD
-  async create(req: CreateAppointmentDto) {
-    try {
-      const room = await this.prisma.room.findUniqueOrThrow({
-        where: { id: req.roomId }
-      });
-
-      // create appointment
-      req.startAt = room.startAt;
-      req.endAt = room.endAt;
-
-      const { teamIds, ...data } = req;
-
-      const res = await this.prisma.appointment.create({ data });
-
-      // create appointment member
-      const memberIds = req.teamIds.split(",");
-
-      await this.prisma.appointmentMember.createMany({
-        data: memberIds.map((memberId) => ({
-          appointId: res.id,
-          teamId: memberId
-        }))
-      });
-
-      // send line notify
-      void this.lineNotify.searchUserForAppointmentNotify(memberIds);
-
-      return res;
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
-  }
+  constructor(private readonly prisma: PrismaService, private readonly lineNotify: NotifyService) {}
 
   async getAppointment(roomId: string, teamId: string) {
     try {
       if (roomId) {
         return await this.prisma.appointment.findMany({
-          where: { roomId, isDel: false }
+          where: { roomId, isDeleted: false }
         });
       }
       if (teamId) {
@@ -65,17 +25,15 @@ export class AppointmentService {
         return await this.prisma.appointment.findMany({
           where: {
             id: {
-              in: appointments.flatMap((e) =>
-                e.appointId ? [ e.appointId ] : []
-              )
+              in: appointments.flatMap((e) => (e.appointmentId ? [ e.appointmentId ] : []))
             },
-            isDel: false
+            isDeleted: false
           }
         });
       }
 
       return await this.prisma.appointment.findMany({
-        where: { isDel: false }
+        where: { isDeleted: false }
       });
     } catch (err) {
       throw new BadRequestException(err.message);
@@ -99,18 +57,14 @@ export class AppointmentService {
       const appointments = await this.prisma.appointment.findMany({
         where: {
           id: {
-            in: appointmentMember.flatMap((e) =>
-              e.appointId ? [ e.appointId ] : []
-            )
+            in: appointmentMember.flatMap((e) => (e.appointmentId ? [ e.appointmentId ] : []))
           },
-          isDel: false
+          isDeleted: false
         }
       });
 
       const res = await Promise.all(
-        appointments.map((appoint) =>
-          this.packAppointment(appoint, member.teamId)
-        )
+        appointments.map((appoint) => this.packAppointment(appoint, member.teamId))
       );
 
       return res;
@@ -122,7 +76,7 @@ export class AppointmentService {
   async packAppointment(appointment: Appointment, teamId: string) {
     try {
       const appointMember = await this.prisma.appointmentMember.findMany({
-        where: { appointId: appointment.id }
+        where: { appointmentId: appointment.id }
       });
 
       if (appointMember.length !== 2) {
@@ -153,30 +107,20 @@ export class AppointmentService {
   }
 
   async update(appointmentId: string, req: UpdateAppointmentDto) {
-    try {
-      return await this.prisma.appointment.update({
-        where: {
-          id: appointmentId
-        },
-        data: req
-      });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    return await this.prisma.appointment.update({
+      where: {
+        id: appointmentId
+      },
+      data: req
+    });
   }
 
   async delete(appointmentId: string) {
-    try {
-      const res = await this.prisma.appointment.update({
-        where: {
-          id: appointmentId
-        },
-        data: { isDel: true }
-      });
-
-      return HttpStatus.NO_CONTENT;
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    await this.prisma.appointment.update({
+      where: {
+        id: appointmentId
+      },
+      data: { isDeleted: true }
+    });
   }
 }

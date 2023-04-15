@@ -40,16 +40,13 @@ export class FacebookAuthGuard extends AuthGuard("facebook") {
       }
     );
 
-    const { data: userInfo } = await axios.get(
-      "https://graph.facebook.com/me",
-      {
-        params: {
-          fields: [ "id", "name", "email", "picture" ].join(","),
-          access_token: tokenData.access_token
-        },
-        ...config
-      }
-    );
+    const { data: userInfo } = await axios.get("https://graph.facebook.com/me", {
+      params: {
+        fields: [ "id", "name", "email", "picture" ].join(","),
+        access_token: tokenData.access_token
+      },
+      ...config
+    });
 
     req.user = userInfo;
 

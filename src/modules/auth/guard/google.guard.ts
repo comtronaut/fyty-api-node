@@ -44,15 +44,12 @@ export class GoogleAuthGuard extends AuthGuard("google") {
       config
     );
 
-    const { data: userInfo } = await axios.get(
-      "https://oauth2.googleapis.com/tokeninfo",
-      {
-        params: {
-          id_token: tokenData.id_token
-        },
-        ...config
-      }
-    );
+    const { data: userInfo } = await axios.get("https://oauth2.googleapis.com/tokeninfo", {
+      params: {
+        id_token: tokenData.id_token
+      },
+      ...config
+    });
 
     req.user = userInfo;
 

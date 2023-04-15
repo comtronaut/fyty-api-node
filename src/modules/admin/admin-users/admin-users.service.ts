@@ -34,16 +34,14 @@ export class AdminUsersService {
         const hashedPassword = await bcrypt.hash(payload.password, 12);
         payload.password = hashedPassword;
       }
-      if (payload.phoneNumber) {
-        const hashedPhoneNumber = await bcrypt.hash(payload.phoneNumber, 12);
-        payload.phoneNumber = hashedPhoneNumber;
-      }
 
       return await this.prisma.user.update({
         where: {
           id: userId
         },
-        data: payload
+        data: {
+          ...payload
+        }
       });
     } catch (error) {
       throw new BadRequestException(error.message);

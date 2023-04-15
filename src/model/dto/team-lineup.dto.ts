@@ -1,5 +1,6 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { Prisma } from "@prisma/client";
+import { Transform } from "class-transformer";
 import { IsBoolean, IsOptional, IsUUID } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
@@ -9,6 +10,7 @@ export class CreateTeamLineupDto implements Prisma.TeamLineupUncheckedCreateInpu
 
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === "true")
   isDefault: boolean;
 
   @IsOptional()

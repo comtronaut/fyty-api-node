@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Query,
-  Req,
-  Res,
-  UnauthorizedException,
-  UseGuards
-} from "@nestjs/common";
+import { Controller, Get, Query, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { Request, Response } from "express";
 import env from "src/common/env.config";
 import { UserSubject } from "src/common/subject.decorator";
@@ -27,18 +19,12 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Get("login")
-  async login(
-    @Query("username") username: string,
-    @Query("password") password: string
-  ) {
+  async login(@Query("username") username: string, @Query("password") password: string) {
     return await this.authService.loginLocal(username, password);
   }
 
   @Get("admin/login")
-  async adminLogin(
-    @Query("email") email: string,
-    @Query("password") password: string
-  ) {
+  async adminLogin(@Query("email") email: string, @Query("password") password: string) {
     return await this.authService.adminLogin(email, password);
   }
 
@@ -63,10 +49,7 @@ export class AuthController {
   }
 
   @Get("google")
-  async redirectToGoogle(
-    @Res() res: Response,
-    @Query() query: Partial<OAuthQuery>
-  ) {
+  async redirectToGoogle(@Res() res: Response, @Query() query: Partial<OAuthQuery>) {
     const url = URI("https://accounts.google.com/o/oauth2/v2/auth")
       .query({
         response_type: "code",
@@ -81,10 +64,7 @@ export class AuthController {
   }
 
   @Get("facebook")
-  async redirectToFacebook(
-    @Res() res: Response,
-    @Query() query: Partial<OAuthQuery>
-  ) {
+  async redirectToFacebook(@Res() res: Response, @Query() query: Partial<OAuthQuery>) {
     const url = URI("https://www.facebook.com/v16.0/dialog/oauth")
       .query({
         response_type: "code",

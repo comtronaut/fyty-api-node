@@ -3,9 +3,7 @@ import { Prisma } from "@prisma/client";
 import { IsNotEmpty } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateUserAvatarDto
-implements Prisma.UserAvatarUncheckedCreateInput
-{
+export class CreateUserAvatarDto implements Prisma.UserAvatarUncheckedCreateInput {
   @IsNotEmpty()
   characterName: string;
 

@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Put,
-  UseGuards
-} from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Put, UseGuards } from "@nestjs/common";
 import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { AdminTeamsService } from "./admin-teams.service";
 import { UpdateTeamDto } from "src/model/dto/team.dto";
@@ -29,10 +21,7 @@ export class AdminTeamsController {
 
   @Put(":id")
   @UseGuards(AdminJwtAuthGuard)
-  async updateTeam(
-    @Param("id") teamId: string,
-    @Body() payload: UpdateTeamDto
-  ) {
+  async updateTeam(@Param("id") teamId: string, @Body() payload: UpdateTeamDto) {
     return await this.adminTeamsService.updateTeamDetail(teamId, payload);
   }
 

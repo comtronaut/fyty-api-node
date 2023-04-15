@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Query } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PasswordResetSessionService } from "./password-reset-sessions.service";
 
-@Controller("api/password-reset-session")
+@Controller("password-reset-session")
 export class PasswordResetSessionController {
   constructor(private readonly service: PasswordResetSessionService) {}
 
@@ -17,10 +17,7 @@ export class PasswordResetSessionController {
   }
 
   @Post("reset")
-  async addUser(
-    @Body("password") password: string,
-    @Body("token") token: string
-  ) {
+  async addUser(@Body("password") password: string, @Body("token") token: string) {
     return await this.service.resetToken(token, password);
   }
 }

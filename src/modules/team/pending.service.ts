@@ -1,22 +1,17 @@
 import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
 import { NotifyService } from "src/modules/notification/lineNotify.service";
-import {
-  CreateTeamPendingDto,
-  UpdateTeamPendingDto
-} from "src/model/dto/team.dto";
+import { CreateTeamPendingDto, UpdateTeamPendingDto } from "src/model/dto/team-pending";
 import { PrismaService } from "src/prisma/prisma.service";
+import { PendingStatus } from "@prisma/client";
 
 @Injectable()
 export class TeampendingService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly lineNotify: NotifyService
-  ) {}
+  constructor(private readonly prisma: PrismaService, private readonly lineNotify: NotifyService) {}
 
   async getTeamPendingByUser(userId: string) {
     try {
       return await this.prisma.teamPending.findMany({
-        where: { userId, status: "pending" }
+        where: { userId, status: PendingStatus.INCOMING }
       });
     } catch (err) {
       throw new BadRequestException(err.message);
@@ -26,7 +21,7 @@ export class TeampendingService {
   async getTeamInvitationByUser(userId: string) {
     try {
       return await this.prisma.teamPending.findMany({
-        where: { userId, status: "invitation" }
+        where: { userId, status: PendingStatus.OUTGOING }
       });
     } catch (err) {
       throw new BadRequestException(err.message);
@@ -36,7 +31,7 @@ export class TeampendingService {
   async getTeamPending(teamId: string) {
     try {
       return await this.prisma.teamPending.findMany({
-        where: { teamId, status: "pending" }
+        where: { teamId, status: PendingStatus.INCOMING }
       });
     } catch (err) {
       throw new BadRequestException(err.message);
@@ -46,7 +41,7 @@ export class TeampendingService {
   async getTeamInvitation(teamId: string) {
     try {
       return await this.prisma.teamPending.findMany({
-        where: { teamId, status: "invitation" }
+        where: { teamId, status: PendingStatus.OUTGOING }
       });
     } catch (err) {
       throw new BadRequestException(err.message);
@@ -58,7 +53,7 @@ export class TeampendingService {
     void this.lineNotify.searchUserForTeamPendingNotify(
       req.teamId,
       req.userId,
-      "pending"
+      PendingStatus.INCOMING
     );
     return await this.prisma.teamPending.create({ data: req });
   }
@@ -68,10 +63,10 @@ export class TeampendingService {
     void this.lineNotify.searchUserForTeamPendingNotify(
       req.teamId,
       req.userId,
-      "invitation"
+      PendingStatus.OUTGOING
     );
     return await this.prisma.teamPending.create({
-      data: { ...req, status: "invitation" }
+      data: { ...req, status: PendingStatus.OUTGOING }
     });
   }
 

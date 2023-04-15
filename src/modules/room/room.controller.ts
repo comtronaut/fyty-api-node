@@ -1,65 +1,32 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-  UseGuards
-} from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from "@nestjs/common";
 import { User } from "@prisma/client";
-import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
-import { Debug } from "src/common/debug.decorator";
 import { UserSubject } from "src/common/subject.decorator";
 import { CreateRoomPendingDto } from "src/model/dto/room-pending.dto";
-import {
-  CreateRoomDto,
-  CreateRoomNoteDto,
-  DeleteRoomDto,
-  UpdateRoomNoteDto
-} from "src/model/dto/room.dto";
-import { RoomNoteService } from "./note.service";
-import { RoomRequestService } from "./request.service";
-import { RoomService } from "./room.service";
+import { DeleteRoomDto } from "src/model/dto/room.dto";
+import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { ChatService } from "../chat/chat.service";
+import { RoomPendingService } from "./pending.service";
+import { RoomService } from "./room.service";
 
-@Controller("api/rooms")
+@Controller("rooms")
 export class RoomController {
   constructor(
     private readonly roomService: RoomService,
     private readonly chatService: ChatService,
-    private readonly roomNoteService: RoomNoteService,
-    private readonly roomRequestService: RoomRequestService
+    private readonly roomPendingService: RoomPendingService
   ) {}
-
-  @Debug()
-  @Post()
-  async createRoom(@Body() req: CreateRoomDto) {
-    return await this.roomService.create(req);
-  }
-
-  @UseGuards(UserJwtAuthGuard)
-  @Post("join")
-  async joinRoom(
-    @Query("teamId") teamId: string,
-    @Query("roomId") roomId: string
-  ) {
-    return await this.roomService.joinRoom(teamId, roomId);
-  }
 
   @UseGuards(UserJwtAuthGuard)
   @Get("game/:id")
   async getRoomsBygame(
     @Param("id") gameId: string,
     @Query("name") roomName?: string,
-    @Query("date") date?: any
+    @Query("date") date?: string
   ) {
     return await this.roomService.getAllRooms(gameId, roomName, date);
   }
 
-  @UseGuards(UserJwtAuthGuard) // get all rooms which u r host
+  @UseGuards(UserJwtAuthGuard)
   @Get("team/:id")
   async getHostedRooms(@Param("id") teamId: string) {
     return await this.roomService.getRoomByHostId(teamId);
@@ -71,48 +38,16 @@ export class RoomController {
     return await this.roomService.getRoomsById(roomId);
   }
 
-  @UseGuards(UserJwtAuthGuard) // new
+  @UseGuards(UserJwtAuthGuard)
   @Get("me/team/:id")
   async getJoinedRooms(@Param("id") teamId: string) {
-    return await this.roomService.getJoinedRoom(teamId);
+    return await this.roomService.getRoomsByTeamId(teamId);
   }
 
   @UseGuards(UserJwtAuthGuard)
   @Delete("disband")
   async deleteRoom(@Body() payload: DeleteRoomDto) {
     return await this.roomService.disband(payload);
-  }
-
-  // room note
-  @UseGuards(UserJwtAuthGuard)
-  @Get(":id/note")
-  async getRoomsNotes(@Param("id") roomId: string) {
-    return await this.roomNoteService.getRoomNotes(roomId);
-  }
-
-  @UseGuards(UserJwtAuthGuard)
-  @Post(":id/note")
-  async createRoomNote(
-    @Param("id") roomId: string,
-    @Body() body: CreateRoomNoteDto
-  ) {
-    return await this.roomNoteService.create(roomId, body);
-  }
-
-  @UseGuards(UserJwtAuthGuard)
-  @Put("note/:id")
-  async updateRoomNote(
-    @Param("id") noteId: string,
-    @UserSubject() user: User,
-    @Body() body: UpdateRoomNoteDto
-  ) {
-    return await this.roomNoteService.update(noteId, user.id, body);
-  }
-
-  @UseGuards(UserJwtAuthGuard)
-  @Delete("note/:id")
-  async deleteRoomNote(@Param("id") noteId: string, @UserSubject() user: User) {
-    return await this.roomNoteService.delete(noteId, user.id);
   }
 
   // detail
@@ -133,30 +68,24 @@ export class RoomController {
   @UseGuards(UserJwtAuthGuard)
   @Get(":id/request")
   async getRoomsRequest(@Param("id") roomId: string) {
-    return await this.roomRequestService.getRoomRequest(roomId);
+    return await this.roomPendingService.getByRoomId(roomId);
   }
 
   @UseGuards(UserJwtAuthGuard)
   @Get("request/team/:id")
   async getRoomsRequestByTeam(@Param("id") teamId: string) {
-    return await this.roomRequestService.getRoomRequestByTeamId(teamId);
+    return await this.roomPendingService.getByTeamId(teamId);
   }
 
   @UseGuards(UserJwtAuthGuard)
   @Post(":id/request")
-  async createRoomRequest(
-    @Param("id") roomId: string,
-    @Body() body: CreateRoomPendingDto
-  ) {
-    return await this.roomRequestService.create(roomId, body);
+  async createRoomRequest(@Param("id") roomId: string, @Body() payload: CreateRoomPendingDto) {
+    return await this.roomPendingService.create(roomId, payload);
   }
 
   @UseGuards(UserJwtAuthGuard)
   @Delete("request/:id")
-  async deleteRoomRequest(
-    @Param("id") requestId: string,
-    @UserSubject() user: User
-  ) {
-    return await this.roomRequestService.delete(requestId, user.id);
+  async deleteRoomRequest(@Param("id") requestId: string, @UserSubject() user: User) {
+    return await this.roomPendingService.deleteById(requestId, user.id);
   }
 }

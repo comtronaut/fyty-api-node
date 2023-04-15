@@ -1,8 +1,5 @@
 import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
-import {
-  CreateTeamMemberDto,
-  UpdateTeamMemberDto
-} from "src/model/dto/team.dto";
+import { CreateTeamMemberDto, UpdateTeamMemberDto } from "src/model/dto/team-member";
 import { MemberRole, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 
@@ -27,15 +24,11 @@ export class TeamMemberService {
     }
   }
 
-  async update(teammemberId: string, req: UpdateTeamMemberDto) {
+  async update(teamMemberId: string, data: UpdateTeamMemberDto) {
     try {
-      const updateRes = await this.prisma.teamMember.update({
-        where: { id: teammemberId },
-        data: req
-      });
-
-      return await this.prisma.teamMember.findUniqueOrThrow({
-        where: { id: teammemberId }
+      return await this.prisma.teamMember.update({
+        where: { id: teamMemberId },
+        data
       });
     } catch (err) {
       throw new BadRequestException(err.message);
@@ -55,15 +48,10 @@ export class TeamMemberService {
       const member = await this.prisma.teamMember.findFirstOrThrow({
         where: { userId: user.id }
       });
-      if (
-        member.role === MemberRole.MANAGER
-        || member.role === MemberRole.LEADER
-      ) {
+      if ([ MemberRole.MANAGER, MemberRole.LEADER ].some((role) => role === member.role)) {
         const res = await this.prisma.teamMember.delete({
           where: { id: teammemberId }
         });
-
-        return HttpStatus.OK;
       } else {
         throw new Error("Permission denined");
       }

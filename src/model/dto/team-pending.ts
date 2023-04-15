@@ -3,9 +3,7 @@ import { PendingStatus, Prisma } from "@prisma/client";
 import { IsEnum, IsNotEmpty, IsUUID } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateTeamPendingDto
-implements Prisma.TeamPendingUncheckedCreateInput
-{
+export class CreateTeamPendingDto implements Prisma.TeamPendingUncheckedCreateInput {
   @IsNotEmpty()
   @IsUUID()
   teamId: string;
