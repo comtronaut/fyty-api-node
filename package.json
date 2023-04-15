@@ -15,7 +15,8 @@
     "format": "npm run prettier && npm run fix:scripts",
     "check": "tsc --noEmit",
     "prisma:migrate": "prisma db push --schema=./src/prisma/schema.prisma",
-    "prisma:gen": "prisma generate --schema=./src/prisma/schema.prisma"
+    "prisma:gen": "prisma generate --schema=./src/prisma/schema.prisma",
+    "prisma:seed": "ts-node src/prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^9.4.0",

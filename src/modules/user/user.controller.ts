@@ -24,7 +24,7 @@ export class UserController {
     return await this.userService.create(user);
   }
 
-  @Get("utils/validation")
+  @Get("validation")
   async validateUserDuplication(
     @Query("username") username?: string,
     @Query("mobilePhone") mobilePhone?: string,
@@ -62,7 +62,7 @@ export class UserController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Get("avatar/other") // new
+  @Get("avatar/other")
   async getUserAvatar(@Query("userId") userId: string, @Query("gameId") gameId: string) {
     return await this.avatarService.getUserAvatar(userId, gameId);
   }
