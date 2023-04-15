@@ -1,41 +1,35 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Put, UseGuards } from "@nestjs/common";
+import dayjs from "dayjs";
+import { UpdateRoomDto } from "src/model/dto/room.dto";
 import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
-import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
-import { AdminRoomsService } from "./admin-rooms.service";
+import { RoomService } from "src/modules/room/room.service";
 
-@Controller("admins/api/rooms")
+@Controller("admins/rooms")
 export class AdminRoomsController {
-  constructor(private readonly roomService: AdminRoomsService) {}
+  constructor(private readonly roomService: RoomService) {}
 
   @UseGuards(AdminJwtAuthGuard)
   @Get()
   async getRooms() {
-    return await this.roomService.getAllRooms();
+    return await this.roomService.getAll();
   }
-
-  // CRUD
-  // @UseGuards(AdminJwtAuthGuard)
-  // @Post()
-  // async createRoom(@Body() req: CreateRoomDto) {
-  //   return await this.roomService.create(req);
-  // }
 
   @UseGuards(AdminJwtAuthGuard)
   @Get(":id")
   async getRoomsById(@Param("id") roomId: string) {
-    return await this.roomService.getRoom(roomId);
+    return await this.roomService.getById(roomId);
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @Get(":id/participants")
   async getRoomParticipantsById(@Param("id") roomId: string) {
-    return await this.roomService.getRoomParticipants(roomId);
+    return await this.roomService.getRoomMembersByRoomId(roomId);
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @Get(":id/roomlineup")
   async getRoomLineUpById(@Param("id") roomId: string) {
-    return await this.roomService.getLineupsByRoomId(roomId);
+    return await this.roomService.getRoomLineupsByRoomId(roomId);
   }
 
   @UseGuards(AdminJwtAuthGuard)
@@ -47,6 +41,7 @@ export class AdminRoomsController {
   @UseGuards(AdminJwtAuthGuard)
   @Delete(":id")
   async deleteRoom(@Param("id") roomId: string) {
-    return await this.roomService.delete(roomId);
+    const timestamp = dayjs().add(1000, "year").toDate();
+    return await this.roomService.deleteMultiple(timestamp, [ roomId ]);
   }
 }

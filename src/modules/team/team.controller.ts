@@ -27,21 +27,21 @@ export class TeamController {
   @Get()
   async getTeamsByGameId(@Param("gameId") gameId: string) {
     if (gameId) {
-      return await this.teamService.getTeamsByGameId(gameId);
+      return await this.teamService.getGameId(gameId);
     }
-    return await this.teamService.getAllTeam();
+    return await this.teamService.getAll();
   }
 
   @UseGuards(UserJwtAuthGuard)
   @Get("me")
   async getMyTeam(@UserSubject() user: User) {
-    return await this.teamService.getMyTeam(user.id);
+    return await this.teamService.getUserTeams(user.id);
   }
 
   @UseGuards(UserJwtAuthGuard)
   @Get(":id")
   async getTeamById(@Param("id") id: string) {
-    return await this.teamService.getTeam(id);
+    return await this.teamService.getById(id);
   }
 
   @UseGuards(UserJwtAuthGuard)
@@ -61,7 +61,7 @@ export class TeamController {
   @UseGuards(UserJwtAuthGuard)
   @Get(":id/members")
   async getMembersByTeamId(@Param("id") teamId: string) {
-    return await this.teammemberService.getMemberByTeamId(teamId);
+    return await this.teammemberService.getTeamId(teamId);
   }
 
   @Post("members")

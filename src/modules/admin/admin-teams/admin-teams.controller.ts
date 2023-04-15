@@ -1,34 +1,34 @@
 import { Body, Controller, Delete, Get, Param, Put, UseGuards } from "@nestjs/common";
-import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
-import { AdminTeamsService } from "./admin-teams.service";
 import { UpdateTeamDto } from "src/model/dto/team.dto";
+import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
+import { TeamService } from "src/modules/team/team.service";
 
-@Controller("admins/api/teams")
+@Controller("admins/teams")
 export class AdminTeamsController {
-  constructor(private readonly adminTeamsService: AdminTeamsService) {}
+  constructor(private readonly adminTeamsService: TeamService) {}
 
   @Get()
   @UseGuards(AdminJwtAuthGuard)
   async getAllTeam() {
-    return await this.adminTeamsService.getAllTeams();
+    return await this.adminTeamsService.getAll();
   }
 
   @Get(":id")
   @UseGuards(AdminJwtAuthGuard)
   async getTeam(@Param("id") teamId: string) {
-    return await this.adminTeamsService.getTeam(teamId);
+    return await this.adminTeamsService.getById(teamId);
   }
 
   @Put(":id")
   @UseGuards(AdminJwtAuthGuard)
   async updateTeam(@Param("id") teamId: string, @Body() payload: UpdateTeamDto) {
-    return await this.adminTeamsService.updateTeamDetail(teamId, payload);
+    return await this.adminTeamsService.update(payload);
   }
 
   // constraint
   @Delete(":id")
   @UseGuards(AdminJwtAuthGuard)
   async deleteTeam(@Param("id") teamId: string) {
-    return await this.adminTeamsService.deleteTeam(teamId);
+    return await this.adminTeamsService.deleteByAdmin(teamId);
   }
 }

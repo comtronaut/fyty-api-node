@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { PendingStatus, RoomStatus } from "@prisma/client";
+import { PendingStatus, Room, RoomLineup, RoomMember, RoomStatus } from "@prisma/client";
 import dayjs from "dayjs";
 import { CreateRoomMemberDto } from "src/model/dto/room-member.dto";
 import { CreateRoomDto, DeleteRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
@@ -20,6 +20,9 @@ export class RoomService {
           endAt: {
             lte: timestamp
           }
+        },
+        select: {
+          id: true
         }
       });
 
@@ -27,100 +30,73 @@ export class RoomService {
         return;
       }
 
-      await Promise.all([
-        this.prisma.room.deleteMany({
-          where: {
-            endAt: {
-              lte: timestamp
-            }
-          }
-        }),
-        this.prisma.appointment.updateMany({
-          where: {
-            roomId: {
-              in: rooms.map((room) => room.id)
-            }
-          },
-          data: {
-            isDeleted: true
-          }
-        })
-      ]);
+      await this.deleteMultiple(timestamp, rooms.map((room) => room.id));
     } catch (err) {
       console.error(err.message);
     }
   }
 
   async create({ teamLineupIds, ...data }: CreateRoomDto) {
-    try {
-      // create room
-      const {
-        members: [ member ],
-        ...room
-      } = await this.prisma.room.create({
-        data: {
-          ...data,
-          members: {
-            create: {
-              teamId: data.hostTeamId
-            }
-          },
-          settings: {
-            create: {}
-          },
-          chat: {
-            create: {}
+    const {
+      members: [ member ],
+      ...room
+    } = await this.prisma.room.create({
+      data: {
+        ...data,
+        members: {
+          create: {
+            teamId: data.hostTeamId
           }
         },
-        include: {
-          members: true
+        settings: {
+          create: {}
+        },
+        chat: {
+          create: {}
         }
-      });
+      },
+      include: {
+        members: true
+      }
+    });
 
-      await this.prisma.roomLineup.createMany({
-        data: teamLineupIds.map((teamLineupId) => ({
-          teamLineupId,
-          roomMemberId: member.id,
-          roomId: room.id
-        }))
-      });
+    await this.prisma.roomLineup.createMany({
+      data: teamLineupIds.map((teamLineupId) => ({
+        teamLineupId,
+        roomMemberId: member.id,
+        roomId: room.id
+      }))
+    });
 
-      // create room appointment
-      await this.prisma.appointment.create({
-        data: {
-          startAt: data.startAt,
-          endAt: data.endAt,
-          roomId: room.id,
-          members: {
-            create: {
-              teamId: data.hostTeamId
-            }
+    // create room appointment
+    await this.prisma.appointment.create({
+      data: {
+        startAt: data.startAt,
+        endAt: data.endAt,
+        roomId: room.id,
+        members: {
+          create: {
+            teamId: data.hostTeamId
           }
         }
-      });
+      }
+    });
 
-      return {
-        room
-      };
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    return {
+      room
+    };
   }
 
   async update(roomId: string, data: UpdateRoomDto) {
-    try {
-      return await this.prisma.room.update({
-        where: {
-          id: roomId
-        },
-        data
-      });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    return await this.prisma.room.update({
+      where: {
+        id: roomId
+      },
+      data
+    });
   }
 
-  async getRoomsByTeamId(teamId: string) {
+  async getByTeamId(teamId: string) {
     try {
       const [ participants, request ] = await Promise.all([
         this.prisma.roomMember.findMany({
@@ -145,19 +121,25 @@ export class RoomService {
     }
   }
 
-  async getRoomsByGameId(gameId: string) {
-    return this.prisma.room.findMany({ where: { gameId } });
+  async getRoomMembersByRoomId(roomId: string): Promise<RoomMember[]> {
+    const out = await this.prisma.room.findFirstOrThrow({ where: { id: roomId }, select: { members: true } });
+    return out.members;
   }
 
-  async getRoomsById(roomId: string) {
-    return await this.prisma.room.findMany({ where: { id: roomId } });
+  async getRoomLineupsByRoomId(roomId: string): Promise<RoomLineup[]> {
+    const out = await this.prisma.room.findFirstOrThrow({ where: { id: roomId }, select: { lineups: true } });
+    return out.lineups;
   }
 
-  async getRoomByHostId(teamId: string) {
+  async getById(roomId: string): Promise<Room> {
+    return await this.prisma.room.findUniqueOrThrow({ where: { id: roomId } });
+  }
+
+  async getByHostTeamId(teamId: string): Promise<Room[]> {
     return await this.prisma.room.findMany({ where: { hostTeamId: teamId } });
   }
 
-  async getAllRooms(gameId: string, roomName?: string, date?: any) {
+  async getAll(gameId?: string, roomName?: string, date?: any): Promise<Room[]> {
     const today = new Date(date);
 
     const dayStart = dayjs(today).startOf("day").toDate();
@@ -165,9 +147,9 @@ export class RoomService {
 
     return await this.prisma.room.findMany({
       where: {
+        ...(gameId && { gameId }),
         ...(roomName && { name: roomName }),
-        ...(date && { startAt: { gte: dayStart, lte: dayEnd } }),
-        gameId
+        ...(date && { startAt: { gte: dayStart, lte: dayEnd } })
       }
     });
   }
@@ -307,6 +289,28 @@ export class RoomService {
     } catch (err) {
       throw new BadRequestException(err.message);
     }
+  }
+
+  async deleteMultiple(timestamp: Date, roomIds: string[]) {
+    await Promise.all([
+      this.prisma.room.deleteMany({
+        where: {
+          endAt: {
+            lte: timestamp
+          }
+        }
+      }),
+      this.prisma.appointment.updateMany({
+        where: {
+          roomId: {
+            in: roomIds
+          }
+        },
+        data: {
+          isDeleted: true
+        }
+      })
+    ]);
   }
 
   async getRoomDetail(roomId: string) {

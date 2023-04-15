@@ -1,4 +1,4 @@
-import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
+import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { Lang, User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { Cache } from "cache-manager";
@@ -9,8 +9,12 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class UserService {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
+
+  async getAllUser() {
+    return await this.prisma.user.findMany();
+  }
 
   async getById(id: string): Promise<User> {
     const cachedUser = await this.cacheManager.get<User>(`user:${id}`);
@@ -46,59 +50,48 @@ export class UserService {
   }
 
   async create(data: CreateUserDto) {
-    try {
-      const [ hashedPassword ] = await Promise.all([ bcrypt.hash(data.password, 12) ]);
+    const [ passwordHash ] = await Promise.all([ bcrypt.hash(data.password, 12) ]);
 
-      const createdContent = { ...data, password: hashedPassword };
+    const createdContent = { ...data, password: passwordHash };
 
-      const { password, ...userData } = await this.prisma.user.create({
-        data: createdContent
-      });
-      await this.prisma.userSettings.create({
-        data: {
-          userId: userData.id,
-          lang: Lang.TH
+    const { password, ...userData } = await this.prisma.user.create({
+      data: {
+        ...createdContent,
+        settings: {
+          create: {
+            lang: Lang.TH
+          }
         }
-      });
+      }
+    });
 
-      return userData;
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    return userData;
   }
 
   async update(id: string, data: UpdateUserDto) {
-    try {
-      const res = await this.prisma.user.update({
-        where: {
-          id
-        },
-        data: {
-          ...data,
-          ...(data.email && { updatedEmailAt: new Date() }),
-          ...(data.username && { updatedUsernameAt: new Date() }),
-          ...(data.password && {
-            password: bcrypt.hashSync(data.password, 12)
-          })
-        }
-      });
+    const res = await this.prisma.user.update({
+      where: {
+        id
+      },
+      data: {
+        ...data,
+        ...(data.email && { updatedEmailAt: new Date() }),
+        ...(data.username && { updatedUsernameAt: new Date() }),
+        ...(data.password && {
+          password: bcrypt.hashSync(data.password, 12)
+        })
+      }
+    });
 
-      await this.cacheManager.set(`user:${id}`, res);
+    await this.cacheManager.set(`user:${id}`, res);
 
-      return res;
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    return res;
   }
 
   async delete(id: string): Promise<void> {
-    try {
-      const res = await this.prisma.user.delete({ where: { id } });
+    await this.prisma.user.delete({ where: { id } });
 
-      await this.cacheManager.del(`user:${id}`);
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    await this.cacheManager.del(`user:${id}`);
   }
 
   async getDuplicationResult(data: UpdateUserDto): Promise<Record<string, boolean>> {

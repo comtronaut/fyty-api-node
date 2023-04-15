@@ -23,25 +23,25 @@ export class RoomController {
     @Query("name") roomName?: string,
     @Query("date") date?: string
   ) {
-    return await this.roomService.getAllRooms(gameId, roomName, date);
+    return await this.roomService.getAll(gameId, roomName, date);
   }
 
   @UseGuards(UserJwtAuthGuard)
   @Get("team/:id")
   async getHostedRooms(@Param("id") teamId: string) {
-    return await this.roomService.getRoomByHostId(teamId);
+    return await this.roomService.getByHostTeamId(teamId);
   }
 
   @UseGuards(UserJwtAuthGuard)
   @Get(":id")
   async getRoomsById(@Param("id") roomId: string) {
-    return await this.roomService.getRoomsById(roomId);
+    return await this.roomService.getById(roomId);
   }
 
   @UseGuards(UserJwtAuthGuard)
   @Get("me/team/:id")
   async getJoinedRooms(@Param("id") teamId: string) {
-    return await this.roomService.getRoomsByTeamId(teamId);
+    return await this.roomService.getByTeamId(teamId);
   }
 
   @UseGuards(UserJwtAuthGuard)

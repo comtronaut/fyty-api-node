@@ -2,11 +2,23 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { Appointment } from "@prisma/client";
 import { UpdateAppointmentDto } from "src/model/dto/appointment.dto";
 import { PrismaService } from "src/prisma/prisma.service";
-import { NotifyService } from "../notification/lineNotify.service";
 
 @Injectable()
 export class AppointmentService {
-  constructor(private readonly prisma: PrismaService, private readonly lineNotify: NotifyService) {}
+  constructor(private readonly prisma: PrismaService) {}
+
+  async getAll() {
+    await this.prisma.appointment.findMany();
+  }
+
+  async getById(id: string) {
+    await this.prisma.appointment.findFirstOrThrow({ where: { id } });
+  }
+
+  async getMembersByAppointmentId(appoinmentId: string) {
+    const out = await this.prisma.appointment.findFirstOrThrow({ where: { id: appoinmentId }, select: { members: true } });
+    return out.members;
+  }
 
   async getAppointment(roomId: string, teamId: string) {
     try {

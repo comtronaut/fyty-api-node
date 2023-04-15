@@ -1,4 +1,4 @@
-import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { MemberRole, Team, User } from "@prisma/client";
 import { CreateTeamDto, UpdateTeamDto } from "src/model/dto/team.dto";
 import { PrismaService } from "src/prisma/prisma.service";
@@ -7,21 +7,26 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class TeamService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // CRUD
   async create(user: User, req: CreateTeamDto) {
     try {
       const teamCount = await this.prisma.teamMember.count({
         where: { userId: user.id }
       });
+
       if (teamCount > 0) {
         throw new Error("You already have team");
       }
 
-      req.founderId = user.id; // set the team's owner
-      const team = await this.prisma.team.create({ data: req });
-
-      await this.prisma.teamMember.create({
-        data: { teamId: team.id, userId: user.id, role: MemberRole.MANAGER }
+      const team = await this.prisma.team.create({
+        data: {
+          ...req,
+          members: {
+            create: {
+              userId: user.id,
+              role: MemberRole.MANAGER
+            }
+          }
+        }
       });
       return team;
     } catch (err) {
@@ -29,72 +34,51 @@ export class TeamService {
     }
   }
 
-  async getTeam(teamId: string) {
-    try {
-      return await this.prisma.team.findUniqueOrThrow({
-        where: { id: teamId }
-      });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+  async getById(teamId: string) {
+    return await this.prisma.team.findUniqueOrThrow({
+      where: { id: teamId }
+    });
   }
 
-  async getMyTeam(userId: string) {
-    try {
-      const members = await this.prisma.teamMember.findMany({
-        where: { userId }
-      });
-      return await this.prisma.team.findMany({
-        where: { id: { in: members.map((e) => e.teamId) } }
-      });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+  async getUserTeams(userId: string) {
+    const memberRes = await this.prisma.teamMember.findMany({
+      where: { userId },
+      select: {
+        team: true
+      }
+    });
+
+    return memberRes.map((e) => e.team);
   }
 
-  async getTeamsByGameId(gameId: string) {
-    try {
-      return await this.prisma.team.findMany({ where: { gameId } });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+  async getGameId(gameId: string) {
+    return await this.prisma.team.findMany({ where: { gameId } });
   }
 
-  async getAllTeam() {
+  async getAll() {
     return await this.prisma.team.findMany();
   }
 
   async update(payload: UpdateTeamDto): Promise<Team> {
-    try {
-      await this.prisma.team.update({
-        where: { id: payload.id },
-        data: payload
-      });
-
-      const updatedTeam = await this.prisma.team.findFirstOrThrow({
-        where: { id: payload.id }
-      });
-
-      return updatedTeam;
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    return await this.prisma.team.update({
+      where: { id: payload.id },
+      data: payload
+    });
   }
 
   async delete(userId: string, teamId: string) {
-    try {
-      const member = await this.prisma.teamMember.findFirstOrThrow({
-        where: { userId, teamId }
-      });
-      if (member.role === MemberRole.MANAGER) {
-        await this.prisma.teamMember.deleteMany({ where: { teamId } });
-      } else {
-        throw new Error("Only Manager can delete team");
-      }
+    const member = await this.prisma.teamMember.findFirstOrThrow({
+      where: { userId, teamId }
+    });
 
-      return HttpStatus.OK;
-    } catch (err) {
-      throw new BadRequestException(err.message);
+    if (member.role === MemberRole.MANAGER) {
+      await this.prisma.teamMember.deleteMany({ where: { teamId } });
+    } else {
+      throw new Error("Only Manager can delete team");
     }
+  }
+
+  async deleteByAdmin(teamId: string) {
+    await this.prisma.teamMember.deleteMany({ where: { teamId } });
   }
 }

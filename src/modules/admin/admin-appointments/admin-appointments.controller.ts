@@ -1,35 +1,28 @@
-import { Body, Controller, Delete, Get, Param, Put, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Put, UseGuards } from "@nestjs/common";
+import { UpdateAppointmentDto } from "src/model/dto/appointment.dto";
+import { AppointmentService } from "src/modules/appointment/appointment.service";
 import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
-import { AdminAppointmentsService } from "./admin-appointments.service";
-import { CreateAppointmentDto, UpdateAppointmentDto } from "src/model/dto/appointment.dto";
 
-@Controller("admins/api/users")
+@Controller("admins/users")
 export class AdminAppointmentsController {
-  constructor(private readonly appointmentService: AdminAppointmentsService) {}
+  constructor(private readonly appointmentService: AppointmentService) {}
 
   @UseGuards(AdminJwtAuthGuard)
   @Get()
   async getAll() {
-    return this.appointmentService.getAllAppointment();
+    return this.appointmentService.getAll();
   }
-
-  // CRUD
-  // @UseGuards(AdminJwtAuthGuard)
-  // @Post()
-  // async crate(@Body() req: CreateAppointmentDto) {
-  //   return this.appointmentService.create(req);
-  // }
 
   @UseGuards(AdminJwtAuthGuard)
   @Get(":id")
   async get(@Param("id") appointmentId: string) {
-    return this.appointmentService.getAppointment(appointmentId);
+    return this.appointmentService.getById(appointmentId);
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @Get(":id/member")
   async getAppointmentMember(@Param("id") appointmentId: string) {
-    return this.appointmentService.getAppointmentMember(appointmentId);
+    return this.appointmentService.getMembersByAppointmentId(appointmentId);
   }
 
   @UseGuards(AdminJwtAuthGuard)

@@ -16,11 +16,7 @@ export class NotifyService {
     const url = "https://notify-api.line.me/api/notify";
     const headers = { Authorization: `Bearer ${token}` };
 
-    try {
-      await axios.postForm(url, { message }, { headers });
-    } catch (error) {
-      throw new Error("Failed to send notification");
-    }
+    await axios.postForm(url, { message }, { headers });
   }
 
   async getAuthorizeUrl(userId: string): Promise<string> {

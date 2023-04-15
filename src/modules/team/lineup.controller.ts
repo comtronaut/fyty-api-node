@@ -28,19 +28,19 @@ export class LineupController {
   @UseGuards(UserJwtAuthGuard)
   @Get()
   async getAllLineups(@Query("teamId") teamId: string) {
-    return await this.lineUpService.getLineupsByTeamId(teamId);
+    return await this.lineUpService.getByTeamId(teamId);
   }
 
   @UseGuards(UserJwtAuthGuard)
   @Get(":id")
   async getLineup(@Param("id") lineUpId: string) {
-    return await this.lineUpService.getLineUpById(lineUpId);
+    return await this.lineUpService.getById(lineUpId);
   }
 
   @UseGuards(UserJwtAuthGuard)
   @Get("participant/:id")
   async getLineups(@Param("id") participantId: string) {
-    return await this.lineUpService.getTeamLineupsByRoomMemberId(participantId);
+    return await this.lineUpService.getByRoomMemberId(participantId);
   }
 
   @UseGuards(UserJwtAuthGuard)
