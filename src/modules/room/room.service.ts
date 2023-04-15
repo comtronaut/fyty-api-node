@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { Room, RoomStatus } from "@prisma/client";
+import { AppointmentStatus, Room, RoomStatus } from "@prisma/client";
 import dayjs from "dayjs";
-import { CreateRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
+import { CreateRoomDto, DeleteRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
@@ -49,7 +49,7 @@ export class RoomService {
   }
 
   // CRUD
-  async create({ teamlineUpIds, ...data }: CreateRoomDto) {
+  async create({ teamlineupIds: teamlineUpIds, ...data }: CreateRoomDto) {
     try {
       const room = await this.prisma.room.create({ data });
       const board = await this.prisma.roomLineupBoard.create({ data: {} });
@@ -171,7 +171,7 @@ export class RoomService {
     }
   }
 
-  async disband(payload: any) {
+  async disband(payload: DeleteRoomDto) {
     try {
       const teamId = payload.teamId;
       const room = await this.prisma.room.findUniqueOrThrow({
@@ -181,7 +181,7 @@ export class RoomService {
       if (room.hostId === teamId) {
         await this.prisma.appointment.updateMany({
           where: { roomId: room.id },
-          data: { isDel: true }
+          data: { isDeleted: true }
         });
 
         await this.prisma.room.delete({ where: { id: room.id } });
@@ -220,7 +220,7 @@ export class RoomService {
         await this.updateStatus(room);
 
         // find room request
-        const request = await this.prisma.roomRequest.findFirstOrThrow({
+        const request = await this.prisma.roomPending.findFirstOrThrow({
           where: { teamId, roomId }
         });
 
@@ -231,7 +231,7 @@ export class RoomService {
           gameId: game.id,
           roomLineUpBoardId: request.roomLineUpBoardId
         };
-        const participant = await this.prisma.roomParticipant.create({
+        const participant = await this.prisma.roomMember.create({
           data: participantData
         });
 
@@ -240,7 +240,7 @@ export class RoomService {
           startAt: room.startAt,
           endAt: room.endAt,
           roomId: room.id,
-          status: "WAITING",
+          status: AppointmentStatus.WAITING,
           isDel: false
         };
         const appointment = await this.prisma.appointment.create({
@@ -282,11 +282,9 @@ export class RoomService {
 
   async leaveRoom(participantId: string) {
     try {
-      const parti = await this.prisma.roomParticipant.findUniqueOrThrow({
-        where: { id: participantId }
-      });
-      const room = await this.prisma.room.findUniqueOrThrow({
-        where: { id: parti.roomId }
+      const { room, ...parti } = await this.prisma.roomParticipant.findUniqueOrThrow({
+        where: { id: participantId },
+        include: { room: true }
       });
 
       await this.prisma.room.update({

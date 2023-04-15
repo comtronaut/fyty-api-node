@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { CreateRoomRequestDto } from "src/model/dto/room-pending.dto";
+import { CreateRoomPendingDto } from "src/model/dto/room-pending.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { NotifyService } from "src/modules/notification/lineNotify.service";
 
@@ -10,7 +10,7 @@ export class RoomRequestService {
     private readonly lineNotify: NotifyService
   ) {}
 
-  async create(roomId: string, body: CreateRoomRequestDto) {
+  async create(roomId: string, body: CreateRoomPendingDto) {
     try {
       const roomRequestCount = await this.prisma.roomRequest.count({
         where: { roomId, teamId: body.teamId }

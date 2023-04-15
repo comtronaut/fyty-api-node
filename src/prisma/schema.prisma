@@ -211,7 +211,7 @@ model TeamPending {
 model User {
   id                String    @id @default(uuid())
   username          String    @unique
-  phoneNumber       String    @unique
+  mobilePhone       String    @unique
   updatedUsernameAt DateTime?
   password          String
   displayName       String
@@ -345,10 +345,10 @@ model Matching {
   hostLoseCount Int            @default(0)
   result        MatchingResult @default(TIE)
 
-  reports MathingReport[]
+  reports MatchingReport[]
 }
 
-model MathingReport {
+model MatchingReport {
   id         String   @id @default(uuid())
   matching   Matching @relation(fields: [matchingId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   matchingId String   @unique

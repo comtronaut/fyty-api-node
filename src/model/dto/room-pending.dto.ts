@@ -1,8 +1,10 @@
 import { Prisma } from "@prisma/client";
+import { Transform } from "class-transformer";
 import { IsNotEmpty, IsUUID } from "class-validator";
+import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateRoomRequestDto
-implements Prisma.RoomRequestUncheckedCreateInput
+export class CreateRoomPendingDto
+implements Prisma.RoomPendingUncheckedCreateInput
 {
   @IsNotEmpty()
   @IsUUID()
@@ -12,10 +14,9 @@ implements Prisma.RoomRequestUncheckedCreateInput
   @IsUUID()
   roomId: string;
 
-  // @IsNotEmpty()
-  // @IsUUID()
-  roomLineUpBoardId: string;
-
   @IsNotEmpty()
-  teamlineUpIds: string;
+  @Transform(({ value }) => value.split(","))
+  teamLineupIds: string[];
 }
+
+export const schemas = validationMetadatasToSchemas();

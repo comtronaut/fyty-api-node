@@ -1,8 +1,11 @@
 import { Prisma } from ".prisma/client";
-import { ApiPropertyOptional } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsNotEmpty, IsOptional, IsUUID } from "class-validator";
+import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
 export class CreateMessageDto implements Prisma.MessageUncheckedCreateInput {
+  @IsOptional()
+  waitingKey: string;
+
   @IsNotEmpty()
   @IsUUID()
   chatId: string;
@@ -11,10 +14,12 @@ export class CreateMessageDto implements Prisma.MessageUncheckedCreateInput {
   @IsUUID()
   senderId: string;
 
-  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
   teamId: string;
 
-  @IsString()
   @IsNotEmpty()
   message: string;
 }
+
+export const schemas = validationMetadatasToSchemas();

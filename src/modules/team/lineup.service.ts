@@ -1,5 +1,8 @@
 import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
-import { CreateLineUpDto, UpdateLineUpDto } from "src/model/dto/team-lineup.dto";
+import {
+  CreateTeamLineupDto,
+  UpdateLineUpDto
+} from "src/model/dto/team-lineup.dto";
 import { MemberRole, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 
@@ -7,7 +10,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class LineUpService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: CreateLineUpDto) {
+  async create(data: CreateTeamLineupDto) {
     try {
       return await this.prisma.teamLineUp.create({ data });
     } catch (err) {

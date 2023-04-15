@@ -1,78 +1,50 @@
 import { PartialType } from "@nestjs/mapped-types";
-import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Prisma } from "@prisma/client";
-import { IsNotEmpty, IsUUID } from "class-validator";
+import { Transform } from "class-transformer";
+import { IsBoolean, IsISO8601, IsNotEmpty, IsOptional, IsUUID } from "class-validator";
+import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
 export class CreateRoomDto implements Prisma.RoomUncheckedCreateInput {
   @IsNotEmpty()
   name: string;
+  
+  @IsOptional()
+  @IsBoolean()
+  isPrivate: boolean;
 
-  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsISO8601()
   startAt: Date;
 
-  @ApiPropertyOptional()
+  @IsNotEmpty()
+  @IsISO8601()
   endAt: Date;
 
-  // @IsNotEmpty()
-  teamlineUpIds: string;
+  @IsNotEmpty()
+  @Transform(({ value }) => value.split(","))
+  teamLineupIds: string[];
 
   @IsNotEmpty()
   gameId: string;
 
+  @IsOptional()
   note: string;
 
   @IsNotEmpty()
+  @IsUUID()
   hostId: string;
 }
 
 export class UpdateRoomDto extends PartialType(CreateRoomDto) {}
 
-// participant
-
-export class CreateParticipantDto
-implements Prisma.RoomParticipantUncheckedCreateInput
-{
-  @IsNotEmpty()
-  @IsUUID()
-  teamId: string;
-
-  @IsNotEmpty()
-  @IsUUID()
-  roomId: string;
-
-  @IsNotEmpty()
-  gameId: string;
-
-  @IsNotEmpty()
-  @IsUUID()
-  roomLineUpBoardId: string;
-}
-
-export class UpdateParticipantDto extends PartialType(CreateParticipantDto) {}
-
-// RoomNote
-
-export class UpdateRoomNoteDto {
-  topic: string;
-
-  body: string;
-}
-
-export class CreateRoomNoteDto {
-  @ApiPropertyOptional()
-  roomId: string;
-
-  @IsNotEmpty()
-  topic: string;
-
-  @ApiPropertyOptional()
-  body: string;
-}
-
 export class DeleteRoomDto {
   @IsNotEmpty()
+  @IsUUID()
   roomId: string;
 
   @IsNotEmpty()
+  @IsUUID()
   teamId: string;
 }
+
+export const schemas = validationMetadatasToSchemas();

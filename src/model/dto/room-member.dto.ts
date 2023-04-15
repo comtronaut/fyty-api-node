@@ -1,8 +1,9 @@
 import { Prisma } from "@prisma/client";
 import { IsNotEmpty, IsUUID } from "class-validator";
+import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateParticipantDto
-implements Prisma.RoomParticipantUncheckedCreateInput
+export class CreateRoomMemberDto
+implements Prisma.RoomMemberUncheckedCreateInput
 {
   @IsNotEmpty()
   @IsUUID()
@@ -14,8 +15,6 @@ implements Prisma.RoomParticipantUncheckedCreateInput
 
   @IsNotEmpty()
   gameId: string;
-
-  @IsNotEmpty()
-  @IsUUID()
-  roomLineUpBoardId: string;
 }
+
+export const schemas = validationMetadatasToSchemas();

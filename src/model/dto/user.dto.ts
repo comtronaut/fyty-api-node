@@ -1,72 +1,54 @@
 import { PartialType } from "@nestjs/mapped-types";
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Prisma } from "@prisma/client";
-import { IsEmail, IsNotEmpty, MinLength } from "class-validator";
+import { IsEmail, IsISO8601, IsMobilePhone, IsNotEmpty, IsOptional, IsUrl, MinLength } from "class-validator";
+import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
 export class CreateUserDto implements Prisma.UserUncheckedCreateInput {
   @IsNotEmpty()
-  @ApiProperty()
   username: string;
 
   @IsNotEmpty()
   @MinLength(6)
-  @ApiProperty()
   password: string;
 
   @IsNotEmpty()
-  @ApiProperty()
   displayName: string;
 
-  @IsEmail()
   @IsNotEmpty()
-  @ApiProperty()
+  @IsEmail()
   email: string;
 
-  @ApiPropertyOptional()
+  @IsOptional()
   bio: string;
 
-  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUrl()
   portraitUrl: string;
 
-  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUrl()
   coverUrl: string;
 
   @IsNotEmpty()
-  phoneNumber: string;
+  @IsMobilePhone("th-TH")
+  mobilePhone: string;
 
-  lineToken?: string | null;
+  @IsOptional()
+  lineToken?: string;
 
+  @IsOptional()
+  @IsISO8601()
   lastLoginAt: Date;
 
+  @IsOptional()
+  @IsISO8601()
   firstLoginAt: Date;
 
-  @ApiPropertyOptional({ description: "auto generated" })
+  @IsOptional()
+  @IsISO8601()
   createdAt: Date;
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
 
-export class CreateUserAvatarDto
-implements Prisma.UserAvatarUncheckedCreateInput
-{
-  @IsNotEmpty()
-  characterName: string;
-
-  @IsNotEmpty()
-  ingameId: string;
-
-  @IsNotEmpty()
-  rank: string;
-
-  ratingScore: number;
-
-  @IsNotEmpty()
-  gameId: string;
-
-  @IsNotEmpty()
-  userId: string;
-
-  createdAt: Date;
-}
-
-export class UpdateUserAvatarDto extends PartialType(CreateUserAvatarDto) {}
+export const schemas = validationMetadatasToSchemas();

@@ -1,20 +1,23 @@
 import { PartialType } from "@nestjs/mapped-types";
-import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Prisma } from "@prisma/client";
-import { IsUUID } from "class-validator";
+import { IsBoolean, IsOptional, IsUUID } from "class-validator";
+import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateLineUpDto implements Prisma.TeamLineUpUncheckedCreateInput {
+export class CreateTeamLineupDto implements Prisma.TeamLineupUncheckedCreateInput {
   @IsUUID()
   teamId: string;
 
-  @ApiPropertyOptional()
-  isDefault: any;
+  @IsOptional()
+  @IsBoolean()
+  isDefault: boolean;
 
-  @ApiPropertyOptional()
+  @IsOptional()
   inGameId: string;
 
-  @ApiPropertyOptional()
+  @IsOptional()
   imageUrl: string;
 }
 
-export class UpdateLineUpDto extends PartialType(CreateLineUpDto) {}
+export class UpdateLineUpDto extends PartialType(CreateTeamLineupDto) {}
+
+export const schemas = validationMetadatasToSchemas();

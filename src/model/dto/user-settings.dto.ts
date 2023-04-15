@@ -1,18 +1,20 @@
 import { PartialType } from "@nestjs/mapped-types";
-import { ApiProperty } from "@nestjs/swagger";
-import { Prisma } from "@prisma/client";
-import { IsString } from "class-validator";
+import { Lang, Prisma } from "@prisma/client";
+import { IsEnum, IsNotEmpty, IsOptional, IsUUID } from "class-validator";
+import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
 export class CreateUserSettingsDto
 implements Prisma.UserSettingsUncheckedCreateInput
 {
-  @IsString()
-  @ApiProperty()
+  @IsNotEmpty()
+  @IsUUID()
   userId: string;
 
-  @IsString()
-  @ApiProperty()
-  lang: string;
+  @IsOptional()
+  @IsEnum(Lang)
+  lang: Lang;
 }
 
 export class UpdateUserSettingsDto extends PartialType(CreateUserSettingsDto) {}
+
+export const schemas = validationMetadatasToSchemas();

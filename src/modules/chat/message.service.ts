@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { CreateMessageDto } from "src/model/dto/chat.dto";
+import { CreateMessageDto } from "src/model/dto/message.dto";
 import { NotifyService } from "src/modules/notification/lineNotify.service";
 import { PrismaService } from "src/prisma/prisma.service";
 
@@ -9,6 +9,7 @@ export class MessageService {
     private readonly prisma: PrismaService,
     private readonly lineNotify: NotifyService
   ) {}
+
   async create({
     waitingKey,
     ...data

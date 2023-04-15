@@ -15,7 +15,7 @@ export class AdminRoomsService {
   }
 
   // CRUD
-  async create({ teamlineUpIds, ...data }: CreateRoomDto) {
+  async create({ teamlineupIds: teamlineUpIds, ...data }: CreateRoomDto) {
     try {
       const room = await this.prisma.room.create({ data });
       const board = await this.prisma.roomLineupBoard.create({ data: {} });

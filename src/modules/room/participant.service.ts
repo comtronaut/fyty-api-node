@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
-import { CreateParticipantDto } from "src/model/dto/room-member.dto";
+import { CreateRoomMemberDto } from "src/model/dto/room-member.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
@@ -29,7 +29,7 @@ export class RoomParticipantService {
     }
   }
 
-  async delete(req: CreateParticipantDto) {
+  async delete(req: CreateRoomMemberDto) {
     try {
       return await this.prisma.roomParticipant.deleteMany({
         where: { teamId: req.teamId, roomId: req.roomId }

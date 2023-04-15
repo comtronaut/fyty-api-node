@@ -4,18 +4,15 @@ import { Transform } from "class-transformer";
 import {
   IsNotEmpty,
   IsNumber,
-  IsNumberString,
-  IsString,
   IsUrl
 } from "class-validator";
+import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
 export class CreateGameDto implements Prisma.GameUncheckedCreateInput {
-  @IsString()
   @IsNotEmpty()
   id: string;
 
   @IsNotEmpty()
-  @IsString()
   name: string;
 
   @IsNumber()
@@ -36,8 +33,10 @@ export class CreateGameDto implements Prisma.GameUncheckedCreateInput {
   @IsNotEmpty()
   coverUrl: string;
 
-  @IsString()
+  @IsNotEmpty()
   desc: string;
 }
 
 export class UpdateGameDto extends PartialType(CreateGameDto) {}
+
+export const schemas = validationMetadatasToSchemas();

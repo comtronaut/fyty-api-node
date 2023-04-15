@@ -14,6 +14,7 @@ Table Game {
   lineupCap Int [not null]
   logoUrl String [not null]
   coverUrl String [not null]
+  isActive Boolean [not null, default: true]
   desc String [not null, default: '']
 }
 
@@ -24,46 +25,39 @@ Table Room {
   option String [not null, default: '']
   startAt DateTime [not null]
   endAt DateTime [not null]
+  isPrivate Boolean [not null, default: false]
   teamCount Int [not null, default: 1]
   note String [not null, default: '']
   gameId String [not null]
   hostId String [not null]
+  updatedAt DateTime [not null]
   createdAt DateTime [default: `now()`, not null]
 }
 
-Table RoomParticipant {
+Table RoomSettings {
+  id String [pk]
+  roomId String [unique, not null]
+}
+
+Table RoomMember {
   id String [pk]
   teamId String [not null]
   roomId String [not null]
-  gameId String [not null]
-  roomLineUpBoardId String [not null]
   joinedAt DateTime [default: `now()`, not null]
-}
-
-Table RoomNote {
-  id String [pk]
-  roomId String [not null]
-  topic String [not null]
-  body String [not null, default: '']
-  createdAt DateTime [default: `now()`, not null]
 }
 
 Table RoomLineup {
   id String [pk]
-  teamLineUpId String
-  roomLineUpBoardId String [not null]
+  teamLineupId String [not null]
+  roomMemberId String [not null]
+  roomId String [not null]
 }
 
-Table RoomLineupBoard {
-  id String [pk]
-}
-
-Table RoomRequest {
+Table RoomPending {
   id String [pk]
   teamId String [not null]
   roomId String [not null]
-  roomLineUpBoardId String [not null]
-  joinedAt DateTime [default: `now()`, not null]
+  status PendingStatus [not null, default: 'INCOMING']
 }
 
 Table Team {
@@ -72,9 +66,17 @@ Table Team {
   coverUrl String [not null, default: '']
   logoUrl String [not null, default: '']
   tier String [not null, default: '']
+  isPrivate Boolean [not null, default: false]
   gameId String [not null]
-  ownerId String [not null]
+  ownerId String
+  isDeleted Boolean [not null, default: false]
   createdAt DateTime [default: `now()`, not null]
+}
+
+Table TeamSettings {
+  id String [pk]
+  teamId String [unique, not null]
+  isJoiningEnabled Boolean [not null, default: true]
 }
 
 Table TeamMember {
@@ -85,7 +87,7 @@ Table TeamMember {
   joinedAt DateTime [default: `now()`, not null]
 }
 
-Table TeamLineUp {
+Table TeamLineup {
   id String [pk]
   teamId String [not null]
   avatarId String
@@ -101,13 +103,14 @@ Table TeamPending {
   id String [pk]
   teamId String [not null]
   userId String [not null]
-  status String [not null, default: 'pending']
-  createAt DateTime [default: `now()`, not null]
+  status PendingStatus [not null, default: 'INCOMING']
+  createdAt DateTime [default: `now()`, not null]
 }
 
 Table User {
   id String [pk]
   username String [unique, not null]
+  mobilePhone String [unique, not null]
   updatedUsernameAt DateTime
   password String [not null]
   displayName String [not null]
@@ -132,7 +135,7 @@ Table UserSettings {
   isTeamNotified Boolean [not null, default: true]
   isMeNotified Boolean [not null, default: true]
   isRoomNotified Boolean [not null, default: true]
-  lang String [not null]
+  lang Lang [not null, default: 'TH']
 }
 
 Table PasswordResetSession {
@@ -147,7 +150,7 @@ Table PasswordResetSession {
 
 Table UserAvatar {
   id String [pk]
-  ingameId String [not null]
+  inGameId String [not null]
   characterName String [not null, default: '']
   rank String [not null]
   ratingScore Decimal [not null, default: 0]
@@ -159,7 +162,7 @@ Table Review {
   id String [pk]
   content String [not null]
   ratingScore Decimal [not null, default: 0]
-  reviewerId String [not null]
+  reviewerId String
   revieweeId String [not null]
   gameId String [not null]
   createdAt DateTime [default: `now()`, not null]
@@ -169,15 +172,16 @@ Table Appointment {
   id String [pk]
   startAt DateTime [not null]
   endAt DateTime [not null]
-  status String [not null, default: '']
-  isDel Boolean [not null, default: false]
-  roomId String
+  status AppointmentStatus [not null, default: 'WAITING']
+  isDeleted Boolean [not null, default: false]
+  roomId String [unique]
+  createdAt DateTime [default: `now()`, not null]
 }
 
 Table AppointmentMember {
   id String [pk]
   teamId String [not null]
-  appointId String
+  appointmentId String
 }
 
 Table Chat {
@@ -194,18 +198,28 @@ Table Message {
   createdAt DateTime [default: `now()`, not null]
 }
 
-Table MatchHistory {
+Table Matching {
   id String [pk]
-  hostId String [not null]
-  guestId String [not null]
-  hostWin Int [not null, default: 0]
-  hostlose Int [not null, default: 0]
-  result String [not null, default: 'tie']
+  appointmentId String [unique, not null]
+  hostId String
+  guestId String
+  hostWinCount Int [not null, default: 0]
+  hostLoseCount Int [not null, default: 0]
+  result MatchingResult [not null, default: 'TIE']
 }
 
-Table TeamStatistic {
+Table MatchingReport {
   id String [pk]
-  teamId String [not null]
+  matchingId String [unique, not null]
+  heading String [not null]
+  content String [not null]
+  images String[] [not null]
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table TeamStats {
+  id String [pk]
+  teamId String [unique, not null]
   matches Int [not null, default: 0]
   win Int [not null, default: 0]
   lose Int [not null, default: 0]
@@ -217,11 +231,6 @@ Table Image {
   id String [pk]
 }
 
-Table PhoneNumber {
-  id String [pk]
-  phoneNumber String [unique, not null]
-}
-
 Table Admin {
   id String [pk]
   email String [unique, not null]
@@ -229,6 +238,11 @@ Table Admin {
   role AdminRole [not null, default: 'MANAGEMENT']
   createAt DateTime [default: `now()`, not null]
   updateAt DateTime [not null]
+}
+
+Enum Lang {
+  TH
+  EN
 }
 
 Enum RoomStatus {
@@ -244,45 +258,61 @@ Enum MemberRole {
   MEMBER
 }
 
+Enum MatchingResult {
+  WIN
+  LOSE
+  TIE
+}
+
+Enum PendingStatus {
+  INCOMING
+  OUTGOING
+}
+
+Enum AppointmentStatus {
+  WAITING
+  TRAINING
+  DISMISSED
+  DONE
+}
+
 Enum AdminRole {
   MANAGEMENT
 }
 
-Ref: Room.gameId > Game.id [delete: Cascade]
+Ref: Room.gameId > Game.id
 
 Ref: Room.hostId > Team.id
 
-Ref: RoomParticipant.teamId > Team.id [delete: Cascade]
+Ref: RoomSettings.roomId - Room.id [delete: Cascade]
 
-Ref: RoomParticipant.roomId > Room.id [delete: Cascade]
+Ref: RoomMember.teamId > Team.id [delete: Cascade]
 
-Ref: RoomParticipant.gameId > Game.id [delete: Cascade]
+Ref: RoomMember.roomId > Room.id [delete: Cascade]
 
-Ref: RoomParticipant.roomLineUpBoardId > RoomLineupBoard.id [delete: Cascade]
+Ref: RoomLineup.teamLineupId > TeamLineup.id [delete: Cascade]
 
-Ref: RoomNote.roomId > Room.id [delete: Cascade]
+Ref: RoomLineup.roomMemberId > RoomMember.id [delete: Cascade]
 
-Ref: RoomLineup.teamLineUpId > TeamLineUp.id [delete: Cascade]
+Ref: RoomLineup.roomId > Room.id [delete: Cascade]
 
-Ref: RoomLineup.roomLineUpBoardId > RoomLineupBoard.id [delete: Cascade]
+Ref: RoomPending.teamId > Team.id [delete: Cascade]
 
-Ref: RoomRequest.teamId > Team.id [delete: Cascade]
-
-Ref: RoomRequest.roomId > Room.id [delete: Cascade]
-
-Ref: RoomRequest.roomLineUpBoardId > RoomLineupBoard.id [delete: Cascade]
+Ref: RoomPending.roomId > Room.id [delete: Cascade]
 
 Ref: Team.gameId > Game.id
 
-Ref: Team.ownerId > User.id
+Ref: Team.ownerId > User.id [delete: Set Null]
+
+Ref: TeamSettings.teamId - Team.id [delete: Cascade]
 
 Ref: TeamMember.teamId > Team.id [delete: Cascade]
 
 Ref: TeamMember.userId > User.id [delete: Cascade]
 
-Ref: TeamLineUp.teamId > Team.id [delete: Cascade]
+Ref: TeamLineup.teamId > Team.id [delete: Cascade]
 
-Ref: TeamLineUp.avatarId > UserAvatar.id [delete: Cascade]
+Ref: TeamLineup.avatarId > UserAvatar.id [delete: Cascade]
 
 Ref: TeamPending.teamId > Team.id [delete: Cascade]
 
@@ -294,19 +324,19 @@ Ref: PasswordResetSession.userId - User.id
 
 Ref: UserAvatar.gameId > Game.id
 
-Ref: UserAvatar.userId > User.id
+Ref: UserAvatar.userId > User.id [delete: Cascade]
 
-Ref: Review.reviewerId > User.id [delete: Cascade]
+Ref: Review.reviewerId > User.id [delete: Set Null]
 
-Ref: Review.revieweeId > User.id [delete: Cascade]
+Ref: Review.revieweeId > User.id [delete: Set Null]
 
 Ref: Review.gameId > Game.id
 
-Ref: Appointment.roomId > Room.id [delete: Set Null]
+Ref: Appointment.roomId - Room.id [delete: Set Null]
 
 Ref: AppointmentMember.teamId > Team.id [delete: Cascade]
 
-Ref: AppointmentMember.appointId > Appointment.id [delete: Cascade]
+Ref: AppointmentMember.appointmentId > Appointment.id [delete: Cascade]
 
 Ref: Chat.roomId - Room.id [delete: Cascade]
 
@@ -316,8 +346,12 @@ Ref: Message.teamId > Team.id [delete: Cascade]
 
 Ref: Message.senderId > User.id [delete: Cascade]
 
-Ref: MatchHistory.hostId > Team.id [delete: Cascade]
+Ref: Matching.appointmentId - Appointment.id [delete: Cascade]
 
-Ref: MatchHistory.guestId > Team.id [delete: Cascade]
+Ref: Matching.hostId > Team.id [delete: Set Null]
 
-Ref: TeamStatistic.teamId > Team.id [delete: Cascade]
+Ref: Matching.guestId > Team.id [delete: Set Null]
+
+Ref: MatchingReport.matchingId > Matching.id [delete: Cascade]
+
+Ref: TeamStats.teamId - Team.id [delete: Cascade]

@@ -1,19 +1,21 @@
 import { PartialType } from "@nestjs/mapped-types";
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { AdminRole, Prisma } from "@prisma/client";
-import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional } from "class-validator";
+import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
 export class CreateAdminDto implements Prisma.AdminUncheckedCreateInput {
-  @ApiProperty()
-  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
   email: string;
 
-  @ApiProperty()
-  @IsString()
+  @IsNotEmpty()
   password: string;
 
-  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEnum(AdminRole)
   role: AdminRole;
 }
 
 export class UpdateAdminDto extends PartialType(CreateAdminDto) {}
+
+export const schemas = validationMetadatasToSchemas();

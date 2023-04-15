@@ -12,7 +12,10 @@ import {
 import { User } from "@prisma/client";
 import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { UserSubject } from "src/common/subject.decorator";
-import { CreateLineUpDto, UpdateLineUpDto } from "src/model/dto/team-lineup.dto";
+import {
+  CreateTeamLineupDto,
+  UpdateLineUpDto
+} from "src/model/dto/team-lineup.dto";
 import { LineUpService } from "./lineup.service";
 
 @Controller("api/lineups")
@@ -21,7 +24,7 @@ export class LineUpController {
 
   @UseGuards(UserJwtAuthGuard)
   @Post()
-  async addLineUp(@Body() req: CreateLineUpDto) {
+  async addLineUp(@Body() req: CreateTeamLineupDto) {
     return await this.lineUpService.create(req);
   }
 

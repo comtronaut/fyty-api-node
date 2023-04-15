@@ -13,7 +13,7 @@ import { User } from "@prisma/client";
 import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { Debug } from "src/common/debug.decorator";
 import { UserSubject } from "src/common/subject.decorator";
-import { CreateRoomRequestDto } from "src/model/dto/room-pending.dto";
+import { CreateRoomPendingDto } from "src/model/dto/room-pending.dto";
 import {
   CreateRoomDto,
   CreateRoomNoteDto,
@@ -79,8 +79,8 @@ export class RoomController {
 
   @UseGuards(UserJwtAuthGuard)
   @Delete("disband")
-  async deleteRoom(@Body() req: DeleteRoomDto) {
-    return await this.roomService.disband(req);
+  async deleteRoom(@Body() payload: DeleteRoomDto) {
+    return await this.roomService.disband(payload);
   }
 
   // room note
@@ -146,7 +146,7 @@ export class RoomController {
   @Post(":id/request")
   async createRoomRequest(
     @Param("id") roomId: string,
-    @Body() body: CreateRoomRequestDto
+    @Body() body: CreateRoomPendingDto
   ) {
     return await this.roomRequestService.create(roomId, body);
   }
