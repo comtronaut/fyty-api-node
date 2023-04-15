@@ -26,7 +26,7 @@ export class LineUpController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Put("/:id")
+  @Put(":id")
   async updateLineUp(
     @UserSubject() user: User,
     @Param("id") lineUpId: string,
@@ -42,7 +42,7 @@ export class LineUpController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Get("/:id")
+  @Get(":id")
   async getLineup(@Param("id") lineUpId: string) {
     return await this.lineUpService.getLineUpById(lineUpId);
   }
@@ -63,7 +63,7 @@ export class LineUpController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Delete("/:id")
+  @Delete(":id")
   async delateLineUp(@UserSubject() user: User, @Param("id") lineUpId: string) {
     return this.lineUpService.deleteById(user.id, lineUpId);
   }

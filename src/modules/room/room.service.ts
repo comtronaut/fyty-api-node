@@ -320,4 +320,25 @@ export class RoomService {
       throw new BadRequestException(err.message);
     }
   }
+
+  async getRoomDetail(roomId: string) {
+    try {
+      const [ room, participants ] = await Promise.all([
+        this.prisma.room.findUniqueOrThrow({ where: { id: roomId } }),
+        this.prisma.roomParticipant.findMany({ where: { roomId } })
+      ]);
+
+      const teams = await this.prisma.team.findMany({
+        where: { id: { in: participants.map((e) => e.teamId) } }
+      });
+
+      return {
+        room,
+        roomParticipants: participants,
+        teams
+      };
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
 }

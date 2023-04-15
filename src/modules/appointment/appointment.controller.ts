@@ -35,7 +35,7 @@ export class AppointmentController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Get("/me")
+  @Get("me")
   async getUserAppointmnet(@UserSubject() user: User) {
     return await this.appointmentService.getAppointmentByUserId(user.id);
   }

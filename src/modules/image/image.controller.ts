@@ -15,7 +15,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { Debug } from "src/common/debug.decorator";
 import { ImageService } from "./image.service";
 
-@Controller("/api/images")
+@Controller("api/images")
 export class ImageController {
   constructor(private readonly imageService: ImageService) {}
 

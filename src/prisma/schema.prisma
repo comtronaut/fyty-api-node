@@ -142,6 +142,7 @@ model Team {
   coverUrl  String   @default("")
   logoUrl   String   @default("")
   tier      String   @default("")
+  isPrivate Boolean  @default(false)
   game      Game     @relation(fields: [gameId], references: [id], onUpdate: Cascade)
   gameId    String
   owner     User?    @relation(fields: [ownerId], references: [id], onUpdate: Cascade, onDelete: SetNull)

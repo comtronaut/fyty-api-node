@@ -23,11 +23,13 @@ import {
 import { RoomNoteService } from "./note.service";
 import { RoomRequestService } from "./request.service";
 import { RoomService } from "./room.service";
+import { ChatService } from "../chat/chat.service";
 
 @Controller("api/rooms")
 export class RoomController {
   constructor(
     private readonly roomService: RoomService,
+    private readonly chatService: ChatService,
     private readonly roomNoteService: RoomNoteService,
     private readonly roomRequestService: RoomRequestService
   ) {}
@@ -39,7 +41,7 @@ export class RoomController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Post("/join")
+  @Post("join")
   async joinRoom(
     @Query("teamId") teamId: string,
     @Query("roomId") roomId: string
@@ -48,7 +50,7 @@ export class RoomController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Get("/game/:id")
+  @Get("game/:id")
   async getRoomsBygame(
     @Param("id") gameId: string,
     @Query("name") roomName?: string,
@@ -58,38 +60,38 @@ export class RoomController {
   }
 
   @UseGuards(UserJwtAuthGuard) // get all rooms which u r host
-  @Get("/team/:id")
+  @Get("team/:id")
   async getHostedRooms(@Param("id") teamId: string) {
     return await this.roomService.getRoomByHostId(teamId);
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Get("/:id")
+  @Get(":id")
   async getRoomsById(@Param("id") roomId: string) {
     return await this.roomService.getRoomsById(roomId);
   }
 
   @UseGuards(UserJwtAuthGuard) // new
-  @Get("/me/team/:id")
+  @Get("me/team/:id")
   async getJoinedRooms(@Param("id") teamId: string) {
     return await this.roomService.getJoinedRoom(teamId);
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Delete("/disband")
+  @Delete("disband")
   async deleteRoom(@Body() req: DeleteRoomDto) {
     return await this.roomService.disband(req);
   }
 
   // room note
   @UseGuards(UserJwtAuthGuard)
-  @Get("/:id/note")
+  @Get(":id/note")
   async getRoomsNotes(@Param("id") roomId: string) {
     return await this.roomNoteService.getRoomNotes(roomId);
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Post("/:id/note")
+  @Post(":id/note")
   async createRoomNote(
     @Param("id") roomId: string,
     @Body() body: CreateRoomNoteDto
@@ -98,7 +100,7 @@ export class RoomController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Put("/note/:id")
+  @Put("note/:id")
   async updateRoomNote(
     @Param("id") noteId: string,
     @UserSubject() user: User,
@@ -108,26 +110,40 @@ export class RoomController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Delete("/note/:id")
+  @Delete("note/:id")
   async deleteRoomNote(@Param("id") noteId: string, @UserSubject() user: User) {
     return await this.roomNoteService.delete(noteId, user.id);
   }
 
+  // detail
+  @UseGuards(UserJwtAuthGuard)
+  @Get(":id/detail")
+  async getRoomDetail(@Param("id") roomId: string) {
+    return await this.roomService.getRoomDetail(roomId);
+  }
+
+  // chat
+  @UseGuards(UserJwtAuthGuard)
+  @Get(":id/chat")
+  async getRoomChatWithMessages(@Param("id") roomId: string) {
+    return await this.chatService.getChatWithMessagesByRoomId(roomId);
+  }
+
   // room request
   @UseGuards(UserJwtAuthGuard)
-  @Get("/:id/request")
+  @Get(":id/request")
   async getRoomsRequest(@Param("id") roomId: string) {
     return await this.roomRequestService.getRoomRequest(roomId);
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Get("/request/team/:id")
+  @Get("request/team/:id")
   async getRoomsRequestByTeam(@Param("id") teamId: string) {
     return await this.roomRequestService.getRoomRequestByTeamId(teamId);
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Post("/:id/request")
+  @Post(":id/request")
   async createRoomRequest(
     @Param("id") roomId: string,
     @Body() body: CreateRoomRequestDto
@@ -136,7 +152,7 @@ export class RoomController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Delete("/request/:id")
+  @Delete("request/:id")
   async deleteRoomRequest(
     @Param("id") requestId: string,
     @UserSubject() user: User

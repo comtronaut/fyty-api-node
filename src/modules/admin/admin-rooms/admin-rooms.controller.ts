@@ -31,25 +31,25 @@ export class AdminRoomsController {
   // }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Get("/:id")
+  @Get(":id")
   async getRoomsById(@Param("id") roomId: string) {
     return await this.roomService.getRoom(roomId);
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Get("/:id/participants")
+  @Get(":id/participants")
   async getRoomParticipantsById(@Param("id") roomId: string) {
     return await this.roomService.getRoomParticipants(roomId);
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Get("/:id/roomlineup")
+  @Get(":id/roomlineup")
   async getRoomLineUpById(@Param("id") roomId: string) {
     return await this.roomService.getRoomLineUp(roomId);
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Put("/:id")
+  @Put(":id")
   async updateRoomsById(
     @Param("id") roomId: string,
     @Body() payload: UpdateRoomDto
@@ -58,7 +58,7 @@ export class AdminRoomsController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Delete("/:id")
+  @Delete(":id")
   async deleteRoom(@Param("id") roomId: string) {
     return await this.roomService.delete(roomId);
   }

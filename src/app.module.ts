@@ -1,5 +1,4 @@
 import { CacheModule, Module } from "@nestjs/common";
-import { SelectorModule } from "./modules/Selector/selector.module";
 import { AdminModule } from "./modules/admin/admin.module";
 import { AppointmentModule } from "./modules/appointment/appointment.module";
 import { AuthModule } from "./modules/auth/auth.module";
@@ -23,7 +22,6 @@ import { PrismaModule } from "./prisma/prisma.module";
     TeamModule,
     RoomModule,
     AppointmentModule,
-    SelectorModule,
     ReviewModule,
     ImageModule,
     DebugModule,

@@ -1,5 +1,5 @@
 import { Prisma } from ".prisma/client";
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
@@ -11,6 +11,22 @@ export class ChatService {
       return await this.prisma.chat.create({ data: req });
     } catch (err) {
       throw new BadRequestException(err.message);
+    }
+  }
+
+  async getChatWithMessages(chatId: string) {
+    try {
+      return await this.prisma.chat.findFirstOrThrow({ where: { id: chatId }, include: { messages: true } });
+    } catch (err) {
+      throw new NotFoundException(err.message);
+    }
+  }
+
+  async getChatWithMessagesByRoomId(roomId: string) {
+    try {
+      return await this.prisma.chat.findFirstOrThrow({ where: { id: roomId }, include: { messages: true } });
+    } catch (err) {
+      throw new NotFoundException(err.message);
     }
   }
 

@@ -47,13 +47,13 @@ export class TeamController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Get("/me")
+  @Get("me")
   async getMyTeam(@UserSubject() user: User) {
     return await this.teamService.getMyTeam(user.id);
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Get("/:id")
+  @Get(":id")
   async getTeamById(@Param("id") id: string) {
     return await this.teamService.getTeam(id);
   }
@@ -78,12 +78,12 @@ export class TeamController {
     return await this.teammemberService.getMemberByTeamId(teamId);
   }
 
-  @Post("/members")
+  @Post("members")
   async createMember(@Body() req: CreateTeamMemberDto) {
     return await this.teammemberService.create(req);
   }
 
-  @Put("/members/:id")
+  @Put("members/:id")
   async updateMemberRole(
     @Param("id") teamMemberId: string,
     @Body() req: UpdateTeamMemberDto
@@ -92,7 +92,7 @@ export class TeamController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Delete("/members/:id")
+  @Delete("members/:id")
   async kickMember(
     @Param("id") teamMemberId: string,
     @UserSubject() user: User
@@ -100,7 +100,7 @@ export class TeamController {
     return await this.teammemberService.kickMember(teamMemberId, user);
   }
 
-  @Delete("/members/:id/leave")
+  @Delete("members/:id/leave")
   async leaveTeam(@Param("id") teamMemberId: string) {
     return this.teammemberService.leaveTeam(teamMemberId);
   }
@@ -118,29 +118,29 @@ export class TeamController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Get("/pending/me")
+  @Get("pending/me")
   async getPendingByUserId(@UserSubject() user: User) {
     return await this.teampendingService.getTeamPendingByUser(user.id);
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Get("/invitation/me")
+  @Get("invitation/me")
   async getInvitationByUserId(@UserSubject() user: User) {
     return await this.teampendingService.getTeamInvitationByUser(user.id);
   }
 
-  @Post("/pending")
+  @Post("pending")
   async createPending(@Body() req: CreateTeamPendingDto) {
     // this.subject.next({ req });
     return await this.teampendingService.createTeamPending(req);
   }
 
-  @Post("/invitation")
+  @Post("invitation")
   async createInvitation(@Body() req: CreateTeamPendingDto) {
     return await this.teampendingService.createTeamInvitation(req);
   }
 
-  @Put("/pending/:id")
+  @Put("pending/:id")
   async updateStatusTeampending(
     @Param("id") teampendingId: string,
     @Body() req: UpdateTeamPendingDto
@@ -148,14 +148,14 @@ export class TeamController {
     return await this.teampendingService.updateStatus(teampendingId, req);
   }
 
-  @Delete("/pending/:id")
+  @Delete("pending/:id")
   async discardpending(@Param("id") teampendingId: string) {
     // this.subject.next({ teampendingId });
     return await this.teampendingService.discard(teampendingId);
   }
 
   // server sending
-  // @Sse("/sse")
+  // @Sse("sse")
   // sse(): Observable<MessageEvent> {
   //   console.log("see activated");
   //   return this.subject.pipe(

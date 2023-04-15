@@ -42,7 +42,7 @@ export class AuthController {
     return await this.authService.adminLogin(email, password);
   }
 
-  @Get("/user/google")
+  @Get("user/google")
   @UseGuards(GoogleAuthGuard)
   async getUser(@UserSubject() user: GoogleInfo) {
     if (!user) {
@@ -52,7 +52,7 @@ export class AuthController {
     return await this.authService.loginGoogle(user);
   }
 
-  @Get("/user/facebook")
+  @Get("user/facebook")
   @UseGuards(FacebookAuthGuard)
   async facebookLoginRedirect(@UserSubject() user: FacebookInfo) {
     if (!user) {
@@ -62,7 +62,7 @@ export class AuthController {
     return await this.authService.loginFacebook(user);
   }
 
-  @Get("/google")
+  @Get("google")
   async redirectToGoogle(
     @Res() res: Response,
     @Query() query: Partial<OAuthQuery>
@@ -80,7 +80,7 @@ export class AuthController {
     return res.redirect(url);
   }
 
-  @Get("/facebook")
+  @Get("facebook")
   async redirectToFacebook(
     @Res() res: Response,
     @Query() query: Partial<OAuthQuery>

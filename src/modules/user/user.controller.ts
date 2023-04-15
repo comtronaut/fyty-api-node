@@ -133,7 +133,7 @@ export class UserController {
     return await this.avatarService.update(avatarId, req);
   }
 
-  @Delete("/avatar/:id")
+  @Delete("avatar/:id")
   async daleteUserAvatar(@Param("id") avatarId: string) {
     return await this.avatarService.deleteUserAvatar(avatarId);
   }

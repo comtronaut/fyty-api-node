@@ -1,21 +1,19 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
   Param,
-  Post,
-  Put
+  UseGuards
 } from "@nestjs/common";
-import { Debug } from "src/common/debug.decorator";
-import { MessageService } from "./message.service";
+import { UserJwtAuthGuard } from "../auth/guard/jwt-auth.guard";
+import { ChatService } from "./chat.service";
 
 @Controller("api/chats")
 export class ChatController {
-  constructor(private readonly messageService: MessageService) {}
+  constructor(private readonly chatService: ChatService) {}
 
-  @Get("/:chatId")
-  async getMesssagesFromChatId(@Param("chatId") chatId: string) {
-    return this.messageService.getMesssagesFromChatId(chatId);
+  @Get(":id")
+  @UseGuards(UserJwtAuthGuard)
+  async getMesssagesFromChatId(@Param("id") chatId: string) {
+    return this.chatService.getChatWithMessages(chatId);
   }
 }
