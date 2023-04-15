@@ -43,37 +43,6 @@ export class UserController {
     return await this.userService.searchUsers(q, teamId);
   }
 
-  @Get("me")
-  @UseGuards(UserJwtAuthGuard)
-  async getSelf(@UserSubject() user: User) {
-    return user;
-  }
-
-  @Put("me")
-  @UseGuards(UserJwtAuthGuard)
-  async updateUser(@UserSubject() user: User, @Body() payload: UpdateUserDto) {
-    return await this.userService.update(user.id, payload);
-  }
-
-  @Debug()
-  @UseGuards(UserJwtAuthGuard)
-  @Delete("me")
-  async deleteUser(@UserSubject() user: User) {
-    return await this.userService.delete(user.id);
-  }
-
-  @Get("me/settings")
-  @UseGuards(UserJwtAuthGuard)
-  async getSelfSettings(@UserSubject() user: User) {
-    return await this.settingsService.getByUserId(user.id);
-  }
-
-  @Put("me/settings")
-  @UseGuards(UserJwtAuthGuard)
-  async updateUserSettings(@UserSubject() user: User, @Body() payload: UpdateUserSettingsDto) {
-    return await this.settingsService.updateByUserId(user.id, payload);
-  }
-
   @Get(":id")
   @UseGuards(UserJwtAuthGuard)
   async getById(@UserSubject() user: User, @Param("id") id: string) {

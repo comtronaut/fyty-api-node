@@ -39,12 +39,6 @@ export class RoomController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Get("me/team/:id")
-  async getJoinedRooms(@Param("id") teamId: string) {
-    return await this.roomService.getByTeamId(teamId);
-  }
-
-  @UseGuards(UserJwtAuthGuard)
   @Delete("disband")
   async deleteRoom(@Body() payload: DeleteRoomDto) {
     return await this.roomService.disband(payload);

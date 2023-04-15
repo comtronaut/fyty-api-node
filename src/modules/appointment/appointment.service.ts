@@ -16,7 +16,10 @@ export class AppointmentService {
   }
 
   async getMembersByAppointmentId(appoinmentId: string) {
-    const out = await this.prisma.appointment.findFirstOrThrow({ where: { id: appoinmentId }, select: { members: true } });
+    const out = await this.prisma.appointment.findFirstOrThrow({
+      where: { id: appoinmentId },
+      select: { members: true }
+    });
     return out.members;
   }
 

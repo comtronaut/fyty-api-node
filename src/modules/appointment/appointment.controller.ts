@@ -16,12 +16,6 @@ export class AppointmentController {
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Get("me")
-  async getUserAppointmnet(@UserSubject() user: User) {
-    return await this.appointmentService.getAppointmentByUserId(user.id);
-  }
-
-  @UseGuards(UserJwtAuthGuard)
   @Put(":id")
   async update(@Param("id") appiontmentId: string, @Body() req: UpdateAppointmentDto) {
     return await this.appointmentService.update(appiontmentId, req);

@@ -12,6 +12,7 @@ import { PasswordResetSessionModule } from "./modules/session/password-reset-ses
 import { TeamModule } from "./modules/team/team.module";
 import { UserModule } from "./modules/user/user.module";
 import { PrismaModule } from "./prisma/prisma.module";
+import { MeModule } from "./modules/me/me.module";
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PrismaModule } from "./prisma/prisma.module";
     AppointmentModule,
     ReviewModule,
     ImageModule,
+    MeModule,
     DebugModule,
     AdminModule,
     NotifyModule,

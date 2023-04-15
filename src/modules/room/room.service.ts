@@ -30,7 +30,10 @@ export class RoomService {
         return;
       }
 
-      await this.deleteMultiple(timestamp, rooms.map((room) => room.id));
+      await this.deleteMultiple(
+        timestamp,
+        rooms.map((room) => room.id)
+      );
     } catch (err) {
       console.error(err.message);
     }
@@ -96,7 +99,7 @@ export class RoomService {
     });
   }
 
-  async getByTeamId(teamId: string) {
+  async getJoinedAndPendingRoomsByTeamId(teamId: string) {
     try {
       const [ participants, request ] = await Promise.all([
         this.prisma.roomMember.findMany({
@@ -122,12 +125,18 @@ export class RoomService {
   }
 
   async getRoomMembersByRoomId(roomId: string): Promise<RoomMember[]> {
-    const out = await this.prisma.room.findFirstOrThrow({ where: { id: roomId }, select: { members: true } });
+    const out = await this.prisma.room.findFirstOrThrow({
+      where: { id: roomId },
+      select: { members: true }
+    });
     return out.members;
   }
 
   async getRoomLineupsByRoomId(roomId: string): Promise<RoomLineup[]> {
-    const out = await this.prisma.room.findFirstOrThrow({ where: { id: roomId }, select: { lineups: true } });
+    const out = await this.prisma.room.findFirstOrThrow({
+      where: { id: roomId },
+      select: { lineups: true }
+    });
     return out.lineups;
   }
 

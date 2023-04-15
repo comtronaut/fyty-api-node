@@ -1,0 +1,24 @@
+import { Module } from "@nestjs/common";
+import { MeController } from "./me.controller";
+import { UserSettingsService } from "../user/settings.service";
+import { TeamService } from "../team/team.service";
+import { AppointmentService } from "../appointment/appointment.service";
+import { RoomService } from "../room/room.service";
+import { TeampendingService } from "../team/pending.service";
+import { NotifyService } from "../notification/lineNotify.service";
+import { UserService } from "../user/user.service";
+
+@Module({
+  imports: [],
+  controllers: [ MeController ],
+  providers: [
+    UserService,
+    UserSettingsService,
+    TeamService,
+    AppointmentService,
+    RoomService,
+    TeampendingService,
+    NotifyService
+  ]
+})
+export class MeModule {}
