@@ -1,5 +1,5 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { User } from "@prisma/client";
+import { Injectable } from "@nestjs/common";
+import { UserAvatar } from "@prisma/client";
 import { CreateUserAvatarDto, UpdateUserAvatarDto } from "src/model/dto/user-avatar.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 
@@ -7,52 +7,26 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class UserAvatarService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createUserAvatar(req: CreateUserAvatarDto) {
-    try {
-      return await this.prisma.userAvatar.create({ data: req });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+  async create(data: CreateUserAvatarDto): Promise<UserAvatar> {
+    return await this.prisma.userAvatar.create({ data });
   }
 
-  async getUserAvatar(userId: string, gameId: string) {
-    try {
-      return await this.prisma.userAvatar.findMany({
-        where: { gameId, userId }
-      });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
-  }
-
-  async getUserAvatarByGameId(gameId: string, user: User) {
+  async getFilter(userId: string, gameId?: string): Promise<UserAvatar[]> {
     return await this.prisma.userAvatar.findMany({
-      where: { gameId, userId: user.id }
+      where: { gameId, userId }
     });
   }
 
-  async update(avatarId: string, req: UpdateUserAvatarDto) {
-    try {
-      const updateRes = await this.prisma.userAvatar.update({
-        where: {
-          id: avatarId
-        },
-        data: req
-      });
-
-      return await this.prisma.userAvatar.findUniqueOrThrow({
-        where: { id: avatarId }
-      });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+  async update(avatarId: string, data: UpdateUserAvatarDto): Promise<UserAvatar> {
+    return await this.prisma.userAvatar.update({
+      where: {
+        id: avatarId
+      },
+      data
+    });
   }
 
-  async deleteUserAvatar(avatarId: string) {
-    try {
-      return await this.prisma.userAvatar.delete({ where: { id: avatarId } });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+  async delete(avatarId: string): Promise<void> {
+    await this.prisma.userAvatar.delete({ where: { id: avatarId } });
   }
 }

@@ -128,13 +128,18 @@ Table TeamPending {
   userId String [not null]
   status PendingStatus [not null, default: 'INCOMING']
   createdAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (teamId, userId) [unique]
+  }
 }
 
 Table User {
   id String [pk]
   username String [unique, not null]
-  mobilePhone String [unique, not null]
   updatedUsernameAt DateTime
+  mobilePhone String [unique, not null]
+  updatedMobilePhoneAt DateTime
   password String [not null]
   displayName String [not null]
   email String [unique]
@@ -142,6 +147,7 @@ Table User {
   bio String [not null, default: '']
   portraitUrl String [not null, default: '']
   coverUrl String [not null, default: '']
+  isDeactivated Boolean [not null, default: false]
   facebookId String [unique]
   googleId String [unique]
   lineId String [unique]
@@ -206,7 +212,12 @@ Table AppointmentMember {
   id String [pk]
   appointmentId String
   teamId String [not null]
+  isLeft Boolean [not null, default: false]
   createdAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (appointmentId, teamId) [unique]
+  }
 }
 
 Table Chat {
@@ -271,7 +282,7 @@ Table Admin {
   email String [unique, not null]
   password String [not null]
   role AdminRole [not null, default: 'MANAGEMENT']
-  createAt DateTime [default: `now()`, not null]
+  createdAt DateTime [default: `now()`, not null]
   updateAt DateTime [not null]
 }
 
@@ -357,9 +368,9 @@ Ref: TeamPending.teamId > Team.id [delete: Cascade]
 
 Ref: TeamPending.userId > User.id [delete: Cascade]
 
-Ref: UserSettings.userId - User.id
+Ref: UserSettings.userId - User.id [delete: Cascade]
 
-Ref: PasswordResetSession.userId - User.id
+Ref: PasswordResetSession.userId - User.id [delete: Cascade]
 
 Ref: UserAvatar.gameId > Game.id
 

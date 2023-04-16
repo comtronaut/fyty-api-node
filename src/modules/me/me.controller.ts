@@ -10,11 +10,13 @@ import { TeamService } from "../team/team.service";
 import { AppointmentService } from "../appointment/appointment.service";
 import { RoomService } from "../room/room.service";
 import { TeampendingService } from "../team/pending.service";
+import { UserAvatarService } from "../user/avatar.service";
 
 @Controller("me")
 export class MeController {
   constructor(
     private readonly userService: UserService,
+    private readonly userAvatarService: UserAvatarService,
     private readonly settingsService: UserSettingsService,
     private readonly teamService: TeamService,
     private readonly appointmentService: AppointmentService,
@@ -51,6 +53,13 @@ export class MeController {
   @Put("settings")
   async putMeSettings(@UserSubject() user: User, @Body() payload: UpdateUserSettingsDto) {
     return await this.settingsService.updateByUserId(user.id, payload);
+  }
+
+  // avatars
+  @UseGuards(UserJwtAuthGuard)
+  @Get("avatars")
+  async getMeAvatars(@UserSubject() user: User) {
+    return await this.userAvatarService.getFilter(user.id);
   }
 
   // teams

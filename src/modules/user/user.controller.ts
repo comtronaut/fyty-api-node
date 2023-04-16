@@ -1,14 +1,12 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { User } from "@prisma/client";
-import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
-import { Debug } from "src/common/debug.decorator";
 import { UserSubject } from "src/common/subject.decorator";
-import { UpdateUserSettingsDto } from "src/model/dto/user-settings.dto";
-import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
+import { CreateUserAvatarDto, UpdateUserAvatarDto } from "src/model/dto/user-avatar.dto";
+import { CreateUserDto } from "src/model/dto/user.dto";
+import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { UserAvatarService } from "./avatar.service";
 import { UserSettingsService } from "./settings.service";
 import { UserService } from "./user.service";
-import { CreateUserAvatarDto, UpdateUserAvatarDto } from "src/model/dto/user-avatar.dto";
 
 @Controller("users")
 export class UserController {
@@ -39,7 +37,7 @@ export class UserController {
 
   @Get()
   @UseGuards(UserJwtAuthGuard)
-  async getAll(@Query("q") q: string, @Query("teamId") teamId: string, @UserSubject() user: User) {
+  async getAll(@Query("q") q: string, @Query("teamId") teamId?: string) {
     return await this.userService.searchUsers(q, teamId);
   }
 
@@ -49,31 +47,25 @@ export class UserController {
     return await this.userService.getById(id);
   }
 
-  @Post("avatar")
+  @Post("avatars")
   @UseGuards(UserJwtAuthGuard)
-  async createUserAvatar(@Body() req: CreateUserAvatarDto) {
-    return this.avatarService.createUserAvatar(req);
+  async createUserAvatar(@Body() payload: CreateUserAvatarDto) {
+    return this.avatarService.create(payload);
   }
 
   @UseGuards(UserJwtAuthGuard)
-  @Get("avatar/game/:id")
-  async getUserAvatarBygameId(@UserSubject() user: User, @Param("id") gameId: string) {
-    return await this.avatarService.getUserAvatarByGameId(gameId, user);
+  @Get(":id/avatars")
+  async getUserAvatar(@Param("id") userId: string, @Query("gameId") gameId?: string) {
+    return await this.avatarService.getFilter(userId, gameId);
   }
 
-  @UseGuards(UserJwtAuthGuard)
-  @Get("avatar/other")
-  async getUserAvatar(@Query("userId") userId: string, @Query("gameId") gameId: string) {
-    return await this.avatarService.getUserAvatar(userId, gameId);
-  }
-
-  @Put("avatar/:id")
+  @Put("avatars/:id")
   async updateUserAvatar(@Param("id") avatarId: string, @Body() req: UpdateUserAvatarDto) {
     return await this.avatarService.update(avatarId, req);
   }
 
-  @Delete("avatar/:id")
+  @Delete("avatars/:id")
   async daleteUserAvatar(@Param("id") avatarId: string) {
-    return await this.avatarService.deleteUserAvatar(avatarId);
+    return await this.avatarService.delete(avatarId);
   }
 }

@@ -225,32 +225,36 @@ model TeamPending {
   userId    String
   status    PendingStatus @default(INCOMING)
   createdAt DateTime      @default(now())
+
+  @@unique([teamId, userId])
 }
 
 // user
 model User {
-  id                String    @id @default(uuid())
-  username          String    @unique
-  mobilePhone       String    @unique
-  updatedUsernameAt DateTime?
-  password          String
-  displayName       String
-  email             String?   @unique
-  updatedEmailAt    DateTime?
-  bio               String    @default("")
-  portraitUrl       String    @default("")
-  coverUrl          String    @default("")
-  facebookId        String?   @unique
-  googleId          String?   @unique
-  lineId            String?   @unique
-  lineToken         String?   @unique
-  firstLoginAt      DateTime?
-  lastLoginAt       DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id                   String    @id @default(uuid())
+  username             String    @unique
+  updatedUsernameAt    DateTime?
+  mobilePhone          String    @unique
+  updatedMobilePhoneAt DateTime?
+  password             String
+  displayName          String
+  email                String?   @unique
+  updatedEmailAt       DateTime?
+  bio                  String    @default("")
+  portraitUrl          String    @default("")
+  coverUrl             String    @default("")
+  isDeactivated        Boolean   @default(false)
+  facebookId           String?   @unique
+  googleId             String?   @unique
+  lineId               String?   @unique
+  lineToken            String?   @unique
+  firstLoginAt         DateTime?
+  lastLoginAt          DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
-  teamOwners           Team[]
-  teamPending          TeamPending[]
+  teamFounders         Team[]
+  teamPendings         TeamPending[]
   teamMembers          TeamMember[]
   avatars              UserAvatar[]
   reviewers            Review[]              @relation("reviewer")
@@ -262,7 +266,7 @@ model User {
 
 model UserSettings {
   id                             String  @id @default(uuid())
-  user                           User    @relation(fields: [userId], references: [id], onUpdate: Cascade)
+  user                           User    @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userId                         String  @unique
   isNotifiedBeforeTrainingMinute Int     @default(60)
   isTeamNotified                 Boolean @default(true)
@@ -273,7 +277,7 @@ model UserSettings {
 
 model PasswordResetSession {
   id           String   @id @default(uuid())
-  user         User     @relation(fields: [userId], references: [id], onUpdate: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userId       String   @unique
   token        String   @unique
   attemptCount Int      @default(0)
@@ -330,7 +334,10 @@ model AppointmentMember {
   appointmentId String?
   team          Team         @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   teamId        String
+  isLeft        Boolean      @default(false)
   createdAt     DateTime     @default(now())
+
+  @@unique([appointmentId, teamId])
 }
 
 // chat
@@ -411,10 +418,10 @@ model Image {
 
 // admin
 model Admin {
-  id       String    @id @default(uuid())
-  email    String    @unique
-  password String
-  role     AdminRole @default(MANAGEMENT)
-  createAt DateTime  @default(now())
-  updateAt DateTime  @updatedAt
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  role      AdminRole @default(MANAGEMENT)
+  createdAt DateTime  @default(now())
+  updateAt  DateTime  @updatedAt
 }

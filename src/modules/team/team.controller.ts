@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  UseGuards
+} from "@nestjs/common";
 import { User } from "@prisma/client";
 import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { UserSubject } from "src/common/subject.decorator";
@@ -25,11 +36,24 @@ export class TeamController {
 
   @UseGuards(UserJwtAuthGuard)
   @Get()
-  async getTeamsByGameId(@Param("gameId") gameId: string) {
-    if (gameId) {
-      return await this.teamService.getGameId(gameId);
-    }
-    return await this.teamService.getAll();
+  async getTeamsByGameId(
+    @Query("gameId") gameId?: string,
+    @Query("perPage") perPage?: string,
+    @Query("page") page?: string
+  ) {
+    return await this.teamService.getFilter({
+      ...([ perPage, page ].every(Boolean) && {
+        pagination: {
+          page: Number(page),
+          perPage: Number(perPage)
+        }
+      }),
+      ...(gameId && {
+        clause: {
+          gameId
+        }
+      })
+    });
   }
 
   @UseGuards(UserJwtAuthGuard)
@@ -50,8 +74,7 @@ export class TeamController {
     return await this.teamService.delete(user.id, teamId);
   }
 
-  // team member
-
+  // members
   @UseGuards(UserJwtAuthGuard)
   @Get(":id/members")
   async getMembersByTeamId(@Param("id") teamId: string) {
@@ -79,8 +102,7 @@ export class TeamController {
     return this.teamMemberService.leaveTeam(teamMemberId);
   }
 
-  // team pending
-
+  // pendings
   @Get(":id/pending")
   async getPendingByTeamId(@Param("id") teamId: string) {
     return await this.teamPendingService.getTeamPending(teamId);

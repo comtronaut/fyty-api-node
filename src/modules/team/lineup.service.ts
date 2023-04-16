@@ -66,7 +66,7 @@ export class LineupService {
   async deleteById(userId: string, lineupId: string) {
     const { team } = await this.prisma.teamLineup.findUniqueOrThrow({
       where: { id: lineupId },
-      include: { team: true }
+      select: { team: true }
     });
     const member = await this.prisma.teamMember.findFirstOrThrow({
       where: { userId, teamId: team.id }

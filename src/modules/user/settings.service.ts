@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { Lang } from "@prisma/client";
 
 import { CreateUserSettingsDto, UpdateUserSettingsDto } from "src/model/dto/user-settings.dto";
@@ -9,33 +9,21 @@ export class UserSettingsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getByUserId(userId: string) {
-    try {
-      const userSettings = await this.prisma.userSettings.findUnique({
-        where: { userId }
-      });
+    const userSettings = await this.prisma.userSettings.findUnique({
+      where: { userId }
+    });
 
-      return userSettings ?? (await this.create({ userId, lang: Lang.TH }));
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    return userSettings ?? (await this.create({ userId, lang: Lang.TH }));
   }
 
   async create(data: CreateUserSettingsDto) {
-    try {
-      return await this.prisma.userSettings.create({ data });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    return await this.prisma.userSettings.create({ data });
   }
 
   async updateByUserId(id: string, data: UpdateUserSettingsDto) {
-    try {
-      return await this.prisma.userSettings.update({
-        where: { userId: id },
-        data
-      });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    return await this.prisma.userSettings.update({
+      where: { userId: id },
+      data
+    });
   }
 }

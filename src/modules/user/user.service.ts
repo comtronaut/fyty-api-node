@@ -4,6 +4,7 @@ import * as bcrypt from "bcrypt";
 import { Cache } from "cache-manager";
 import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
 import { PrismaService } from "src/prisma/prisma.service";
+import { SecuredUser } from "src/types/general";
 
 @Injectable()
 export class UserService {
@@ -12,26 +13,27 @@ export class UserService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
 
-  async getAllUser() {
-    return await this.prisma.user.findMany();
+  async getAllUser(): Promise<SecuredUser[]> {
+    const users = await this.prisma.user.findMany();
+    return users.map(({ password, ...e }) => e);
   }
 
-  async getById(id: string): Promise<User> {
+  async getById(id: string) {
     const cachedUser = await this.cacheManager.get<User>(`user:${id}`);
 
     if (cachedUser) {
       return cachedUser;
     }
 
-    const user = await this.prisma.user.findUniqueOrThrow({ where: { id } });
+    const { password, ...out } = await this.prisma.user.findUniqueOrThrow({ where: { id } });
 
-    await this.cacheManager.set(`user:${id}`, user);
+    await this.cacheManager.set(`user:${id}`, out);
 
-    return user;
+    return out;
   }
 
-  async searchUsers(searchString: string, teamId?: string): Promise<User[]> {
-    return await this.prisma.user.findMany({
+  async searchUsers(searchString: string, teamId?: string): Promise<SecuredUser[]> {
+    const users = await this.prisma.user.findMany({
       where: {
         OR: [
           {
@@ -45,11 +47,14 @@ export class UserService {
             }
           }
         ]
-      }
+      },
+      take: 10
     });
+
+    return users.map(({ password, ...e }) => e);
   }
 
-  async create(data: CreateUserDto) {
+  async create(data: CreateUserDto): Promise<SecuredUser> {
     const [ passwordHash ] = await Promise.all([ bcrypt.hash(data.password, 12) ]);
 
     const createdContent = { ...data, password: passwordHash };
@@ -68,8 +73,8 @@ export class UserService {
     return userData;
   }
 
-  async update(id: string, data: UpdateUserDto) {
-    const res = await this.prisma.user.update({
+  async update(id: string, data: UpdateUserDto): Promise<SecuredUser> {
+    const { password, ...out } = await this.prisma.user.update({
       where: {
         id
       },
@@ -83,22 +88,29 @@ export class UserService {
       }
     });
 
-    await this.cacheManager.set(`user:${id}`, res);
+    await this.cacheManager.set(`user:${id}`, out);
 
-    return res;
+    return out;
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.user.delete({ where: { id } });
-
-    await this.cacheManager.del(`user:${id}`);
+    await Promise.all([
+      this.prisma.user.delete({ where: { id } }),
+      this.cacheManager.del(`user:${id}`)
+    ]);
   }
 
   async getDuplicationResult(data: UpdateUserDto): Promise<Record<string, boolean>> {
     const res = {} as Record<string, boolean>;
 
     for (const [ key, value ] of Object.entries(data)) {
-      res[key] = Boolean(await this.prisma.user.findFirst({ where: { [key]: value } }));
+      if (value) {
+        const t = await this.prisma.user.findFirst({
+          where: { [key]: value },
+          select: { id: true }
+        });
+        res[key] = Boolean(t);
+      }
     }
 
     return res;

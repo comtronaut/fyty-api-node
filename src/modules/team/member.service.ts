@@ -8,21 +8,38 @@ export class TeamMemberService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateTeamMemberDto) {
-    const { gameId } = await this.prisma.team.findUniqueOrThrow({
+    const pending = await this.prisma.teamPending.findUniqueOrThrow({
+      where: {
+        teamId_userId: {
+          teamId: data.teamId,
+          userId: data.userId
+        }
+      },
+      select: { id: true }
+    });
+    const team = await this.prisma.team.findUniqueOrThrow({
       where: { id: data.teamId },
       select: { gameId: true }
     });
     const existedTeamInAGame = await this.prisma.teamMember.findFirst({
-      where: { userId: data.userId, team: { gameId } }
+      where: { userId: data.userId, team },
+      select: { id: true }
     });
 
     if (existedTeamInAGame) {
       throw new Error("This user already joined team");
     }
 
-    return await this.prisma.teamMember.create({
-      data: { ...data, role: MemberRole.MEMBER }
-    });
+    const [ , out ] = await Promise.all([
+      this.prisma.teamPending.delete({
+        where: pending
+      }),
+      this.prisma.teamMember.create({
+        data: { ...data, role: MemberRole.MEMBER }
+      })
+    ]);
+
+    return out;
   }
 
   async update(teamMemberId: string, data: UpdateTeamMemberDto): Promise<TeamMember> {
@@ -60,8 +77,12 @@ export class TeamMemberService {
       where: { teamId }
     });
 
+    // remove team if has no members left
     if (memberCount <= 0) {
-      await this.prisma.team.update({ where: { id: teamId }, data: { isDeleted: true } });
+      await this.prisma.team.update({
+        where: { id: teamId },
+        data: { isDeleted: true, lineups: { deleteMany: {} } }
+      });
     }
   }
 }

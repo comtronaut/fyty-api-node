@@ -10,7 +10,7 @@ export class AdminTeamsController {
   @Get()
   @UseGuards(AdminJwtAuthGuard)
   async getAllTeam() {
-    return await this.adminTeamsService.getAll();
+    return await this.adminTeamsService.getFilter({});
   }
 
   @Get(":id")
