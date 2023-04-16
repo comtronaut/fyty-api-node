@@ -8,7 +8,9 @@ import env from "./common/env.config";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    cors: true
+    cors: env.SERVER_ORIGIN === "https://api.fyty-esport.com"
+      ? { origin: env.CLIENT_ORIGIN }
+      : true
   });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }));
@@ -16,9 +18,13 @@ async function bootstrap() {
   app.use(urlencoded({ extended: true, limit: "50mb" }));
 
   // swagger api document
-  const config = new DocumentBuilder().setTitle("FyTy API").setVersion("1.0").build();
+  const config = new DocumentBuilder()
+    .setTitle("FyTy API")
+    .setVersion("1.0")
+    .addBearerAuth()
+    .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api", app, document);
+  SwaggerModule.setup("", app, document);
 
   // binding
   const port = process.env["PORT"] || 3000;
