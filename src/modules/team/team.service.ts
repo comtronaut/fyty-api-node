@@ -47,7 +47,7 @@ export class TeamService {
     });
   }
 
-  async getUserTeams(userId: string): Promise<Team[]> {
+  async getByUserId(userId: string): Promise<Team[]> {
     const memberRes = await this.prisma.teamMember.findMany({
       where: { userId },
       select: {
@@ -58,14 +58,17 @@ export class TeamService {
     return memberRes.map((e) => e.team);
   }
 
-  async getFilter(filter: { pagination?: Pagination; clause?: Partial<Team> }): Promise<Team[]> {
+  async getByFilter(filter: { pagination?: Pagination; clause?: Partial<Team> }): Promise<Team[]> {
     return await this.prisma.team.findMany({
       ...(filter.pagination && {
         skip: (filter.pagination.page - 1) * filter.pagination.perPage,
         take: filter.pagination.perPage
       }),
       ...(filter.clause && {
-        where: filter.clause
+        where: {
+          isDeleted: false,
+          ...filter.clause
+        }
       })
     });
   }
@@ -77,30 +80,31 @@ export class TeamService {
     });
   }
 
-  async delete(userId: string, teamId: string): Promise<void> {
+  async deleteSoftly(teamId: string): Promise<void> {
+    await this.prisma.team.update({
+      where: { id: teamId },
+      data: {
+        isDeleted: true,
+        lineups: {
+          deleteMany: {}
+        },
+        members: {
+          deleteMany: {}
+        }
+      }
+    });
+  }
+
+  async deleteByUser(userId: string, teamId: string): Promise<void> {
     const member = await this.prisma.teamMember.findFirstOrThrow({
-      where: { userId, teamId }
+      where: { userId, teamId },
+      select: { role: true }
     });
 
     if (member.role === MemberRole.MANAGER) {
-      await this.prisma.team.update({
-        where: { id: teamId },
-        data: {
-          isDeleted: true,
-          lineups: {
-            deleteMany: {}
-          },
-          members: {
-            deleteMany: {}
-          }
-        }
-      });
+      await this.deleteSoftly(teamId);
     } else {
-      throw new Error("Only Manager can delete team");
+      throw new Error("only Manager can delete team");
     }
-  }
-
-  async deleteByAdmin(teamId: string): Promise<void> {
-    await this.prisma.teamMember.deleteMany({ where: { teamId } });
   }
 }

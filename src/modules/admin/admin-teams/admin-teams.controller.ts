@@ -10,7 +10,7 @@ export class AdminTeamsController {
   @Get()
   @UseGuards(AdminJwtAuthGuard)
   async getAllTeam() {
-    return await this.adminTeamsService.getFilter({});
+    return await this.adminTeamsService.getByFilter({});
   }
 
   @Get(":id")
@@ -29,6 +29,6 @@ export class AdminTeamsController {
   @Delete(":id")
   @UseGuards(AdminJwtAuthGuard)
   async deleteTeam(@Param("id") teamId: string) {
-    return await this.adminTeamsService.deleteByAdmin(teamId);
+    return await this.adminTeamsService.deleteSoftly(teamId);
   }
 }

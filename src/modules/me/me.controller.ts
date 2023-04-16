@@ -66,7 +66,7 @@ export class MeController {
   @UseGuards(UserJwtAuthGuard)
   @Get("teams")
   async getMeTeams(@UserSubject() user: User) {
-    return await this.teamService.getUserTeams(user.id);
+    return await this.teamService.getByUserId(user.id);
   }
 
   // appointments

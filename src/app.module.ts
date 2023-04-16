@@ -2,7 +2,6 @@ import { CacheModule, Module } from "@nestjs/common";
 import { AdminModule } from "./modules/admin/admin.module";
 import { AppointmentModule } from "./modules/appointment/appointment.module";
 import { AuthModule } from "./modules/auth/auth.module";
-import { DebugModule } from "./modules/debug/debug.module";
 import { GameModule } from "./modules/game/game.module";
 import { ImageModule } from "./modules/image/image.module";
 import { NotifyModule } from "./modules/notification/lineNotify.module";
@@ -26,7 +25,6 @@ import { MeModule } from "./modules/me/me.module";
     ReviewModule,
     ImageModule,
     MeModule,
-    DebugModule,
     AdminModule,
     NotifyModule,
     PrismaModule,

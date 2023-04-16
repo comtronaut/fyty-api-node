@@ -1,5 +1,7 @@
 import { AdminRole, PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
+import fs from "fs";
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -30,6 +32,71 @@ async function main() {
       role: AdminRole.MANAGEMENT
     }
   });
+
+  // await migrate("user");
+}
+
+function prune(str: string) {
+  if (str.startsWith("\"") && str.endsWith("\"")) {
+    return str.slice(1, -1);
+  } else {
+    return str;
+  }
+}
+
+function formatCol(raw: string, table: string) {
+  if (raw.startsWith("202")) {
+    return new Date(raw);
+  } else if (raw === "NULL") {
+    return null;
+  } else if (raw === "True") {
+    return true;
+  } else if (raw === "False") {
+    return false;
+  } else {
+    return raw;
+  }
+}
+
+async function migrate(table: string): Promise<void> {
+  const raw = fs.readFileSync(`migration/${table}.csv`, "utf8");
+
+  const [ header, ...rows ] = raw.split("\r\n").filter(Boolean);
+  const headerCols = header.split(",");
+
+  const formattedRow = rows.map((rawRow) => {
+    const colEntries = rawRow.split(",").map((col, i) => {
+      return [ prune(headerCols[i]), formatCol(prune(col), table) ];
+    });
+
+    return Object.fromEntries(colEntries);
+  });
+
+  if (table === "user") {
+    await prisma.user.createMany({
+      data: formattedRow
+    });
+  } else if (table === "team") {
+    await prisma.team.createMany({
+      data: formattedRow
+    });
+  } else if (table === "team_line_up") {
+    await prisma.teamLineup.createMany({
+      data: formattedRow
+    });
+  } else if (table === "team_member") {
+    await prisma.teamMember.createMany({
+      data: formattedRow
+    });
+  } else if (table === "appointment") {
+    await prisma.appointment.createMany({
+      data: formattedRow
+    });
+  } else if (table === "appointment_member") {
+    await prisma.appointmentMember.createMany({
+      data: formattedRow
+    });
+  }
 }
 
 main()

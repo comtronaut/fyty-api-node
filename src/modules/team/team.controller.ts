@@ -41,7 +41,7 @@ export class TeamController {
     @Query("perPage") perPage?: string,
     @Query("page") page?: string
   ) {
-    return await this.teamService.getFilter({
+    return await this.teamService.getByFilter({
       ...([ perPage, page ].every(Boolean) && {
         pagination: {
           page: Number(page),
@@ -71,7 +71,7 @@ export class TeamController {
   @UseGuards(UserJwtAuthGuard)
   @Delete(":id")
   async deleteTeam(@UserSubject() user: User, @Param("id") teamId: string) {
-    return await this.teamService.delete(user.id, teamId);
+    return await this.teamService.deleteByUser(user.id, teamId);
   }
 
   // members

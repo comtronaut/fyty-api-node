@@ -23,8 +23,8 @@ export class RoomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage("room/create")
   async createRoom(client: Socket, payload: CreateRoomDto): Promise<void> {
-    const res = await this.roomService.create(payload);
-    this.server.emit("res/room/create", res);
+    const room = await this.roomService.create(payload);
+    this.server.emit("res/room/create", { room });
   }
 
   @SubscribeMessage("room/join")

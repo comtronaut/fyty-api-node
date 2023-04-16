@@ -21,9 +21,7 @@ export class RoomService {
             lte: timestamp
           }
         },
-        select: {
-          id: true
-        }
+        select: { id: true }
       });
 
       if (!rooms.length) {
@@ -41,7 +39,7 @@ export class RoomService {
     }
   }
 
-  async create({ teamLineupIds, ...data }: CreateRoomDto) {
+  async create({ teamLineupIds, ...data }: CreateRoomDto): Promise<Room> {
     const {
       members: [ member ],
       ...room
@@ -58,11 +56,21 @@ export class RoomService {
         },
         chat: {
           create: {}
+        },
+        // create room appointment
+        appointment: {
+          create: {
+            startAt: data.startAt,
+            endAt: data.endAt,
+            members: {
+              create: {
+                teamId: data.hostTeamId
+              }
+            }
+          }
         }
       },
-      include: {
-        members: true
-      }
+      include: { members: true }
     });
 
     await this.prisma.roomLineup.createMany({
@@ -73,26 +81,10 @@ export class RoomService {
       }))
     });
 
-    // create room appointment
-    await this.prisma.appointment.create({
-      data: {
-        startAt: data.startAt,
-        endAt: data.endAt,
-        roomId: room.id,
-        members: {
-          create: {
-            teamId: data.hostTeamId
-          }
-        }
-      }
-    });
-
-    return {
-      room
-    };
+    return room;
   }
 
-  async update(roomId: string, data: UpdateRoomDto) {
+  async update(roomId: string, data: UpdateRoomDto): Promise<Room> {
     return await this.prisma.room.update({
       where: {
         id: roomId

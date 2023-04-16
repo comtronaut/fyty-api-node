@@ -1,5 +1,5 @@
 import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
-import { Lang, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { Cache } from "cache-manager";
 import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
@@ -55,17 +55,14 @@ export class UserService {
   }
 
   async create(data: CreateUserDto): Promise<SecuredUser> {
-    const [ passwordHash ] = await Promise.all([ bcrypt.hash(data.password, 12) ]);
-
+    const passwordHash = await bcrypt.hash(data.password, 12);
     const createdContent = { ...data, password: passwordHash };
 
     const { password, ...userData } = await this.prisma.user.create({
       data: {
         ...createdContent,
         settings: {
-          create: {
-            lang: Lang.TH
-          }
+          create: {}
         }
       }
     });
