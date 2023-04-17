@@ -60,6 +60,8 @@ export class UserService {
 
     const { password, ...userData } = await this.prisma.user.create({
       data: {
+        // FIXME: set verificaiton status to true for everyone for now
+        isVerified: true,
         ...createdContent,
         settings: {
           create: {}

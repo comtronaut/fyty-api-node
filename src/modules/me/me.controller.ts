@@ -73,7 +73,7 @@ export class MeController {
   @UseGuards(UserJwtAuthGuard)
   @Get("appointments")
   async getMeAppointments(@UserSubject() user: User) {
-    return await this.appointmentService.getAppointmentByUserId(user.id);
+    return await this.appointmentService.getOthersByUserId(user.id);
   }
 
   // lobby

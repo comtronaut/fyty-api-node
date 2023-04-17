@@ -243,6 +243,7 @@ model User {
   bio                  String    @default("")
   portraitUrl          String    @default("")
   coverUrl             String    @default("")
+  isVerified           Boolean   @default(false)
   isDeactivated        Boolean   @default(false)
   facebookId           String?   @unique
   googleId             String?   @unique

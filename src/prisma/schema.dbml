@@ -147,6 +147,7 @@ Table User {
   bio String [not null, default: '']
   portraitUrl String [not null, default: '']
   coverUrl String [not null, default: '']
+  isVerified Boolean [not null, default: false]
   isDeactivated Boolean [not null, default: false]
   facebookId String [unique]
   googleId String [unique]

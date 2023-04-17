@@ -16,11 +16,11 @@ export class AppointmentService {
   }
 
   async getMembersByAppointmentId(appoinmentId: string) {
-    const out = await this.prisma.appointment.findFirstOrThrow({
+    const { members } = await this.prisma.appointment.findFirstOrThrow({
       where: { id: appoinmentId },
       select: { members: true }
     });
-    return out.members;
+    return members;
   }
 
   async getAppointment(roomId: string, teamId: string) {
@@ -55,7 +55,7 @@ export class AppointmentService {
     }
   }
 
-  async getAppointmentByUserId(userId: string) {
+  async getOthersByUserId(userId: string) {
     try {
       const member = await this.prisma.teamMember.findFirst({
         where: { userId }
@@ -79,7 +79,7 @@ export class AppointmentService {
       });
 
       const res = await Promise.all(
-        appointments.map((appoint) => this.packAppointment(appoint, member.teamId))
+        appointments.map((appoint) => this.packOtherAppointment(appoint, member.teamId))
       );
 
       return res;
@@ -88,45 +88,43 @@ export class AppointmentService {
     }
   }
 
-  async packAppointment(appointment: Appointment, teamId: string) {
-    try {
-      const appointMember = await this.prisma.appointmentMember.findMany({
-        where: { appointmentId: appointment.id }
-      });
-
-      if (appointMember.length !== 2) {
-        return {
-          appointment,
-          team: null
-        };
+  async packOtherAppointment(appointment: Appointment, teamId: string) {
+    // FIXME: use find first for now as the game has cap of 2
+    const appointMember = await this.prisma.appointmentMember.findFirst({
+      where: {
+        appointmentId: appointment.id,
+        isLeft: false,
+        NOT: {
+          teamId
+        }
+      },
+      select: {
+        team: true
       }
+    });
 
-      let team = null;
-      if (appointMember[0].teamId === teamId) {
-        team = await this.prisma.team.findUniqueOrThrow({
-          where: { id: appointMember[1].teamId }
-        });
-      } else {
-        team = await this.prisma.team.findUniqueOrThrow({
-          where: { id: appointMember[0].teamId }
-        });
-      }
-
-      return {
-        appointment,
-        team
-      };
-    } catch (err) {
-      throw new Error(err.message);
-    }
+    return {
+      appointment,
+      team: appointMember?.team ?? null
+    };
   }
 
-  async update(appointmentId: string, req: UpdateAppointmentDto) {
+  async update(appointmentId: string, data: UpdateAppointmentDto) {
     return await this.prisma.appointment.update({
       where: {
         id: appointmentId
       },
-      data: req
+      data: {
+        ...data,
+        ...((data.endAt || data.startAt) && {
+          room: {
+            update: {
+              startAt: data.startAt,
+              endAt: data.endAt
+            }
+          }
+        })
+      }
     });
   }
 
@@ -135,7 +133,12 @@ export class AppointmentService {
       where: {
         id: appointmentId
       },
-      data: { isDeleted: true }
+      data: {
+        isDeleted: true,
+        room: {
+          delete: true
+        }
+      }
     });
   }
 }

@@ -89,7 +89,17 @@ export class RoomService {
       where: {
         id: roomId
       },
-      data
+      data: {
+        ...data,
+        ...((data.endAt || data.startAt) && {
+          appointment: {
+            update: {
+              startAt: data.startAt,
+              endAt: data.endAt
+            }
+          }
+        })
+      }
     });
   }
 
