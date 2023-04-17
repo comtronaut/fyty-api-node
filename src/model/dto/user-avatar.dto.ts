@@ -1,6 +1,6 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { Prisma } from "@prisma/client";
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsUUID } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
 export class CreateUserAvatarDto implements Prisma.UserAvatarUncheckedCreateInput {
@@ -13,15 +13,15 @@ export class CreateUserAvatarDto implements Prisma.UserAvatarUncheckedCreateInpu
   @IsNotEmpty()
   rank: string;
 
+  @IsNotEmpty()
   ratingScore: number;
 
   @IsNotEmpty()
   gameId: string;
 
   @IsNotEmpty()
+  @IsUUID()
   userId: string;
-
-  createdAt: Date;
 }
 
 export class UpdateUserAvatarDto extends PartialType(CreateUserAvatarDto) {}

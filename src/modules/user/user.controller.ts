@@ -1,18 +1,14 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
-import { User } from "@prisma/client";
-import { UserSubject } from "src/common/subject.decorator";
 import { CreateUserAvatarDto, UpdateUserAvatarDto } from "src/model/dto/user-avatar.dto";
 import { CreateUserDto } from "src/model/dto/user.dto";
 import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { UserAvatarService } from "./avatar.service";
-import { UserSettingsService } from "./settings.service";
 import { UserService } from "./user.service";
 
 @Controller("users")
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    private readonly settingsService: UserSettingsService,
     private readonly avatarService: UserAvatarService
   ) {}
 
@@ -43,28 +39,31 @@ export class UserController {
 
   @Get(":id")
   @UseGuards(UserJwtAuthGuard)
-  async getById(@UserSubject() user: User, @Param("id") id: string) {
+  async getById(@Param("id") id: string) {
     return await this.userService.getById(id);
   }
 
+  // avatars
   @Post("avatars")
   @UseGuards(UserJwtAuthGuard)
   async createUserAvatar(@Body() payload: CreateUserAvatarDto) {
-    return this.avatarService.create(payload);
+    return await this.avatarService.create(payload);
   }
 
-  @UseGuards(UserJwtAuthGuard)
   @Get(":id/avatars")
+  @UseGuards(UserJwtAuthGuard)
   async getUserAvatar(@Param("id") userId: string, @Query("gameId") gameId?: string) {
     return await this.avatarService.getFilter(userId, gameId);
   }
 
   @Put("avatars/:id")
+  @UseGuards(UserJwtAuthGuard)
   async updateUserAvatar(@Param("id") avatarId: string, @Body() payload: UpdateUserAvatarDto) {
     return await this.avatarService.update(avatarId, payload);
   }
 
   @Delete("avatars/:id")
+  @UseGuards(UserJwtAuthGuard)
   async daleteUserAvatar(@Param("id") avatarId: string) {
     return await this.avatarService.delete(avatarId);
   }
