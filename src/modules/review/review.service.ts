@@ -6,17 +6,16 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class ReviewService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // CRUD
-  async createReview(req: CreateReviewDto) {
+  async createReview(data: CreateReviewDto) {
     try {
-      const review = await this.prisma.review.create({ data: req });
+      const review = await this.prisma.review.create({ data });
 
       const [ useravatar, reviewscore ] = await Promise.all([
         this.prisma.userAvatar.findFirstOrThrow({
-          where: { userId: req.revieweeId, gameId: req.gameId }
+          where: { userId: data.revieweeId, gameId: data.gameId }
         }),
         this.prisma.review.findMany({
-          where: { revieweeId: req.revieweeId, gameId: req.gameId }
+          where: { revieweeId: data.revieweeId, gameId: data.gameId }
         })
       ]);
 
@@ -45,32 +44,4 @@ export class ReviewService {
   async getReviewById(id: string) {
     return await this.prisma.review.findMany({ where: { id } });
   }
-
-  // update
-  // async update(reviewerId: string, req: UpdateReviewDto) {
-  //   try {
-  //     const updateRes = await this.reviewModel.update(reviewerId, req);
-
-  //     if (updateRes.affected === 0) {
-  //       return new HttpException("", HttpStatus.NO_CONTENT);
-  //     }
-
-  //     return await this.reviewModel.findOneOrFail({ where: { id: reviewerId } });
-  //   } catch (err) {
-  //     throw new BadRequestException(err.message);
-  //   }
-  // }
-
-  // async deleteReview(reviewId: string) {
-  //   try {
-  //     const res = await this.reviewModel.delete({ id: reviewId });
-  //     if (res.affected === 0) {
-  //       return new HttpException("", HttpStatus.NO_CONTENT)
-  //     }
-  //     console.log(res);
-  //     return;
-  //   } catch(err) {
-  //     throw new BadRequestException(err.message);
-  //   }
-  // }
 }

@@ -7,8 +7,8 @@ export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
   @Post()
-  async createReview(@Body() req: CreateReviewDto) {
-    return await this.reviewService.createReview(req);
+  async createReview(@Body() payload: CreateReviewDto) {
+    return await this.reviewService.createReview(payload);
   }
 
   @Get("")

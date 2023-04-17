@@ -11,8 +11,8 @@ export class LineupController {
 
   @UseGuards(UserJwtAuthGuard)
   @Post()
-  async addLineUp(@Body() req: CreateTeamLineupDto) {
-    return await this.lineUpService.create(req);
+  async addLineUp(@Body() payload: CreateTeamLineupDto) {
+    return await this.lineUpService.create(payload);
   }
 
   @UseGuards(UserJwtAuthGuard)
@@ -20,9 +20,9 @@ export class LineupController {
   async updateLineUp(
     @UserSubject() user: User,
     @Param("id") lineUpId: string,
-    @Body() req: UpdateLineUpDto
+    @Body() payload: UpdateLineUpDto
   ) {
-    return await this.lineUpService.update(user, lineUpId, req);
+    return await this.lineUpService.update(user, lineUpId, payload);
   }
 
   @UseGuards(UserJwtAuthGuard)

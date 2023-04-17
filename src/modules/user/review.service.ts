@@ -8,10 +8,10 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class UserReviewService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async updateRatingScore(user: User, req: UpdateUserDto) {
+  async updateRatingScore(user: User, data: UpdateUserDto) {
     const updateRes = await this.prisma.user.update({
       where: { id: user.id },
-      data: req
+      data
     });
 
     const { password, ...res } = await this.prisma.user.findUniqueOrThrow({

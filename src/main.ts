@@ -8,9 +8,7 @@ import env from "./common/env.config";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    cors: env.SERVER_ORIGIN === "https://api.fyty-esport.com"
-      ? { origin: env.CLIENT_ORIGIN }
-      : true
+    cors: env.SERVER_ORIGIN === "https://api.fyty-esport.com" ? { origin: env.CLIENT_ORIGIN } : true
   });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }));

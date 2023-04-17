@@ -26,7 +26,7 @@ export class UserAvatarService {
     });
   }
 
-  async delete(avatarId: string): Promise<void> {
-    await this.prisma.userAvatar.delete({ where: { id: avatarId } });
+  async delete(id: string): Promise<void> {
+    await this.prisma.userAvatar.delete({ where: { id } });
   }
 }

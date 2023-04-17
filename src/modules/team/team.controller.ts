@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  Query,
-  UseGuards
-} from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { UserSubject } from "src/common/subject.decorator";
@@ -30,8 +19,8 @@ export class TeamController {
 
   @UseGuards(UserJwtAuthGuard)
   @Post()
-  async createTeam(@UserSubject() user: User, @Body() req: CreateTeamDto) {
-    return await this.teamService.create(user, req);
+  async createTeam(@UserSubject() user: User, @Body() payload: CreateTeamDto) {
+    return await this.teamService.create(user, payload);
   }
 
   @UseGuards(UserJwtAuthGuard)
@@ -82,13 +71,13 @@ export class TeamController {
   }
 
   @Post("members")
-  async createMember(@Body() req: CreateTeamMemberDto) {
-    return await this.teamMemberService.create(req);
+  async createMember(@Body() payload: CreateTeamMemberDto) {
+    return await this.teamMemberService.create(payload);
   }
 
   @Put("members/:id")
-  async updateMemberRole(@Param("id") teamMemberId: string, @Body() req: UpdateTeamMemberDto) {
-    return await this.teamMemberService.update(teamMemberId, req);
+  async updateMemberRole(@Param("id") teamMemberId: string, @Body() payload: UpdateTeamMemberDto) {
+    return await this.teamMemberService.update(teamMemberId, payload);
   }
 
   @UseGuards(UserJwtAuthGuard)

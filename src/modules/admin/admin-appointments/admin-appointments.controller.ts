@@ -22,13 +22,13 @@ export class AdminAppointmentsController {
   @UseGuards(AdminJwtAuthGuard)
   @Get(":id/member")
   async getAppointmentMember(@Param("id") appointmentId: string) {
-    return this.appointmentService.getMembersByAppointmentId(appointmentId);
+    return this.appointmentService.getMembersById(appointmentId);
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @Put(":id")
-  async update(@Param("id") appiontmentId: string, @Body() req: UpdateAppointmentDto) {
-    return await this.appointmentService.update(appiontmentId, req);
+  async update(@Param("id") appiontmentId: string, @Body() payload: UpdateAppointmentDto) {
+    return await this.appointmentService.update(appiontmentId, payload);
   }
 
   @UseGuards(AdminJwtAuthGuard)

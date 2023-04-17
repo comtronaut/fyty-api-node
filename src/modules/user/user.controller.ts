@@ -60,8 +60,8 @@ export class UserController {
   }
 
   @Put("avatars/:id")
-  async updateUserAvatar(@Param("id") avatarId: string, @Body() req: UpdateUserAvatarDto) {
-    return await this.avatarService.update(avatarId, req);
+  async updateUserAvatar(@Param("id") avatarId: string, @Body() payload: UpdateUserAvatarDto) {
+    return await this.avatarService.update(avatarId, payload);
   }
 
   @Delete("avatars/:id")

@@ -333,7 +333,7 @@ export class RoomService {
         },
         select: { id: true }
       });
-      
+
       await this.prisma.room.update({
         where: { id: room.id },
         data: {

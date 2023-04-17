@@ -9,14 +9,14 @@ export class GamesController {
 
   @UseGuards(AdminJwtAuthGuard)
   @Post()
-  async addGame(@Body() req: CreateGameDto) {
-    return await this.gameService.create(req);
+  async addGame(@Body() payload: CreateGameDto) {
+    return await this.gameService.create(payload);
   }
 
   @UseGuards(AdminJwtAuthGuard)
   @Put(":id")
-  async updateGame(@Param("id") gameId: string, @Body() req: UpdateGameDto) {
-    return await this.gameService.update(gameId, req);
+  async updateGame(@Param("id") gameId: string, @Body() payload: UpdateGameDto) {
+    return await this.gameService.update(gameId, payload);
   }
 
   @UseGuards(AdminJwtAuthGuard)

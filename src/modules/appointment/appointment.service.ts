@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { Appointment } from "@prisma/client";
+import { Appointment, AppointmentMember } from "@prisma/client";
 import { UpdateAppointmentDto } from "src/model/dto/appointment.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 
@@ -7,17 +7,17 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class AppointmentService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAll() {
-    await this.prisma.appointment.findMany();
+  async getAll(): Promise<Appointment[]> {
+    return await this.prisma.appointment.findMany();
   }
 
-  async getById(id: string) {
-    await this.prisma.appointment.findFirstOrThrow({ where: { id } });
+  async getById(id: string): Promise<Appointment> {
+    return await this.prisma.appointment.findFirstOrThrow({ where: { id } });
   }
 
-  async getMembersByAppointmentId(appoinmentId: string) {
+  async getMembersById(id: string): Promise<AppointmentMember[]> {
     const { members } = await this.prisma.appointment.findFirstOrThrow({
-      where: { id: appoinmentId },
+      where: { id },
       select: { members: true }
     });
     return members;
