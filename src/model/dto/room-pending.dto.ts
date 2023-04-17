@@ -1,6 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { Transform } from "class-transformer";
-import { IsNotEmpty, IsUUID } from "class-validator";
+import { IsArray, IsNotEmpty, IsUUID } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
 export class CreateRoomPendingDto implements Prisma.RoomPendingUncheckedCreateInput {
@@ -13,7 +12,7 @@ export class CreateRoomPendingDto implements Prisma.RoomPendingUncheckedCreateIn
   roomId: string;
 
   @IsNotEmpty()
-  @Transform(({ value }) => value.split(","))
+  @IsArray()
   teamLineupIds: string[];
 }
 

@@ -48,8 +48,8 @@ export class RoomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage("room/modify")
   async modifyRoom(client: Socket, payload: RoomModify): Promise<void> {
-    const res = await this.roomService.update(payload.roomId, payload.req);
-    this.server.emit(`res/room/${payload.roomId}/modify`, res);
+    const room = await this.roomService.update(payload.roomId, payload.req);
+    this.server.emit(`res/room/${payload.roomId}/modify`, { room });
   }
 
   afterInit(server: Server) {

@@ -19,10 +19,10 @@ export class LineupController {
   @Put(":id")
   async updateLineUp(
     @UserSubject() user: User,
-    @Param("id") lineUpId: string,
+    @Param("id") lineupId: string,
     @Body() payload: UpdateLineUpDto
   ) {
-    return await this.lineUpService.update(user, lineUpId, payload);
+    return await this.lineUpService.update(user, lineupId, payload);
   }
 
   @UseGuards(UserJwtAuthGuard)

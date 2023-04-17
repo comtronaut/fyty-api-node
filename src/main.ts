@@ -2,18 +2,16 @@ import { Logger, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { json, urlencoded } from "express";
 import { AppModule } from "./app.module";
 import env from "./common/env.config";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    cors: env.SERVER_ORIGIN === "https://api.fyty-esport.com" ? { origin: env.CLIENT_ORIGIN } : true
+    cors: env.SERVER_ORIGIN === "https://api.fyty-esport.com" ? { origin: env.CLIENT_ORIGIN } : true,
+    bodyParser: true
   });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }));
-  app.use(json({ limit: "50mb" }));
-  app.use(urlencoded({ extended: true, limit: "50mb" }));
 
   // swagger api document
   const config = new DocumentBuilder()

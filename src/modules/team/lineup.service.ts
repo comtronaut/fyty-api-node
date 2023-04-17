@@ -11,14 +11,14 @@ export class LineupService {
     return await this.prisma.teamLineup.create({ data });
   }
 
-  async update(user: User, lineUpId: string, data: UpdateLineUpDto) {
+  async update(user: User, lineupId: string, data: UpdateLineUpDto) {
     const teamMember = await this.prisma.teamMember.findFirstOrThrow({
       where: { userId: user.id }
     });
 
     if ([ MemberRole.MANAGER, MemberRole.LEADER ].some((role) => role === teamMember.role)) {
       return await this.prisma.teamLineup.update({
-        where: { id: lineUpId },
+        where: { id: lineupId },
         data
       });
     } else {

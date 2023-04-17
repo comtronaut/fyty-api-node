@@ -1,12 +1,11 @@
 import { Prisma } from ".prisma/client";
 import { PartialType, PickType } from "@nestjs/mapped-types";
-import { Transform } from "class-transformer";
-import { IsISO8601, IsNotEmpty, IsUUID } from "class-validator";
+import { IsArray, IsISO8601, IsNotEmpty, IsUUID } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
 export class CreateAppointmentDto implements Prisma.AppointmentUncheckedCreateInput {
   @IsNotEmpty()
-  @Transform(({ value }) => value.split(","))
+  @IsArray()
   teamIds: string[];
 
   @IsNotEmpty()

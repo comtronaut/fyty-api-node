@@ -1,7 +1,6 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { Prisma } from "@prisma/client";
-import { Transform } from "class-transformer";
-import { IsBoolean, IsISO8601, IsNotEmpty, IsOptional, IsUUID } from "class-validator";
+import { IsArray, IsBoolean, IsISO8601, IsNotEmpty, IsOptional, IsUUID } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
 export class CreateRoomDto implements Prisma.RoomUncheckedCreateInput {
@@ -10,7 +9,6 @@ export class CreateRoomDto implements Prisma.RoomUncheckedCreateInput {
 
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => value === "true")
   isPrivate: boolean;
 
   @IsNotEmpty()
@@ -22,7 +20,7 @@ export class CreateRoomDto implements Prisma.RoomUncheckedCreateInput {
   endAt: Date;
 
   @IsNotEmpty()
-  @Transform(({ value }) => value.split(","))
+  @IsArray()
   teamLineupIds: string[];
 
   @IsNotEmpty()

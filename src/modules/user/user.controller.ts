@@ -39,8 +39,8 @@ export class UserController {
 
   @Get(":id")
   @UseGuards(UserJwtAuthGuard)
-  async getById(@Param("id") id: string) {
-    return await this.userService.getById(id);
+  async getById(@Param("id") userId: string) {
+    return await this.userService.getById(userId);
   }
 
   // avatars

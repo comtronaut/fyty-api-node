@@ -1,6 +1,5 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { Prisma } from "@prisma/client";
-import { Transform } from "class-transformer";
 import { IsISO8601, IsNotEmpty, IsNumber, IsOptional, IsUUID } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
@@ -10,7 +9,6 @@ export class CreateReviewDto implements Prisma.ReviewUncheckedCreateInput {
 
   @IsNotEmpty()
   @IsNumber()
-  @Transform(({ value }) => Number(value))
   ratingScore: number;
 
   @IsNotEmpty()
