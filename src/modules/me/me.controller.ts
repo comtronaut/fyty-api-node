@@ -9,7 +9,7 @@ import { UpdateUserSettingsDto } from "src/model/dto/user-settings.dto";
 import { TeamService } from "../team/team.service";
 import { AppointmentService } from "../appointment/appointment.service";
 import { RoomService } from "../room/room.service";
-import { TeampendingService } from "../team/pending.service";
+import { TeamPendingService } from "../team/pending.service";
 import { UserAvatarService } from "../user/avatar.service";
 
 @Controller("me")
@@ -21,7 +21,7 @@ export class MeController {
     private readonly teamService: TeamService,
     private readonly appointmentService: AppointmentService,
     private readonly roomService: RoomService,
-    private readonly teamPendingService: TeampendingService
+    private readonly teamPendingService: TeamPendingService
   ) {}
 
   @UseGuards(UserJwtAuthGuard)
@@ -73,7 +73,7 @@ export class MeController {
   @UseGuards(UserJwtAuthGuard)
   @Get("appointments")
   async getMeAppointments(@UserSubject() user: User) {
-    return await this.appointmentService.getOthersByUserId(user.id);
+    return await this.appointmentService.getOthersOfUser(user.id);
   }
 
   // lobby

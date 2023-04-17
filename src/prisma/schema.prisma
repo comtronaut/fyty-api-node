@@ -330,13 +330,13 @@ model Appointment {
 }
 
 model AppointmentMember {
-  id            String       @id @default(uuid())
-  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  appointmentId String?
-  team          Team         @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  id            String      @id @default(uuid())
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  appointmentId String
+  team          Team        @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   teamId        String
-  isLeft        Boolean      @default(false)
-  createdAt     DateTime     @default(now())
+  isLeft        Boolean     @default(false)
+  createdAt     DateTime    @default(now())
 
   @@unique([appointmentId, teamId])
 }

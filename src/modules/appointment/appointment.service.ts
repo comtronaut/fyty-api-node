@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { Appointment, AppointmentMember } from "@prisma/client";
+import { Appointment, AppointmentMember, Team } from "@prisma/client";
 import { UpdateAppointmentDto } from "src/model/dto/appointment.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 
@@ -55,48 +55,48 @@ export class AppointmentService {
     }
   }
 
-  async getOthersByUserId(userId: string) {
-    try {
-      const member = await this.prisma.teamMember.findFirst({
-        where: { userId }
-      });
-
-      if (member === null) {
-        return [];
-      }
-      const appointmentMember = await this.prisma.appointmentMember.findMany({
-        where: {
-          teamId: member.teamId
-        }
-      });
-      const appointments = await this.prisma.appointment.findMany({
-        where: {
-          id: {
-            in: appointmentMember.flatMap((e) => (e.appointmentId ? [ e.appointmentId ] : []))
-          },
-          isDeleted: false
-        }
-      });
-
-      const res = await Promise.all(
-        appointments.map((appoint) => this.packOtherAppointment(appoint, member.teamId))
-      );
-
-      return res;
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+  async getOthersOfTeam(teamId: string): Promise<{ appointment: Appointment, team: Team | null }[]> {
+    const res = await this.prisma.appointmentMember.findMany({
+      where: { teamId, isLeft: false },
+      select: { appointment: true }
+    });
+    
+    return await Promise.all(
+      res.map((e) => this.packOtherAppointment(e.appointment, teamId))
+    );
   }
 
-  async packOtherAppointment(appointment: Appointment, teamId: string) {
+  async getOthersOfUser(userId: string): Promise<{ appointment: Appointment, team: Team | null }[]> {
+    const res = await this.prisma.teamMember.findMany({
+      where: { userId },
+      select: {
+        teamId: true,
+        team: {
+          select: {
+            appointmentMembers: {
+              select: {
+                appointment: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    const appointments = res.flatMap((e) => e.team.appointmentMembers.map((f) => [ e.teamId, f.appointment ] as const));
+
+    return await Promise.all(
+      appointments.map(([ myTeamId, appointment ]) => this.packOtherAppointment(appointment, myTeamId))
+    );
+  }
+
+  async packOtherAppointment(appointment: Appointment, teamId: string): Promise<{ appointment: Appointment, team: Team | null }> {
     // FIXME: use find first for now as the game has cap of 2
     const appointMember = await this.prisma.appointmentMember.findFirst({
       where: {
         appointmentId: appointment.id,
         isLeft: false,
-        NOT: {
-          teamId
-        }
+        NOT: { teamId }
       },
       select: {
         team: true
@@ -109,10 +109,10 @@ export class AppointmentService {
     };
   }
 
-  async update(appointmentId: string, data: UpdateAppointmentDto) {
+  async update(id: string, data: UpdateAppointmentDto) {
     return await this.prisma.appointment.update({
       where: {
-        id: appointmentId
+        id
       },
       data: {
         ...data,
@@ -128,10 +128,10 @@ export class AppointmentService {
     });
   }
 
-  async delete(appointmentId: string) {
+  async delete(id: string) {
     await this.prisma.appointment.update({
       where: {
-        id: appointmentId
+        id
       },
       data: {
         isDeleted: true,

@@ -49,7 +49,7 @@ export class TeamMemberService {
     });
   }
 
-  async getTeamId(teamId: string): Promise<TeamMember[]> {
+  async getByTeamId(teamId: string): Promise<TeamMember[]> {
     return await this.prisma.teamMember.findMany({ where: { teamId } });
   }
 

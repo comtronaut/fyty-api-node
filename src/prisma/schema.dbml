@@ -211,7 +211,7 @@ Table Appointment {
 
 Table AppointmentMember {
   id String [pk]
-  appointmentId String
+  appointmentId String [not null]
   teamId String [not null]
   isLeft Boolean [not null, default: false]
   createdAt DateTime [default: `now()`, not null]

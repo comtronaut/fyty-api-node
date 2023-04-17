@@ -4,17 +4,19 @@ import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { UserSubject } from "src/common/subject.decorator";
 import { CreateTeamDto, UpdateTeamDto } from "src/model/dto/team.dto";
 import { TeamMemberService } from "./member.service";
-import { TeampendingService } from "./pending.service";
+import { TeamPendingService } from "./pending.service";
 import { TeamService } from "./team.service";
 import { CreateTeamMemberDto, UpdateTeamMemberDto } from "src/model/dto/team-member";
 import { CreateTeamPendingDto, UpdateTeamPendingDto } from "src/model/dto/team-pending";
+import { AppointmentService } from "../appointment/appointment.service";
 
 @Controller("teams")
 export class TeamController {
   constructor(
     private readonly teamService: TeamService,
     private readonly teamMemberService: TeamMemberService,
-    private readonly teamPendingService: TeampendingService
+    private readonly teamPendingService: TeamPendingService,
+    private readonly appointmentService: AppointmentService
   ) {}
 
   @UseGuards(UserJwtAuthGuard)
@@ -63,11 +65,18 @@ export class TeamController {
     return await this.teamService.deleteByUser(user.id, teamId);
   }
 
+  // appointments
+  @UseGuards(UserJwtAuthGuard)
+  @Get(":id/appointments")
+  async getTeamAppointments(@Param("id") teamId: string) {
+    return await this.appointmentService.getOthersOfTeam(teamId);
+  }
+
   // members
   @UseGuards(UserJwtAuthGuard)
   @Get(":id/members")
   async getMembersByTeamId(@Param("id") teamId: string) {
-    return await this.teamMemberService.getTeamId(teamId);
+    return await this.teamMemberService.getByTeamId(teamId);
   }
 
   @Post("members")

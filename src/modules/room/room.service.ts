@@ -325,23 +325,6 @@ export class RoomService {
       where: { id: roomMemberId }
     });
 
-    // if host leave, set new host
-    if (room.hostTeamId === leavingMember.teamId && room.teamCount > 1) {
-      const { id: hostTeamId } = await this.prisma.roomMember.findFirstOrThrow({
-        where: {
-          roomId: room.id
-        },
-        select: { id: true }
-      });
-
-      await this.prisma.room.update({
-        where: { id: room.id },
-        data: {
-          hostTeamId
-        }
-      });
-    }
-
     // soft delete appointment if room is empty
     if (room.teamCount <= 0) {
       await this.prisma.appointment.update({

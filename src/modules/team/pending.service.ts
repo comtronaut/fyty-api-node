@@ -5,7 +5,7 @@ import { NotifyService } from "src/modules/notification/lineNotify.service";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
-export class TeampendingService {
+export class TeamPendingService {
   constructor(private readonly prisma: PrismaService, private readonly lineNotify: NotifyService) {}
 
   async getTeamPendingByUser(userId: string) {

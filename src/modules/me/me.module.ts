@@ -4,7 +4,7 @@ import { UserSettingsService } from "../user/settings.service";
 import { TeamService } from "../team/team.service";
 import { AppointmentService } from "../appointment/appointment.service";
 import { RoomService } from "../room/room.service";
-import { TeampendingService } from "../team/pending.service";
+import { TeamPendingService } from "../team/pending.service";
 import { NotifyService } from "../notification/lineNotify.service";
 import { UserService } from "../user/user.service";
 import { UserAvatarService } from "../user/avatar.service";
@@ -19,7 +19,7 @@ import { UserAvatarService } from "../user/avatar.service";
     TeamService,
     AppointmentService,
     RoomService,
-    TeampendingService,
+    TeamPendingService,
     NotifyService
   ]
 })
