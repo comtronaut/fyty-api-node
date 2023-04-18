@@ -8,21 +8,21 @@ import { AdminService } from "./admin-admins-service";
 @Controller("admin/admins")
 @UseGuards(AdminJwtAuthGuard)
 export class AdminController {
-  constructor(private readonly addminService: AdminService) {}
+  constructor(private readonly adminService: AdminService) {}
 
   @Post()
   async createAdminAccount(@Body() payload: CreateAdminDto) {
-    return await this.addminService.createAdmin(payload);
+    return await this.adminService.createAdmin(payload);
   }
 
   @Get()
   async getAllAdmin() {
-    return await this.addminService.getAllAdmin();
+    return await this.adminService.getAllAdmin();
   }
 
   @Get(":id")
   async getAdmin(@Param("id") adminId: Admin["id"]) {
-    return await this.addminService.getAdminById(adminId);
+    return await this.adminService.getAdminById(adminId);
   }
 
   @Put(":id")
@@ -30,11 +30,11 @@ export class AdminController {
     @Param("id") adminId: Admin["id"],
     @Body() payload: UpdateAdminDto
   ) {
-    return await this.addminService.updateAdminData(adminId, payload);
+    return await this.adminService.updateAdminData(adminId, payload);
   }
 
   @Delete(":id")
   async deleteAdmin(@Param("id") adminId: Admin["id"]) {
-    return await this.addminService.deleteAdmin(adminId);
+    return await this.adminService.deleteAdmin(adminId);
   }
 }
