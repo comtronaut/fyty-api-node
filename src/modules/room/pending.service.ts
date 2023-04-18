@@ -7,7 +7,10 @@ import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class RoomPendingService {
-  constructor(private readonly prisma: PrismaService, private readonly lineNotify: NotifyService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly lineNotify: NotifyService
+  ) {}
 
   async create(roomId: string, payload: CreateRoomPendingDto) {
     // check if already sent or joined
@@ -49,10 +52,6 @@ export class RoomPendingService {
 
   async getByRoomId(roomId: string): Promise<RoomPending[]> {
     return await this.prisma.roomPending.findMany({ where: { roomId } });
-  }
-
-  async getByTeamId(teamId: string): Promise<RoomPending[]> {
-    return await this.prisma.roomPending.findMany({ where: { teamId } });
   }
 
   async deleteById(requestId: string, userId: string) {

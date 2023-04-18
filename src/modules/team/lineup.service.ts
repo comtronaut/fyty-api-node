@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { MemberRole, TeamLineup, User } from "@prisma/client";
-import { CreateTeamLineupDto, UpdateLineUpDto } from "src/model/dto/team-lineup.dto";
+import { CreateTeamLineupDto, UpdateLineupDto } from "src/model/dto/team-lineup.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
@@ -11,7 +11,7 @@ export class LineupService {
     return await this.prisma.teamLineup.create({ data });
   }
 
-  async update(user: User, lineupId: string, data: UpdateLineUpDto) {
+  async update(user: User, lineupId: string, data: UpdateLineupDto) {
     const teamMember = await this.prisma.teamMember.findFirstOrThrow({
       where: { userId: user.id }
     });

@@ -16,7 +16,9 @@ import { RoomJoin, RoomDisband, RoomLeave, RoomModify } from "src/types/ws-paylo
     origin: "*"
   }
 })
-export class RoomGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class RoomGateway
+implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(private roomService: RoomService) {}
 
   @WebSocketServer() server: Server;

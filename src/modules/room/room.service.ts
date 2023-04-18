@@ -103,31 +103,6 @@ export class RoomService {
     });
   }
 
-  async getJoinedAndPendingRoomsByTeamId(teamId: string) {
-    try {
-      const [ participants, request ] = await Promise.all([
-        this.prisma.roomMember.findMany({
-          where: { teamId },
-          select: { room: true }
-        }),
-        this.prisma.roomPending.findMany({
-          where: { teamId, status: PendingStatus.INCOMING },
-          select: { room: true }
-        })
-      ]);
-
-      const joined = participants.map((e) => e.room);
-      const requested = request.map((e) => e.room);
-
-      return {
-        joined,
-        requested
-      };
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
-  }
-
   async getRoomMembersByRoomId(roomId: string): Promise<RoomMember[]> {
     const { members } = await this.prisma.room.findFirstOrThrow({
       where: { id: roomId },
@@ -148,21 +123,51 @@ export class RoomService {
     return await this.prisma.room.findUniqueOrThrow({ where: { id: roomId } });
   }
 
-  async getByHostTeamId(teamId: string): Promise<Room[]> {
-    return await this.prisma.room.findMany({ where: { hostTeamId: teamId } });
+  async getByTeamFilter(
+    teamId: string,
+    cluase: Partial<{ isJoined: boolean; isPending: boolean; isHosted: boolean }>
+  ): Promise<Partial<{ joined: Room[]; requested: Room[]; hosted: Room[] }>> {
+    const [ participants, request, hosted ] = await Promise.all([
+      cluase.isJoined
+        ? this.prisma.roomMember.findMany({
+          where: { teamId },
+          select: { room: true }
+        })
+        : [],
+      cluase.isPending
+        ? this.prisma.roomPending.findMany({
+          where: { teamId, status: PendingStatus.INCOMING },
+          select: { room: true }
+        })
+        : [],
+      cluase.isHosted
+        ? this.prisma.room.findMany({ where: { hostTeamId: teamId } })
+        : []
+    ]);
+
+    const joined = participants.map((e) => e.room);
+    const requested = request.map((e) => e.room);
+
+    return {
+      ...(cluase.isJoined && { joined }),
+      ...(cluase.isPending && { requested }),
+      ...(cluase.isHosted && { hosted })
+    };
   }
 
-  async getAll(gameId?: string, roomName?: string, date?: any): Promise<Room[]> {
-    const today = new Date(date);
+  async getByFilter(
+    clause: Partial<{ gameId: string; name: string; date: any }>
+  ): Promise<Room[]> {
+    const today = new Date(clause.date);
 
     const dayStart = dayjs(today).startOf("day").toDate();
     const dayEnd = dayjs(today).endOf("day").toDate();
 
     return await this.prisma.room.findMany({
       where: {
-        ...(gameId && { gameId }),
-        ...(roomName && { name: roomName }),
-        ...(date && { startAt: { gte: dayStart, lte: dayEnd } })
+        ...(clause.gameId && { gameId: clause.gameId }),
+        ...(clause.name && { name: clause.name }),
+        ...(clause.date && { startAt: { gte: dayStart, lte: dayEnd } })
       }
     });
   }
@@ -214,7 +219,9 @@ export class RoomService {
     if (room.hostTeamId !== teamId) {
       throw new Error("only host can accept the room request");
     }
-    if ([ RoomStatus.UNAVAILABLE, RoomStatus.FULL ].some((status) => status === room.status)) {
+    if (
+      [ RoomStatus.UNAVAILABLE, RoomStatus.FULL ].some((status) => status === room.status)
+    ) {
       throw new ConflictException("room is not available");
     }
     if (new Date() > room.endAt) {

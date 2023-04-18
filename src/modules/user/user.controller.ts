@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards
+} from "@nestjs/common";
 import { CreateUserAvatarDto, UpdateUserAvatarDto } from "src/model/dto/user-avatar.dto";
 import { CreateUserDto } from "src/model/dto/user.dto";
 import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
@@ -58,7 +68,10 @@ export class UserController {
 
   @Put("avatars/:id")
   @UseGuards(UserJwtAuthGuard)
-  async updateUserAvatar(@Param("id") avatarId: string, @Body() payload: UpdateUserAvatarDto) {
+  async updateUserAvatar(
+    @Param("id") avatarId: string,
+    @Body() payload: UpdateUserAvatarDto
+  ) {
     return await this.avatarService.update(avatarId, payload);
   }
 

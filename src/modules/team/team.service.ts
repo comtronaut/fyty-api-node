@@ -58,7 +58,10 @@ export class TeamService {
     return memberRes.map((e) => e.team);
   }
 
-  async getByFilter(filter: { pagination?: Pagination; clause?: Partial<Team> }): Promise<Team[]> {
+  async getByFilter(filter: {
+    pagination?: Pagination;
+    clause?: Partial<Team>;
+  }): Promise<Team[]> {
     return await this.prisma.team.findMany({
       ...(filter.pagination && {
         skip: (filter.pagination.page - 1) * filter.pagination.perPage,
@@ -85,6 +88,9 @@ export class TeamService {
       where: { id: teamId },
       data: {
         isDeleted: true,
+        settings: {
+          delete: true
+        },
         lineups: {
           deleteMany: {}
         },

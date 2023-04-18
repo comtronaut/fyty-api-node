@@ -25,7 +25,9 @@ export class UserService {
       return cachedUser;
     }
 
-    const { password, ...out } = await this.prisma.user.findUniqueOrThrow({ where: { id } });
+    const { password, ...out } = await this.prisma.user.findUniqueOrThrow({
+      where: { id }
+    });
 
     await this.cacheManager.set(`user:${id}`, out);
 
@@ -80,6 +82,7 @@ export class UserService {
       data: {
         ...data,
         ...(data.email && { updatedEmailAt: new Date() }),
+        ...(data.mobilePhone && { updatedMobilePhoneAt: new Date() }),
         ...(data.username && { updatedUsernameAt: new Date() }),
         ...(data.password && {
           password: bcrypt.hashSync(data.password, 12)

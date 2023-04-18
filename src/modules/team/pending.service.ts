@@ -6,7 +6,10 @@ import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class TeamPendingService {
-  constructor(private readonly prisma: PrismaService, private readonly lineNotify: NotifyService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly lineNotify: NotifyService
+  ) {}
 
   async getTeamPendingByUser(userId: string) {
     return await this.prisma.teamPending.findMany({

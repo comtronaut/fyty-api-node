@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from "@nestjs/common";
 import { CreateReviewDto, UpdateReviewDto } from "src/model/dto/review.dto";
 import { ReviewService } from "./review.service";
+import { UserJwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 
 @Controller("review")
+@UseGuards(UserJwtAuthGuard)
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 

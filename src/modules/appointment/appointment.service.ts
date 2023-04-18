@@ -23,50 +23,22 @@ export class AppointmentService {
     return members;
   }
 
-  async getAppointment(roomId: string, teamId: string) {
-    try {
-      if (roomId) {
-        return await this.prisma.appointment.findMany({
-          where: { roomId, isDeleted: false }
-        });
-      }
-      if (teamId) {
-        const appointments = await this.prisma.appointmentMember.findMany({
-          where: {
-            teamId
-          }
-        });
-
-        return await this.prisma.appointment.findMany({
-          where: {
-            id: {
-              in: appointments.flatMap((e) => (e.appointmentId ? [ e.appointmentId ] : []))
-            },
-            isDeleted: false
-          }
-        });
-      }
-
-      return await this.prisma.appointment.findMany({
-        where: { isDeleted: false }
-      });
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
-  }
-
-  async getOthersOfTeam(teamId: string): Promise<{ appointment: Appointment, team: Team | null }[]> {
+  async getOthersOfTeam(
+    teamId: string
+  ): Promise<{ appointment: Appointment; team: Team | null }[]> {
     const res = await this.prisma.appointmentMember.findMany({
       where: { teamId, isLeft: false },
       select: { appointment: true }
     });
-    
+
     return await Promise.all(
       res.map((e) => this.packOtherAppointment(e.appointment, teamId))
     );
   }
 
-  async getOthersOfUser(userId: string): Promise<{ appointment: Appointment, team: Team | null }[]> {
+  async getOthersOfUser(
+    userId: string
+  ): Promise<{ appointment: Appointment; team: Team | null }[]> {
     const res = await this.prisma.teamMember.findMany({
       where: { userId },
       select: {
@@ -83,14 +55,21 @@ export class AppointmentService {
       }
     });
 
-    const appointments = res.flatMap((e) => e.team.appointmentMembers.map((f) => [ e.teamId, f.appointment ] as const));
+    const appointments = res.flatMap((e) =>
+      e.team.appointmentMembers.map((f) => [ e.teamId, f.appointment ] as const)
+    );
 
     return await Promise.all(
-      appointments.map(([ myTeamId, appointment ]) => this.packOtherAppointment(appointment, myTeamId))
+      appointments.map(([ myTeamId, appointment ]) =>
+        this.packOtherAppointment(appointment, myTeamId)
+      )
     );
   }
 
-  async packOtherAppointment(appointment: Appointment, teamId: string): Promise<{ appointment: Appointment, team: Team | null }> {
+  async packOtherAppointment(
+    appointment: Appointment,
+    teamId: string
+  ): Promise<{ appointment: Appointment; team: Team | null }> {
     // FIXME: use find first for now as the game has cap of 2
     const appointMember = await this.prisma.appointmentMember.findFirst({
       where: {

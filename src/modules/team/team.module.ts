@@ -7,10 +7,19 @@ import { TeamPendingService } from "./pending.service";
 import { TeamController } from "./team.controller";
 import { TeamService } from "./team.service";
 import { AppointmentService } from "../appointment/appointment.service";
+import { TeamSettingsService } from "./settings.service";
 
 @Module({
   imports: [],
   controllers: [ TeamController, LineupController ],
-  providers: [ TeamService, LineupService, TeamMemberService, TeamPendingService, AppointmentService, NotifyService ]
+  providers: [
+    TeamService,
+    LineupService,
+    TeamMemberService,
+    TeamSettingsService,
+    TeamPendingService,
+    AppointmentService,
+    NotifyService
+  ]
 })
 export class TeamModule {}

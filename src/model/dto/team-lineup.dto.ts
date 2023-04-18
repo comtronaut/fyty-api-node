@@ -18,6 +18,6 @@ export class CreateTeamLineupDto implements Prisma.TeamLineupUncheckedCreateInpu
   imageUrl: string;
 }
 
-export class UpdateLineUpDto extends PartialType(CreateTeamLineupDto) {}
+export class UpdateLineupDto extends PartialType(CreateTeamLineupDto) {}
 
 export const schemas = validationMetadatasToSchemas();

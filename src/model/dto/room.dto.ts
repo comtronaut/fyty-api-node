@@ -1,6 +1,13 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { Prisma } from "@prisma/client";
-import { IsArray, IsBoolean, IsISO8601, IsNotEmpty, IsOptional, IsUUID } from "class-validator";
+import {
+  IsArray,
+  IsBoolean,
+  IsISO8601,
+  IsNotEmpty,
+  IsOptional,
+  IsUUID
+} from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
 export class CreateRoomDto implements Prisma.RoomUncheckedCreateInput {

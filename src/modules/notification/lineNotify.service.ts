@@ -149,7 +149,10 @@ export class NotifyService {
         });
       } else {
         if (managerUsers !== null && managerUsers[0].lineToken !== null) {
-          void this.sendNotification("คุณได้รับการร้องขอเข้าทีม", managerUsers[0].lineToken);
+          void this.sendNotification(
+            "คุณได้รับการร้องขอเข้าทีม",
+            managerUsers[0].lineToken
+          );
         }
       }
     } else if (status === PendingStatus.OUTGOING) {
