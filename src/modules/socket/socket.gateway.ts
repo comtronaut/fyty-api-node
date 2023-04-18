@@ -8,21 +8,37 @@ import {
 } from "@nestjs/websockets";
 import { Socket, Server } from "socket.io";
 import { CreateRoomDto } from "src/model/dto/room.dto";
-import { RoomService } from "./room.service";
 import { RoomJoin, RoomDisband, RoomLeave, RoomModify } from "src/types/ws-payload";
+import { RoomService } from "../room/room.service";
+import { MessageService } from "../chat/message.service";
 
 @WebSocketGateway({
   cors: {
     origin: "*"
   }
 })
-export class RoomGateway
+export class SocketGateway
 implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private roomService: RoomService) {}
+  constructor(
+    private readonly roomService: RoomService,
+    private readonly messageService: MessageService
+  ) {}
 
   @WebSocketServer() server: Server;
 
+  // message
+  @SubscribeMessage("message")
+  async handleSendMessage(client: Socket, payload: any): Promise<void> {
+    const createdMessage = await this.messageService.create(payload.data);
+
+    this.server.emit(`res/chat/${payload.data.chatId}`, {
+      data: createdMessage,
+      waitingKey: payload.waitingKey
+    });
+  }
+
+  // rooms
   @SubscribeMessage("room/create")
   async createRoom(client: Socket, payload: CreateRoomDto): Promise<void> {
     const room = await this.roomService.create(payload);

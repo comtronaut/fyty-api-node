@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -16,6 +17,7 @@ import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { ChatService } from "../chat/chat.service";
 import { RoomPendingService } from "./pending.service";
 import { RoomService } from "./room.service";
+import { LobbyService } from "./lobby.service";
 
 @Controller("rooms")
 @UseGuards(UserJwtAuthGuard)
@@ -23,7 +25,8 @@ export class RoomController {
   constructor(
     private readonly roomService: RoomService,
     private readonly chatService: ChatService,
-    private readonly roomPendingService: RoomPendingService
+    private readonly roomPendingService: RoomPendingService,
+    private readonly lobbyService: LobbyService
   ) {}
 
   @Get()
@@ -53,6 +56,17 @@ export class RoomController {
     });
   }
 
+  // lobby
+  @Get("lobby")
+  async getRoomsLobby(@UserSubject() user: User, @Query("date") date: string, @Query("gameId") gameId: string) {
+    if (!date || !gameId) {
+      throw new BadRequestException("date or gameId weren't supplied");
+    }
+
+    return await this.lobbyService.getLobbyByGameId(gameId, date, user);
+  }
+
+  // room
   @Get(":id")
   async getRoomsById(@Param("id") roomId: string) {
     return await this.roomService.getById(roomId);

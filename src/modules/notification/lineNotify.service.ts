@@ -1,4 +1,5 @@
-import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { MemberRole, PendingStatus } from "@prisma/client";
 import axios from "axios";
 import env from "src/common/env.config";

@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, Injectable } from "@nestjs/comm
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { PendingStatus, Room, RoomLineup, RoomMember, RoomStatus } from "@prisma/client";
 import dayjs from "dayjs";
+import { getDayRangeWithin } from "src/common/utils/date";
 import { CreateRoomMemberDto } from "src/model/dto/room-member.dto";
 import { CreateRoomDto, DeleteRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
 import { PrismaService } from "src/prisma/prisma.service";
@@ -158,16 +159,13 @@ export class RoomService {
   async getByFilter(
     clause: Partial<{ gameId: string; name: string; date: any }>
   ): Promise<Room[]> {
-    const today = new Date(clause.date);
-
-    const dayStart = dayjs(today).startOf("day").toDate();
-    const dayEnd = dayjs(today).endOf("day").toDate();
+    const { start, end } = getDayRangeWithin(clause.date);
 
     return await this.prisma.room.findMany({
       where: {
         ...(clause.gameId && { gameId: clause.gameId }),
         ...(clause.name && { name: clause.name }),
-        ...(clause.date && { startAt: { gte: dayStart, lte: dayEnd } })
+        ...(clause.date && { startAt: { gte: start, lte: end } })
       }
     });
   }

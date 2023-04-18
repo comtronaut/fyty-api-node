@@ -1,4 +1,5 @@
-import { CacheModule, Module } from "@nestjs/common";
+import { Module } from "@nestjs/common";
+import { CacheModule } from "@nestjs/cache-manager";
 import { AdminModule } from "./modules/admin/admin.module";
 import { AppointmentModule } from "./modules/appointment/appointment.module";
 import { AuthModule } from "./modules/auth/auth.module";
@@ -12,6 +13,7 @@ import { TeamModule } from "./modules/team/team.module";
 import { UserModule } from "./modules/user/user.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { MeModule } from "./modules/me/me.module";
+import { SocketModule } from "./modules/socket/socket.module";
 
 @Module({
   imports: [
@@ -27,6 +29,7 @@ import { MeModule } from "./modules/me/me.module";
     MeModule,
     AdminModule,
     NotifyModule,
+    SocketModule,
     PrismaModule,
     CacheModule.register({
       ttl: 1000 * 60 * 60,
