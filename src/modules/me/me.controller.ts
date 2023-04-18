@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Put, UseGuards } from "@nestjs/common";
-import { User } from "@prisma/client";
+import { Body, Controller, Delete, Get, Put, Query, UseGuards } from "@nestjs/common";
+import { PendingStatus, User } from "@prisma/client";
 import { UserSubject } from "src/common/subject.decorator";
 import { UpdateUserSettingsDto } from "src/model/dto/user-settings.dto";
 import { UpdateUserDto } from "src/model/dto/user.dto";
@@ -69,12 +69,10 @@ export class MeController {
 
   // pendings
   @Get("teams/pendings")
-  async getPendingByUserId(@UserSubject() user: User) {
-    return await this.teamPendingService.getTeamPendingByUser(user.id);
-  }
-
-  @Get("teams/invitations")
-  async getInvitationByUserId(@UserSubject() user: User) {
-    return await this.teamPendingService.getTeamInvitationByUser(user.id);
+  async getPendingByUserId(
+    @UserSubject() user: User,
+    @Query("status") status?: PendingStatus
+  ) {
+    return await this.teamPendingService.getTeamPendingByUser(user.id, status);
   }
 }

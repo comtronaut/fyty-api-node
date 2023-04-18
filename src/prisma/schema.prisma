@@ -29,27 +29,28 @@ enum RoomStatus {
 }
 
 enum MemberRole {
+  HEAD_COACH
   LEADER
   MANAGER
   MEMBER
 }
 
-enum MatchingResult {
-  WIN
-  LOSE
-  TIE
+enum TrainingStatus {
+  // the training partner accepts the result
+  ACCEPTED
+  // the training partner refuses the result
+  DENIED
+  // the training partner wants to correct the result
+  CONFLICTED
+  // halted by admin (via report)
+  INEFFECTIVE
+  // the training partner  is not review
+  UNREVIEWED
 }
 
 enum PendingStatus {
   INCOMING
   OUTGOING
-}
-
-enum AppointmentStatus {
-  WAITING
-  TRAINING
-  DISMISSED
-  DONE
 }
 
 enum AdminRole {
@@ -177,10 +178,12 @@ model Team {
   roomMembers        RoomMember[]
   messages           Message[]
   appointmentMembers AppointmentMember[]
-  matchingHosts      Matching[]          @relation("host")
-  matchingGuests     Matching[]          @relation("guest")
+  trainingHosts      Training[]          @relation("host")
+  trainingGuests     Training[]          @relation("guest")
   stats              TeamStats?
   settings           TeamSettings?
+  trainingReports    TrainingReport[]
+  trainingRevisions  TrainingRevision[]
 }
 
 model TeamSettings {
@@ -263,6 +266,7 @@ model User {
   messages             Message[]
   settings             UserSettings?
   passwordResetSession PasswordResetSession?
+  trainingReports      TrainingReport[]
 }
 
 model UserSettings {
@@ -316,17 +320,17 @@ model Review {
 
 // appointment
 model Appointment {
-  id        String            @id @default(uuid())
-  startAt   DateTime
-  endAt     DateTime
-  status    AppointmentStatus @default(WAITING)
-  isDeleted Boolean           @default(false)
-  room      Room?             @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: SetNull)
-  roomId    String?           @unique
-  createdAt DateTime          @default(now())
+  id              String    @id @default(uuid())
+  startAt         DateTime
+  endAt           DateTime
+  deletedBeforeAt DateTime?
+  isDeleted       Boolean   @default(false)
+  room            Room?     @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  roomId          String?   @unique
+  createdAt       DateTime  @default(now())
 
   members  AppointmentMember[]
-  matching Matching?
+  training Training?
 }
 
 model AppointmentMember {
@@ -368,7 +372,22 @@ model Message {
 }
 
 // stats
-model Matching {
+// FIXME: the table is support only 2-team games
+model TeamStats {
+  id                     String   @id @default(uuid())
+  team                   Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId                 String   @unique
+  leftWhileTrainingCount Int      @default(0)
+  completedTrainingCount Int      @default(0)
+  trainingMinute         Int      @default(0)
+  trainingCount          Int      @default(0)
+  winCount               Int      @default(0)
+  loseCount              Int      @default(0)
+  tieCount               Int      @default(0)
+  updateAt               DateTime @updatedAt
+}
+
+model Training {
   id            String         @id @default(uuid())
   appointment   Appointment    @relation(fields: [appointmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   appointmentId String         @unique
@@ -376,40 +395,45 @@ model Matching {
   hostId        String?
   guest         Team?          @relation(fields: [guestId], references: [id], onUpdate: Cascade, onDelete: SetNull, name: "guest")
   guestId       String?
-  hostWinCount  Int            @default(0)
-  hostLoseCount Int            @default(0)
-  result        MatchingResult @default(TIE)
+  hostWinCount  Int?
+  hostLoseCount Int?
+  note          String         @default("")
+  deniedReason  String         @default("")
+  status        TrainingStatus @default(UNREVIEWED)
+  imageUrls     String[]       @default([])
+  isSubmitted   Boolean        @default(false)
+  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime       @default(now())
 
-  reports MatchingReport[]
+  reports  TrainingReport[]
+  revision TrainingRevision?
 }
 
-model MatchingReport {
-  id         String   @id @default(uuid())
-  matching   Matching @relation(fields: [matchingId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  matchingId String   @unique
-  heading    String
-  content    String
-  imageUrls  String[] @default([])
-  createdAt  DateTime @default(now())
+model TrainingRevision {
+  id            String   @id @default(uuid())
+  fromTeam      Team?    @relation(fields: [fromTeamId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  fromTeamId    String?
+  training      Training @relation(fields: [trainingId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  trainingId    String   @unique
+  note          String   @default("")
+  hostWinCount  Int
+  hostLoseCount Int
+  imageUrls     String[] @default([])
 }
 
-model TeamStats {
-  id                     String   @id @default(uuid())
-  team                   Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  teamId                 String   @unique
-  beingHostCount         Int      @default(0)
-  beingKickedCount       Int      @default(0)
-  beingAcceptedCount     Int      @default(0)
-  beingRejectedCount     Int      @default(0)
-  roomRequestSentCount   Int      @default(0)
-  leftBeforeTimeCount    Int      @default(0)
-  completedTrainingCount Int      @default(0)
-  trainingMinute         Int      @default(0)
-  matchingCount          Int      @default(0)
-  winCount               Int      @default(0)
-  loseCount              Int      @default(0)
-  tieCount               Int      @default(0)
-  updateAt               DateTime @updatedAt
+model TrainingReport {
+  id              String   @id @default(uuid())
+  reporterUser    User?    @relation(fields: [reporterUserId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  reporterUserId  String?
+  reporterTeam    Team?    @relation(fields: [reporterTeamId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  reporterTeamId  String?
+  training        Training @relation(fields: [trainingId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  trainingId      String
+  isAdminReviewed Boolean  @default(false)
+  heading         String
+  content         String
+  imageUrls       String[] @default([])
+  createdAt       DateTime @default(now())
 }
 
 // misc.

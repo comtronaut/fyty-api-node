@@ -3,7 +3,7 @@ import { CreateReviewDto, UpdateReviewDto } from "src/model/dto/review.dto";
 import { ReviewService } from "./review.service";
 import { UserJwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 
-@Controller("review")
+@Controller("reviews")
 @UseGuards(UserJwtAuthGuard)
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
@@ -13,7 +13,7 @@ export class ReviewController {
     return await this.reviewService.createReview(payload);
   }
 
-  @Get("")
+  @Get()
   async getReview(@Query() revieweeId: UpdateReviewDto) {
     return await this.reviewService.getReviewFilter(revieweeId);
   }

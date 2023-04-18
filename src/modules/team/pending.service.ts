@@ -11,27 +11,21 @@ export class TeamPendingService {
     private readonly lineNotify: NotifyService
   ) {}
 
-  async getTeamPendingByUser(userId: string) {
+  async getTeamPendingByUser(userId: string, status?: PendingStatus) {
     return await this.prisma.teamPending.findMany({
-      where: { userId, status: PendingStatus.INCOMING }
+      where: {
+        userId,
+        ...(status && { status })
+      }
     });
   }
 
-  async getTeamInvitationByUser(userId: string) {
+  async getTeamPending(teamId: string, status?: PendingStatus) {
     return await this.prisma.teamPending.findMany({
-      where: { userId, status: PendingStatus.OUTGOING }
-    });
-  }
-
-  async getTeamPending(teamId: string) {
-    return await this.prisma.teamPending.findMany({
-      where: { teamId, status: PendingStatus.INCOMING }
-    });
-  }
-
-  async getTeamInvitation(teamId: string) {
-    return await this.prisma.teamPending.findMany({
-      where: { teamId, status: PendingStatus.OUTGOING }
+      where: {
+        teamId,
+        ...(status && { status })
+      }
     });
   }
 
@@ -41,21 +35,7 @@ export class TeamPendingService {
     void this.lineNotify.searchUserForTeamPendingNotify(
       data.teamId,
       data.userId,
-      PendingStatus.INCOMING
-    );
-
-    return out;
-  }
-
-  async createTeamInvitation(data: CreateTeamPendingDto) {
-    const out = await this.prisma.teamPending.create({
-      data: { ...data, status: PendingStatus.OUTGOING }
-    });
-
-    void this.lineNotify.searchUserForTeamPendingNotify(
-      data.teamId,
-      data.userId,
-      PendingStatus.OUTGOING
+      data.status
     );
 
     return out;

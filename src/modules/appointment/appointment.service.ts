@@ -107,13 +107,14 @@ export class AppointmentService {
     });
   }
 
-  async delete(id: string) {
+  async delete(id: string, isDeletedBefore = false) {
     await this.prisma.appointment.update({
       where: {
         id
       },
       data: {
         isDeleted: true,
+        ...(isDeletedBefore && { deletedBeforeAt: new Date() }),
         room: {
           delete: true
         }

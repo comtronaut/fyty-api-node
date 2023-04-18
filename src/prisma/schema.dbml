@@ -203,7 +203,7 @@ Table Appointment {
   id String [pk]
   startAt DateTime [not null]
   endAt DateTime [not null]
-  status AppointmentStatus [not null, default: 'WAITING']
+  deletedBeforeAt DateTime
   isDeleted Boolean [not null, default: false]
   roomId String [unique]
   createdAt DateTime [default: `now()`, not null]
@@ -237,41 +237,55 @@ Table Message {
   createdAt DateTime [default: `now()`, not null]
 }
 
-Table Matching {
-  id String [pk]
-  appointmentId String [unique, not null]
-  hostId String
-  guestId String
-  hostWinCount Int [not null, default: 0]
-  hostLoseCount Int [not null, default: 0]
-  result MatchingResult [not null, default: 'TIE']
-}
-
-Table MatchingReport {
-  id String [pk]
-  matchingId String [unique, not null]
-  heading String [not null]
-  content String [not null]
-  imageUrls String[] [not null]
-  createdAt DateTime [default: `now()`, not null]
-}
-
 Table TeamStats {
   id String [pk]
   teamId String [unique, not null]
-  beingHostCount Int [not null, default: 0]
-  beingKickedCount Int [not null, default: 0]
-  beingAcceptedCount Int [not null, default: 0]
-  beingRejectedCount Int [not null, default: 0]
-  roomRequestSentCount Int [not null, default: 0]
-  leftBeforeTimeCount Int [not null, default: 0]
+  leftWhileTrainingCount Int [not null, default: 0]
   completedTrainingCount Int [not null, default: 0]
   trainingMinute Int [not null, default: 0]
-  matchingCount Int [not null, default: 0]
+  trainingCount Int [not null, default: 0]
   winCount Int [not null, default: 0]
   loseCount Int [not null, default: 0]
   tieCount Int [not null, default: 0]
   updateAt DateTime [not null]
+}
+
+Table Training {
+  id String [pk]
+  appointmentId String [unique, not null]
+  hostId String
+  guestId String
+  hostWinCount Int
+  hostLoseCount Int
+  note String [not null, default: '']
+  deniedReason String [not null, default: '']
+  status TrainingStatus [not null, default: 'UNREVIEWED']
+  imageUrls String[] [not null]
+  isSubmitted Boolean [not null, default: false]
+  updatedAt DateTime [not null]
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table TrainingRevision {
+  id String [pk]
+  fromTeamId String
+  trainingId String [unique, not null]
+  note String [not null, default: '']
+  hostWinCount Int [not null]
+  hostLoseCount Int [not null]
+  imageUrls String[] [not null]
+}
+
+Table TrainingReport {
+  id String [pk]
+  reporterUserId String
+  reporterTeamId String
+  trainingId String [not null]
+  isAdminReviewed Boolean [not null, default: false]
+  heading String [not null]
+  content String [not null]
+  imageUrls String[] [not null]
+  createdAt DateTime [default: `now()`, not null]
 }
 
 Table Image {
@@ -300,27 +314,23 @@ Enum RoomStatus {
 }
 
 Enum MemberRole {
+  HEAD_COACH
   LEADER
   MANAGER
   MEMBER
 }
 
-Enum MatchingResult {
-  WIN
-  LOSE
-  TIE
+Enum TrainingStatus {
+  ACCEPTED
+  DENIED
+  CONFLICTED
+  INEFFECTIVE
+  UNREVIEWED
 }
 
 Enum PendingStatus {
   INCOMING
   OUTGOING
-}
-
-Enum AppointmentStatus {
-  WAITING
-  TRAINING
-  DISMISSED
-  DONE
 }
 
 Enum AdminRole {
@@ -399,12 +409,20 @@ Ref: Message.teamId > Team.id [delete: Set Null]
 
 Ref: Message.senderId > User.id [delete: Set Null]
 
-Ref: Matching.appointmentId - Appointment.id [delete: Cascade]
-
-Ref: Matching.hostId > Team.id [delete: Set Null]
-
-Ref: Matching.guestId > Team.id [delete: Set Null]
-
-Ref: MatchingReport.matchingId > Matching.id [delete: Cascade]
-
 Ref: TeamStats.teamId - Team.id [delete: Cascade]
+
+Ref: Training.appointmentId - Appointment.id [delete: Cascade]
+
+Ref: Training.hostId > Team.id [delete: Set Null]
+
+Ref: Training.guestId > Team.id [delete: Set Null]
+
+Ref: TrainingRevision.fromTeamId > Team.id [delete: Set Null]
+
+Ref: TrainingRevision.trainingId - Training.id [delete: Cascade]
+
+Ref: TrainingReport.reporterUserId > User.id [delete: Set Null]
+
+Ref: TrainingReport.reporterTeamId > Team.id [delete: Set Null]
+
+Ref: TrainingReport.trainingId > Training.id [delete: Cascade]

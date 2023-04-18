@@ -8,6 +8,7 @@ import { TeamController } from "./team.controller";
 import { TeamService } from "./team.service";
 import { AppointmentService } from "../appointment/appointment.service";
 import { TeamSettingsService } from "./settings.service";
+import { TrainingService } from "./training.service";
 
 @Module({
   imports: [],
@@ -19,6 +20,7 @@ import { TeamSettingsService } from "./settings.service";
     TeamSettingsService,
     TeamPendingService,
     AppointmentService,
+    TrainingService,
     NotifyService
   ]
 })

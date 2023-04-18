@@ -36,6 +36,9 @@ export class TeamService {
         },
         settings: {
           create: {}
+        },
+        stats: {
+          create: {}
         }
       }
     });
@@ -89,6 +92,9 @@ export class TeamService {
       data: {
         isDeleted: true,
         settings: {
+          delete: true
+        },
+        stats: {
           delete: true
         },
         lineups: {
