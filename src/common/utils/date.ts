@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 
-export function getDayRangeWithin(rawDate: any): { start: Date, end: Date } {
+export function getDayRangeWithin(rawDate: any): { start: Date; end: Date } {
   const today = new Date(rawDate);
 
   const dayStart = dayjs(today).startOf("day").toDate();

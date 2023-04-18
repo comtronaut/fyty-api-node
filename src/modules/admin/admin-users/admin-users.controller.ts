@@ -4,7 +4,7 @@ import { UpdateUserDto } from "src/model/dto/user.dto";
 import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { UserService } from "src/modules/user/user.service";
 
-@Controller("admins/users")
+@Controller("admin/users")
 @UseGuards(AdminJwtAuthGuard)
 export class AdminUsersController {
   constructor(private readonly userService: UserService) {}

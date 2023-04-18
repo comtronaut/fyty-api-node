@@ -4,7 +4,7 @@ import { UpdateRoomDto } from "src/model/dto/room.dto";
 import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { RoomService } from "src/modules/room/room.service";
 
-@Controller("admins/rooms")
+@Controller("admin/rooms")
 @UseGuards(AdminJwtAuthGuard)
 export class AdminRoomsController {
   constructor(private readonly roomService: RoomService) {}

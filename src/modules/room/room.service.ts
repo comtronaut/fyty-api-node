@@ -141,9 +141,7 @@ export class RoomService {
           select: { room: true }
         })
         : [],
-      cluase.isHosted
-        ? this.prisma.room.findMany({ where: { hostTeamId: teamId } })
-        : []
+      cluase.isHosted ? this.prisma.room.findMany({ where: { hostTeamId: teamId } }) : []
     ]);
 
     const joined = participants.map((e) => e.room);

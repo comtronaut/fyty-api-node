@@ -6,4 +6,4 @@ import { AdminRoomsController } from "./admin-rooms.controller";
   controllers: [ AdminRoomsController ],
   providers: [ RoomService ]
 })
-export class AdminRoomrsModule {}
+export class AdminRoomsModule {}

@@ -3,7 +3,7 @@ import { CreateGameDto, UpdateGameDto } from "src/model/dto/game.dto";
 import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { GameService } from "src/modules/game/game.service";
 
-@Controller("admins/games")
+@Controller("admin/games")
 @UseGuards(AdminJwtAuthGuard)
 export class GamesController {
   constructor(private readonly gameService: GameService) {}

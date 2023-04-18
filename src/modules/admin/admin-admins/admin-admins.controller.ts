@@ -3,9 +3,9 @@ import { UseGuards } from "@nestjs/common/decorators";
 import { Admin } from "@prisma/client";
 import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { CreateAdminDto, UpdateAdminDto } from "src/model/dto/admin.dto";
-import { AdminService } from "./admin.service";
+import { AdminService } from "./admin-admins-service";
 
-@Controller("admins")
+@Controller("admin/admins")
 @UseGuards(AdminJwtAuthGuard)
 export class AdminController {
   constructor(private readonly addminService: AdminService) {}

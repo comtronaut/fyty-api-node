@@ -3,7 +3,7 @@ import { UpdateTeamDto } from "src/model/dto/team.dto";
 import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 import { TeamService } from "src/modules/team/team.service";
 
-@Controller("admins/teams")
+@Controller("admin/teams")
 @UseGuards(AdminJwtAuthGuard)
 export class AdminTeamsController {
   constructor(private readonly adminTeamsService: TeamService) {}

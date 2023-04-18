@@ -3,11 +3,11 @@ import { UpdateAppointmentDto } from "src/model/dto/appointment.dto";
 import { AppointmentService } from "src/modules/appointment/appointment.service";
 import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
 
-@Controller("admins/users")
+@Controller("admin/users")
 @UseGuards(AdminJwtAuthGuard)
 export class AdminAppointmentsController {
   constructor(private readonly appointmentService: AppointmentService) {}
-  
+
   @Get()
   async getAll() {
     return this.appointmentService.getAll();

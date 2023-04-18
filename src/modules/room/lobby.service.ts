@@ -11,13 +11,17 @@ export class LobbyService {
     private readonly roomService: RoomService
   ) {}
 
-  async getLobbyByGameId(gameId: string, date: any, user: User): Promise<{
+  async getLobbyByGameId(
+    gameId: string,
+    date: any,
+    user: User
+  ): Promise<{
     rooms: Room[];
-    userGameTeams: Team[],
-    hostedRoomIds: string[],
-    joinedRoomIds: string[],
-    pendingRoomIds: string[],
-    roomPendings: RoomPending[]
+    userGameTeams: Team[];
+    hostedRoomIds: string[];
+    joinedRoomIds: string[];
+    pendingRoomIds: string[];
+    roomPendings: RoomPending[];
   }> {
     const { start, end } = getDayRangeWithin(date);
 
@@ -47,7 +51,13 @@ export class LobbyService {
 
     const [ res, roomPendings ] = await Promise.all([
       Promise.all(
-        userGameTeams.map((team) => this.roomService.getByTeamFilter(team.id, { isJoined: true, isPending: true, isHosted: true }))
+        userGameTeams.map((team) =>
+          this.roomService.getByTeamFilter(team.id, {
+            isJoined: true,
+            isPending: true,
+            isHosted: true
+          })
+        )
       ),
       this.prisma.roomPending.findMany({
         where: { teamId: { in: userGameTeamIds } }

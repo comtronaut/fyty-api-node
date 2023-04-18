@@ -58,7 +58,11 @@ export class RoomController {
 
   // lobby
   @Get("lobby")
-  async getRoomsLobby(@UserSubject() user: User, @Query("date") date: string, @Query("gameId") gameId: string) {
+  async getRoomsLobby(
+    @UserSubject() user: User,
+    @Query("date") date: string,
+    @Query("gameId") gameId: string
+  ) {
     if (!date || !gameId) {
       throw new BadRequestException("date or gameId weren't supplied");
     }
