@@ -20,6 +20,8 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "strict": false
+    "strict": false,
+
+    "types": ["tsdef"],
   }
 }

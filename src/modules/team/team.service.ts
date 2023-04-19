@@ -1,8 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { MemberRole, Team, User } from "@prisma/client";
+import { paginate } from "src/common/utils/pagination";
 import { CreateTeamDto, UpdateTeamDto } from "src/model/dto/team.dto";
 import { PrismaService } from "src/prisma/prisma.service";
-import { Pagination } from "src/types/general";
+import { Pagination } from "src/types/local";
+import { TeamDetail } from "src/types/query-detail";
 
 @Injectable()
 export class TeamService {
@@ -44,6 +46,43 @@ export class TeamService {
     });
   }
 
+  async getDetailById(teamId: string): Promise<TeamDetail> {
+    const {
+      settings,
+      stats,
+      lineups,
+      members: memberRes,
+      pendings,
+      ...info
+    } = await this.prisma.team.findUniqueOrThrow({
+      where: { id: teamId },
+      include: {
+        settings: true,
+        stats: true,
+        lineups: true,
+        members: {
+          include: {
+            user: true
+          }
+        },
+        pendings: true
+      }
+    });
+
+    const users = memberRes.map((e) => e.user);
+    const members = memberRes.map(({ user, ...e }) => e);
+
+    return {
+      info,
+      settings,
+      stats,
+      lineups,
+      members,
+      users,
+      pendings
+    };
+  }
+
   async getById(teamId: string): Promise<Team> {
     return await this.prisma.team.findUniqueOrThrow({
       where: { id: teamId }
@@ -66,10 +105,7 @@ export class TeamService {
     clause?: Partial<Team>;
   }): Promise<Team[]> {
     return await this.prisma.team.findMany({
-      ...(filter.pagination && {
-        skip: (filter.pagination.page - 1) * filter.pagination.perPage,
-        take: filter.pagination.perPage
-      }),
+      ...(filter.pagination && paginate(filter.pagination)),
       ...(filter.clause && {
         where: {
           isDeleted: false,

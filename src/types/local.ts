@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import type { User } from "@prisma/client";
 
 export type Pagination = {
   /**
@@ -14,3 +14,5 @@ export type Pagination = {
 };
 
 export type SecuredUser = Omit<User, "password">;
+
+export type AppointmentStatus = "UPCOMING" | "ONGOING";

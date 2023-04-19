@@ -1,7 +1,9 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { Appointment, AppointmentMember, Team } from "@prisma/client";
 import { UpdateAppointmentDto } from "src/model/dto/appointment.dto";
 import { PrismaService } from "src/prisma/prisma.service";
+import { AppointmentStatus } from "src/types/local";
+import { AppointmentPack } from "src/types/query-detail";
 
 @Injectable()
 export class AppointmentService {
@@ -24,10 +26,37 @@ export class AppointmentService {
   }
 
   async getOthersOfTeam(
-    teamId: string
-  ): Promise<{ appointment: Appointment; team: Team | null }[]> {
+    teamId: string,
+    status?: AppointmentStatus
+  ): Promise<AppointmentPack[]> {
     const res = await this.prisma.appointmentMember.findMany({
-      where: { teamId, isLeft: false },
+      where: {
+        teamId,
+        isLeft: false,
+        ...(status === "UPCOMING" && {
+          appointment: {
+            startAt: {
+              gt: new Date()
+            }
+          }
+        }),
+        ...(status === "ONGOING" && {
+          appointment: {
+            AND: [
+              {
+                startAt: {
+                  lte: new Date()
+                }
+              },
+              {
+                endAt: {
+                  gt: new Date()
+                }
+              }
+            ]
+          }
+        })
+      },
       select: { appointment: true }
     });
 
@@ -36,9 +65,7 @@ export class AppointmentService {
     );
   }
 
-  async getOthersOfUser(
-    userId: string
-  ): Promise<{ appointment: Appointment; team: Team | null }[]> {
+  async getOthersOfUser(userId: string): Promise<AppointmentPack[]> {
     const res = await this.prisma.teamMember.findMany({
       where: { userId },
       select: {

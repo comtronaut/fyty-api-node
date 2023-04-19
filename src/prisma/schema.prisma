@@ -372,7 +372,6 @@ model Message {
 }
 
 // stats
-// FIXME: the table is support only 2-team games
 model TeamStats {
   id                     String   @id @default(uuid())
   team                   Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -387,6 +386,7 @@ model TeamStats {
   updateAt               DateTime @updatedAt
 }
 
+// FIXME: the table is support only 2-team games
 model Training {
   id            String         @id @default(uuid())
   appointment   Appointment    @relation(fields: [appointmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)

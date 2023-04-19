@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { Room, RoomPending, Team, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import { getDayRangeWithin } from "src/common/utils/date";
 import { PrismaService } from "src/prisma/prisma.service";
+import { LobbyDetail } from "src/types/query-detail";
 import { RoomService } from "./room.service";
 
 @Injectable()
@@ -11,18 +12,7 @@ export class LobbyService {
     private readonly roomService: RoomService
   ) {}
 
-  async getLobbyByGameId(
-    gameId: string,
-    date: any,
-    user: User
-  ): Promise<{
-    rooms: Room[];
-    userGameTeams: Team[];
-    hostedRoomIds: string[];
-    joinedRoomIds: string[];
-    pendingRoomIds: string[];
-    roomPendings: RoomPending[];
-  }> {
+  async getLobbyByGameId(gameId: string, date: string, user: User): Promise<LobbyDetail> {
     const { start, end } = getDayRangeWithin(date);
 
     const [ rooms, memberRes ] = await Promise.all([

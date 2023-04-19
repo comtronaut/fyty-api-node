@@ -21,6 +21,7 @@ import { CreateTeamPendingDto, UpdateTeamPendingDto } from "src/model/dto/team-p
 import { AppointmentService } from "../appointment/appointment.service";
 import { TeamSettingsService } from "./settings.service";
 import { TrainingService } from "./training.service";
+import { AppointmentStatus } from "src/types/local";
 
 @Controller("teams")
 @UseGuards(UserJwtAuthGuard)
@@ -75,6 +76,12 @@ export class TeamController {
     return await this.teamService.deleteByUser(user.id, teamId);
   }
 
+  // detail
+  @Get(":id/detail")
+  async getTeamDetail(@Param("id") id: string) {
+    return await this.teamService.getDetailById(id);
+  }
+
   // settings
   @Get(":id/settings")
   async getSettings(@Param("id") teamId: string) {
@@ -94,8 +101,17 @@ export class TeamController {
 
   // trainings
   @Get(":id/trainings")
-  async getTrainings(@Param("id") teamId: string) {
-    return await this.trainingService.getByTeamId(teamId);
+  async getTrainings(
+    @Param("id") teamId: string,
+    @Query("perPage") perPage?: string,
+    @Query("page") page?: string
+  ) {
+    return [ perPage, page ].every(Boolean)
+      ? await this.trainingService.getByTeamId(teamId, {
+        page: Number(page),
+        perPage: Number(perPage)
+      })
+      : await this.trainingService.getByTeamId(teamId);
   }
 
   @Put("trainings/:id")
@@ -120,8 +136,11 @@ export class TeamController {
 
   // appointments
   @Get(":id/appointments")
-  async getTeamAppointments(@Param("id") teamId: string) {
-    return await this.appointmentService.getOthersOfTeam(teamId);
+  async getTeamAppointments(
+    @Param("id") teamId: string,
+    @Query("status") status?: AppointmentStatus
+  ) {
+    return await this.appointmentService.getOthersOfTeam(teamId, status);
   }
 
   // members

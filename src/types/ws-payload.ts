@@ -1,7 +1,7 @@
-import { Message, Room } from "@prisma/client";
+import type { Prisma, Room } from "@prisma/client";
 
 export type ChatMessage = {
-  data: Message;
+  data: Prisma.MessageUncheckedCreateInput & { waitingKey: string };
   waitingKey: string;
 };
 

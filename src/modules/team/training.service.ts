@@ -1,39 +1,34 @@
 import { Injectable } from "@nestjs/common";
 import { TeamStats, Training } from "@prisma/client";
+import { paginate } from "src/common/utils/pagination";
 import { PrismaService } from "src/prisma/prisma.service";
+import { Pagination } from "src/types/local";
 
 @Injectable()
 export class TrainingService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getTeamStats(teamId: string): Promise<TeamStats | null> {
-    const { stats } = await this.prisma.team.findUniqueOrThrow({
-      where: { id: teamId },
-      select: { stats: true }
+    return await this.prisma.teamStats.findUniqueOrThrow({
+      where: { teamId }
     });
-
-    return stats;
   }
 
-  async getByTeamId(teamId: string): Promise<Training[]> {
-    const teamRes = await this.prisma.team.findUniqueOrThrow({
-      where: { id: teamId },
-      select: {
-        appointmentMembers: {
+  async getByTeamId(teamId: string, pagination?: Pagination): Promise<Training[]> {
+    return await this.prisma.training.findMany({
+      where: {
+        ...(pagination && paginate(pagination)),
+        OR: [{ hostId: teamId }, { guestId: teamId }]
+      },
+      include: {
+        appointment: {
           select: {
-            appointment: {
-              select: {
-                training: true
-              }
-            }
+            startAt: true,
+            endAt: true
           }
         }
       }
     });
-
-    return teamRes.appointmentMembers
-      .map((e) => e.appointment)
-      .flatMap((e) => (e.training ? [ e.training ] : []));
   }
 
   async update(id: string, data: any): Promise<Training> {

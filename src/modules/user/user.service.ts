@@ -5,7 +5,7 @@ import * as bcrypt from "bcrypt";
 import { Cache } from "cache-manager";
 import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
 import { PrismaService } from "src/prisma/prisma.service";
-import { SecuredUser } from "src/types/general";
+import { SecuredUser } from "src/types/local";
 
 @Injectable()
 export class UserService {

@@ -2,12 +2,11 @@ import {
   Controller,
   Get,
   Query,
-  Req,
   Res,
   UnauthorizedException,
   UseGuards
 } from "@nestjs/common";
-import { Request, Response } from "express";
+import { Response } from "express";
 import env from "src/common/env.config";
 import { UserSubject } from "src/common/subject.decorator";
 import URI from "urijs";

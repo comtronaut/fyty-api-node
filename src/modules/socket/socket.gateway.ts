@@ -11,6 +11,7 @@ import { CreateRoomDto } from "src/model/dto/room.dto";
 import { RoomJoin, RoomDisband, RoomLeave, RoomModify } from "src/types/ws-payload";
 import { RoomService } from "../room/room.service";
 import { MessageService } from "../chat/message.service";
+import type * as WSPayloadType from "src/types/ws-payload";
 
 @WebSocketGateway({
   cors: {
@@ -29,9 +30,11 @@ implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 
   // message
   @SubscribeMessage("message")
-  async handleSendMessage(client: Socket, payload: any): Promise<void> {
-    const createdMessage = await this.messageService.create(payload.data);
-
+  async handleSendMessage(
+    client: Socket,
+    payload: WSPayloadType.ChatMessage
+  ): Promise<void> {
+    const createdMessage = await this.messageService.create(payload.data as any);
     this.server.emit(`res/chat/${payload.data.chatId}`, {
       data: createdMessage,
       waitingKey: payload.waitingKey

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { CreateMessageDto } from "src/model/dto/message.dto";
 import { NotifyService } from "src/modules/notification/lineNotify.service";
 import { PrismaService } from "src/prisma/prisma.service";
