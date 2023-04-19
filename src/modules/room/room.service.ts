@@ -98,10 +98,7 @@ export class RoomService {
             }))
         }),
         // delete rooms
-        this.deleteMultiple(
-          timestamp,
-          rooms.map((room) => room.id)
-        )
+        this.deleteMultiple(rooms.map((room) => room.id))
       ]);
 
       // send notifications
@@ -432,26 +429,28 @@ export class RoomService {
     };
   }
 
-  async deleteMultiple(timestamp: Date, roomIds: string[]) {
-    await Promise.all([
-      this.prisma.room.deleteMany({
-        where: {
-          endAt: {
-            lte: timestamp
-          }
-        }
-      }),
-      this.prisma.appointment.updateMany({
-        where: {
-          roomId: {
-            in: roomIds
-          }
+  async deleteMultiple(roomIds: string[]) {
+    await Promise.all(roomIds.map((id) => this.deleteSingle(id)));
+  }
+
+  async deleteSingle(roomId: string) {
+    await this.prisma.appointment.update({
+      where: { roomId },
+      data: {
+        isDeleted: true,
+        room: {
+          delete: true
         },
-        data: {
-          isDeleted: true
+        members: {
+          updateMany: {
+            where: {},
+            data: {
+              isLeft: true
+            }
+          }
         }
-      })
-    ]);
+      }
+    });
   }
 
   async getRoomDetail(roomId: string) {

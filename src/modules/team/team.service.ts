@@ -5,10 +5,14 @@ import { CreateTeamDto, UpdateTeamDto } from "src/model/dto/team.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { Pagination } from "src/types/local";
 import { TeamDetail } from "src/types/query-detail";
+import { RoomService } from "../room/room.service";
 
 @Injectable()
 export class TeamService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly roomService: RoomService
+  ) {}
 
   async create(user: User, data: CreateTeamDto): Promise<Team> {
     const teamMemberRes = await this.prisma.teamMember.findMany({
@@ -123,7 +127,7 @@ export class TeamService {
   }
 
   async deleteSoftly(teamId: string): Promise<void> {
-    await this.prisma.team.update({
+    const { roomHosts } = await this.prisma.team.update({
       where: { id: teamId },
       data: {
         isDeleted: true,
@@ -138,9 +142,36 @@ export class TeamService {
         },
         members: {
           deleteMany: {}
+        },
+        // all pendigns
+        pendings: {
+          deleteMany: {}
+        },
+        roomPendings: {
+          deleteMany: {}
+        },
+        // delete upcoming/ongoing appointments and trainings
+        roomMembers: {
+          deleteMany: {}
+        },
+        appointmentMembers: {
+          deleteMany: {
+            isLeft: true
+          }
+        }
+      },
+      select: {
+        roomHosts: {
+          select: {
+            id: true
+          }
         }
       }
     });
+
+    // TODO: add sse or notification
+
+    await this.roomService.deleteMultiple(roomHosts.map((e) => e.id));
   }
 
   async deleteByUser(userId: string, teamId: string): Promise<void> {

@@ -7,6 +7,7 @@ import { UserAvatarService } from "../user/avatar.service";
 import { UserSettingsService } from "../user/settings.service";
 import { UserService } from "../user/user.service";
 import { MeController } from "./me.controller";
+import { RoomService } from "../room/room.service";
 
 @Module({
   imports: [],
@@ -18,6 +19,7 @@ import { MeController } from "./me.controller";
     TeamService,
     AppointmentService,
     TeamPendingService,
+    RoomService,
     NotifyService
   ]
 })

@@ -1,25 +1,32 @@
 import { Injectable } from "@nestjs/common";
 import { MemberRole, TeamMember, User } from "@prisma/client";
-import { CreateTeamMemberDto, UpdateTeamMemberDto } from "src/model/dto/team-member";
+import { CreateTeamMemberDto, UpdateTeamMemberDto } from "src/model/dto/team-member.dto";
 import { PrismaService } from "src/prisma/prisma.service";
+import { TeamService } from "./team.service";
 
 @Injectable()
 export class TeamMemberService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly teamService: TeamService
+  ) {}
 
   async create(data: CreateTeamMemberDto) {
-    const pending = await this.prisma.teamPending.findUniqueOrThrow({
+    const { team, ...pending } = await this.prisma.teamPending.findUniqueOrThrow({
       where: {
         teamId_userId: {
           teamId: data.teamId,
           userId: data.userId
         }
       },
-      select: { id: true }
-    });
-    const team = await this.prisma.team.findUniqueOrThrow({
-      where: { id: data.teamId },
-      select: { gameId: true }
+      select: {
+        id: true,
+        team: {
+          select: {
+            gameId: true
+          }
+        }
+      }
     });
     const existedTeamInAGame = await this.prisma.teamMember.findFirst({
       where: { userId: data.userId, team },
@@ -73,16 +80,26 @@ export class TeamMemberService {
       select: { teamId: true }
     });
 
-    const memberCount = await this.prisma.teamMember.count({
+    const livingMembers = await this.prisma.teamMember.findMany({
       where: { teamId }
     });
 
-    // remove team if has no members left
-    if (memberCount <= 0) {
-      await this.prisma.team.update({
-        where: { id: teamId },
-        data: { isDeleted: true, lineups: { deleteMany: {} } }
+    // if the manager leave set a new manager
+    if (
+      livingMembers.every((e) => e.role !== MemberRole.MANAGER)
+      && livingMembers.length > 0
+    ) {
+      const nonManagerMember = livingMembers.find((e) => e.role !== MemberRole.MANAGER);
+
+      await this.prisma.teamMember.update({
+        where: { id: nonManagerMember?.id },
+        data: { role: MemberRole.MANAGER }
       });
+    }
+
+    // remove team if has no members left
+    if (livingMembers.length <= 0) {
+      await this.teamService.deleteSoftly(teamId);
     }
   }
 }

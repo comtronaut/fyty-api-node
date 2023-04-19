@@ -36,7 +36,6 @@ export class AdminRoomsController {
 
   @Delete(":id")
   async deleteRoom(@Param("id") roomId: string) {
-    const timestamp = dayjs().add(1000, "year").toDate();
-    return await this.roomService.deleteMultiple(timestamp, [ roomId ]);
+    return await this.roomService.deleteSingle(roomId);
   }
 }

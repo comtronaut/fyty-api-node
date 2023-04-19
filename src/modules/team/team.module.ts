@@ -9,6 +9,7 @@ import { TeamService } from "./team.service";
 import { AppointmentService } from "../appointment/appointment.service";
 import { TeamSettingsService } from "./settings.service";
 import { TrainingService } from "./training.service";
+import { RoomService } from "../room/room.service";
 
 @Module({
   imports: [],
@@ -20,6 +21,7 @@ import { TrainingService } from "./training.service";
     TeamSettingsService,
     TeamPendingService,
     AppointmentService,
+    RoomService,
     TrainingService,
     NotifyService
   ]
