@@ -30,24 +30,23 @@ export class RoomPendingService {
       throw new ConflictException(RoomPendingError.ExistedRoomMembership);
     }
 
-    const roomPending = await this.prisma.roomPending.create({
+    const out = await this.prisma.roomPending.create({
       data: {
         teamId: payload.teamId,
-        roomId
+        roomId,
+        lineups: {
+          createMany: {
+            data: payload.teamLineupIds.map((e) => ({
+              teamLineupId: e
+            }))
+          }
+        }
       }
-    });
-
-    await this.prisma.roomPendingLineup.createMany({
-      data: payload.teamLineupIds.map((teamLineupId) => ({
-        roomPendingId: roomPending.id,
-        teamLineupId,
-        roomId
-      }))
     });
 
     void this.lineNotify.searchUserForRequestNotify(roomId);
 
-    return roomPending;
+    return out;
   }
 
   async getByRoomId(roomId: string): Promise<RoomPending[]> {

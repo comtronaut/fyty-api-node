@@ -277,27 +277,36 @@ export class RoomService {
   }
 
   async acceptRoomRequest({ roomId, teamId }: CreateRoomMemberDto) {
-    const { appointment, ...room } = await this.prisma.room.findUniqueOrThrow({
-      where: { id: roomId },
-      include: { appointment: true }
-    });
-    const { lineups, ...pending } = await this.prisma.roomPending.findUniqueOrThrow({
+    const {
+      team: { game },
+      room: { appointment, ...room },
+      lineups,
+      ...pending
+    } = await this.prisma.roomPending.findUniqueOrThrow({
       where: {
         teamId_roomId: {
           teamId,
           roomId
         }
       },
-      select: { id: true, lineups: true }
-    });
-    const { game } = await this.prisma.team.findUniqueOrThrow({
-      where: { id: teamId },
-      include: { game: true }
+      select: {
+        id: true,
+        lineups: {
+          select: { teamLineupId: true }
+        },
+        team: {
+          select: { game: true }
+        },
+        room: {
+          include: {
+            appointment: {
+              select: { id: true }
+            }
+          }
+        }
+      }
     });
 
-    if (room.hostTeamId !== teamId) {
-      throw new Error("only host can accept the room request");
-    }
     if (
       [ RoomStatus.UNAVAILABLE, RoomStatus.FULL ].some((status) => status === room.status)
     ) {
@@ -307,30 +316,28 @@ export class RoomService {
       throw new BadRequestException("this room has expired");
     }
 
-    // create joining data
-    const newRoomMember = await this.prisma.roomMember.create({
-      data: {
-        roomId,
-        teamId
-      }
-    });
-
     await this.prisma.room.update({
       where: {
-        id: room.id
+        id: roomId
       },
       data: {
-        ...room,
-        ...(room.teamCount - 1 >= game.teamCap && { status: RoomStatus.UNAVAILABLE }),
+        ...(room.teamCount >= game.teamCap - 1 && { status: RoomStatus.UNAVAILABLE }),
         teamCount: {
           increment: 1
         },
-        // add room lineups
-        lineups: {
-          create: lineups.map((teamLineup) => ({
-            roomMemberId: newRoomMember.id,
-            teamLineupId: teamLineup.id
-          }))
+        // add room member and lineups
+        members: {
+          create: {
+            teamId,
+            roomLineups: {
+              createMany: {
+                data: lineups.map(({ teamLineupId }) => ({
+                  roomId,
+                  teamLineupId
+                }))
+              }
+            }
+          }
         },
         // delete the request
         pendings: {
@@ -340,7 +347,7 @@ export class RoomService {
     });
 
     // upsert appointment
-    if (appointment?.id) {
+    if (appointment) {
       await this.prisma.appointmentMember.upsert({
         where: {
           appointmentId_teamId: {
@@ -392,7 +399,7 @@ export class RoomService {
     });
 
     // update appointment member
-    if (room.appointment?.id) {
+    if (room.appointment) {
       await this.prisma.appointmentMember.update({
         where: {
           appointmentId_teamId: {
