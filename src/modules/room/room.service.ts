@@ -442,7 +442,7 @@ export class RoomService {
           delete: true
         },
         members: {
-          updateMany: {
+          update: {
             where: {},
             data: {
               isLeft: true
