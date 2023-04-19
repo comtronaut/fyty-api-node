@@ -119,8 +119,8 @@ export class TeamController {
     return await this.trainingService.update(trainingId, payload);
   }
 
-  @Post("trainings/:id/command")
-  async commandTrainingResult(@Param("id") trainingId: string, payload: any) {
+  @Post("trainings/:id/reports")
+  async createTrainingReport(@Param("id") trainingId: string, payload: any) {
     // TODO:
   }
 
