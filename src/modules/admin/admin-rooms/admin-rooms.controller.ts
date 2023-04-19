@@ -36,6 +36,6 @@ export class AdminRoomsController {
 
   @Delete(":id")
   async deleteRoom(@Param("id") roomId: string) {
-    return await this.roomService.deleteSingle(roomId);
+    return await this.roomService.deleteSingle(roomId, true);
   }
 }

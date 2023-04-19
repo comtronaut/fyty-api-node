@@ -429,24 +429,23 @@ export class RoomService {
     };
   }
 
-  async deleteMultiple(roomIds: string[]) {
-    await Promise.all(roomIds.map((id) => this.deleteSingle(id)));
+  async deleteMultiple(roomIds: string[], isDeletedBefore = false) {
+    await Promise.all(roomIds.map((id) => this.deleteSingle(id), isDeletedBefore));
   }
 
-  async deleteSingle(roomId: string) {
+  async deleteSingle(roomId: string, isDeletedBefore = false) {
     await this.prisma.appointment.update({
       where: { roomId },
       data: {
         isDeleted: true,
+        ...(isDeletedBefore && { deletedBeforeAt: new Date() }),
         room: {
           delete: true
         },
         members: {
           update: {
             where: {},
-            data: {
-              isLeft: true
-            }
+            data: { isLeft: true }
           }
         }
       }

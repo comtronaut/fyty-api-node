@@ -171,7 +171,7 @@ export class TeamService {
 
     // TODO: add sse or notification
 
-    await this.roomService.deleteMultiple(roomHosts.map((e) => e.id));
+    await this.roomService.deleteMultiple(roomHosts.map((e) => e.id), true);
   }
 
   async deleteByUser(userId: string, teamId: string): Promise<void> {
