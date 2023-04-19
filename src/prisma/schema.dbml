@@ -258,22 +258,11 @@ Table Training {
   hostWinCount Int
   hostLoseCount Int
   note String [not null, default: '']
-  deniedReason String [not null, default: '']
   status TrainingStatus [not null, default: 'UNREVIEWED']
   imageUrls String[] [not null]
   isSubmitted Boolean [not null, default: false]
   updatedAt DateTime [not null]
   createdAt DateTime [default: `now()`, not null]
-}
-
-Table TrainingRevision {
-  id String [pk]
-  fromTeamId String
-  trainingId String [unique, not null]
-  note String [not null, default: '']
-  hostWinCount Int [not null]
-  hostLoseCount Int [not null]
-  imageUrls String[] [not null]
 }
 
 Table TrainingReport {
@@ -323,7 +312,6 @@ Enum MemberRole {
 Enum TrainingStatus {
   ACCEPTED
   DENIED
-  CONFLICTED
   INEFFECTIVE
   UNREVIEWED
 }
@@ -416,10 +404,6 @@ Ref: Training.appointmentId - Appointment.id [delete: Cascade]
 Ref: Training.hostId > Team.id [delete: Set Null]
 
 Ref: Training.guestId > Team.id [delete: Set Null]
-
-Ref: TrainingRevision.fromTeamId > Team.id [delete: Set Null]
-
-Ref: TrainingRevision.trainingId - Training.id [delete: Cascade]
 
 Ref: TrainingReport.reporterUserId > User.id [delete: Set Null]
 

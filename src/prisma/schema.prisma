@@ -40,8 +40,6 @@ enum TrainingStatus {
   ACCEPTED
   // the training partner refuses the result
   DENIED
-  // the training partner wants to correct the result
-  CONFLICTED
   // halted by admin (via report)
   INEFFECTIVE
   // the training partner  is not review
@@ -183,7 +181,6 @@ model Team {
   stats              TeamStats?
   settings           TeamSettings?
   trainingReports    TrainingReport[]
-  trainingRevisions  TrainingRevision[]
 }
 
 model TeamSettings {
@@ -398,7 +395,6 @@ model Training {
   hostWinCount  Int?
   hostLoseCount Int?
   note          String         @default("")
-  deniedReason  String         @default("")
   status        TrainingStatus @default(UNREVIEWED)
   imageUrls     String[]       @default([])
   isSubmitted   Boolean        @default(false)
@@ -406,19 +402,6 @@ model Training {
   createdAt     DateTime       @default(now())
 
   reports  TrainingReport[]
-  revision TrainingRevision?
-}
-
-model TrainingRevision {
-  id            String   @id @default(uuid())
-  fromTeam      Team?    @relation(fields: [fromTeamId], references: [id], onUpdate: Cascade, onDelete: SetNull)
-  fromTeamId    String?
-  training      Training @relation(fields: [trainingId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  trainingId    String   @unique
-  note          String   @default("")
-  hostWinCount  Int
-  hostLoseCount Int
-  imageUrls     String[] @default([])
 }
 
 model TrainingReport {
