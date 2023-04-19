@@ -119,16 +119,6 @@ export class TeamController {
     return await this.trainingService.update(trainingId, payload);
   }
 
-  @Get("trainings/:id/revision")
-  async getTrainingRevision(@Param("id") trainingId: string) {
-    // TODO:
-  }
-
-  @Post("trainings/:id/revision")
-  async createTrainingRevision(@Param("id") trainingId: string, payload: any) {
-    // TODO:
-  }
-
   @Post("trainings/:id/command")
   async commandTrainingResult(@Param("id") trainingId: string, payload: any) {
     // TODO:
