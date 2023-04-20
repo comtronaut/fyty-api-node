@@ -3,17 +3,17 @@ import { Prisma } from "@prisma/client";
 import { IsBoolean, IsNotEmpty, IsUUID } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateTeamSetting implements Prisma.TeamSettingUncheckedCreateInput {
+export class CreateTeamSettingsDto implements Prisma.TeamSettingUncheckedCreateInput {
   @IsNotEmpty()
   @IsUUID()
   teamId: string;
 
   @IsNotEmpty()
   @IsBoolean()
-  isJoiningEnabled: Boolean;
+  isJoiningEnabled: boolean;
 }
 
-export class UpdateTeamSetting extends PartialType(CreateTeamSetting) {
+export class UpdateTeamSettingsDto extends PartialType(CreateTeamSettingsDto) {
     @IsNotEmpty()
     @IsUUID()
     id: string

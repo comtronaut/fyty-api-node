@@ -1,9 +1,9 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { TrainingStatus, Prisma } from "@prisma/client";
-import { IsBoolean, IsEnum, IsISO8601, IsInt, IsNotEmpty, IsOptional, IsUUID, IsUrl } from "class-validator";
+import { IsArray, IsBoolean, IsEnum, IsISO8601, IsInt, IsNotEmpty, IsOptional, IsUUID, IsUrl } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateTraining implements Prisma.TrainingUncheckedCreateInput {
+export class CreateTrainingDto implements Prisma.TrainingUncheckedCreateInput {
     @IsNotEmpty()
     @IsUUID()
     appointmentId: string
@@ -33,11 +33,12 @@ export class CreateTraining implements Prisma.TrainingUncheckedCreateInput {
 
     @IsNotEmpty()
     @IsUrl()
+    @IsArray()
     imageUrls: String[]
 
     @IsNotEmpty()
     @IsBoolean()
-    isSubmitted: Boolean
+    isSubmitted: boolean
 
     @IsOptional()
     @IsISO8601()
@@ -48,7 +49,7 @@ export class CreateTraining implements Prisma.TrainingUncheckedCreateInput {
     createdAt: Date
 }
 
-export class UpdateTraining extends PartialType(CreateTraining) {
+export class UpdateTrainingDto extends PartialType(CreateTrainingDto) {
     @IsNotEmpty()
     @IsUUID()
     id: string
