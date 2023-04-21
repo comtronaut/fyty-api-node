@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { AppointmentService } from "src/modules/appointment/appointment.service";
+import { AppointmentService } from "modules/appointment/appointment.service";
 import { AdminAppointmentsController } from "./admin-appointments.controller";
 
 @Module({

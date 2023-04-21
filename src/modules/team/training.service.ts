@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { TeamStats, Training, TrainingReport } from "@prisma/client";
-import { paginate } from "src/common/utils/pagination";
+import { paginate } from "common/utils/pagination";
 import {
   CreateTrainingReportDto,
   UpdateTrainingReportDto
-} from "src/model/dto/training-report.dto";
-import { PrismaService } from "src/prisma/prisma.service";
-import { Pagination } from "src/types/local";
+} from "model/dto/training-report.dto";
+import { PrismaService } from "prisma/prisma.service";
+import { Pagination } from "types/local";
 
 @Injectable()
 export class TrainingService {

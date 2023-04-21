@@ -10,24 +10,24 @@ import {
   UseGuards
 } from "@nestjs/common";
 import { PendingStatus, User } from "@prisma/client";
-import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
-import { UserSubject } from "src/common/subject.decorator";
-import { CreateTeamDto, UpdateTeamDto } from "src/model/dto/team.dto";
+import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
+import { UserSubject } from "common/subject.decorator";
+import { CreateTeamDto, UpdateTeamDto } from "model/dto/team.dto";
 import { TeamMemberService } from "./member.service";
 import { TeamPendingService } from "./pending.service";
 import { TeamService } from "./team.service";
-import { CreateTeamMemberDto, UpdateTeamMemberDto } from "src/model/dto/team-member.dto";
-import { CreateTeamPendingDto, UpdateTeamPendingDto } from "src/model/dto/team-pending.dto";
+import { CreateTeamMemberDto, UpdateTeamMemberDto } from "model/dto/team-member.dto";
+import { CreateTeamPendingDto, UpdateTeamPendingDto } from "model/dto/team-pending.dto";
 import { AppointmentService } from "../appointment/appointment.service";
 import { TeamSettingsService } from "./settings.service";
 import { TrainingService } from "./training.service";
-import { AppointmentStatus } from "src/types/local";
+import { AppointmentStatus } from "types/local";
 import {
   CreateTrainingReportDto,
   UpdateTrainingReportDto
-} from "src/model/dto/training-report.dto";
-import { CreateTrainingDto } from "src/model/dto/training.dto";
-import { UpdateTeamSettingsDto } from "src/model/dto/team-settings.dto";
+} from "model/dto/training-report.dto";
+import { CreateTrainingDto } from "model/dto/training.dto";
+import { UpdateTeamSettingsDto } from "model/dto/team-settings.dto";
 
 @Controller("teams")
 @UseGuards(UserJwtAuthGuard)

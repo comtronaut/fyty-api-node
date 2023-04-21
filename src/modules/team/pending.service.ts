@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { PendingStatus } from "@prisma/client";
-import { CreateTeamPendingDto, UpdateTeamPendingDto } from "src/model/dto/team-pending.dto";
-import { NotifyService } from "src/modules/notification/lineNotify.service";
-import { PrismaService } from "src/prisma/prisma.service";
+import { CreateTeamPendingDto, UpdateTeamPendingDto } from "model/dto/team-pending.dto";
+import { NotifyService } from "modules/notification/lineNotify.service";
+import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
 export class TeamPendingService {

@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
 import { UseGuards } from "@nestjs/common/decorators";
 import { Admin } from "@prisma/client";
-import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
-import { CreateAdminDto, UpdateAdminDto } from "src/model/dto/admin.dto";
+import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
+import { CreateAdminDto, UpdateAdminDto } from "model/dto/admin.dto";
 import { AdminService } from "./admin-admins-service";
 
 @Controller("admin/admins")

@@ -5,9 +5,9 @@ import dayjs from "dayjs";
 import {
   CreatePasswordResetSessionDto,
   UpdatePasswordResetSessionDto
-} from "src/model/dto/password-reset-session.dto";
+} from "model/dto/password-reset-session.dto";
 
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
 export class PasswordResetSessionService {

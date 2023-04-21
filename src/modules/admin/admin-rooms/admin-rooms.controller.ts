@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Put, UseGuards } from "@nestjs/common";
 import dayjs from "dayjs";
-import { UpdateRoomDto } from "src/model/dto/room.dto";
-import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
-import { RoomService } from "src/modules/room/room.service";
+import { UpdateRoomDto } from "model/dto/room.dto";
+import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
+import { RoomService } from "modules/room/room.service";
 
 @Controller("admin/rooms")
 @UseGuards(AdminJwtAuthGuard)

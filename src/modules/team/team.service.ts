@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { MemberRole, Team, User } from "@prisma/client";
-import { paginate } from "src/common/utils/pagination";
-import { CreateTeamDto, UpdateTeamDto } from "src/model/dto/team.dto";
-import { PrismaService } from "src/prisma/prisma.service";
-import { Pagination } from "src/types/local";
-import { TeamDetail } from "src/types/query-detail";
+import { paginate } from "common/utils/pagination";
+import { CreateTeamDto, UpdateTeamDto } from "model/dto/team.dto";
+import { PrismaService } from "prisma/prisma.service";
+import { Pagination } from "types/local";
+import { TeamDetail } from "types/query-detail";
 import { RoomService } from "../room/room.service";
 
 @Injectable()

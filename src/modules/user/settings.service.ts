@@ -4,8 +4,8 @@ import { Lang } from "@prisma/client";
 import {
   CreateUserSettingsDto,
   UpdateUserSettingsDto
-} from "src/model/dto/user-settings.dto";
-import { PrismaService } from "src/prisma/prisma.service";
+} from "model/dto/user-settings.dto";
+import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
 export class UserSettingsService {

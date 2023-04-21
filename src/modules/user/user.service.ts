@@ -3,9 +3,9 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { Cache } from "cache-manager";
-import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
-import { PrismaService } from "src/prisma/prisma.service";
-import { SecuredUser } from "src/types/local";
+import { CreateUserDto, UpdateUserDto } from "model/dto/user.dto";
+import { PrismaService } from "prisma/prisma.service";
+import { SecuredUser } from "types/local";
 import { ImageService } from "../image/image.service";
 
 @Injectable()

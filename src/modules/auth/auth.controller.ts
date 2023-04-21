@@ -7,8 +7,8 @@ import {
   UseGuards
 } from "@nestjs/common";
 import { Response } from "express";
-import env from "src/common/env.config";
-import { UserSubject } from "src/common/subject.decorator";
+import env from "common/env.config";
+import { UserSubject } from "common/subject.decorator";
 import URI from "urijs";
 import { AuthService } from "./auth.service";
 import { FacebookAuthGuard, FacebookInfo } from "./guard/facebook.guard";

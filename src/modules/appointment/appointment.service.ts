@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { Appointment, AppointmentMember, Team } from "@prisma/client";
-import { UpdateAppointmentDto } from "src/model/dto/appointment.dto";
-import { PrismaService } from "src/prisma/prisma.service";
-import { AppointmentStatus } from "src/types/local";
-import { AppointmentPack } from "src/types/query-detail";
+import { UpdateAppointmentDto } from "model/dto/appointment.dto";
+import { PrismaService } from "prisma/prisma.service";
+import { AppointmentStatus } from "types/local";
+import { AppointmentPack } from "types/query-detail";
 
 @Injectable()
 export class AppointmentService {

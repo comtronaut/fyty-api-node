@@ -1,4 +1,4 @@
-import { Pagination } from "src/types/local";
+import { Pagination } from "types/local";
 
 export function paginate(pagination: Pagination) {
   return {

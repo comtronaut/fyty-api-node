@@ -2,8 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { BadRequestException } from "@nestjs/common/exceptions";
 import { Admin } from "@prisma/client";
 import * as bcrypt from "bcrypt";
-import { CreateAdminDto, UpdateAdminDto } from "src/model/dto/admin.dto";
-import { PrismaService } from "src/prisma/prisma.service";
+import { CreateAdminDto, UpdateAdminDto } from "model/dto/admin.dto";
+import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
 export class AdminService {

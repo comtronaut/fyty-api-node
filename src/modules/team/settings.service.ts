@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { TeamSettings } from "@prisma/client";
-import { UpdateLineupDto } from "src/model/dto/team-lineup.dto";
-import { PrismaService } from "src/prisma/prisma.service";
+import { UpdateLineupDto } from "model/dto/team-lineup.dto";
+import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
 export class TeamSettingsService {

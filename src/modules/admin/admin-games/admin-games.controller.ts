@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Param, Post, Put, UseGuards } from "@nestjs/common";
-import { CreateGameDto, UpdateGameDto } from "src/model/dto/game.dto";
-import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
-import { GameService } from "src/modules/game/game.service";
+import { CreateGameDto, UpdateGameDto } from "model/dto/game.dto";
+import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
+import { GameService } from "modules/game/game.service";
 
 @Controller("admin/games")
 @UseGuards(AdminJwtAuthGuard)

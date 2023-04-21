@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Put, UseGuards } from "@nestjs/common";
-import { UpdateTeamDto } from "src/model/dto/team.dto";
-import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
-import { TeamService } from "src/modules/team/team.service";
+import { UpdateTeamDto } from "model/dto/team.dto";
+import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
+import { TeamService } from "modules/team/team.service";
 
 @Controller("admin/teams")
 @UseGuards(AdminJwtAuthGuard)
