@@ -1,10 +1,9 @@
-import { Module } from "@nestjs/common";
-import { ImageController } from "./image.controller";
+import { Global, Module } from "@nestjs/common";
 import { ImageService } from "./image.service";
 
+@Global()
 @Module({
-  imports: [],
-  controllers: [ ImageController ],
+  exports: [ ImageService ],
   providers: [ ImageService ]
 })
-export class ImageModule {}
+export class ImageModule { }

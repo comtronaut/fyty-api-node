@@ -39,7 +39,6 @@
     "class-validator-jsonschema": "^5.0.0",
     "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
-    "firebase": "^9.20.0",
     "non-null": "^2.0.1",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",

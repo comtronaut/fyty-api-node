@@ -277,10 +277,6 @@ Table TrainingReport {
   createdAt DateTime [default: `now()`, not null]
 }
 
-Table Image {
-  id String [pk]
-}
-
 Table Admin {
   id String [pk]
   email String [unique, not null]

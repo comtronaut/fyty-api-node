@@ -419,11 +419,6 @@ model TrainingReport {
   createdAt       DateTime @default(now())
 }
 
-// misc.
-model Image {
-  id String @id @default(uuid())
-}
-
 // admin
 model Admin {
   id        String    @id @default(uuid())

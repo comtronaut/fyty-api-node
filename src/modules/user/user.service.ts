@@ -6,11 +6,13 @@ import { Cache } from "cache-manager";
 import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { SecuredUser } from "src/types/local";
+import { ImageService } from "../image/image.service";
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly imageService: ImageService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
 
@@ -76,6 +78,8 @@ export class UserService {
   }
 
   async update(id: string, data: UpdateUserDto): Promise<SecuredUser> {
+    const oldUserData = await this.prisma.user.findUniqueOrThrow({ where: { id }, select: { portraitUrl: true, coverUrl: true } });
+
     const { password, ...out } = await this.prisma.user.update({
       where: {
         id
@@ -90,6 +94,13 @@ export class UserService {
         })
       }
     });
+    
+    const removalImageUrl = this.imageService.compareUrls([
+      [ oldUserData.portraitUrl, data.portraitUrl ],
+      [ oldUserData.coverUrl, data.coverUrl ]
+    ]);
+
+    void this.imageService.deleteImageByIds(removalImageUrl);
 
     await this.cacheManager.set(`user:${id}`, out);
 
