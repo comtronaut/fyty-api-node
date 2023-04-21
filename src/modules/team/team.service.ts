@@ -6,12 +6,14 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { Pagination } from "src/types/local";
 import { TeamDetail } from "src/types/query-detail";
 import { RoomService } from "../room/room.service";
+import { NotifyService } from "../notification/lineNotify.service";
 
 @Injectable()
 export class TeamService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly roomService: RoomService
+    private readonly roomService: RoomService,
+    private readonly lineNotify: NotifyService
   ) {}
 
   async create(user: User, data: CreateTeamDto): Promise<Team> {
@@ -170,6 +172,8 @@ export class TeamService {
     });
 
     // TODO: add sse or notification
+    //notify
+    this.lineNotify.searchUserForTeamDisbandNotify(teamId);
 
     await this.roomService.deleteMultiple(
       roomHosts.map((e) => e.id),

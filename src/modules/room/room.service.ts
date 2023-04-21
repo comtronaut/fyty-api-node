@@ -15,12 +15,16 @@ import { CreateRoomMemberDto } from "src/model/dto/room-member.dto";
 import { CreateRoomDto, DeleteRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { RoomSystemRemoval } from "src/types/sse-payload";
+import { NotifyService } from "../notification/lineNotify.service";
 
 @Injectable()
 export class RoomService {
   private readonly roomSystemRemoval = new Subject<RoomSystemRemoval>();
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly lineNotify: NotifyService
+    ) {}
 
   @Cron(CronExpression.EVERY_MINUTE, { timeZone: "Asia/Bangkok" })
   async handleCron() {
@@ -82,21 +86,21 @@ export class RoomService {
 
       await Promise.all([
         // create training result
-        this.prisma.training.createMany({
-          data: rooms
-            .filter((e) =>
-              [
-                e.appointment,
-                e.members.length === e.game.teamCap,
-                e.members.filter((f) => f.teamId !== e.hostTeamId).length
-              ].every(Boolean)
-            )
-            .map((e) => ({
-              appointmentId: e.appointment!.id,
-              hostId: e.hostTeamId,
-              guestId: e.members.filter((f) => f.teamId !== e.hostTeamId)[0]!.teamId
-            }))
-        }),
+        // this.prisma.training.createMany({
+        //   data: rooms
+        //     .filter((e) =>
+        //       [
+        //         e.appointment,
+        //         e.members.length === e.game.teamCap,
+        //         e.members.filter((f) => f.teamId !== e.hostTeamId).length
+        //       ].every(Boolean)
+        //     )
+        //     .map((e) => ({
+        //       appointmentId: e.appointment!.id,
+        //       hostId: e.hostTeamId,
+        //       guestId: e.members.filter((f) => f.teamId !== e.hostTeamId)[0]!.teamId
+        //     }))
+        // }),
         // delete rooms
         this.deleteMultiple(rooms.map((room) => room.id))
       ]);
@@ -258,6 +262,9 @@ export class RoomService {
     });
 
     if (room.hostTeamId === payload.teamId) {
+      //notify
+      await this.lineNotify.searchUserForDisbanRoomNotify(payload.roomId);
+
       await this.prisma.appointment.update({
         where: { roomId: room.id },
         data: {
@@ -346,6 +353,9 @@ export class RoomService {
       }
     });
 
+    //notify accept room
+    this.lineNotify.searchUserForAcceptNotify(roomId,teamId);
+
     // upsert appointment
     if (appointment) {
       await this.prisma.appointmentMember.upsert({
@@ -397,6 +407,9 @@ export class RoomService {
         }
       }
     });
+
+    //notify leaving room
+    this.lineNotify.searchUserForLeaveNotify(roomMemberId,room.id);
 
     // update appointment member
     if (room.appointment) {
@@ -450,7 +463,7 @@ export class RoomService {
           delete: true
         },
         members: {
-          update: {
+          updateMany: {
             where: {},
             data: { isLeft: true }
           }
