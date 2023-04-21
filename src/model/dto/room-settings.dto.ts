@@ -4,15 +4,11 @@ import { IsNotEmpty, IsUUID } from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
 export class CreateRoomSettingDto implements Prisma.RoomSettingsUncheckedCreateInput {
-    @IsNotEmpty()
-    @IsUUID()
-    roomId: string
+  @IsNotEmpty()
+  @IsUUID()
+  roomId: string;
 }
 
-export class UpdateRoomSettingDto extends PartialType(CreateRoomSettingDto) {
-    @IsNotEmpty()
-    @IsUUID()
-    id: string
-}
+export class UpdateRoomSettingDto extends PartialType(CreateRoomSettingDto) {}
 
 export const schemas = validationMetadatasToSchemas();

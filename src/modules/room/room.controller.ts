@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   UseGuards
 } from "@nestjs/common";
@@ -18,6 +19,7 @@ import { ChatService } from "../chat/chat.service";
 import { RoomPendingService } from "./pending.service";
 import { RoomService } from "./room.service";
 import { LobbyService } from "./lobby.service";
+import { UpdateRoomSettingDto } from "src/model/dto/room-settings.dto";
 
 @Controller("rooms")
 @UseGuards(UserJwtAuthGuard)
@@ -79,6 +81,17 @@ export class RoomController {
   @Delete("disband")
   async deleteRoom(@Body() payload: DeleteRoomDto) {
     return await this.roomService.disband(payload);
+  }
+
+  // settings
+  @Get(":id/settings")
+  async getRoomSettings(@Param("id") roomId: string) {
+    // TODO:
+  }
+
+  @Put(":id/settings")
+  async updateRoomSettings(@Param("id") roomId: string, payload: UpdateRoomSettingDto) {
+    // TODO:
   }
 
   // detail

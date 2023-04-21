@@ -1,58 +1,62 @@
 import { PartialType } from "@nestjs/mapped-types";
-import { TrainingStatus, Prisma } from "@prisma/client";
-import { IsArray, IsBoolean, IsEnum, IsISO8601, IsInt, IsNotEmpty, IsOptional, IsUUID, IsUrl } from "class-validator";
+import { Prisma, TrainingStatus } from "@prisma/client";
+import {
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsISO8601,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsUUID
+} from "class-validator";
 import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
 export class CreateTrainingDto implements Prisma.TrainingUncheckedCreateInput {
-    @IsNotEmpty()
-    @IsUUID()
-    appointmentId: string
+  @IsNotEmpty()
+  @IsUUID()
+  appointmentId: string;
 
-    @IsOptional()
-    @IsUUID()
-    hostId: string
+  @IsOptional()
+  @IsUUID()
+  hostId: string;
 
-    @IsOptional()
-    @IsUUID()
-    guestId: string
+  @IsOptional()
+  @IsUUID()
+  guestId: string;
 
-    @IsOptional()
-    @IsInt()
-    hostWinCount: number
+  @IsOptional()
+  @IsInt()
+  hostWinCount: number;
 
-    @IsOptional()
-    @IsInt()
-    hostLoseCount: number
+  @IsOptional()
+  @IsInt()
+  hostLoseCount: number;
 
-    @IsNotEmpty()
-    note: string
-    
-    @IsOptional()
-    @IsEnum(TrainingStatus)
-    status: TrainingStatus;
+  @IsOptional()
+  note: string;
 
-    @IsNotEmpty()
-    @IsUrl()
-    @IsArray()
-    imageUrls: String[]
+  @IsOptional()
+  @IsEnum(TrainingStatus)
+  status: TrainingStatus;
 
-    @IsNotEmpty()
-    @IsBoolean()
-    isSubmitted: boolean
+  @IsNotEmpty()
+  @IsArray()
+  imageUrls: string[];
 
-    @IsOptional()
-    @IsISO8601()
-    updatedAt: Date
+  @IsNotEmpty()
+  @IsBoolean()
+  isSubmitted: boolean;
 
-    @IsOptional()
-    @IsISO8601()
-    createdAt: Date
+  @IsOptional()
+  @IsISO8601()
+  updatedAt: Date;
+
+  @IsOptional()
+  @IsISO8601()
+  createdAt: Date;
 }
 
-export class UpdateTrainingDto extends PartialType(CreateTrainingDto) {
-    @IsNotEmpty()
-    @IsUUID()
-    id: string
-}
+export class UpdateTrainingDto extends PartialType(CreateTrainingDto) {}
 
 export const schemas = validationMetadatasToSchemas();

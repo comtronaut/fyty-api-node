@@ -78,7 +78,10 @@ export class UserService {
   }
 
   async update(id: string, data: UpdateUserDto): Promise<SecuredUser> {
-    const oldUserData = await this.prisma.user.findUniqueOrThrow({ where: { id }, select: { portraitUrl: true, coverUrl: true } });
+    const oldUserData = await this.prisma.user.findUniqueOrThrow({
+      where: { id },
+      select: { portraitUrl: true, coverUrl: true }
+    });
 
     const { password, ...out } = await this.prisma.user.update({
       where: {
@@ -94,13 +97,13 @@ export class UserService {
         })
       }
     });
-    
-    const removalImageUrl = this.imageService.compareUrls([
+
+    const toBeRemovedImageUrls = this.imageService.compareUrls([
       [ oldUserData.portraitUrl, data.portraitUrl ],
       [ oldUserData.coverUrl, data.coverUrl ]
     ]);
 
-    void this.imageService.deleteImageByIds(removalImageUrl);
+    void this.imageService.deleteImageByIds(toBeRemovedImageUrls);
 
     await this.cacheManager.set(`user:${id}`, out);
 

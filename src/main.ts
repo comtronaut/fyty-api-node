@@ -9,11 +9,13 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors:
       env.SERVER_ORIGIN === "https://api.fyty-esport.com"
-        ? { origin: [
-          env.CLIENT_ORIGIN,
-          "https://admin.fyty-esport.com",
-          "https://fyty-esport.com"
-        ] }
+        ? {
+          origin: [
+            env.CLIENT_ORIGIN,
+            "https://admin.fyty-esport.com",
+            "https://fyty-esport.com"
+          ]
+        }
         : true,
     bodyParser: true
   });

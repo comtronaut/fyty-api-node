@@ -22,6 +22,12 @@ import { AppointmentService } from "../appointment/appointment.service";
 import { TeamSettingsService } from "./settings.service";
 import { TrainingService } from "./training.service";
 import { AppointmentStatus } from "src/types/local";
+import {
+  CreateTrainingReportDto,
+  UpdateTrainingReportDto
+} from "src/model/dto/training-report.dto";
+import { CreateTrainingDto } from "src/model/dto/training.dto";
+import { UpdateTeamSettingsDto } from "src/model/dto/team-settings.dto";
 
 @Controller("teams")
 @UseGuards(UserJwtAuthGuard)
@@ -89,7 +95,7 @@ export class TeamController {
   }
 
   @Put(":id/settings")
-  async updateSetting(@Param("id") teamId: string, payload: any) {
+  async updateSetting(@Param("id") teamId: string, payload: UpdateTeamSettingsDto) {
     return await this.teamSettingsService.update(payload);
   }
 
@@ -115,13 +121,29 @@ export class TeamController {
   }
 
   @Put("trainings/:id")
-  async updateTraining(@Param("id") trainingId: string, payload: any) {
+  async updateTraining(@Param("id") trainingId: string, payload: CreateTrainingDto) {
     return await this.trainingService.update(trainingId, payload);
   }
 
+  @Get("trainings/:id/reports")
+  async getTrainingReport(@Param("id") trainingId: string) {
+    return await this.trainingService.getReportsByTeamId(trainingId);
+  }
+
   @Post("trainings/:id/reports")
-  async createTrainingReport(@Param("id") trainingId: string, payload: any) {
-    // TODO:
+  async createTrainingReport(
+    @Param("id") trainingId: string,
+    payload: CreateTrainingReportDto
+  ) {
+    return await this.trainingService.createReport(trainingId, payload);
+  }
+
+  @Put("trainings/reports/:id")
+  async updateTrainingReport(
+    @Param("id") reportId: string,
+    payload: UpdateTrainingReportDto
+  ) {
+    return await this.trainingService.updateReport(reportId, payload);
   }
 
   // appointments
