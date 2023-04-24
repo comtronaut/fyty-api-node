@@ -82,6 +82,12 @@ export class TeamController {
     return await this.teamService.deleteByUser(user.id, teamId);
   }
 
+  // multiple
+  @Get("multiple/:ids")
+  async getTeamsMultiple(@Param("ids") ids: string) {
+    return await this.teamService.getByIds(ids.split(","));
+  }
+
   // detail
   @Get(":id/detail")
   async getTeamDetail(@Param("id") id: string) {

@@ -50,8 +50,8 @@ export class TrainingService {
 
   async getByTeamId(teamId: string, pagination?: Pagination): Promise<Training[]> {
     return await this.prisma.training.findMany({
+      ...(pagination && paginate(pagination)),
       where: {
-        ...(pagination && paginate(pagination)),
         OR: [{ hostId: teamId }, { guestId: teamId }]
       },
       include: {

@@ -53,6 +53,13 @@ export class UserController {
     return await this.userService.getById(userId);
   }
 
+  // multiple
+  @Get("multiple/:ids")
+  @UseGuards(UserJwtAuthGuard)
+  async getByIds(@Param("ids") ids: string) {
+    return await this.userService.getByIds(ids.split(","));
+  }
+
   // avatars
   @Post("avatars")
   @UseGuards(UserJwtAuthGuard)

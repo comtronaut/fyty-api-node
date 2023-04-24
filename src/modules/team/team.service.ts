@@ -87,6 +87,12 @@ export class TeamService {
     };
   }
 
+  async getByIds(teamIds: string[]): Promise<Team[]> {
+    return await this.prisma.team.findMany({
+      where: { id: { in: teamIds } }
+    });
+  }
+
   async getById(teamId: string): Promise<Team> {
     return await this.prisma.team.findUniqueOrThrow({
       where: { id: teamId }
