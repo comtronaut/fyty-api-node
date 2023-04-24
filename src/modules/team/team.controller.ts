@@ -126,11 +126,17 @@ export class TeamController {
       : await this.trainingService.getByTeamId(teamId);
   }
 
+  @Get("trainings/:id")
+  async getTraining(@Param("id") trainingId: string) {
+    return await this.trainingService.getById(trainingId);
+  }
+
   @Put("trainings/:id")
   async updateTraining(@Param("id") trainingId: string, payload: CreateTrainingDto) {
     return await this.trainingService.update(trainingId, payload);
   }
 
+  // training report
   @Get("trainings/:id/reports")
   async getTrainingReport(@Param("id") trainingId: string) {
     return await this.trainingService.getReportsByTeamId(trainingId);
@@ -142,6 +148,13 @@ export class TeamController {
     payload: CreateTrainingReportDto
   ) {
     return await this.trainingService.createReport(trainingId, payload);
+  }
+
+  @Get("trainings/reports/:id")
+  async getReportById(
+    @Param("id") reportId: string
+  ) {
+    return await this.trainingService.getReportById(reportId);
   }
 
   @Put("trainings/reports/:id")

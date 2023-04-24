@@ -12,6 +12,26 @@ import { Pagination } from "types/local";
 export class TrainingService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getById(id: string): Promise<Training> {
+    return await this.prisma.training.findUniqueOrThrow({
+      where: { id },
+      include: {
+        appointment: {
+          select: {
+            startAt: true,
+            endAt: true
+          }
+        }
+      }
+    });
+  }
+
+  async getReportById(reportId: string): Promise<TrainingReport> {
+    return await this.prisma.trainingReport.findUniqueOrThrow({
+      where: { id: reportId }
+    });
+  }
+
   async getReportsByTeamId(teamId: string): Promise<TrainingReport[]> {
     return await this.prisma.trainingReport.findMany({
       where: { reporterTeamId: teamId }
