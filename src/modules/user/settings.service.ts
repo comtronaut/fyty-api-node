@@ -1,10 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Lang } from "@prisma/client";
 
-import {
-  CreateUserSettingsDto,
-  UpdateUserSettingsDto
-} from "model/dto/user-settings.dto";
+import { CreateUserSettingsDto, UpdateUserSettingsDto } from "model/dto/user-settings.dto";
 import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()

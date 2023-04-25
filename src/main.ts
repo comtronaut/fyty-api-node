@@ -23,13 +23,15 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }));
 
   // swagger api document
-  const config = new DocumentBuilder()
-    .setTitle("FyTy API")
-    .setVersion("1.0")
-    .addBearerAuth()
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("", app, document);
+  if (env.SERVER_ORIGIN !== "https://api.fyty-esport.com") {
+    const config = new DocumentBuilder()
+      .setTitle("FyTy API")
+      .setVersion("1.0")
+      .addBearerAuth()
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup("", app, document);
+  }
 
   // binding
   const port = process.env["PORT"] || 3000;

@@ -4,6 +4,7 @@ import { Admin } from "@prisma/client";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { CreateAdminDto, UpdateAdminDto } from "model/dto/admin.dto";
 import { AdminService } from "./admin-admins-service";
+import { UserSubject } from "common/subject.decorator";
 
 @Controller("admin/admins")
 @UseGuards(AdminJwtAuthGuard)
@@ -18,6 +19,11 @@ export class AdminController {
   @Get()
   async getAllAdmin() {
     return await this.adminService.getAllAdmin();
+  }
+
+  @Get("me")
+  async getMeAdmin(@UserSubject() user: Admin) {
+    return user;
   }
 
   @Get(":id")

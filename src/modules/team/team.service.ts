@@ -119,7 +119,12 @@ export class TeamService {
       ...(filter.clause && {
         where: {
           isDeleted: false,
-          ...filter.clause
+          ...filter.clause,
+          ...(filter.clause.name && {
+            name: {
+              contains: filter.clause.name
+            }
+          })
         }
       })
     });

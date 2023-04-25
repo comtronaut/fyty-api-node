@@ -10,24 +10,24 @@ import {
   UseGuards
 } from "@nestjs/common";
 import { PendingStatus, User } from "@prisma/client";
-import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { UserSubject } from "common/subject.decorator";
-import { CreateTeamDto, UpdateTeamDto } from "model/dto/team.dto";
-import { TeamMemberService } from "./member.service";
-import { TeamPendingService } from "./pending.service";
-import { TeamService } from "./team.service";
 import { CreateTeamMemberDto, UpdateTeamMemberDto } from "model/dto/team-member.dto";
 import { CreateTeamPendingDto, UpdateTeamPendingDto } from "model/dto/team-pending.dto";
-import { AppointmentService } from "../appointment/appointment.service";
-import { TeamSettingsService } from "./settings.service";
-import { TrainingService } from "./training.service";
-import { AppointmentStatus } from "types/local";
+import { UpdateTeamSettingsDto } from "model/dto/team-settings.dto";
+import { CreateTeamDto, UpdateTeamDto } from "model/dto/team.dto";
 import {
   CreateTrainingReportDto,
   UpdateTrainingReportDto
 } from "model/dto/training-report.dto";
-import { CreateTrainingDto } from "model/dto/training.dto";
-import { UpdateTeamSettingsDto } from "model/dto/team-settings.dto";
+import { UpdateTrainingDto } from "model/dto/training.dto";
+import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
+import { AppointmentStatus } from "types/local";
+import { AppointmentService } from "../appointment/appointment.service";
+import { TeamMemberService } from "./member.service";
+import { TeamPendingService } from "./pending.service";
+import { TeamSettingsService } from "./settings.service";
+import { TeamService } from "./team.service";
+import { TrainingService } from "./training.service";
 
 @Controller("teams")
 @UseGuards(UserJwtAuthGuard)
@@ -101,7 +101,7 @@ export class TeamController {
   }
 
   @Put(":id/settings")
-  async updateSetting(@Param("id") teamId: string, payload: UpdateTeamSettingsDto) {
+  async updateSetting(@Param("id") teamId: string, @Body() payload: UpdateTeamSettingsDto) {
     return await this.teamSettingsService.update(payload);
   }
 
@@ -132,7 +132,10 @@ export class TeamController {
   }
 
   @Put("trainings/:id")
-  async updateTraining(@Param("id") trainingId: string, payload: CreateTrainingDto) {
+  async updateTraining(
+    @Param("id") trainingId: string,
+    @Body() payload: UpdateTrainingDto
+  ) {
     return await this.trainingService.update(trainingId, payload);
   }
 
@@ -145,22 +148,20 @@ export class TeamController {
   @Post("trainings/:id/reports")
   async createTrainingReport(
     @Param("id") trainingId: string,
-    payload: CreateTrainingReportDto
+    @Body() payload: CreateTrainingReportDto
   ) {
-    return await this.trainingService.createReport(trainingId, payload);
+    return await this.trainingService.createReport(payload);
   }
 
   @Get("trainings/reports/:id")
-  async getReportById(
-    @Param("id") reportId: string
-  ) {
+  async getReportById(@Param("id") reportId: string) {
     return await this.trainingService.getReportById(reportId);
   }
 
   @Put("trainings/reports/:id")
   async updateTrainingReport(
     @Param("id") reportId: string,
-    payload: UpdateTrainingReportDto
+    @Body() payload: UpdateTrainingReportDto
   ) {
     return await this.trainingService.updateReport(reportId, payload);
   }

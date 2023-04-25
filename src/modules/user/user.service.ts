@@ -22,7 +22,7 @@ export class UserService {
   }
 
   async getByIds(ids: string[]): Promise<SecuredUser[]> {
-    const users = await this.prisma.user.findMany({ where: { id: { in: ids }}});
+    const users = await this.prisma.user.findMany({ where: { id: { in: ids } } });
     return users.map(({ password, ...e }) => e);
   }
 

@@ -5,9 +5,13 @@ import { AdminGamesModule } from "./admin-games/admin-games.module";
 import { AdminRoomsModule } from "./admin-rooms/admin-rooms.module";
 import { AdminTeamsModule } from "./admin-teams/admin-teams.module";
 import { AdminUsersModule } from "./admin-users/admin-users.module";
+import { AdminTrainingsModule } from "./admin-traininings/admin-trainings.module";
+import { AdminReportsModule } from "./admin-reports/admin-reports.module";
 
 @Module({
   imports: [
+    AdminReportsModule,
+    AdminTrainingsModule,
     AdminAdminsModule,
     AdminGamesModule,
     AdminUsersModule,
