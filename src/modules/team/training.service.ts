@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Team, TeamStats, Training, TrainingReport } from "@prisma/client";
 import { paginate } from "common/utils/pagination";
+import { diffMinute } from "common/utils/time";
 import {
   CreateTrainingReportDto,
   UpdateTrainingReportDto
@@ -56,6 +57,18 @@ export class TrainingService {
       }, {
         hostLoseCount: payload.hostLoseCount,
         hostWinCount: payload.hostWinCount
+      });
+
+      await this.prisma.teamStats.updateMany({
+        where: { teamId: { in: [ host!.id, guest!.id ].filter(Boolean) } },
+        data: {
+          trainingMinute: {
+            increment: diffMinute(payload.startAt, payload.endAt)
+          },
+          trainingCount: {
+            increment: 1
+          }
+        }
       });
     }
 
@@ -328,23 +341,47 @@ export class TrainingService {
   }
 
   async delete(id: string): Promise<void> {
-    const { host, guest, ...previousTraining }
+    const { host, guest, appointment, ...previousTraining }
       = await this.prisma.training.findUniqueOrThrow({
         where: { id },
         include: {
           host: true,
-          guest: true
+          guest: true,
+          appointment: {
+            select: {
+              startAt: true,
+              endAt: true
+            }
+          }
         }
       });
 
     const { hostWinCount, hostLoseCount } = previousTraining;
 
+    // update stats
     await this.resetParticipants(
       host,
       guest,
       { hostWinCount, hostLoseCount }
     );
 
+    if (appointment) {
+      const { startAt, endAt } = appointment;
+
+      await this.prisma.teamStats.updateMany({
+        where: { teamId: { in: [ host!.id, guest!.id ].filter(Boolean) } },
+        data: {
+          trainingMinute: {
+            decrement: diffMinute(startAt, endAt)
+          },
+          trainingCount: {
+            decrement: 1
+          }
+        }
+      });
+    }
+
+    // delete training
     await this.prisma.training.delete({
       where: { id }
     });
