@@ -25,7 +25,10 @@ export class AdminReportsController {
   }
 
   @Put(":id")
-  async updateTeam(@Param("id") reportId: string, @Body() payload: UpdateTrainingReportDto) {
+  async updateTeam(
+    @Param("id") reportId: string,
+    @Body() payload: UpdateTrainingReportDto
+  ) {
     return await this.trainingService.updateReport(reportId, payload);
   }
 

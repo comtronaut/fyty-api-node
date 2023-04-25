@@ -22,13 +22,16 @@ export class TrainingService {
         endAt: payload.endAt,
         isDeleted: true,
         members: {
-          create: [{
-            teamId: payload.hostId,
-            isLeft: true
-          }, {
-            teamId: payload.guestId,
-            isLeft: true
-          }]
+          create: [
+            {
+              teamId: payload.hostId,
+              isLeft: true
+            },
+            {
+              teamId: payload.guestId,
+              isLeft: true
+            }
+          ]
         },
         training: {
           create: {
@@ -47,17 +50,22 @@ export class TrainingService {
         }
       }
     });
-    
+
     if (training) {
       const { host, guest } = training;
 
-      await this.compareAndUpdateParticipants(host!, guest!, {
-        hostLoseCount: null,
-        hostWinCount: null
-      }, {
-        hostLoseCount: payload.hostLoseCount,
-        hostWinCount: payload.hostWinCount
-      });
+      await this.compareAndUpdateParticipants(
+        host!,
+        guest!,
+        {
+          hostLoseCount: null,
+          hostWinCount: null
+        },
+        {
+          hostLoseCount: payload.hostLoseCount,
+          hostWinCount: payload.hostWinCount
+        }
+      );
 
       await this.prisma.teamStats.updateMany({
         where: { teamId: { in: [ host!.id, guest!.id ].filter(Boolean) } },
@@ -204,7 +212,8 @@ export class TrainingService {
   ) {
     const fromNull = oldRes.hostWinCount === null && Number.isFinite(newRes.hostLoseCount);
     const toNull = Number.isFinite(oldRes.hostWinCount) && newRes.hostLoseCount === null;
-    const toExisted = Number.isFinite(oldRes.hostWinCount) && Number.isFinite(newRes.hostLoseCount);
+    const toExisted
+      = Number.isFinite(oldRes.hostWinCount) && Number.isFinite(newRes.hostLoseCount);
 
     const isNewHostWin = (newRes.hostWinCount || 0) > (newRes.hostLoseCount || 0);
     const isNewHostLose = (newRes.hostWinCount || 0) < (newRes.hostLoseCount || 0);
@@ -296,10 +305,10 @@ export class TrainingService {
                 decrement: isOldTie ? 1 : 0
               },
               perGameWinCount: {
-                decrement: (oldRes.hostWinCount || 0)
+                decrement: oldRes.hostWinCount || 0
               },
               perGameLoseCount: {
-                decrement: (oldRes.hostLoseCount || 0)
+                decrement: oldRes.hostLoseCount || 0
               }
             }
           }
@@ -322,10 +331,10 @@ export class TrainingService {
                 decrement: isOldTie ? 1 : 0
               },
               perGameWinCount: {
-                decrement: (oldRes.hostLoseCount || 0)
+                decrement: oldRes.hostLoseCount || 0
               },
               perGameLoseCount: {
-                decrement: (oldRes.hostWinCount || 0)
+                decrement: oldRes.hostWinCount || 0
               }
             }
           }
@@ -359,13 +368,9 @@ export class TrainingService {
     const { hostWinCount, hostLoseCount } = previousTraining;
 
     // update stats
-    await this.resetParticipants(
-      host,
-      guest,
-      { hostWinCount, hostLoseCount }
-    );
+    await this.resetParticipants(host, guest, { hostWinCount, hostLoseCount });
 
-    if (appointment) {
+    /* if (appointment) {
       const { startAt, endAt } = appointment;
 
       await this.prisma.teamStats.updateMany({
@@ -379,7 +384,7 @@ export class TrainingService {
           }
         }
       });
-    }
+    } */
 
     // delete training
     await this.prisma.training.delete({
