@@ -9,9 +9,9 @@ import {
   Query,
   UseGuards
 } from "@nestjs/common";
-import { CreateUserAvatarDto, UpdateUserAvatarDto } from "src/model/dto/user-avatar.dto";
-import { CreateUserDto } from "src/model/dto/user.dto";
-import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
+import { CreateUserAvatarDto, UpdateUserAvatarDto } from "model/dto/user-avatar.dto";
+import { CreateUserDto } from "model/dto/user.dto";
+import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { UserAvatarService } from "./avatar.service";
 import { UserService } from "./user.service";
 
@@ -51,6 +51,13 @@ export class UserController {
   @UseGuards(UserJwtAuthGuard)
   async getById(@Param("id") userId: string) {
     return await this.userService.getById(userId);
+  }
+
+  // multiple
+  @Get("multiple/:ids")
+  @UseGuards(UserJwtAuthGuard)
+  async getByIds(@Param("ids") ids: string) {
+    return await this.userService.getByIds(ids.split(","));
   }
 
   // avatars

@@ -380,6 +380,8 @@ model TeamStats {
   winCount               Int      @default(0)
   loseCount              Int      @default(0)
   tieCount               Int      @default(0)
+  perGameWinCount        Int      @default(0)
+  perGameLoseCount       Int      @default(0)
   updateAt               DateTime @updatedAt
 }
 
@@ -401,7 +403,7 @@ model Training {
   updatedAt     DateTime       @updatedAt
   createdAt     DateTime       @default(now())
 
-  reports  TrainingReport[]
+  reports TrainingReport[]
 }
 
 model TrainingReport {
@@ -417,11 +419,6 @@ model TrainingReport {
   content         String
   imageUrls       String[] @default([])
   createdAt       DateTime @default(now())
-}
-
-// misc.
-model Image {
-  id String @id @default(uuid())
 }
 
 // admin

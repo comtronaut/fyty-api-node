@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Put, Query, UseGuards } from "@nestjs/common";
 import { PendingStatus, User } from "@prisma/client";
-import { UserSubject } from "src/common/subject.decorator";
-import { UpdateUserSettingsDto } from "src/model/dto/user-settings.dto";
-import { UpdateUserDto } from "src/model/dto/user.dto";
-import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
+import { UserSubject } from "common/subject.decorator";
+import { UpdateUserSettingsDto } from "model/dto/user-settings.dto";
+import { UpdateUserDto } from "model/dto/user.dto";
+import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { AppointmentService } from "../appointment/appointment.service";
 import { TeamPendingService } from "../team/pending.service";
 import { TeamService } from "../team/team.service";

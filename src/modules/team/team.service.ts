@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { MemberRole, Team, User } from "@prisma/client";
-import { paginate } from "src/common/utils/pagination";
-import { CreateTeamDto, UpdateTeamDto } from "src/model/dto/team.dto";
-import { PrismaService } from "src/prisma/prisma.service";
-import { Pagination } from "src/types/local";
-import { TeamDetail } from "src/types/query-detail";
+import { paginate } from "common/utils/pagination";
+import { CreateTeamDto, UpdateTeamDto } from "model/dto/team.dto";
+import { PrismaService } from "prisma/prisma.service";
+import { Pagination } from "types/local";
+import { TeamDetail } from "types/query-detail";
 import { RoomService } from "../room/room.service";
 import { NotifyService } from "../notification/lineNotify.service";
 
@@ -89,6 +89,12 @@ export class TeamService {
     };
   }
 
+  async getByIds(teamIds: string[]): Promise<Team[]> {
+    return await this.prisma.team.findMany({
+      where: { id: { in: teamIds } }
+    });
+  }
+
   async getById(teamId: string): Promise<Team> {
     return await this.prisma.team.findUniqueOrThrow({
       where: { id: teamId }
@@ -115,7 +121,12 @@ export class TeamService {
       ...(filter.clause && {
         where: {
           isDeleted: false,
-          ...filter.clause
+          ...filter.clause,
+          ...(filter.clause.name && {
+            name: {
+              contains: filter.clause.name
+            }
+          })
         }
       })
     });

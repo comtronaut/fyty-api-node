@@ -247,6 +247,8 @@ Table TeamStats {
   winCount Int [not null, default: 0]
   loseCount Int [not null, default: 0]
   tieCount Int [not null, default: 0]
+  perGameWinCount Int [not null, default: 0]
+  perGameLoseCount Int [not null, default: 0]
   updateAt DateTime [not null]
 }
 
@@ -275,10 +277,6 @@ Table TrainingReport {
   content String [not null]
   imageUrls String[] [not null]
   createdAt DateTime [default: `now()`, not null]
-}
-
-Table Image {
-  id String [pk]
 }
 
 Table Admin {

@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
-import { getDayRangeWithin } from "src/common/utils/date";
-import { PrismaService } from "src/prisma/prisma.service";
-import { LobbyDetail } from "src/types/query-detail";
+import { getDayRangeWithin } from "common/utils/date";
+import { PrismaService } from "prisma/prisma.service";
+import { LobbyDetail } from "types/query-detail";
 import { RoomService } from "./room.service";
 
 @Injectable()

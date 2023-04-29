@@ -3,19 +3,26 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { Cache } from "cache-manager";
-import { CreateUserDto, UpdateUserDto } from "src/model/dto/user.dto";
-import { PrismaService } from "src/prisma/prisma.service";
-import { SecuredUser } from "src/types/local";
+import { CreateUserDto, UpdateUserDto } from "model/dto/user.dto";
+import { PrismaService } from "prisma/prisma.service";
+import { SecuredUser } from "types/local";
+import { ImageService } from "../image/image.service";
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly imageService: ImageService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
 
   async getAllUser(): Promise<SecuredUser[]> {
     const users = await this.prisma.user.findMany();
+    return users.map(({ password, ...e }) => e);
+  }
+
+  async getByIds(ids: string[]): Promise<SecuredUser[]> {
+    const users = await this.prisma.user.findMany({ where: { id: { in: ids } } });
     return users.map(({ password, ...e }) => e);
   }
 
@@ -76,6 +83,11 @@ export class UserService {
   }
 
   async update(id: string, data: UpdateUserDto): Promise<SecuredUser> {
+    const oldUserData = await this.prisma.user.findUniqueOrThrow({
+      where: { id },
+      select: { portraitUrl: true, coverUrl: true }
+    });
+
     const { password, ...out } = await this.prisma.user.update({
       where: {
         id
@@ -90,6 +102,13 @@ export class UserService {
         })
       }
     });
+
+    const toBeRemovedImageUrls = this.imageService.compareUrls([
+      [ oldUserData.portraitUrl, data.portraitUrl ],
+      [ oldUserData.coverUrl, data.coverUrl ]
+    ]);
+
+    void this.imageService.deleteImageByIds(toBeRemovedImageUrls);
 
     await this.cacheManager.set(`user:${id}`, out);
 

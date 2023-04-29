@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Query, UseGuards } from "@nestjs/common";
-import { CreateReviewDto, UpdateReviewDto } from "src/model/dto/review.dto";
+import { CreateReviewDto, UpdateReviewDto } from "model/dto/review.dto";
 import { ReviewService } from "./review.service";
 import { UserJwtAuthGuard } from "../auth/guard/jwt-auth.guard";
 

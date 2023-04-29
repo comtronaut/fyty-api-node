@@ -10,9 +10,9 @@ import {
   UseGuards
 } from "@nestjs/common";
 import { User } from "@prisma/client";
-import { UserJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
-import { UserSubject } from "src/common/subject.decorator";
-import { CreateTeamLineupDto, UpdateLineupDto } from "src/model/dto/team-lineup.dto";
+import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
+import { UserSubject } from "common/subject.decorator";
+import { CreateTeamLineupDto, UpdateLineupDto } from "model/dto/team-lineup.dto";
 import { LineupService } from "./lineup.service";
 
 @Controller("lineups")

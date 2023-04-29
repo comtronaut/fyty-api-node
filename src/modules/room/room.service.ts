@@ -86,21 +86,21 @@ export class RoomService {
 
       await Promise.all([
         // create training result
-        // this.prisma.training.createMany({
-        //   data: rooms
-        //     .filter((e) =>
-        //       [
-        //         e.appointment,
-        //         e.members.length === e.game.teamCap,
-        //         e.members.filter((f) => f.teamId !== e.hostTeamId).length
-        //       ].every(Boolean)
-        //     )
-        //     .map((e) => ({
-        //       appointmentId: e.appointment!.id,
-        //       hostId: e.hostTeamId,
-        //       guestId: e.members.filter((f) => f.teamId !== e.hostTeamId)[0]!.teamId
-        //     }))
-        // }),
+        this.prisma.training.createMany({
+          data: rooms
+            .filter((e) =>
+              [
+                e.appointment,
+                e.members.length === e.game.teamCap,
+                e.members.filter((f) => f.teamId !== e.hostTeamId).length
+              ].every(Boolean)
+            )
+            .map((e) => ({
+              appointmentId: e.appointment!.id,
+              hostId: e.hostTeamId,
+              guestId: e.members.filter((f) => f.teamId !== e.hostTeamId)[0]!.teamId
+            }))
+        }),
         // delete rooms
         this.deleteMultiple(rooms.map((room) => room.id))
       ]);

@@ -1,9 +1,9 @@
 import { ConflictException, Injectable } from "@nestjs/common";
 import { RoomPending } from "@prisma/client";
-import { RoomPendingError } from "src/common/constants/errors";
-import { CreateRoomPendingDto } from "src/model/dto/room-pending.dto";
-import { NotifyService } from "src/modules/notification/lineNotify.service";
-import { PrismaService } from "src/prisma/prisma.service";
+import { RoomPendingError } from "common/constants/errors";
+import { CreateRoomPendingDto } from "model/dto/room-pending.dto";
+import { NotifyService } from "modules/notification/lineNotify.service";
+import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
 export class RoomPendingService {

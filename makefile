@@ -14,25 +14,25 @@ push-dev:
 	git push heroku main
 docker-deploy:
 	docker build -t ${app_name} -f ./docker/dockerfile.prod .
-	docker save ${app_name} > ${app_name}.tar
+	docker save ${app_name} | xz -0 > ${app_name}.tar.xz
 	docker rmi ${app_name}
-	scp ./${app_name}.tar ${remote_host}:/root/
-	rm ./${app_name}.tar
+	scp ./${app_name}.tar.xz ${remote_host}:/root/
+	rm ./${app_name}.tar.xz
 	ssh -t ${remote_host} 'docker rm -f $$(docker ps -f name=^/${app_name}$$ -q) 2>/dev/null || true \
     &&  docker rmi -f ${app_name}:latest 2>/dev/null || true \
-    &&  docker load < /root/${app_name}.tar \
-    &&  rm /root/${app_name}.tar \
+    &&  docker load < /root/${app_name}.tar.xz \
+    &&  rm /root/${app_name}.tar.xz \
     &&  docker run -d -p ${prod_port}:80 --name ${app_name} -t ${app_name}'
 docker-deploy-dev:
 	docker build -t ${app_name_dev} -f ./docker/dockerfile.dev .
-	docker save ${app_name_dev} > ${app_name_dev}.tar
+	docker save ${app_name_dev} | xz -0 > ${app_name_dev}.tar.xz
 	docker rmi ${app_name_dev}
-	scp ./${app_name_dev}.tar ${remote_host}:/root/
-	rm ./${app_name_dev}.tar
+	scp ./${app_name_dev}.tar.xz ${remote_host}:/root/
+	rm ./${app_name_dev}.tar.xz
 	ssh -t ${remote_host} 'docker rm -f $$(docker ps -f name=^/${app_name_dev}$$ -q) 2>/dev/null || true \
     &&  docker rmi -f ${app_name_dev}:latest 2>/dev/null || true \
-    &&  docker load < /root/${app_name_dev}.tar \
-    &&  rm /root/${app_name_dev}.tar \
+    &&  docker load -i /root/${app_name_dev}.tar.xz \
+    &&  rm /root/${app_name_dev}.tar.xz \
     &&  docker run -d -p ${dev_port}:80 --name ${app_name_dev} -t ${app_name_dev}'
 remote-ssh:
 	ssh -t ${remote_host} '$m'

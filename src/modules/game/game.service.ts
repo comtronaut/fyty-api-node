@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { CreateGameDto } from "src/model/dto/game.dto";
-import { PrismaService } from "src/prisma/prisma.service";
+import { CreateGameDto } from "model/dto/game.dto";
+import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
 export class GameService {

@@ -1,9 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
 import { UseGuards } from "@nestjs/common/decorators";
 import { Admin } from "@prisma/client";
-import { AdminJwtAuthGuard } from "src/modules/auth/guard/jwt-auth.guard";
-import { CreateAdminDto, UpdateAdminDto } from "src/model/dto/admin.dto";
+import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
+import { CreateAdminDto, UpdateAdminDto } from "model/dto/admin.dto";
 import { AdminService } from "./admin-admins-service";
+import { UserSubject } from "common/subject.decorator";
 
 @Controller("admin/admins")
 @UseGuards(AdminJwtAuthGuard)
@@ -18,6 +19,11 @@ export class AdminController {
   @Get()
   async getAllAdmin() {
     return await this.adminService.getAllAdmin();
+  }
+
+  @Get("me")
+  async getMeAdmin(@UserSubject() user: Admin) {
+    return user;
   }
 
   @Get(":id")

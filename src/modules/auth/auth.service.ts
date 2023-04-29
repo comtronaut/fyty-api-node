@@ -3,10 +3,10 @@ import { BadRequestException } from "@nestjs/common/exceptions";
 import { Admin, User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
-import { AdminService } from "src/modules/admin/admin-admins/admin-admins-service";
-import { UserService } from "src/modules/user/user.service";
-import env from "src/common/env.config";
-import { PrismaService } from "src/prisma/prisma.service";
+import { AdminService } from "modules/admin/admin-admins/admin-admins-service";
+import { UserService } from "modules/user/user.service";
+import env from "common/env.config";
+import { PrismaService } from "prisma/prisma.service";
 import { FacebookInfo } from "./guard/facebook.guard";
 import { GoogleInfo } from "./guard/google.guard";
 
