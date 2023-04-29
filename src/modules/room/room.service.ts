@@ -9,18 +9,22 @@ import { Cron, CronExpression } from "@nestjs/schedule";
 import { PendingStatus, Room, RoomLineup, RoomMember, RoomStatus } from "@prisma/client";
 import dayjs from "dayjs";
 import { Observable, Subject, map } from "rxjs";
-import { EventSourceKey } from "common/constants/keys";
-import { getDayRangeWithin } from "common/utils/date";
-import { CreateRoomMemberDto } from "model/dto/room-member.dto";
-import { CreateRoomDto, DeleteRoomDto, UpdateRoomDto } from "model/dto/room.dto";
-import { PrismaService } from "prisma/prisma.service";
-import { RoomSystemRemoval } from "types/sse-payload";
+import { EventSourceKey } from "src/common/constants/keys";
+import { getDayRangeWithin } from "src/common/utils/date";
+import { CreateRoomMemberDto } from "src/model/dto/room-member.dto";
+import { CreateRoomDto, DeleteRoomDto, UpdateRoomDto } from "src/model/dto/room.dto";
+import { PrismaService } from "src/prisma/prisma.service";
+import { RoomSystemRemoval } from "src/types/sse-payload";
+import { NotifyService } from "../notification/lineNotify.service";
 
 @Injectable()
 export class RoomService {
   private readonly roomSystemRemoval = new Subject<RoomSystemRemoval>();
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly lineNotify: NotifyService
+    ) {}
 
   @Cron(CronExpression.EVERY_MINUTE, { timeZone: "Asia/Bangkok" })
   async handleCron() {
@@ -258,6 +262,9 @@ export class RoomService {
     });
 
     if (room.hostTeamId === payload.teamId) {
+      //notify
+      await this.lineNotify.searchUserForDisbanRoomNotify(payload.roomId);
+
       await this.prisma.appointment.update({
         where: { roomId: room.id },
         data: {
@@ -346,6 +353,9 @@ export class RoomService {
       }
     });
 
+    //notify accept room
+    this.lineNotify.searchUserForAcceptNotify(roomId,teamId);
+
     // upsert appointment
     if (appointment) {
       await this.prisma.appointmentMember.upsert({
@@ -397,6 +407,9 @@ export class RoomService {
         }
       }
     });
+
+    //notify leaving room
+    this.lineNotify.searchUserForLeaveNotify(roomMemberId,room.id);
 
     // update appointment member
     if (room.appointment) {

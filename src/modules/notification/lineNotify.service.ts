@@ -66,6 +66,7 @@ export class NotifyService {
     }
   }
 
+  //Appointment
   async searchUserForAppointmentNotify(memberIds: string[]) {
     const member = await this.prisma.teamMember.findMany({
       where: {
@@ -76,17 +77,79 @@ export class NotifyService {
       select: {
         user: {
           select: {
+            settings:{
+              select:{
+                isMeNotified: true,
+                isRoomNotified: true,
+                isTeamNotified: true,
+              }
+            },
             lineToken: true
           }
         }
       }
     });
 
-    const tokens = member.map((e) => e.user.lineToken);
+    const tokens = member.map((e) => ({
+                                      'token':e.user.lineToken, 
+                                      'isMe':e.user.settings?.isMeNotified, 
+                                      'isRoom':e.user.settings?.isRoomNotified, 
+                                      'isTeam':e.user.settings?.isTeamNotified})) ?? [];
 
     for (const token of tokens) {
-      if (token) {
-        void this.sendNotification("คุณได้รับการนัดหมายแล้ว", token);
+      if (token.token && token.isRoom) {
+        void this.sendNotification("คุณได้รับการนัดหมายแล้ว", token.token);
+      }
+    }
+  }
+
+  //Room
+  async searchUserForDisbanRoomNotify(roomId: string) {
+    const roomRes = await this.prisma.roomMember.findMany({
+      where: {
+        roomId
+      },
+      select: {
+        team: {
+          select: {
+            members: {
+              select: {
+                user: {
+                  select: {
+                    settings:{
+                      select:{
+                        isMeNotified: true,
+                        isRoomNotified: true,
+                        isTeamNotified: true,
+                      }
+                    },
+                    lineToken: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    const member = roomRes.map((e) => e.team.members.map((e) => ({
+      'token':e.user.lineToken, 
+      'isMe':e.user.settings?.isMeNotified, 
+      'isRoom':e.user.settings?.isRoomNotified, 
+      'isTeam':e.user.settings?.isTeamNotified})) ?? []) ?? [];
+
+      const room = await this.prisma.room.findFirst({
+        where: {
+          id: roomId
+        }
+      })
+
+    for (const tokens of member) {
+      for(const token of tokens){
+        if (token.token && token.isRoom) {
+          void this.sendNotification(`ห้อง ${room?.name} ถูกยุบแล้ว`, token.token);
+        }
       }
     }
   }
@@ -103,6 +166,13 @@ export class NotifyService {
               select: {
                 user: {
                   select: {
+                    settings:{
+                      select:{
+                        isMeNotified: true,
+                        isRoomNotified: true,
+                        isTeamNotified: true,
+                      }
+                    },
                     lineToken: true
                   }
                 }
@@ -113,13 +183,194 @@ export class NotifyService {
       }
     });
 
-    const tokens = roomRes?.hostTeam.members.map((e) => e.user.lineToken) ?? [];
+    const tokens = roomRes?.hostTeam.members.map((e) => ({
+      'token':e.user.lineToken, 
+      'isMe':e.user.settings?.isMeNotified, 
+      'isRoom':e.user.settings?.isRoomNotified, 
+      'isTeam':e.user.settings?.isTeamNotified})) ?? [];
 
     for (const token of tokens) {
-      if (token) {
-        void this.sendNotification("คุณได้รับการร้องขอเข้าห้อง", token);
+      if (token.token && token.isRoom) {
+        void this.sendNotification("คุณได้รับการร้องขอเข้าห้อง", token.token);
       }
     }
+  }
+
+  async searchUserForAcceptNotify(roomId: string, teamId: string) {
+    const teamMem = await this.prisma.teamMember.findMany({
+      where: {
+        teamId,
+      },
+      select: {
+        user: {
+          select: {
+            settings:{
+              select:{
+                isMeNotified: true,
+                isRoomNotified: true,
+                isTeamNotified: true,
+              }
+            },
+            lineToken: true
+          }
+        }
+      }
+    });
+
+    const room = await this.prisma.room.findFirst({
+      where: {
+        id: roomId
+      }
+    })
+
+    const tokens = teamMem?.map((e) => ({
+      'token':e.user.lineToken, 
+      'isMe':e.user.settings?.isMeNotified, 
+      'isRoom':e.user.settings?.isRoomNotified, 
+      'isTeam':e.user.settings?.isTeamNotified})) ?? [];
+
+    for (const token of tokens) {
+      if (token.token && token.isRoom) {
+        void this.sendNotification(`คุณได้รับการยืนยันเข้าห้อง ${room?.name}`, token.token);
+      }
+    }
+  }
+
+  async searchUserForLeaveNotify(roomMemberId: string, roomId: string) {
+    //team leave
+    const teamLeave = await this.prisma.roomMember.findFirst({
+      where: {
+        id: roomMemberId,
+      },
+      select: {
+        team: {
+          select: {
+            members:{
+              select:{
+                user:{
+                  select:{
+                    settings:{
+                      select:{
+                        isMeNotified: true,
+                        isRoomNotified: true,
+                        isTeamNotified: true,
+                      }
+                    },
+                    lineToken: true
+                  }
+                }
+              }
+            },
+            name:true
+          }
+        }
+      }
+    });
+
+    //other team
+    const teamOther = await this.prisma.roomMember.findMany({
+      where: {
+        roomId: roomId,
+        NOT: {id:roomMemberId},
+      },
+      select: {
+        team:{
+          select:{
+            members:{
+              select:{
+                user:{
+                  select:{
+                    settings:{
+                      select:{
+                        isMeNotified: true,
+                        isRoomNotified: true,
+                        isTeamNotified: true,
+                      }
+                    },
+                    lineToken: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+
+    //room
+    const room = await this.prisma.room.findFirst({
+      where:{
+        id: roomId
+      }
+    })
+
+    const tokens = teamLeave?.team.members.map((e) => ({
+      'token':e.user.lineToken, 
+      'isMe':e.user.settings?.isMeNotified, 
+      'isRoom':e.user.settings?.isRoomNotified, 
+      'isTeam':e.user.settings?.isTeamNotified})) ?? [];
+    const tokenOther = teamOther?.map((e) => e.team.members.map((e) => ({
+      'token':e.user.lineToken, 
+      'isMe':e.user.settings?.isMeNotified, 
+      'isRoom':e.user.settings?.isRoomNotified, 
+      'isTeam':e.user.settings?.isTeamNotified})) ?? []) ?? [];
+
+    for (const token of tokens) {
+      if (token.token && token.isRoom) {
+        void this.sendNotification(`คุณได้ออกจากห้อง ${room?.name}`, token.token);
+      }
+    }
+    for (const tokenO of tokenOther) {
+      for (const token of tokenO) {
+        if (token.token && token.isRoom) {
+          void this.sendNotification(`ทีม ${teamLeave?.team.name} ได้ออกจากห้อง ${room?.name}`, token.token);
+        }
+      }
+    }
+  }
+
+  //Team
+  async searchUserForTeamDisbandNotify(teamId: string) {
+      const member = await this.prisma.teamMember.findMany({
+        where: {
+          teamId,
+        },
+        select: {
+          user: {
+            select: {
+              settings:{
+                select:{
+                  isMeNotified: true,
+                  isRoomNotified: true,
+                  isTeamNotified: true,
+                }
+              },
+              lineToken: true
+            }
+          }
+        }
+      });
+
+      const team = await this.prisma.team.findFirst({
+        where:{id: teamId}
+      })
+
+      const teamUsers = member.map((e) => e.user);
+
+      if (teamUsers.length > 1) {
+        teamUsers.map((e) => {
+          if (e.lineToken !== null && e.settings?.isTeamNotified) {
+            void this.sendNotification(`ทีม ${team?.name} ถูกยุบแล้ว`, e.lineToken);
+          }
+        });
+      } else {
+        if (teamUsers !== null && teamUsers[0].lineToken !== null && teamUsers[0].settings?.isTeamNotified) {
+          void this.sendNotification(
+            `ทีม ${team?.name} ถูกยุบแล้ว`,
+            teamUsers[0].lineToken
+          );
+        }
+      }
   }
 
   async searchUserForTeamPendingNotify(teamId: string, userId: string, status: string) {
@@ -134,6 +385,13 @@ export class NotifyService {
         select: {
           user: {
             select: {
+              settings:{
+                select:{
+                  isMeNotified: true,
+                  isRoomNotified: true,
+                  isTeamNotified: true,
+                }
+              },
               lineToken: true
             }
           }
@@ -144,12 +402,12 @@ export class NotifyService {
 
       if (managerUsers.length > 1) {
         managerUsers.map((e) => {
-          if (e.lineToken !== null) {
+          if (e.lineToken !== null && e.settings?.isTeamNotified) {
             void this.sendNotification("คุณได้รับการร้องขอเข้าทีม", e.lineToken);
           }
         });
       } else {
-        if (managerUsers !== null && managerUsers[0].lineToken !== null) {
+        if (managerUsers !== null && managerUsers[0].lineToken !== null && managerUsers[0].settings?.isTeamNotified) {
           void this.sendNotification(
             "คุณได้รับการร้องขอเข้าทีม",
             managerUsers[0].lineToken
@@ -160,15 +418,219 @@ export class NotifyService {
       const user = await this.prisma.user.findFirst({
         where: {
           id: userId
+        },
+        select:{
+          settings:{
+            select:{
+              isMeNotified: true,
+              isRoomNotified: true,
+              isTeamNotified: true,
+            }
+          },
+          lineToken: true
         }
       });
 
-      if (user !== null && user.lineToken !== null) {
+      if (user !== null && user.lineToken !== null && user.settings?.isMeNotified) {
         void this.sendNotification("คุณได้รับการเชิญเข้าทีม", user.lineToken);
       }
     }
   }
 
+  async searchUserForTeamKickedNotify(teamMemberId: string) {
+    const team = await this.prisma.teamMember.findFirst({
+      where: {
+        id: teamMemberId
+      },
+      select: {
+        user: {
+          select: {
+            settings:{
+              select:{
+                isMeNotified: true,
+                isRoomNotified: true,
+                isTeamNotified: true,
+              }
+            },
+            lineToken: true
+          }
+        }
+      }
+    });
+
+    const tokens = {
+      'token':team?.user.lineToken, 
+      'isMe':team?.user.settings?.isMeNotified, 
+      'isRoom':team?.user.settings?.isRoomNotified, 
+      'isTeam':team?.user.settings?.isTeamNotified};
+
+    if (tokens.token && tokens.isTeam) {
+      void this.sendNotification("คุณถูกเตะออกจากทีม", tokens.token);
+    }
+    
+  }
+
+  async searchUserForTeamAcceptNotify(userId: string, teamId: string, status: string) {
+
+    const team = await this.prisma.team.findFirst({
+      where:{
+        id: teamId
+      }
+    })
+
+    if(status == 'Accepted'){
+      const user = await this.prisma.user.findFirst({
+        where: {
+          id: userId
+        },
+        select: {
+          settings:{
+            select:{
+              isMeNotified: true,
+              isRoomNotified: true,
+              isTeamNotified: true,
+            }
+          },
+          lineToken: true
+        }
+      });
+  
+      const tokens = {
+        'token':user?.lineToken, 
+        'isMe':user?.settings?.isMeNotified, 
+        'isRoom':user?.settings?.isRoomNotified, 
+        'isTeam':user?.settings?.isTeamNotified};
+  
+      if (tokens.token && tokens.isMe) {
+        void this.sendNotification(`คุณได้เข้าร่วมทีม ${team?.name}`, tokens.token);
+      }
+    }else if(status == 'Denied'){
+
+      const user = await this.prisma.user.findFirst({
+        where: {
+          id: userId
+        },
+        select: {
+          settings:{
+            select:{
+              isMeNotified: true,
+              isRoomNotified: true,
+              isTeamNotified: true,
+            }
+          },
+          lineToken: true
+        }
+      });
+  
+      const tokens = {
+        'token':user?.lineToken, 
+        'isMe':user?.settings?.isMeNotified, 
+        'isRoom':user?.settings?.isRoomNotified, 
+        'isTeam':user?.settings?.isTeamNotified};
+  
+      if (tokens.token && tokens.isMe) {
+        void this.sendNotification(`คุณถูกปฏิเสธจากทีม ${team?.name}`, tokens.token);
+      }
+    }
+    
+  }
+
+  async searchUserForAcceptTeamNotify(userId: string, teamId: string, status: string) {
+
+    const userA = await this.prisma.user.findFirst({
+      where:{
+        id: userId
+      }
+    })
+
+    if(status == 'Accepted'){
+
+      const member = await this.prisma.teamMember.findMany({
+        where: {
+          teamId,
+          role: {
+            in: [ MemberRole.MANAGER, MemberRole.LEADER ]
+          }
+        },
+        select: {
+          user: {
+            select: {
+              settings:{
+                select:{
+                  isMeNotified: true,
+                  isRoomNotified: true,
+                  isTeamNotified: true,
+                }
+              },
+              lineToken: true
+            }
+          }
+        }
+      });
+
+      const managerUsers = member.map((e) => e.user);
+  
+      if (managerUsers.length > 1) {
+        managerUsers.map((e) => {
+          if (e.lineToken !== null && e.settings?.isTeamNotified) {
+            void this.sendNotification(`${userA?.displayName} ได้เข้าร่วมทีม`, e.lineToken);
+          }
+        });
+      } else {
+        if (managerUsers !== null && managerUsers[0].lineToken !== null && managerUsers[0].settings?.isTeamNotified) {
+          void this.sendNotification(
+            `${userA?.displayName} ได้เข้าร่วมทีม`,
+            managerUsers[0].lineToken
+          );
+        }
+      }
+
+    }else if(status == 'Denied'){
+
+      const member = await this.prisma.teamMember.findMany({
+        where: {
+          teamId,
+          role: {
+            in: [ MemberRole.MANAGER, MemberRole.LEADER ]
+          }
+        },
+        select: {
+          user: {
+            select: {
+              settings:{
+                select:{
+                  isMeNotified: true,
+                  isRoomNotified: true,
+                  isTeamNotified: true,
+                }
+              },
+              lineToken: true
+            }
+          }
+        }
+      });
+
+      const managerUsers = member.map((e) => e.user);
+  
+      if (managerUsers.length > 1) {
+        managerUsers.map((e) => {
+          if (e.lineToken !== null && e.settings?.isTeamNotified) {
+            void this.sendNotification(`${userA?.displayName} ได้ปฏิเสธการร่วมทีม`, e.lineToken);
+          }
+        });
+      } else {
+        if (managerUsers !== null && managerUsers[0].lineToken !== null && managerUsers[0].settings?.isTeamNotified) {
+          void this.sendNotification(
+            `${userA?.displayName} ได้ปฏิเสธการร่วมทีม`,
+            managerUsers[0].lineToken
+          );
+        }
+      }
+    }
+    
+  }
+
+  //Chat
   async searchUserForChatNotify(chatId: string, teamId: string) {
     const chat = await this.prisma.chat.findFirst({
       where: {
@@ -188,6 +650,13 @@ export class NotifyService {
               select: {
                 user: {
                   select: {
+                    settings:{
+                      select:{
+                        isMeNotified: true,
+                        isRoomNotified: true,
+                        isTeamNotified: true,
+                      }
+                    },
                     lineToken: true
                   }
                 }
@@ -198,13 +667,23 @@ export class NotifyService {
       }
     });
 
+    const team = await this.prisma.team.findFirst({
+      where:{
+        id: teamId
+      }
+    })
+
     const lineTokenOfOtherUsers = roomMemberRes.flatMap((e) =>
-      e.team.members.map((e) => e.user.lineToken)
-    );
+      e.team.members.map((e) => ({
+        'token':e.user.lineToken, 
+        'isMe':e.user.settings?.isMeNotified, 
+        'isRoom':e.user.settings?.isRoomNotified, 
+        'isTeam':e.user.settings?.isTeamNotified})) ?? []
+    ) ?? [];
 
     for (const token of lineTokenOfOtherUsers) {
-      if (token) {
-        void this.sendNotification("คุณได้รับข้อความใหม่", token);
+      if (token.token && token.isRoom) {
+        void this.sendNotification(`คุณได้รับข้อความใหม่จาก ${team?.name}`, token.token);
       }
     }
   }

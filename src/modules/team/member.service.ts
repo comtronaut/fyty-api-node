@@ -3,12 +3,14 @@ import { MemberRole, TeamMember, User } from "@prisma/client";
 import { CreateTeamMemberDto, UpdateTeamMemberDto } from "model/dto/team-member.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { TeamService } from "./team.service";
+import { NotifyService } from "../notification/lineNotify.service";
 
 @Injectable()
 export class TeamMemberService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly teamService: TeamService
+    private readonly teamService: TeamService,
+    private readonly lineNotify: NotifyService
   ) {}
 
   async create(data: CreateTeamMemberDto) {
@@ -21,6 +23,7 @@ export class TeamMemberService {
       },
       select: {
         id: true,
+        status: true,
         team: {
           select: {
             gameId: true
@@ -46,6 +49,12 @@ export class TeamMemberService {
       })
     ]);
 
+    //notify 
+    if(pending.status == 'INCOMING')
+      this.lineNotify.searchUserForTeamAcceptNotify(data.userId, data.teamId, 'Accepted')
+    else if(pending.status == 'OUTGOING')
+      this.lineNotify.searchUserForAcceptTeamNotify(data?.userId,data?.teamId,'Denied')
+
     return out;
   }
 
@@ -69,6 +78,10 @@ export class TeamMemberService {
       await this.prisma.teamMember.delete({
         where: { id: memberId }
       });
+
+      //notify
+      this.lineNotify.searchUserForTeamKickedNotify(memberId);
+
     } else {
       throw new Error("Permission denined");
     }
