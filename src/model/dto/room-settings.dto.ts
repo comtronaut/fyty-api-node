@@ -1,14 +1,13 @@
-import { PartialType } from "@nestjs/mapped-types";
 import { Prisma } from "@prisma/client";
-import { IsNotEmpty, IsUUID } from "class-validator";
-import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateRoomSettingDto implements Prisma.RoomSettingsUncheckedCreateInput {
-  @IsNotEmpty()
-  @IsUUID()
-  roomId: string;
-}
+import {
+  RoomSettingsOptionalDefaultsSchema,
+  RoomSettingsPartialSchema
+} from "model/schema";
+import { createZodDto } from "nestjs-zod";
 
-export class UpdateRoomSettingDto extends PartialType(CreateRoomSettingDto) {}
+export class CreateRoomSettingDto
+  extends createZodDto(RoomSettingsOptionalDefaultsSchema)
+  implements Prisma.RoomSettingsUncheckedCreateInput {}
 
-export const schemas = validationMetadatasToSchemas();
+export class UpdateRoomSettingDto extends createZodDto(RoomSettingsPartialSchema) {}

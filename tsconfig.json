@@ -19,7 +19,6 @@
     "noUncheckedIndexedAccess": true,
     "strictNullChecks": true,
     "noImplicitAny": true,
-    "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "strict": false,

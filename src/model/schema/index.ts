@@ -29,7 +29,9 @@ export const DECIMAL_STRING_REGEX = /^[0-9.,e+-bxffo_cp]+$|Infinity|NaN/;
 export const isValidDecimalInput = (
   v?: null | string | number | Prisma.DecimalJsLike
 ): v is string | number | Prisma.DecimalJsLike => {
-  if (v === undefined || v === null) {return false;}
+  if (v === undefined || v === null) {
+    return false;
+  }
   return (
     (typeof v === "object" && "d" in v && "e" in v && "s" in v && "toFixed" in v)
     || (typeof v === "string" && DECIMAL_STRING_REGEX.test(v))
@@ -361,6 +363,18 @@ export const GamePartialSchema = GameSchema.partial();
 
 export type GamePartial = z.infer<typeof GamePartialSchema>;
 
+// GAME OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const GameOptionalDefaultsSchema = GameSchema.merge(
+  z.object({
+    isActive: z.boolean().optional(),
+    desc: z.string().optional()
+  })
+);
+
+export type GameOptionalDefaults = z.infer<typeof GameOptionalDefaultsSchema>;
+
 // ///////////////////////////////////////
 // ROOM SCHEMA
 // ///////////////////////////////////////
@@ -391,6 +405,24 @@ export const RoomPartialSchema = RoomSchema.partial();
 
 export type RoomPartial = z.infer<typeof RoomPartialSchema>;
 
+// ROOM OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const RoomOptionalDefaultsSchema = RoomSchema.merge(
+  z.object({
+    status: RoomStatusSchema.optional(),
+    id: z.string().uuid().optional(),
+    option: z.string().optional(),
+    isPrivate: z.boolean().optional(),
+    teamCount: z.number().int().optional(),
+    note: z.string().optional(),
+    updatedAt: z.coerce.date().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
+
+export type RoomOptionalDefaults = z.infer<typeof RoomOptionalDefaultsSchema>;
+
 // ///////////////////////////////////////
 // ROOM SETTINGS SCHEMA
 // ///////////////////////////////////////
@@ -409,6 +441,19 @@ export type RoomSettings = z.infer<typeof RoomSettingsSchema>;
 export const RoomSettingsPartialSchema = RoomSettingsSchema.partial();
 
 export type RoomSettingsPartial = z.infer<typeof RoomSettingsPartialSchema>;
+
+// ROOM SETTINGS OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const RoomSettingsOptionalDefaultsSchema = RoomSettingsSchema.merge(
+  z.object({
+    id: z.string().uuid().optional()
+  })
+);
+
+export type RoomSettingsOptionalDefaults = z.infer<
+  typeof RoomSettingsOptionalDefaultsSchema
+>;
 
 // ///////////////////////////////////////
 // ROOM MEMBER SCHEMA
@@ -431,6 +476,18 @@ export const RoomMemberPartialSchema = RoomMemberSchema.partial();
 
 export type RoomMemberPartial = z.infer<typeof RoomMemberPartialSchema>;
 
+// ROOM MEMBER OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const RoomMemberOptionalDefaultsSchema = RoomMemberSchema.merge(
+  z.object({
+    id: z.string().uuid().optional(),
+    joinedAt: z.coerce.date().optional()
+  })
+);
+
+export type RoomMemberOptionalDefaults = z.infer<typeof RoomMemberOptionalDefaultsSchema>;
+
 // ///////////////////////////////////////
 // ROOM LINEUP SCHEMA
 // ///////////////////////////////////////
@@ -451,6 +508,17 @@ export type RoomLineup = z.infer<typeof RoomLineupSchema>;
 export const RoomLineupPartialSchema = RoomLineupSchema.partial();
 
 export type RoomLineupPartial = z.infer<typeof RoomLineupPartialSchema>;
+
+// ROOM LINEUP OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const RoomLineupOptionalDefaultsSchema = RoomLineupSchema.merge(
+  z.object({
+    id: z.string().uuid().optional()
+  })
+);
+
+export type RoomLineupOptionalDefaults = z.infer<typeof RoomLineupOptionalDefaultsSchema>;
 
 // ///////////////////////////////////////
 // ROOM PENDING SCHEMA
@@ -474,6 +542,19 @@ export const RoomPendingPartialSchema = RoomPendingSchema.partial();
 
 export type RoomPendingPartial = z.infer<typeof RoomPendingPartialSchema>;
 
+// ROOM PENDING OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const RoomPendingOptionalDefaultsSchema = RoomPendingSchema.merge(
+  z.object({
+    status: PendingStatusSchema.optional(),
+    id: z.string().uuid().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
+
+export type RoomPendingOptionalDefaults = z.infer<typeof RoomPendingOptionalDefaultsSchema>;
+
 // ///////////////////////////////////////
 // ROOM PENDING LINEUP SCHEMA
 // ///////////////////////////////////////
@@ -493,6 +574,19 @@ export type RoomPendingLineup = z.infer<typeof RoomPendingLineupSchema>;
 export const RoomPendingLineupPartialSchema = RoomPendingLineupSchema.partial();
 
 export type RoomPendingLineupPartial = z.infer<typeof RoomPendingLineupPartialSchema>;
+
+// ROOM PENDING LINEUP OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const RoomPendingLineupOptionalDefaultsSchema = RoomPendingLineupSchema.merge(
+  z.object({
+    id: z.string().uuid().optional()
+  })
+);
+
+export type RoomPendingLineupOptionalDefaults = z.infer<
+  typeof RoomPendingLineupOptionalDefaultsSchema
+>;
 
 // ///////////////////////////////////////
 // TEAM SCHEMA
@@ -521,6 +615,23 @@ export const TeamPartialSchema = TeamSchema.partial();
 
 export type TeamPartial = z.infer<typeof TeamPartialSchema>;
 
+// TEAM OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const TeamOptionalDefaultsSchema = TeamSchema.merge(
+  z.object({
+    id: z.string().uuid().optional(),
+    coverUrl: z.string().optional(),
+    logoUrl: z.string().optional(),
+    tier: z.string().optional(),
+    isPrivate: z.boolean().optional(),
+    isDeleted: z.boolean().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
+
+export type TeamOptionalDefaults = z.infer<typeof TeamOptionalDefaultsSchema>;
+
 // ///////////////////////////////////////
 // TEAM SETTINGS SCHEMA
 // ///////////////////////////////////////
@@ -540,6 +651,20 @@ export type TeamSettings = z.infer<typeof TeamSettingsSchema>;
 export const TeamSettingsPartialSchema = TeamSettingsSchema.partial();
 
 export type TeamSettingsPartial = z.infer<typeof TeamSettingsPartialSchema>;
+
+// TEAM SETTINGS OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const TeamSettingsOptionalDefaultsSchema = TeamSettingsSchema.merge(
+  z.object({
+    id: z.string().uuid().optional(),
+    isJoiningEnabled: z.boolean().optional()
+  })
+);
+
+export type TeamSettingsOptionalDefaults = z.infer<
+  typeof TeamSettingsOptionalDefaultsSchema
+>;
 
 // ///////////////////////////////////////
 // TEAM MEMBER SCHEMA
@@ -562,6 +687,19 @@ export type TeamMember = z.infer<typeof TeamMemberSchema>;
 export const TeamMemberPartialSchema = TeamMemberSchema.partial();
 
 export type TeamMemberPartial = z.infer<typeof TeamMemberPartialSchema>;
+
+// TEAM MEMBER OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const TeamMemberOptionalDefaultsSchema = TeamMemberSchema.merge(
+  z.object({
+    role: MemberRoleSchema.optional(),
+    id: z.string().uuid().optional(),
+    joinedAt: z.coerce.date().optional()
+  })
+);
+
+export type TeamMemberOptionalDefaults = z.infer<typeof TeamMemberOptionalDefaultsSchema>;
 
 // ///////////////////////////////////////
 // TEAM LINEUP SCHEMA
@@ -589,6 +727,22 @@ export const TeamLineupPartialSchema = TeamLineupSchema.partial();
 
 export type TeamLineupPartial = z.infer<typeof TeamLineupPartialSchema>;
 
+// TEAM LINEUP OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const TeamLineupOptionalDefaultsSchema = TeamLineupSchema.merge(
+  z.object({
+    id: z.string().uuid().optional(),
+    isDefault: z.boolean().optional(),
+    profileUrl: z.string().optional(),
+    imageUrl: z.string().optional(),
+    name: z.string().optional(),
+    note: z.string().optional()
+  })
+);
+
+export type TeamLineupOptionalDefaults = z.infer<typeof TeamLineupOptionalDefaultsSchema>;
+
 // ///////////////////////////////////////
 // TEAM PENDING SCHEMA
 // ///////////////////////////////////////
@@ -611,6 +765,19 @@ export const TeamPendingPartialSchema = TeamPendingSchema.partial();
 
 export type TeamPendingPartial = z.infer<typeof TeamPendingPartialSchema>;
 
+// TEAM PENDING OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const TeamPendingOptionalDefaultsSchema = TeamPendingSchema.merge(
+  z.object({
+    status: PendingStatusSchema.optional(),
+    id: z.string().uuid().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
+
+export type TeamPendingOptionalDefaults = z.infer<typeof TeamPendingOptionalDefaultsSchema>;
+
 // ///////////////////////////////////////
 // USER SCHEMA
 // ///////////////////////////////////////
@@ -623,7 +790,7 @@ export const UserSchema = z.object({
   updatedMobilePhoneAt: z.coerce.date().nullish(),
   password: z.string(),
   displayName: z.string(),
-  email: z.string().nullish(),
+  email: z.string().email().nullish(),
   updatedEmailAt: z.coerce.date().nullish(),
   bio: z.string(),
   portraitUrl: z.string(),
@@ -650,6 +817,24 @@ export const UserPartialSchema = UserSchema.partial();
 
 export type UserPartial = z.infer<typeof UserPartialSchema>;
 
+// USER OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const UserOptionalDefaultsSchema = UserSchema.merge(
+  z.object({
+    id: z.string().uuid().optional(),
+    bio: z.string().optional(),
+    portraitUrl: z.string().optional(),
+    coverUrl: z.string().optional(),
+    isVerified: z.boolean().optional(),
+    isDeactivated: z.boolean().optional(),
+    createdAt: z.coerce.date().optional(),
+    updatedAt: z.coerce.date().optional()
+  })
+);
+
+export type UserOptionalDefaults = z.infer<typeof UserOptionalDefaultsSchema>;
+
 // ///////////////////////////////////////
 // USER SETTINGS SCHEMA
 // ///////////////////////////////////////
@@ -674,6 +859,24 @@ export const UserSettingsPartialSchema = UserSettingsSchema.partial();
 
 export type UserSettingsPartial = z.infer<typeof UserSettingsPartialSchema>;
 
+// USER SETTINGS OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const UserSettingsOptionalDefaultsSchema = UserSettingsSchema.merge(
+  z.object({
+    lang: LangSchema.optional(),
+    id: z.string().uuid().optional(),
+    isNotifiedBeforeTrainingMinute: z.number().int().optional(),
+    isTeamNotified: z.boolean().optional(),
+    isMeNotified: z.boolean().optional(),
+    isRoomNotified: z.boolean().optional()
+  })
+);
+
+export type UserSettingsOptionalDefaults = z.infer<
+  typeof UserSettingsOptionalDefaultsSchema
+>;
+
 // ///////////////////////////////////////
 // PASSWORD RESET SESSION SCHEMA
 // ///////////////////////////////////////
@@ -697,6 +900,22 @@ export type PasswordResetSession = z.infer<typeof PasswordResetSessionSchema>;
 export const PasswordResetSessionPartialSchema = PasswordResetSessionSchema.partial();
 
 export type PasswordResetSessionPartial = z.infer<typeof PasswordResetSessionPartialSchema>;
+
+// PASSWORD RESET SESSION OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const PasswordResetSessionOptionalDefaultsSchema = PasswordResetSessionSchema.merge(
+  z.object({
+    id: z.string().uuid().optional(),
+    attemptCount: z.number().int().optional(),
+    updatedAt: z.coerce.date().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
+
+export type PasswordResetSessionOptionalDefaults = z.infer<
+  typeof PasswordResetSessionOptionalDefaultsSchema
+>;
 
 // ///////////////////////////////////////
 // USER AVATAR SCHEMA
@@ -726,6 +945,24 @@ export const UserAvatarPartialSchema = UserAvatarSchema.partial();
 
 export type UserAvatarPartial = z.infer<typeof UserAvatarPartialSchema>;
 
+// USER AVATAR OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const UserAvatarOptionalDefaultsSchema = UserAvatarSchema.merge(
+  z.object({
+    id: z.string().uuid().optional(),
+    characterName: z.string().optional(),
+    ratingScore: z
+      .union([ z.number(), z.string(), DecimalJSLikeSchema ])
+      .refine((v) => isValidDecimalInput(v), {
+        message: "Field 'ratingScore' must be a Decimal. Location: ['Models', 'UserAvatar']"
+      })
+      .optional()
+  })
+);
+
+export type UserAvatarOptionalDefaults = z.infer<typeof UserAvatarOptionalDefaultsSchema>;
+
 // ///////////////////////////////////////
 // REVIEW SCHEMA
 // ///////////////////////////////////////
@@ -754,6 +991,24 @@ export const ReviewPartialSchema = ReviewSchema.partial();
 
 export type ReviewPartial = z.infer<typeof ReviewPartialSchema>;
 
+// REVIEW OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const ReviewOptionalDefaultsSchema = ReviewSchema.merge(
+  z.object({
+    id: z.string().uuid().optional(),
+    ratingScore: z
+      .union([ z.number(), z.string(), DecimalJSLikeSchema ])
+      .refine((v) => isValidDecimalInput(v), {
+        message: "Field 'ratingScore' must be a Decimal. Location: ['Models', 'Review']"
+      })
+      .optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
+
+export type ReviewOptionalDefaults = z.infer<typeof ReviewOptionalDefaultsSchema>;
+
 // ///////////////////////////////////////
 // APPOINTMENT SCHEMA
 // ///////////////////////////////////////
@@ -778,6 +1033,19 @@ export const AppointmentPartialSchema = AppointmentSchema.partial();
 
 export type AppointmentPartial = z.infer<typeof AppointmentPartialSchema>;
 
+// APPOINTMENT OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const AppointmentOptionalDefaultsSchema = AppointmentSchema.merge(
+  z.object({
+    id: z.string().uuid().optional(),
+    isDeleted: z.boolean().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
+
+export type AppointmentOptionalDefaults = z.infer<typeof AppointmentOptionalDefaultsSchema>;
+
 // ///////////////////////////////////////
 // APPOINTMENT MEMBER SCHEMA
 // ///////////////////////////////////////
@@ -800,6 +1068,21 @@ export const AppointmentMemberPartialSchema = AppointmentMemberSchema.partial();
 
 export type AppointmentMemberPartial = z.infer<typeof AppointmentMemberPartialSchema>;
 
+// APPOINTMENT MEMBER OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const AppointmentMemberOptionalDefaultsSchema = AppointmentMemberSchema.merge(
+  z.object({
+    id: z.string().uuid().optional(),
+    isLeft: z.boolean().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
+
+export type AppointmentMemberOptionalDefaults = z.infer<
+  typeof AppointmentMemberOptionalDefaultsSchema
+>;
+
 // ///////////////////////////////////////
 // CHAT SCHEMA
 // ///////////////////////////////////////
@@ -818,6 +1101,17 @@ export type Chat = z.infer<typeof ChatSchema>;
 export const ChatPartialSchema = ChatSchema.partial();
 
 export type ChatPartial = z.infer<typeof ChatPartialSchema>;
+
+// CHAT OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const ChatOptionalDefaultsSchema = ChatSchema.merge(
+  z.object({
+    id: z.string().uuid().optional()
+  })
+);
+
+export type ChatOptionalDefaults = z.infer<typeof ChatOptionalDefaultsSchema>;
 
 // ///////////////////////////////////////
 // MESSAGE SCHEMA
@@ -843,6 +1137,19 @@ export type Message = z.infer<typeof MessageSchema>;
 export const MessagePartialSchema = MessageSchema.partial();
 
 export type MessagePartial = z.infer<typeof MessagePartialSchema>;
+
+// MESSAGE OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const MessageOptionalDefaultsSchema = MessageSchema.merge(
+  z.object({
+    id: z.string().uuid().optional(),
+    imageUrls: z.string().array().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
+
+export type MessageOptionalDefaults = z.infer<typeof MessageOptionalDefaultsSchema>;
 
 // ///////////////////////////////////////
 // TEAM STATS SCHEMA
@@ -873,6 +1180,27 @@ export const TeamStatsPartialSchema = TeamStatsSchema.partial();
 
 export type TeamStatsPartial = z.infer<typeof TeamStatsPartialSchema>;
 
+// TEAM STATS OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const TeamStatsOptionalDefaultsSchema = TeamStatsSchema.merge(
+  z.object({
+    id: z.string().uuid().optional(),
+    leftWhileTrainingCount: z.number().int().optional(),
+    completedTrainingCount: z.number().int().optional(),
+    trainingMinute: z.number().int().optional(),
+    trainingCount: z.number().int().optional(),
+    winCount: z.number().int().optional(),
+    loseCount: z.number().int().optional(),
+    tieCount: z.number().int().optional(),
+    perGameWinCount: z.number().int().optional(),
+    perGameLoseCount: z.number().int().optional(),
+    updateAt: z.coerce.date().optional()
+  })
+);
+
+export type TeamStatsOptionalDefaults = z.infer<typeof TeamStatsOptionalDefaultsSchema>;
+
 // ///////////////////////////////////////
 // TRAINING SCHEMA
 // ///////////////////////////////////////
@@ -902,6 +1230,23 @@ export const TrainingPartialSchema = TrainingSchema.partial();
 
 export type TrainingPartial = z.infer<typeof TrainingPartialSchema>;
 
+// TRAINING OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const TrainingOptionalDefaultsSchema = TrainingSchema.merge(
+  z.object({
+    status: TrainingStatusSchema.optional(),
+    id: z.string().uuid().optional(),
+    note: z.string().optional(),
+    imageUrls: z.string().array().optional(),
+    isSubmitted: z.boolean().optional(),
+    updatedAt: z.coerce.date().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
+
+export type TrainingOptionalDefaults = z.infer<typeof TrainingOptionalDefaultsSchema>;
+
 // ///////////////////////////////////////
 // TRAINING REPORT SCHEMA
 // ///////////////////////////////////////
@@ -928,6 +1273,22 @@ export const TrainingReportPartialSchema = TrainingReportSchema.partial();
 
 export type TrainingReportPartial = z.infer<typeof TrainingReportPartialSchema>;
 
+// TRAINING REPORT OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const TrainingReportOptionalDefaultsSchema = TrainingReportSchema.merge(
+  z.object({
+    id: z.string().uuid().optional(),
+    isAdminReviewed: z.boolean().optional(),
+    imageUrls: z.string().array().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
+
+export type TrainingReportOptionalDefaults = z.infer<
+  typeof TrainingReportOptionalDefaultsSchema
+>;
+
 // ///////////////////////////////////////
 // ADMIN SCHEMA
 // ///////////////////////////////////////
@@ -935,7 +1296,7 @@ export type TrainingReportPartial = z.infer<typeof TrainingReportPartialSchema>;
 export const AdminSchema = z.object({
   role: AdminRoleSchema,
   id: z.string().uuid(),
-  email: z.string(),
+  email: z.string().email(),
   password: z.string(),
   createdAt: z.coerce.date(),
   updateAt: z.coerce.date()
@@ -950,3 +1311,17 @@ export type Admin = z.infer<typeof AdminSchema>;
 export const AdminPartialSchema = AdminSchema.partial();
 
 export type AdminPartial = z.infer<typeof AdminPartialSchema>;
+
+// ADMIN OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const AdminOptionalDefaultsSchema = AdminSchema.merge(
+  z.object({
+    role: AdminRoleSchema.optional(),
+    id: z.string().uuid().optional(),
+    createdAt: z.coerce.date().optional(),
+    updateAt: z.coerce.date().optional()
+  })
+);
+
+export type AdminOptionalDefaults = z.infer<typeof AdminOptionalDefaultsSchema>;

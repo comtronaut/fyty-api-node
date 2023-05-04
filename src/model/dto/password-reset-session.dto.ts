@@ -1,23 +1,13 @@
-import { PartialType } from "@nestjs/mapped-types";
 import { Prisma } from "@prisma/client";
-import { IsISO8601, IsNotEmpty, IsUUID } from "class-validator";
-import { validationMetadatasToSchemas } from "class-validator-jsonschema";
+
+import { PasswordResetSessionPartialSchema } from "model/schema";
+import { PasswordResetSessionOptionalDefaultsSchema } from "model/schema";
+import { createZodDto } from "nestjs-zod";
 
 export class CreatePasswordResetSessionDto
-implements Prisma.PasswordResetSessionUncheckedCreateInput
-{
-  @IsUUID()
-  userId: string;
+  extends createZodDto(PasswordResetSessionOptionalDefaultsSchema)
+  implements Prisma.PasswordResetSessionUncheckedCreateInput {}
 
-  @IsNotEmpty()
-  token: string;
-
-  @IsISO8601()
-  expiredAt: Date;
-}
-
-export class UpdatePasswordResetSessionDto extends PartialType(
-  CreatePasswordResetSessionDto
+export class UpdatePasswordResetSessionDto extends createZodDto(
+  PasswordResetSessionPartialSchema
 ) {}
-
-export const schemas = validationMetadatasToSchemas();

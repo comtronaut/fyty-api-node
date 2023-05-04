@@ -1,18 +1,12 @@
-import { PartialType } from "@nestjs/mapped-types";
-import { Lang, Prisma } from "@prisma/client";
-import { IsEnum, IsNotEmpty, IsOptional, IsUUID } from "class-validator";
-import { validationMetadatasToSchemas } from "class-validator-jsonschema";
+import { Prisma } from "@prisma/client";
+import {
+  UserSettingsOptionalDefaultsSchema,
+  UserSettingsPartialSchema
+} from "model/schema";
+import { createZodDto } from "nestjs-zod";
 
-export class CreateUserSettingsDto implements Prisma.UserSettingsUncheckedCreateInput {
-  @IsNotEmpty()
-  @IsUUID()
-  userId: string;
+export class CreateUserSettingsDto
+  extends createZodDto(UserSettingsOptionalDefaultsSchema)
+  implements Prisma.UserSettingsUncheckedCreateInput {}
 
-  @IsOptional()
-  @IsEnum(Lang)
-  lang: Lang;
-}
-
-export class UpdateUserSettingsDto extends PartialType(CreateUserSettingsDto) {}
-
-export const schemas = validationMetadatasToSchemas();
+export class UpdateUserSettingsDto extends createZodDto(UserSettingsPartialSchema) {}

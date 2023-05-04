@@ -25,7 +25,8 @@ export class MeController {
 
   @Get()
   async getMeInfo(@UserSubject() user: User) {
-    return user;
+    const { password, ...safeUser } = user;
+    return safeUser;
   }
 
   @Put()

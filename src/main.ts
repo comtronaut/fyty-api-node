@@ -1,4 +1,4 @@
-import { Logger, ValidationPipe } from "@nestjs/common";
+import { Logger } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
@@ -19,8 +19,6 @@ async function bootstrap() {
         : true,
     bodyParser: true
   });
-
-  app.useGlobalPipes(new ValidationPipe({ transform: true, forbidNonWhitelisted: true }));
 
   // swagger api document
   if (env.SERVER_ORIGIN !== "https://api.fyty-esport.com") {

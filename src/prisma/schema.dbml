@@ -142,7 +142,7 @@ Table User {
   updatedMobilePhoneAt DateTime
   password String [not null]
   displayName String [not null]
-  email String [unique]
+  email String [unique, note: '@zod.string.email()']
   updatedEmailAt DateTime
   bio String [not null, default: '']
   portraitUrl String [not null, default: '']
@@ -281,7 +281,7 @@ Table TrainingReport {
 
 Table Admin {
   id String [pk]
-  email String [unique, not null]
+  email String [unique, not null, note: '@zod.string.email()']
   password String [not null]
   role AdminRole [not null, default: 'MANAGEMENT']
   createdAt DateTime [default: `now()`, not null]

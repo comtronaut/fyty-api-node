@@ -51,9 +51,17 @@ export class TeamMemberService {
 
     // notify
     if (pending.status === PendingStatus.INCOMING) {
-      void this.lineNotify.searchUserForTeamAcceptNotify(data.userId, data.teamId, "Accepted");
+      void this.lineNotify.searchUserForTeamAcceptNotify(
+        data.userId,
+        data.teamId,
+        "Accepted"
+      );
     } else if (pending.status === PendingStatus.OUTGOING) {
-      void this.lineNotify.searchUserForAcceptTeamNotify(data?.userId, data?.teamId, "Denied");
+      void this.lineNotify.searchUserForAcceptTeamNotify(
+        data?.userId,
+        data?.teamId,
+        "Denied"
+      );
     }
 
     return out;

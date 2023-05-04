@@ -1,23 +1,10 @@
-import { PartialType } from "@nestjs/mapped-types";
 import { Prisma } from "@prisma/client";
-import { IsBoolean, IsOptional, IsUUID } from "class-validator";
-import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateTeamLineupDto implements Prisma.TeamLineupUncheckedCreateInput {
-  @IsUUID()
-  teamId: string;
+import { TeamLineupOptionalDefaultsSchema, TeamLineupPartialSchema } from "model/schema";
+import { createZodDto } from "nestjs-zod";
 
-  @IsOptional()
-  @IsBoolean()
-  isDefault: boolean;
+export class CreateTeamLineupDto
+  extends createZodDto(TeamLineupOptionalDefaultsSchema)
+  implements Prisma.TeamLineupUncheckedCreateInput {}
 
-  @IsOptional()
-  inGameId: string;
-
-  @IsOptional()
-  imageUrl: string;
-}
-
-export class UpdateLineupDto extends PartialType(CreateTeamLineupDto) {}
-
-export const schemas = validationMetadatasToSchemas();
+export class UpdateLineupDto extends createZodDto(TeamLineupPartialSchema) {}

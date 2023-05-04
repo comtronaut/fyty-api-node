@@ -1,28 +1,22 @@
 import { Prisma } from ".prisma/client";
-import { PartialType, PickType } from "@nestjs/mapped-types";
-import { IsArray, IsISO8601, IsNotEmpty, IsUUID } from "class-validator";
-import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateAppointmentDto implements Prisma.AppointmentUncheckedCreateInput {
-  @IsNotEmpty()
-  @IsArray()
-  teamIds: string[];
+import { AppointmentOptionalDefaultsSchema, AppointmentPartialSchema } from "model/schema";
+import { createZodDto } from "nestjs-zod";
+import { z } from "zod";
 
-  @IsNotEmpty()
-  @IsUUID()
-  roomId: string;
+export class CreateAppointmentDto
+  extends createZodDto(
+    AppointmentOptionalDefaultsSchema.merge(
+      z.object({
+        teamIds: z.string().array().nonempty()
+      })
+    )
+  )
+  implements Prisma.AppointmentUncheckedCreateInput {}
 
-  @IsNotEmpty()
-  @IsISO8601()
-  startAt: Date;
-
-  @IsNotEmpty()
-  @IsISO8601()
-  endAt: Date;
-}
-
-export class UpdateAppointmentDto extends PartialType(
-  PickType(CreateAppointmentDto, [ "startAt", "endAt" ] as const)
+export class UpdateAppointmentDto extends createZodDto(
+  AppointmentPartialSchema.pick({
+    startAt: true,
+    endAt: true
+  })
 ) {}
-
-export const schemas = validationMetadatasToSchemas();

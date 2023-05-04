@@ -1,18 +1,13 @@
-import { PartialType } from "@nestjs/mapped-types";
 import { Prisma } from "@prisma/client";
-import { IsBoolean, IsNotEmpty, IsUUID } from "class-validator";
-import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateTeamSettingsDto implements Prisma.TeamSettingsUncheckedCreateInput {
-  @IsNotEmpty()
-  @IsUUID()
-  teamId: string;
+import {
+  TeamSettingsOptionalDefaultsSchema,
+  TeamSettingsPartialSchema
+} from "model/schema";
+import { createZodDto } from "nestjs-zod";
 
-  @IsNotEmpty()
-  @IsBoolean()
-  isJoiningEnabled: boolean;
-}
+export class CreateTeamSettingsDto
+  extends createZodDto(TeamSettingsOptionalDefaultsSchema)
+  implements Prisma.TeamSettingsUncheckedCreateInput {}
 
-export class UpdateTeamSettingsDto extends PartialType(CreateTeamSettingsDto) {}
-
-export const schemas = validationMetadatasToSchemas();
+export class UpdateTeamSettingsDto extends createZodDto(TeamSettingsPartialSchema) {}

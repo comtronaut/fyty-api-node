@@ -1,22 +1,10 @@
-import { PartialType } from "@nestjs/mapped-types";
-import { PendingStatus, Prisma } from "@prisma/client";
-import { IsEnum, IsNotEmpty, IsUUID } from "class-validator";
-import { validationMetadatasToSchemas } from "class-validator-jsonschema";
+import { Prisma } from "@prisma/client";
 
-export class CreateTeamPendingDto implements Prisma.TeamPendingUncheckedCreateInput {
-  @IsNotEmpty()
-  @IsUUID()
-  teamId: string;
+import { TeamPendingOptionalDefaultsSchema, TeamPendingPartialSchema } from "model/schema";
+import { createZodDto } from "nestjs-zod";
 
-  @IsNotEmpty()
-  @IsUUID()
-  userId: string;
+export class CreateTeamPendingDto
+  extends createZodDto(TeamPendingOptionalDefaultsSchema)
+  implements Prisma.TeamPendingUncheckedCreateInput {}
 
-  @IsNotEmpty()
-  @IsEnum(PendingStatus)
-  status: PendingStatus;
-}
-
-export class UpdateTeamPendingDto extends PartialType(CreateTeamPendingDto) {}
-
-export const schemas = validationMetadatasToSchemas();
+export class UpdateTeamPendingDto extends createZodDto(TeamPendingPartialSchema) {}

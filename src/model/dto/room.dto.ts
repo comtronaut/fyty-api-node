@@ -1,56 +1,24 @@
-import { PartialType } from "@nestjs/mapped-types";
 import { Prisma } from "@prisma/client";
-import {
-  IsArray,
-  IsBoolean,
-  IsISO8601,
-  IsNotEmpty,
-  IsOptional,
-  IsUUID
-} from "class-validator";
-import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateRoomDto implements Prisma.RoomUncheckedCreateInput {
-  @IsNotEmpty()
-  name: string;
+import { RoomOptionalDefaultsSchema, RoomPartialSchema } from "model/schema";
+import { createZodDto } from "nestjs-zod";
+import { z } from "zod";
 
-  @IsOptional()
-  @IsBoolean()
-  isPrivate: boolean;
+export class CreateRoomDto
+  extends createZodDto(
+    RoomOptionalDefaultsSchema.merge(
+      z.object({
+        teamLineupIds: z.string().uuid().array()
+      })
+    )
+  )
+  implements Prisma.RoomUncheckedCreateInput {}
 
-  @IsNotEmpty()
-  @IsISO8601()
-  startAt: Date;
+export class UpdateRoomDto extends createZodDto(RoomPartialSchema) {}
 
-  @IsNotEmpty()
-  @IsISO8601()
-  endAt: Date;
-
-  @IsNotEmpty()
-  @IsArray()
-  teamLineupIds: string[];
-
-  @IsNotEmpty()
-  gameId: string;
-
-  @IsOptional()
-  note: string;
-
-  @IsNotEmpty()
-  @IsUUID()
-  hostTeamId: string;
-}
-
-export class UpdateRoomDto extends PartialType(CreateRoomDto) {}
-
-export class DeleteRoomDto {
-  @IsNotEmpty()
-  @IsUUID()
-  roomId: string;
-
-  @IsNotEmpty()
-  @IsUUID()
-  teamId: string;
-}
-
-export const schemas = validationMetadatasToSchemas();
+export class DeleteRoomDto extends createZodDto(
+  z.object({
+    roomId: z.string().uuid(),
+    teamId: z.string().uuid()
+  })
+) {}

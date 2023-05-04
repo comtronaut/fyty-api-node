@@ -1,62 +1,10 @@
-import { PartialType } from "@nestjs/mapped-types";
-import { Prisma, TrainingStatus } from "@prisma/client";
-import {
-  IsArray,
-  IsBoolean,
-  IsEnum,
-  IsISO8601,
-  IsInt,
-  IsNotEmpty,
-  IsOptional,
-  IsUUID
-} from "class-validator";
-import { validationMetadatasToSchemas } from "class-validator-jsonschema";
+import { Prisma } from "@prisma/client";
 
-export class CreateTrainingDto implements Prisma.TrainingUncheckedCreateInput {
-  @IsNotEmpty()
-  @IsUUID()
-  appointmentId: string;
+import { TrainingOptionalDefaultsSchema, TrainingPartialSchema } from "model/schema";
+import { createZodDto } from "nestjs-zod";
 
-  @IsOptional()
-  @IsUUID()
-  hostId: string;
+export class CreateTrainingDto
+  extends createZodDto(TrainingOptionalDefaultsSchema)
+  implements Prisma.TrainingUncheckedCreateInput {}
 
-  @IsOptional()
-  @IsUUID()
-  guestId: string;
-
-  @IsOptional()
-  @IsInt()
-  hostWinCount: number;
-
-  @IsOptional()
-  @IsInt()
-  hostLoseCount: number;
-
-  @IsOptional()
-  note: string;
-
-  @IsOptional()
-  @IsEnum(TrainingStatus)
-  status: TrainingStatus;
-
-  @IsNotEmpty()
-  @IsArray()
-  imageUrls: string[];
-
-  @IsNotEmpty()
-  @IsBoolean()
-  isSubmitted: boolean;
-
-  @IsOptional()
-  @IsISO8601()
-  updatedAt: Date;
-
-  @IsOptional()
-  @IsISO8601()
-  createdAt: Date;
-}
-
-export class UpdateTrainingDto extends PartialType(CreateTrainingDto) {}
-
-export const schemas = validationMetadatasToSchemas();
+export class UpdateTrainingDto extends createZodDto(TrainingPartialSchema) {}

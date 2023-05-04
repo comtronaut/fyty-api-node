@@ -1,29 +1,10 @@
-import { PartialType } from "@nestjs/mapped-types";
 import { Prisma } from "@prisma/client";
-import { IsNotEmpty, IsUUID } from "class-validator";
-import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateUserAvatarDto implements Prisma.UserAvatarUncheckedCreateInput {
-  @IsNotEmpty()
-  characterName: string;
+import { UserAvatarOptionalDefaultsSchema, UserAvatarPartialSchema } from "model/schema";
+import { createZodDto } from "nestjs-zod";
 
-  @IsNotEmpty()
-  inGameId: string;
+export class CreateUserAvatarDto
+  extends createZodDto(UserAvatarOptionalDefaultsSchema)
+  implements Prisma.UserAvatarUncheckedCreateInput {}
 
-  @IsNotEmpty()
-  rank: string;
-
-  @IsNotEmpty()
-  ratingScore: number;
-
-  @IsNotEmpty()
-  gameId: string;
-
-  @IsNotEmpty()
-  @IsUUID()
-  userId: string;
-}
-
-export class UpdateUserAvatarDto extends PartialType(CreateUserAvatarDto) {}
-
-export const schemas = validationMetadatasToSchemas();
+export class UpdateUserAvatarDto extends createZodDto(UserAvatarPartialSchema) {}

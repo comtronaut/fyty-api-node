@@ -395,7 +395,7 @@ export class NotifyService {
     }
   }
 
-  async searchUserForTeamPendingNotify(teamId: string, userId: string, status: string) {
+  async searchUserForTeamPendingNotify(teamId: string, userId: string, status?: string) {
     if (status === PendingStatus.INCOMING) {
       const member = await this.prisma.teamMember.findMany({
         where: {
