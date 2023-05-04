@@ -354,7 +354,7 @@ export class RoomService {
     });
 
     // notify accept room
-    this.lineNotify.searchUserForAcceptNotify(roomId, teamId);
+    void this.lineNotify.searchUserForAcceptNotify(roomId, teamId);
 
     // upsert appointment
     if (appointment) {
@@ -409,7 +409,7 @@ export class RoomService {
     });
 
     // notify leaving room
-    this.lineNotify.searchUserForLeaveNotify(roomMemberId, room.id);
+    void this.lineNotify.searchUserForLeaveNotify(roomMemberId, room.id);
 
     // update appointment member
     if (room.appointment) {

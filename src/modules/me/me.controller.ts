@@ -24,17 +24,17 @@ export class MeController {
   ) {}
 
   @Get()
-  async getMeData(@UserSubject() user: User) {
+  async getMeInfo(@UserSubject() user: User) {
     return user;
   }
 
   @Put()
-  async putMeData(@UserSubject() user: User, @Body() payload: UpdateUserDto) {
+  async putMeInfo(@UserSubject() user: User, @Body() payload: UpdateUserDto) {
     return await this.userService.update(user.id, payload);
   }
 
   @Delete()
-  async deleteMeData(@UserSubject() user: User) {
+  async deleteMeInfo(@UserSubject() user: User) {
     return await this.userService.delete(user.id);
   }
 
@@ -69,7 +69,7 @@ export class MeController {
 
   // pendings
   @Get("teams/pendings")
-  async getPendingByUserId(
+  async getMeTeamPendings(
     @UserSubject() user: User,
     @Query("status") status?: PendingStatus
   ) {
