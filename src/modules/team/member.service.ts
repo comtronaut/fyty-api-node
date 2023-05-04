@@ -49,11 +49,11 @@ export class TeamMemberService {
       })
     ]);
 
-    //notify 
-    if(pending.status == 'INCOMING')
-      this.lineNotify.searchUserForTeamAcceptNotify(data.userId, data.teamId, 'Accepted')
-    else if(pending.status == 'OUTGOING')
-      this.lineNotify.searchUserForAcceptTeamNotify(data?.userId,data?.teamId,'Denied')
+    // notify
+    if (pending.status == "INCOMING")
+    {this.lineNotify.searchUserForTeamAcceptNotify(data.userId, data.teamId, "Accepted");}
+    else if (pending.status == "OUTGOING")
+    {this.lineNotify.searchUserForAcceptTeamNotify(data?.userId, data?.teamId, "Denied");}
 
     return out;
   }
@@ -79,9 +79,8 @@ export class TeamMemberService {
         where: { id: memberId }
       });
 
-      //notify
+      // notify
       this.lineNotify.searchUserForTeamKickedNotify(memberId);
-
     } else {
       throw new Error("Permission denined");
     }

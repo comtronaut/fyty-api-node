@@ -24,7 +24,7 @@ export class RoomService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly lineNotify: NotifyService
-    ) {}
+  ) {}
 
   @Cron(CronExpression.EVERY_MINUTE, { timeZone: "Asia/Bangkok" })
   async handleCron() {
@@ -164,7 +164,7 @@ export class RoomService {
     await this.prisma.roomLineup.createMany({
       data: teamLineupIds.map((teamLineupId) => ({
         teamLineupId,
-        roomMemberId: member.id,
+        roomMemberId: member?.id ?? "",
         roomId: room.id
       }))
     });
@@ -262,7 +262,7 @@ export class RoomService {
     });
 
     if (room.hostTeamId === payload.teamId) {
-      //notify
+      // notify
       await this.lineNotify.searchUserForDisbanRoomNotify(payload.roomId);
 
       await this.prisma.appointment.update({
@@ -353,8 +353,8 @@ export class RoomService {
       }
     });
 
-    //notify accept room
-    this.lineNotify.searchUserForAcceptNotify(roomId,teamId);
+    // notify accept room
+    this.lineNotify.searchUserForAcceptNotify(roomId, teamId);
 
     // upsert appointment
     if (appointment) {
@@ -408,8 +408,8 @@ export class RoomService {
       }
     });
 
-    //notify leaving room
-    this.lineNotify.searchUserForLeaveNotify(roomMemberId,room.id);
+    // notify leaving room
+    this.lineNotify.searchUserForLeaveNotify(roomMemberId, room.id);
 
     // update appointment member
     if (room.appointment) {

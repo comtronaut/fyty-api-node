@@ -34,7 +34,7 @@ export class GoogleAuthGuard extends AuthGuard("google") {
     const { data: tokenData } = await axios.postForm(
       "https://oauth2.googleapis.com/token",
       {
-        code: query.code,
+        code: query["code"],
         // "code_verifier": query.code_verifier,
         client_id: env.GOOGLE_CLIENT_ID,
         client_secret: env.GOOGLE_CLIENT_SECRET,
