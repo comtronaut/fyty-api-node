@@ -16,18 +16,17 @@ import { CreateTeamLineupDto, UpdateLineupDto } from "model/dto/team-lineup.dto"
 import { LineupService } from "./lineup.service";
 
 @Controller("lineups")
+@UseGuards(UserJwtAuthGuard)
 export class LineupController {
   constructor(private readonly lineupService: LineupService) {}
 
-  @UseGuards(UserJwtAuthGuard)
   @Post()
-  async addLineup(@Body() payload: CreateTeamLineupDto) {
+  async postTeamLineup(@Body() payload: CreateTeamLineupDto) {
     return await this.lineupService.create(payload);
   }
 
-  @UseGuards(UserJwtAuthGuard)
   @Put(":id")
-  async updateLineup(
+  async putTeamLineupById(
     @UserSubject() user: User,
     @Param("id") lineupId: string,
     @Body() payload: UpdateLineupDto
@@ -35,33 +34,23 @@ export class LineupController {
     return await this.lineupService.update(user, lineupId, payload);
   }
 
-  @UseGuards(UserJwtAuthGuard)
   @Get()
-  async getAllLineups(@Query("teamId") teamId: string) {
+  async getTeamLineups(@Query("teamId") teamId: string) {
     return await this.lineupService.getByTeamId(teamId);
   }
 
-  @UseGuards(UserJwtAuthGuard)
   @Get(":id")
-  async getLineup(@Param("id") lineupId: string) {
+  async getTeamLineupById(@Param("id") lineupId: string) {
     return await this.lineupService.getById(lineupId);
   }
 
-  @UseGuards(UserJwtAuthGuard)
   @Get("participant/:id")
-  async getLineups(@Param("id") participantId: string) {
-    return await this.lineupService.getByRoomMemberId(participantId);
+  async getTeamLineupsByRoomMemberId(@Param("id") roomMemberId: string) {
+    return await this.lineupService.getByRoomMemberId(roomMemberId);
   }
 
-  @UseGuards(UserJwtAuthGuard)
-  @Delete()
-  async delateLineups(@UserSubject() user: User, @Param("teamId") teamId: string) {
-    return this.lineupService.deleteAllLineups(user.id, teamId);
-  }
-
-  @UseGuards(UserJwtAuthGuard)
   @Delete(":id")
-  async delateLineup(@UserSubject() user: User, @Param("id") lineupId: string) {
+  async deleteTeamLineupById(@UserSubject() user: User, @Param("id") lineupId: string) {
     return this.lineupService.deleteById(user.id, lineupId);
   }
 }

@@ -32,7 +32,7 @@ export class RoomController {
   ) {}
 
   @Get()
-  async getRoomsBygame(
+  async getRooms(
     @Query("gameId") gameId?: string,
     @Query("name") name?: string,
     @Query("date") date?: string
@@ -74,7 +74,7 @@ export class RoomController {
 
   // room
   @Get(":id")
-  async getRoomsById(@Param("id") roomId: string) {
+  async getRoomById(@Param("id") roomId: string) {
     return await this.roomService.getById(roomId);
   }
 
@@ -85,18 +85,18 @@ export class RoomController {
 
   // settings
   @Get(":id/settings")
-  async getRoomSettings(@Param("id") roomId: string) {
+  async getRoomSettingsByRoomId(@Param("id") roomId: string) {
     // TODO:
   }
 
-  @Put(":id/settings")
-  async updateRoomSettings(@Param("id") roomId: string, payload: UpdateRoomSettingDto) {
+  @Put("settings/:id")
+  async putRoomSettings(@Param("id") roomId: string, payload: UpdateRoomSettingDto) {
     // TODO:
   }
 
   // detail
   @Get(":id/detail")
-  async getRoomDetail(@Param("id") roomId: string) {
+  async getRoomDetailById(@Param("id") roomId: string) {
     return await this.roomService.getRoomDetail(roomId);
   }
 
@@ -108,12 +108,12 @@ export class RoomController {
 
   // pendings
   @Get(":id/pendings")
-  async getRoomsPendings(@Param("id") roomId: string) {
+  async getRoomsPendingsByRoomId(@Param("id") roomId: string) {
     return await this.roomPendingService.getByRoomId(roomId);
   }
 
   @Post(":id/pendings")
-  async createRoomPending(
+  async postRoomPendingByRoomId(
     @Param("id") roomId: string,
     @Body() payload: CreateRoomPendingDto
   ) {
@@ -121,7 +121,7 @@ export class RoomController {
   }
 
   @Delete("pendings/:id")
-  async deleteRoomPending(@Param("id") pendingId: string, @UserSubject() user: User) {
+  async deleteRoomPendingById(@Param("id") pendingId: string, @UserSubject() user: User) {
     return await this.roomPendingService.deleteById(pendingId, user.id);
   }
 }

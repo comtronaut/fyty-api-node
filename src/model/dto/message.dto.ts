@@ -6,10 +6,8 @@ import { z } from "zod";
 
 export class CreateMessageDto
   extends createZodDto(
-    MessageOptionalDefaultsSchema.merge(
-      z.object({
-        waitingKey: z.string().optional()
-      })
-    )
+    MessageOptionalDefaultsSchema.extend({
+      waitingKey: z.string().optional()
+    })
   )
   implements Prisma.MessageUncheckedCreateInput {}

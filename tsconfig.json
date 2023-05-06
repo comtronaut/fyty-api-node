@@ -24,5 +24,7 @@
     "strict": false,
 
     "types": ["tsdef"],
-  }
+  },
+  "exclude": ["./export/**/*.ts"],
+  "include": ["./src/**/*.ts"]
 }

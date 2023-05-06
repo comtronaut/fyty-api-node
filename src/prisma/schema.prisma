@@ -92,7 +92,7 @@ model Game {
 
 // room
 model Room {
-  id         String     @id @default(uuid())
+  id         String     @id @default(cuid())
   name       String
   status     RoomStatus @default(AVAILABLE)
   option     String     @default("")
@@ -117,13 +117,13 @@ model Room {
 }
 
 model RoomSettings {
-  id     String @id @default(uuid())
+  id     String @id @default(cuid())
   room   Room   @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   roomId String @unique
 }
 
 model RoomMember {
-  id       String   @id @default(uuid())
+  id       String   @id @default(cuid())
   team     Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   teamId   String
   room     Room     @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -136,7 +136,7 @@ model RoomMember {
 }
 
 model RoomLineup {
-  id           String     @id @default(uuid())
+  id           String     @id @default(cuid())
   teamLineup   TeamLineup @relation(fields: [teamLineupId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   teamLineupId String
   roomMember   RoomMember @relation(fields: [roomMemberId], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -148,7 +148,7 @@ model RoomLineup {
 }
 
 model RoomPending {
-  id        String        @id @default(uuid())
+  id        String        @id @default(cuid())
   team      Team          @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   teamId    String
   room      Room          @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -162,7 +162,7 @@ model RoomPending {
 }
 
 model RoomPendingLineup {
-  id            String      @id @default(uuid())
+  id            String      @id @default(cuid())
   roomPending   RoomPending @relation(fields: [roomPendingId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   roomPendingId String
   teamLineup    TeamLineup  @relation(fields: [teamLineupId], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -173,7 +173,7 @@ model RoomPendingLineup {
 
 // team
 model Team {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   name      String
   coverUrl  String   @default("")
   logoUrl   String   @default("")
@@ -202,14 +202,14 @@ model Team {
 }
 
 model TeamSettings {
-  id               String  @id @default(uuid())
+  id               String  @id @default(cuid())
   team             Team    @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   teamId           String  @unique
   isJoiningEnabled Boolean @default(true)
 }
 
 model TeamMember {
-  id       String     @id @default(uuid())
+  id       String     @id @default(cuid())
   role     MemberRole @default(MEMBER)
   team     Team       @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   teamId   String
@@ -219,7 +219,7 @@ model TeamMember {
 }
 
 model TeamLineup {
-  id         String      @id @default(uuid())
+  id         String      @id @default(cuid())
   team       Team        @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   teamId     String
   avatar     UserAvatar? @relation(fields: [avatarId], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -236,7 +236,7 @@ model TeamLineup {
 }
 
 model TeamPending {
-  id        String        @id @default(uuid())
+  id        String        @id @default(cuid())
   team      Team          @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   teamId    String
   user      User          @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -249,7 +249,7 @@ model TeamPending {
 
 // user
 model User {
-  id                   String    @id @default(uuid())
+  id                   String    @id @default(cuid())
   username             String    @unique
   updatedUsernameAt    DateTime?
   mobilePhone          String    @unique
@@ -286,7 +286,7 @@ model User {
 }
 
 model UserSettings {
-  id                             String  @id @default(uuid())
+  id                             String  @id @default(cuid())
   user                           User    @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userId                         String  @unique
   isNotifiedBeforeTrainingMinute Int     @default(60)
@@ -297,7 +297,7 @@ model UserSettings {
 }
 
 model PasswordResetSession {
-  id           String   @id @default(uuid())
+  id           String   @id @default(cuid())
   user         User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userId       String   @unique
   token        String   @unique
@@ -308,7 +308,7 @@ model PasswordResetSession {
 }
 
 model UserAvatar {
-  id            String  @id @default(uuid())
+  id            String  @id @default(cuid())
   inGameId      String
   characterName String  @default("")
   rank          String
@@ -322,7 +322,7 @@ model UserAvatar {
 }
 
 model Review {
-  id          String   @id @default(uuid())
+  id          String   @id @default(cuid())
   content     String
   ratingScore Decimal  @default(0.0)
   reviewer    User?    @relation(fields: [reviewerId], references: [id], onUpdate: Cascade, onDelete: SetNull, name: "reviewer")
@@ -336,7 +336,7 @@ model Review {
 
 // appointment
 model Appointment {
-  id              String    @id @default(uuid())
+  id              String    @id @default(cuid())
   startAt         DateTime
   endAt           DateTime
   deletedBeforeAt DateTime?
@@ -350,7 +350,7 @@ model Appointment {
 }
 
 model AppointmentMember {
-  id            String      @id @default(uuid())
+  id            String      @id @default(cuid())
   appointment   Appointment @relation(fields: [appointmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   appointmentId String
   team          Team        @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -363,7 +363,7 @@ model AppointmentMember {
 
 // chat
 model Chat {
-  id     String @id @default(uuid())
+  id     String @id @default(cuid())
   room   Room   @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   roomId String @unique
 
@@ -371,7 +371,7 @@ model Chat {
 }
 
 model Message {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   chat      Chat     @relation(fields: [chatId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   chatId    String
   reply     Message? @relation(fields: [replyId], references: [id], onUpdate: Cascade, onDelete: Cascade, name: "reply")
@@ -389,7 +389,7 @@ model Message {
 
 // stats
 model TeamStats {
-  id                     String   @id @default(uuid())
+  id                     String   @id @default(cuid())
   team                   Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   teamId                 String   @unique
   leftWhileTrainingCount Int      @default(0)
@@ -406,7 +406,7 @@ model TeamStats {
 
 // FIXME: the table is support only 2-team games
 model Training {
-  id            String         @id @default(uuid())
+  id            String         @id @default(cuid())
   appointment   Appointment    @relation(fields: [appointmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   appointmentId String         @unique
   host          Team?          @relation(fields: [hostId], references: [id], onUpdate: Cascade, onDelete: SetNull, name: "host")
@@ -426,7 +426,7 @@ model Training {
 }
 
 model TrainingReport {
-  id              String   @id @default(uuid())
+  id              String   @id @default(cuid())
   reporterUser    User?    @relation(fields: [reporterUserId], references: [id], onUpdate: Cascade, onDelete: SetNull)
   reporterUserId  String?
   reporterTeam    Team?    @relation(fields: [reporterTeamId], references: [id], onUpdate: Cascade, onDelete: SetNull)
@@ -442,7 +442,7 @@ model TrainingReport {
 
 // admin
 model Admin {
-  id        String    @id @default(uuid())
+  id        String    @id @default(cuid())
   /// @zod.string.email()
   email     String    @unique
   password  String

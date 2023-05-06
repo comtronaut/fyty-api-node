@@ -20,20 +20,20 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Get("login")
-  async login(@Query() query: LoginUserQueryDto) {
+  async loginUser(@Query() query: LoginUserQueryDto) {
     const { username, password } = query;
     return await this.authService.loginLocal(username, password);
   }
 
   @Get("admin/login")
-  async adminLogin(@Query() query: LoginAdminQueryDto) {
+  async loginAdmin(@Query() query: LoginAdminQueryDto) {
     const { email, password } = query;
     return await this.authService.adminLogin(email, password);
   }
 
   @Get("user/google")
   @UseGuards(GoogleAuthGuard)
-  async getUser(@UserSubject() user: GoogleInfo) {
+  async getGoogleUser(@UserSubject() user: GoogleInfo) {
     if (!user) {
       throw new UnauthorizedException();
     }

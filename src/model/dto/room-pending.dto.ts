@@ -6,10 +6,8 @@ import { z } from "zod";
 
 export class CreateRoomPendingDto
   extends createZodDto(
-    RoomPendingOptionalDefaultsSchema.merge(
-      z.object({
-        teamLineupIds: z.string().array().nonempty()
-      })
-    )
+    RoomPendingOptionalDefaultsSchema.extend({
+      teamLineupIds: z.string().array().nonempty()
+    })
   )
   implements Prisma.RoomPendingUncheckedCreateInput {}

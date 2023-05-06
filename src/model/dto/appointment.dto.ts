@@ -6,11 +6,9 @@ import { z } from "zod";
 
 export class CreateAppointmentDto
   extends createZodDto(
-    AppointmentOptionalDefaultsSchema.merge(
-      z.object({
-        teamIds: z.string().array().nonempty()
-      })
-    )
+    AppointmentOptionalDefaultsSchema.extend({
+      teamIds: z.string().array().nonempty()
+    })
   )
   implements Prisma.AppointmentUncheckedCreateInput {}
 

@@ -8,7 +8,7 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Get(":id")
-  async getMesssagesFromChatId(@Param("id") chatId: string) {
+  async getChatById(@Param("id") chatId: string) {
     return this.chatService.getChatWithMessages(chatId);
   }
 }
