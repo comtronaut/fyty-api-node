@@ -29,9 +29,7 @@ export const DECIMAL_STRING_REGEX = /^[0-9.,e+-bxffo_cp]+$|Infinity|NaN/;
 export const isValidDecimalInput = (
   v?: null | string | number | Prisma.DecimalJsLike
 ): v is string | number | Prisma.DecimalJsLike => {
-  if (v === undefined || v === null) {
-    return false;
-  }
+  if (v === undefined || v === null) {return false;}
   return (
     (typeof v === "object" && "d" in v && "e" in v && "s" in v && "toFixed" in v)
     || (typeof v === "string" && DECIMAL_STRING_REGEX.test(v))
@@ -381,7 +379,7 @@ export type GameOptionalDefaults = z.infer<typeof GameOptionalDefaultsSchema>;
 
 export const RoomSchema = z.object({
   status: RoomStatusSchema,
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   name: z.string(),
   option: z.string(),
   startAt: z.coerce.date(),
@@ -411,7 +409,7 @@ export type RoomPartial = z.infer<typeof RoomPartialSchema>;
 export const RoomOptionalDefaultsSchema = RoomSchema.merge(
   z.object({
     status: RoomStatusSchema.optional(),
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     option: z.string().optional(),
     isPrivate: z.boolean().optional(),
     teamCount: z.number().int().optional(),
@@ -428,7 +426,7 @@ export type RoomOptionalDefaults = z.infer<typeof RoomOptionalDefaultsSchema>;
 // ///////////////////////////////////////
 
 export const RoomSettingsSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   roomId: z.string()
 });
 
@@ -447,7 +445,7 @@ export type RoomSettingsPartial = z.infer<typeof RoomSettingsPartialSchema>;
 
 export const RoomSettingsOptionalDefaultsSchema = RoomSettingsSchema.merge(
   z.object({
-    id: z.string().uuid().optional()
+    id: z.string().cuid().optional()
   })
 );
 
@@ -460,7 +458,7 @@ export type RoomSettingsOptionalDefaults = z.infer<
 // ///////////////////////////////////////
 
 export const RoomMemberSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   teamId: z.string(),
   roomId: z.string(),
   joinedAt: z.coerce.date()
@@ -481,7 +479,7 @@ export type RoomMemberPartial = z.infer<typeof RoomMemberPartialSchema>;
 
 export const RoomMemberOptionalDefaultsSchema = RoomMemberSchema.merge(
   z.object({
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     joinedAt: z.coerce.date().optional()
   })
 );
@@ -493,7 +491,7 @@ export type RoomMemberOptionalDefaults = z.infer<typeof RoomMemberOptionalDefaul
 // ///////////////////////////////////////
 
 export const RoomLineupSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   teamLineupId: z.string(),
   roomMemberId: z.string(),
   roomId: z.string()
@@ -514,7 +512,7 @@ export type RoomLineupPartial = z.infer<typeof RoomLineupPartialSchema>;
 
 export const RoomLineupOptionalDefaultsSchema = RoomLineupSchema.merge(
   z.object({
-    id: z.string().uuid().optional()
+    id: z.string().cuid().optional()
   })
 );
 
@@ -526,7 +524,7 @@ export type RoomLineupOptionalDefaults = z.infer<typeof RoomLineupOptionalDefaul
 
 export const RoomPendingSchema = z.object({
   status: PendingStatusSchema,
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   teamId: z.string(),
   roomId: z.string(),
   createdAt: z.coerce.date()
@@ -548,7 +546,7 @@ export type RoomPendingPartial = z.infer<typeof RoomPendingPartialSchema>;
 export const RoomPendingOptionalDefaultsSchema = RoomPendingSchema.merge(
   z.object({
     status: PendingStatusSchema.optional(),
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     createdAt: z.coerce.date().optional()
   })
 );
@@ -560,7 +558,7 @@ export type RoomPendingOptionalDefaults = z.infer<typeof RoomPendingOptionalDefa
 // ///////////////////////////////////////
 
 export const RoomPendingLineupSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   roomPendingId: z.string(),
   teamLineupId: z.string()
 });
@@ -580,7 +578,7 @@ export type RoomPendingLineupPartial = z.infer<typeof RoomPendingLineupPartialSc
 
 export const RoomPendingLineupOptionalDefaultsSchema = RoomPendingLineupSchema.merge(
   z.object({
-    id: z.string().uuid().optional()
+    id: z.string().cuid().optional()
   })
 );
 
@@ -593,7 +591,7 @@ export type RoomPendingLineupOptionalDefaults = z.infer<
 // ///////////////////////////////////////
 
 export const TeamSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   name: z.string(),
   coverUrl: z.string(),
   logoUrl: z.string(),
@@ -620,7 +618,7 @@ export type TeamPartial = z.infer<typeof TeamPartialSchema>;
 
 export const TeamOptionalDefaultsSchema = TeamSchema.merge(
   z.object({
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     coverUrl: z.string().optional(),
     logoUrl: z.string().optional(),
     tier: z.string().optional(),
@@ -637,7 +635,7 @@ export type TeamOptionalDefaults = z.infer<typeof TeamOptionalDefaultsSchema>;
 // ///////////////////////////////////////
 
 export const TeamSettingsSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   teamId: z.string(),
   isJoiningEnabled: z.boolean()
 });
@@ -657,7 +655,7 @@ export type TeamSettingsPartial = z.infer<typeof TeamSettingsPartialSchema>;
 
 export const TeamSettingsOptionalDefaultsSchema = TeamSettingsSchema.merge(
   z.object({
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     isJoiningEnabled: z.boolean().optional()
   })
 );
@@ -672,7 +670,7 @@ export type TeamSettingsOptionalDefaults = z.infer<
 
 export const TeamMemberSchema = z.object({
   role: MemberRoleSchema,
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   teamId: z.string(),
   userId: z.string(),
   joinedAt: z.coerce.date()
@@ -694,7 +692,7 @@ export type TeamMemberPartial = z.infer<typeof TeamMemberPartialSchema>;
 export const TeamMemberOptionalDefaultsSchema = TeamMemberSchema.merge(
   z.object({
     role: MemberRoleSchema.optional(),
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     joinedAt: z.coerce.date().optional()
   })
 );
@@ -706,7 +704,7 @@ export type TeamMemberOptionalDefaults = z.infer<typeof TeamMemberOptionalDefaul
 // ///////////////////////////////////////
 
 export const TeamLineupSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   teamId: z.string(),
   avatarId: z.string().nullish(),
   inGameId: z.string().nullish(),
@@ -732,7 +730,7 @@ export type TeamLineupPartial = z.infer<typeof TeamLineupPartialSchema>;
 
 export const TeamLineupOptionalDefaultsSchema = TeamLineupSchema.merge(
   z.object({
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     isDefault: z.boolean().optional(),
     profileUrl: z.string().optional(),
     imageUrl: z.string().optional(),
@@ -749,7 +747,7 @@ export type TeamLineupOptionalDefaults = z.infer<typeof TeamLineupOptionalDefaul
 
 export const TeamPendingSchema = z.object({
   status: PendingStatusSchema,
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   teamId: z.string(),
   userId: z.string(),
   createdAt: z.coerce.date()
@@ -771,7 +769,7 @@ export type TeamPendingPartial = z.infer<typeof TeamPendingPartialSchema>;
 export const TeamPendingOptionalDefaultsSchema = TeamPendingSchema.merge(
   z.object({
     status: PendingStatusSchema.optional(),
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     createdAt: z.coerce.date().optional()
   })
 );
@@ -783,7 +781,7 @@ export type TeamPendingOptionalDefaults = z.infer<typeof TeamPendingOptionalDefa
 // ///////////////////////////////////////
 
 export const UserSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   username: z.string(),
   updatedUsernameAt: z.coerce.date().nullish(),
   mobilePhone: z.string(),
@@ -822,7 +820,7 @@ export type UserPartial = z.infer<typeof UserPartialSchema>;
 
 export const UserOptionalDefaultsSchema = UserSchema.merge(
   z.object({
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     bio: z.string().optional(),
     portraitUrl: z.string().optional(),
     coverUrl: z.string().optional(),
@@ -841,7 +839,7 @@ export type UserOptionalDefaults = z.infer<typeof UserOptionalDefaultsSchema>;
 
 export const UserSettingsSchema = z.object({
   lang: LangSchema,
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   userId: z.string(),
   isNotifiedBeforeTrainingMinute: z.number().int(),
   isTeamNotified: z.boolean(),
@@ -865,7 +863,7 @@ export type UserSettingsPartial = z.infer<typeof UserSettingsPartialSchema>;
 export const UserSettingsOptionalDefaultsSchema = UserSettingsSchema.merge(
   z.object({
     lang: LangSchema.optional(),
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     isNotifiedBeforeTrainingMinute: z.number().int().optional(),
     isTeamNotified: z.boolean().optional(),
     isMeNotified: z.boolean().optional(),
@@ -882,7 +880,7 @@ export type UserSettingsOptionalDefaults = z.infer<
 // ///////////////////////////////////////
 
 export const PasswordResetSessionSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   userId: z.string(),
   token: z.string(),
   attemptCount: z.number().int(),
@@ -906,7 +904,7 @@ export type PasswordResetSessionPartial = z.infer<typeof PasswordResetSessionPar
 
 export const PasswordResetSessionOptionalDefaultsSchema = PasswordResetSessionSchema.merge(
   z.object({
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     attemptCount: z.number().int().optional(),
     updatedAt: z.coerce.date().optional(),
     createdAt: z.coerce.date().optional()
@@ -922,7 +920,7 @@ export type PasswordResetSessionOptionalDefaults = z.infer<
 // ///////////////////////////////////////
 
 export const UserAvatarSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   inGameId: z.string(),
   characterName: z.string(),
   rank: z.string(),
@@ -950,7 +948,7 @@ export type UserAvatarPartial = z.infer<typeof UserAvatarPartialSchema>;
 
 export const UserAvatarOptionalDefaultsSchema = UserAvatarSchema.merge(
   z.object({
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     characterName: z.string().optional(),
     ratingScore: z
       .union([ z.number(), z.string(), DecimalJSLikeSchema ])
@@ -968,7 +966,7 @@ export type UserAvatarOptionalDefaults = z.infer<typeof UserAvatarOptionalDefaul
 // ///////////////////////////////////////
 
 export const ReviewSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   content: z.string(),
   ratingScore: z
     .union([ z.number(), z.string(), DecimalJSLikeSchema ])
@@ -996,7 +994,7 @@ export type ReviewPartial = z.infer<typeof ReviewPartialSchema>;
 
 export const ReviewOptionalDefaultsSchema = ReviewSchema.merge(
   z.object({
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     ratingScore: z
       .union([ z.number(), z.string(), DecimalJSLikeSchema ])
       .refine((v) => isValidDecimalInput(v), {
@@ -1014,7 +1012,7 @@ export type ReviewOptionalDefaults = z.infer<typeof ReviewOptionalDefaultsSchema
 // ///////////////////////////////////////
 
 export const AppointmentSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   startAt: z.coerce.date(),
   endAt: z.coerce.date(),
   deletedBeforeAt: z.coerce.date().nullish(),
@@ -1038,7 +1036,7 @@ export type AppointmentPartial = z.infer<typeof AppointmentPartialSchema>;
 
 export const AppointmentOptionalDefaultsSchema = AppointmentSchema.merge(
   z.object({
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     isDeleted: z.boolean().optional(),
     createdAt: z.coerce.date().optional()
   })
@@ -1051,7 +1049,7 @@ export type AppointmentOptionalDefaults = z.infer<typeof AppointmentOptionalDefa
 // ///////////////////////////////////////
 
 export const AppointmentMemberSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   appointmentId: z.string(),
   teamId: z.string(),
   isLeft: z.boolean(),
@@ -1073,7 +1071,7 @@ export type AppointmentMemberPartial = z.infer<typeof AppointmentMemberPartialSc
 
 export const AppointmentMemberOptionalDefaultsSchema = AppointmentMemberSchema.merge(
   z.object({
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     isLeft: z.boolean().optional(),
     createdAt: z.coerce.date().optional()
   })
@@ -1088,7 +1086,7 @@ export type AppointmentMemberOptionalDefaults = z.infer<
 // ///////////////////////////////////////
 
 export const ChatSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   roomId: z.string()
 });
 
@@ -1107,7 +1105,7 @@ export type ChatPartial = z.infer<typeof ChatPartialSchema>;
 
 export const ChatOptionalDefaultsSchema = ChatSchema.merge(
   z.object({
-    id: z.string().uuid().optional()
+    id: z.string().cuid().optional()
   })
 );
 
@@ -1118,7 +1116,7 @@ export type ChatOptionalDefaults = z.infer<typeof ChatOptionalDefaultsSchema>;
 // ///////////////////////////////////////
 
 export const MessageSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   chatId: z.string(),
   replyId: z.string().nullish(),
   imageUrls: z.string().array(),
@@ -1143,7 +1141,7 @@ export type MessagePartial = z.infer<typeof MessagePartialSchema>;
 
 export const MessageOptionalDefaultsSchema = MessageSchema.merge(
   z.object({
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     imageUrls: z.string().array().optional(),
     createdAt: z.coerce.date().optional()
   })
@@ -1156,7 +1154,7 @@ export type MessageOptionalDefaults = z.infer<typeof MessageOptionalDefaultsSche
 // ///////////////////////////////////////
 
 export const TeamStatsSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   teamId: z.string(),
   leftWhileTrainingCount: z.number().int(),
   completedTrainingCount: z.number().int(),
@@ -1185,7 +1183,7 @@ export type TeamStatsPartial = z.infer<typeof TeamStatsPartialSchema>;
 
 export const TeamStatsOptionalDefaultsSchema = TeamStatsSchema.merge(
   z.object({
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     leftWhileTrainingCount: z.number().int().optional(),
     completedTrainingCount: z.number().int().optional(),
     trainingMinute: z.number().int().optional(),
@@ -1207,7 +1205,7 @@ export type TeamStatsOptionalDefaults = z.infer<typeof TeamStatsOptionalDefaults
 
 export const TrainingSchema = z.object({
   status: TrainingStatusSchema,
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   appointmentId: z.string(),
   hostId: z.string().nullish(),
   guestId: z.string().nullish(),
@@ -1236,7 +1234,7 @@ export type TrainingPartial = z.infer<typeof TrainingPartialSchema>;
 export const TrainingOptionalDefaultsSchema = TrainingSchema.merge(
   z.object({
     status: TrainingStatusSchema.optional(),
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     note: z.string().optional(),
     imageUrls: z.string().array().optional(),
     isSubmitted: z.boolean().optional(),
@@ -1252,7 +1250,7 @@ export type TrainingOptionalDefaults = z.infer<typeof TrainingOptionalDefaultsSc
 // ///////////////////////////////////////
 
 export const TrainingReportSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   reporterUserId: z.string().nullish(),
   reporterTeamId: z.string().nullish(),
   trainingId: z.string(),
@@ -1278,7 +1276,7 @@ export type TrainingReportPartial = z.infer<typeof TrainingReportPartialSchema>;
 
 export const TrainingReportOptionalDefaultsSchema = TrainingReportSchema.merge(
   z.object({
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     isAdminReviewed: z.boolean().optional(),
     imageUrls: z.string().array().optional(),
     createdAt: z.coerce.date().optional()
@@ -1295,7 +1293,7 @@ export type TrainingReportOptionalDefaults = z.infer<
 
 export const AdminSchema = z.object({
   role: AdminRoleSchema,
-  id: z.string().uuid(),
+  id: z.string().cuid(),
   email: z.string().email(),
   password: z.string(),
   createdAt: z.coerce.date(),
@@ -1318,7 +1316,7 @@ export type AdminPartial = z.infer<typeof AdminPartialSchema>;
 export const AdminOptionalDefaultsSchema = AdminSchema.merge(
   z.object({
     role: AdminRoleSchema.optional(),
-    id: z.string().uuid().optional(),
+    id: z.string().cuid().optional(),
     createdAt: z.coerce.date().optional(),
     updateAt: z.coerce.date().optional()
   })

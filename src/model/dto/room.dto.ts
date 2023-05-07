@@ -7,7 +7,7 @@ import { z } from "zod";
 export class CreateRoomDto
   extends createZodDto(
     RoomOptionalDefaultsSchema.extend({
-      teamLineupIds: z.string().uuid().array()
+      teamLineupIds: z.string().cuid().array()
     })
   )
   implements Prisma.RoomUncheckedCreateInput {}
@@ -16,7 +16,7 @@ export class UpdateRoomDto extends createZodDto(RoomPartialSchema) {}
 
 export class DeleteRoomDto extends createZodDto(
   z.object({
-    roomId: z.string().uuid(),
-    teamId: z.string().uuid()
+    roomId: z.string().cuid(),
+    teamId: z.string().cuid()
   })
 ) {}
