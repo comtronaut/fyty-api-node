@@ -53,16 +53,6 @@ export class LineupService {
     return roomLineups.map((e) => e.teamLineup);
   }
 
-  async deleteAllLineups(userId: string, teamId: string) {
-    const member = await this.prisma.teamMember.findFirstOrThrow({
-      where: { teamId, userId }
-    });
-
-    if ([ MemberRole.MANAGER, MemberRole.LEADER ].some((role) => role === member.role)) {
-      await this.prisma.teamLineup.deleteMany({ where: { teamId } });
-    }
-  }
-
   async deleteById(userId: string, lineupId: string) {
     const { team } = await this.prisma.teamLineup.findUniqueOrThrow({
       where: { id: lineupId },

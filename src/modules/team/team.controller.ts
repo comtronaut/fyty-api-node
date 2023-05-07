@@ -42,12 +42,12 @@ export class TeamController {
   ) {}
 
   @Post()
-  async createTeam(@UserSubject() user: User, @Body() payload: CreateTeamDto) {
+  async postTeam(@UserSubject() user: User, @Body() payload: CreateTeamDto) {
     return await this.teamService.create(user, payload);
   }
 
   @Get()
-  async getTeamsByGameId(
+  async getTeams(
     @Query("gameId") gameId?: string,
     @Query("perPage") perPage?: string,
     @Query("page") page?: string
@@ -73,18 +73,18 @@ export class TeamController {
   }
 
   @Put(":id")
-  async updateTeam(@UserSubject() user: User, @Body() payload: UpdateTeamDto) {
+  async putTeamById(@UserSubject() user: User, @Body() payload: UpdateTeamDto) {
     return await this.teamService.update(payload);
   }
 
   @Delete(":id")
-  async deleteTeam(@UserSubject() user: User, @Param("id") teamId: string) {
+  async deleteTeamById(@UserSubject() user: User, @Param("id") teamId: string) {
     return await this.teamService.deleteByUser(user.id, teamId);
   }
 
   // multiple
   @Get("multiple/:ids")
-  async getTeamsMultiple(@Param("ids") ids: string) {
+  async getMultipleTeamsByIds(@Param("ids") ids: string) {
     return await this.teamService.getByIds(ids.split(","));
   }
 
@@ -96,24 +96,27 @@ export class TeamController {
 
   // settings
   @Get(":id/settings")
-  async getSettings(@Param("id") teamId: string) {
+  async getTeamSettingsByTeamId(@Param("id") teamId: string) {
     return await this.teamSettingsService.getByTeamId(teamId);
   }
 
   @Put(":id/settings")
-  async updateSetting(@Param("id") teamId: string, @Body() payload: UpdateTeamSettingsDto) {
+  async putTeamSettingsByTeamId(
+    @Param("id") teamId: string,
+    @Body() payload: UpdateTeamSettingsDto
+  ) {
     return await this.teamSettingsService.update(payload);
   }
 
   // stats
   @Get(":id/stats")
-  async getStats(@Param("id") teamId: string) {
+  async getTeamStatsByTeamId(@Param("id") teamId: string) {
     return await this.trainingService.getTeamStats(teamId);
   }
 
   // trainings
   @Get(":id/trainings")
-  async getTrainings(
+  async getTeamTrainingsByTeamId(
     @Param("id") teamId: string,
     @Query("perPage") perPage?: string,
     @Query("page") page?: string
@@ -127,12 +130,12 @@ export class TeamController {
   }
 
   @Get("trainings/:id")
-  async getTraining(@Param("id") trainingId: string) {
+  async getTrainingById(@Param("id") trainingId: string) {
     return await this.trainingService.getById(trainingId);
   }
 
   @Put("trainings/:id")
-  async updateTraining(
+  async putTrainingById(
     @Param("id") trainingId: string,
     @Body() payload: UpdateTrainingDto
   ) {
@@ -141,12 +144,12 @@ export class TeamController {
 
   // training report
   @Get("trainings/:id/reports")
-  async getTrainingReport(@Param("id") trainingId: string) {
+  async getReportByTrainingId(@Param("id") trainingId: string) {
     return await this.trainingService.getReportsByTeamId(trainingId);
   }
 
   @Post("trainings/:id/reports")
-  async createTrainingReport(
+  async postReportByTrainingId(
     @Param("id") trainingId: string,
     @Body() payload: CreateTrainingReportDto
   ) {
@@ -159,7 +162,7 @@ export class TeamController {
   }
 
   @Put("trainings/reports/:id")
-  async updateTrainingReport(
+  async putReportById(
     @Param("id") reportId: string,
     @Body() payload: UpdateTrainingReportDto
   ) {
@@ -168,7 +171,7 @@ export class TeamController {
 
   // appointments
   @Get(":id/appointments")
-  async getTeamAppointments(
+  async getAppointmentsByTeamId(
     @Param("id") teamId: string,
     @Query("status") status?: AppointmentStatus
   ) {
@@ -177,17 +180,17 @@ export class TeamController {
 
   // members
   @Get(":id/members")
-  async getMembersByTeamId(@Param("id") teamId: string) {
+  async getTeamMemberByTeamId(@Param("id") teamId: string) {
     return await this.teamMemberService.getByTeamId(teamId);
   }
 
   @Post("members")
-  async createMember(@Body() payload: CreateTeamMemberDto) {
+  async postTeamMember(@Body() payload: CreateTeamMemberDto) {
     return await this.teamMemberService.create(payload);
   }
 
   @Put("members/:id")
-  async updateMemberRole(
+  async putTeamMemberByTeamId(
     @Param("id") teamMemberId: string,
     @Body() payload: UpdateTeamMemberDto
   ) {
@@ -195,18 +198,18 @@ export class TeamController {
   }
 
   @Delete("members/:id")
-  async kickMember(@Param("id") teamMemberId: string, @UserSubject() user: User) {
+  async deleteTeamMemberById(@Param("id") teamMemberId: string, @UserSubject() user: User) {
     return await this.teamMemberService.kickMember(teamMemberId, user);
   }
 
   @Delete("members/:id/leave")
-  async leaveTeam(@Param("id") teamMemberId: string) {
+  async deleteTeamMemberByIdAsLeaving(@Param("id") teamMemberId: string) {
     return this.teamMemberService.leaveTeam(teamMemberId);
   }
 
   // pendings
   @Get(":id/pendings")
-  async getPendingByTeamId(
+  async getTeamPendingsByTeamId(
     @Param("id") teamId: string,
     @Query("status") status?: PendingStatus
   ) {
@@ -214,12 +217,12 @@ export class TeamController {
   }
 
   @Post("pendings")
-  async createPending(@Body() payload: CreateTeamPendingDto) {
+  async postTeamPending(@Body() payload: CreateTeamPendingDto) {
     return await this.teamPendingService.createTeamPending(payload);
   }
 
   @Put("pendings/:id")
-  async updateStatusTeampending(
+  async putTeamPendingById(
     @Param("id") teamPendingId: string,
     @Body() payload: UpdateTeamPendingDto
   ) {
@@ -227,7 +230,7 @@ export class TeamController {
   }
 
   @Delete("pendings/:id")
-  async discardpending(@Param("id") teamPendingId: string) {
+  async deleteTeamPendingById(@Param("id") teamPendingId: string) {
     return await this.teamPendingService.discard(teamPendingId);
   }
 }

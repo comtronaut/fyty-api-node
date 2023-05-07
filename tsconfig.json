@@ -15,13 +15,16 @@
     "incremental": true,
     "skipLibCheck": true,
 
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
     "strictNullChecks": true,
     "noImplicitAny": true,
-    "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "strict": false,
 
     "types": ["tsdef"],
-  }
+  },
+  "exclude": ["./export/**/*.ts"],
+  "include": ["./src/**/*.ts"]
 }

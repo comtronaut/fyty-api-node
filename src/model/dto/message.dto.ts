@@ -1,25 +1,13 @@
 import { Prisma } from ".prisma/client";
-import { IsNotEmpty, IsOptional, IsUUID } from "class-validator";
-import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateMessageDto implements Prisma.MessageUncheckedCreateInput {
-  @IsOptional()
-  waitingKey: string;
+import { MessageOptionalDefaultsSchema } from "model/schema";
+import { createZodDto } from "nestjs-zod";
+import { z } from "zod";
 
-  @IsNotEmpty()
-  @IsUUID()
-  chatId: string;
-
-  @IsNotEmpty()
-  @IsUUID()
-  senderId: string;
-
-  @IsOptional()
-  @IsUUID()
-  teamId: string;
-
-  @IsNotEmpty()
-  message: string;
-}
-
-export const schemas = validationMetadatasToSchemas();
+export class CreateMessageDto
+  extends createZodDto(
+    MessageOptionalDefaultsSchema.extend({
+      waitingKey: z.string().optional()
+    })
+  )
+  implements Prisma.MessageUncheckedCreateInput {}

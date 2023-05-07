@@ -49,22 +49,30 @@ export class TeamPendingService {
   }
 
   async discard(teamPendingId: string) {
-
     const data = await this.prisma.teamPending.findFirst({
-      where: { id: teamPendingId}
-    })
+      where: { id: teamPendingId }
+    });
 
-    //notify
-    if(data){
-      if(data.status == 'INCOMING')
-        this.lineNotify.searchUserForTeamAcceptNotify(data?.userId,data?.teamId,'Denied')
-      if(data.status == 'OUTGOING')
-        this.lineNotify.searchUserForAcceptTeamNotify(data?.userId,data?.teamId,'Denied')
+    // notify
+    if (data) {
+      if (data.status === PendingStatus.INCOMING) {
+        void this.lineNotify.searchUserForTeamAcceptNotify(
+          data?.userId,
+          data?.teamId,
+          "Denied"
+        );
+      }
+      if (data.status === PendingStatus.OUTGOING) {
+        void this.lineNotify.searchUserForAcceptTeamNotify(
+          data?.userId,
+          data?.teamId,
+          "Denied"
+        );
+      }
     }
-    
+
     await this.prisma.teamPending.delete({
       where: { id: teamPendingId }
     });
-    
   }
 }

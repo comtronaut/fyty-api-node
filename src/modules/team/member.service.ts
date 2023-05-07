@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { MemberRole, TeamMember, User } from "@prisma/client";
+import { MemberRole, PendingStatus, TeamMember, User } from "@prisma/client";
 import { CreateTeamMemberDto, UpdateTeamMemberDto } from "model/dto/team-member.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { TeamService } from "./team.service";
@@ -49,11 +49,20 @@ export class TeamMemberService {
       })
     ]);
 
-    //notify 
-    if(pending.status == 'INCOMING')
-      this.lineNotify.searchUserForTeamAcceptNotify(data.userId, data.teamId, 'Accepted')
-    else if(pending.status == 'OUTGOING')
-      this.lineNotify.searchUserForAcceptTeamNotify(data?.userId,data?.teamId,'Denied')
+    // notify
+    if (pending.status === PendingStatus.INCOMING) {
+      void this.lineNotify.searchUserForTeamAcceptNotify(
+        data.userId,
+        data.teamId,
+        "Accepted"
+      );
+    } else if (pending.status === PendingStatus.OUTGOING) {
+      void this.lineNotify.searchUserForAcceptTeamNotify(
+        data?.userId,
+        data?.teamId,
+        "Denied"
+      );
+    }
 
     return out;
   }
@@ -79,9 +88,8 @@ export class TeamMemberService {
         where: { id: memberId }
       });
 
-      //notify
-      this.lineNotify.searchUserForTeamKickedNotify(memberId);
-
+      // notify
+      void this.lineNotify.searchUserForTeamKickedNotify(memberId);
     } else {
       throw new Error("Permission denined");
     }

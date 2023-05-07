@@ -14,6 +14,8 @@ import { UserModule } from "./modules/user/user.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { MeModule } from "./modules/me/me.module";
 import { SocketModule } from "./modules/socket/socket.module";
+import { APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
+import { ZodSerializerInterceptor, ZodValidationPipe } from "nestjs-zod";
 
 @Module({
   imports: [
@@ -37,6 +39,15 @@ import { SocketModule } from "./modules/socket/socket.module";
     })
   ],
   controllers: [],
-  providers: []
+  providers: [
+    {
+      provide: APP_PIPE,
+      useClass: ZodValidationPipe
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ZodSerializerInterceptor
+    }
+  ]
 })
 export class AppModule {}

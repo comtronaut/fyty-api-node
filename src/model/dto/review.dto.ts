@@ -1,32 +1,10 @@
-import { PartialType } from "@nestjs/mapped-types";
 import { Prisma } from "@prisma/client";
-import { IsISO8601, IsNotEmpty, IsNumber, IsOptional, IsUUID } from "class-validator";
-import { validationMetadatasToSchemas } from "class-validator-jsonschema";
 
-export class CreateReviewDto implements Prisma.ReviewUncheckedCreateInput {
-  @IsNotEmpty()
-  content: string;
+import { ReviewOptionalDefaultsSchema, ReviewPartialSchema } from "model/schema";
+import { createZodDto } from "nestjs-zod";
 
-  @IsNotEmpty()
-  @IsNumber()
-  ratingScore: number;
+export class CreateReviewDto
+  extends createZodDto(ReviewOptionalDefaultsSchema)
+  implements Prisma.ReviewUncheckedCreateInput {}
 
-  @IsNotEmpty()
-  @IsUUID()
-  reviewerId: string;
-
-  @IsNotEmpty()
-  @IsUUID()
-  revieweeId: string;
-
-  @IsNotEmpty()
-  gameId: string;
-
-  @IsOptional()
-  @IsISO8601()
-  createdAt: Date;
-}
-
-export class UpdateReviewDto extends PartialType(CreateReviewDto) {}
-
-export const schemas = validationMetadatasToSchemas();
+export class UpdateReviewDto extends createZodDto(ReviewPartialSchema) {}

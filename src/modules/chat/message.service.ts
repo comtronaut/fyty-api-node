@@ -11,7 +11,9 @@ export class MessageService {
   ) {}
 
   async create({ waitingKey, ...data }: CreateMessageDto & { waitingKey: string }) {
-    void this.lineNotify.searchUserForChatNotify(data.chatId, data.teamId);
+    if (data.teamId) {
+      void this.lineNotify.searchUserForChatNotify(data.chatId, data.teamId);
+    }
 
     return await this.prisma.message.create({ data });
   }

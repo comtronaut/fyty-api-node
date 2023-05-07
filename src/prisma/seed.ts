@@ -62,11 +62,11 @@ async function migrate(table: string): Promise<void> {
   const raw = fs.readFileSync(`migration/${table}.csv`, "utf8");
 
   const [ header, ...rows ] = raw.split("\r\n").filter(Boolean);
-  const headerCols = header.split(",");
+  const headerCols = header!.split(",");
 
   const formattedRow = rows.map((rawRow) => {
     const colEntries = rawRow.split(",").map((col, i) => {
-      return [ prune(headerCols[i]), formatCol(prune(col), table) ];
+      return [ prune(headerCols[i]!), formatCol(prune(col), table) ];
     });
 
     return Object.fromEntries(colEntries);

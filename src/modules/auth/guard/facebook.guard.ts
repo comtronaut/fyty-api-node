@@ -30,7 +30,7 @@ export class FacebookAuthGuard extends AuthGuard("facebook") {
       "https://graph.facebook.com/v16.0/oauth/access_token",
       {
         params: {
-          code: query.code,
+          code: query["code"],
           // "code_verifier": query.code_verifier,
           client_id: env.FACEBOOK_CLIENT_ID,
           client_secret: env.FACEBOOK_CLIENT_SECRET,

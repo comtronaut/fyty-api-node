@@ -183,8 +183,8 @@ export class TeamService {
     });
 
     // TODO: add sse or notification
-    //notify
-    this.lineNotify.searchUserForTeamDisbandNotify(teamId);
+    // notify
+    void this.lineNotify.searchUserForTeamDisbandNotify(teamId);
 
     await this.roomService.deleteMultiple(
       roomHosts.map((e) => e.id),

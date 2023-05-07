@@ -1,21 +1,9 @@
-import { PartialType } from "@nestjs/mapped-types";
-import { AdminRole, Prisma } from "@prisma/client";
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional } from "class-validator";
-import { validationMetadatasToSchemas } from "class-validator-jsonschema";
+import { Prisma } from "@prisma/client";
+import { AdminOptionalDefaultsSchema, AdminPartialSchema } from "model/schema";
+import { createZodDto } from "nestjs-zod";
 
-export class CreateAdminDto implements Prisma.AdminUncheckedCreateInput {
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
+export class CreateAdminDto
+  extends createZodDto(AdminOptionalDefaultsSchema)
+  implements Prisma.AdminUncheckedCreateInput {}
 
-  @IsNotEmpty()
-  password: string;
-
-  @IsOptional()
-  @IsEnum(AdminRole)
-  role: AdminRole;
-}
-
-export class UpdateAdminDto extends PartialType(CreateAdminDto) {}
-
-export const schemas = validationMetadatasToSchemas();
+export class UpdateAdminDto extends createZodDto(AdminPartialSchema) {}

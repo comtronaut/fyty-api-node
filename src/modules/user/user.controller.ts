@@ -29,7 +29,7 @@ export class UserController {
   }
 
   @Get("validation")
-  async validateUserDuplication(
+  async getUserDedup(
     @Query("username") username?: string,
     @Query("mobilePhone") mobilePhone?: string,
     @Query("email") email?: string
@@ -43,39 +43,42 @@ export class UserController {
 
   @Get()
   @UseGuards(UserJwtAuthGuard)
-  async getAll(@Query("q") q: string, @Query("teamId") teamId?: string) {
+  async getUsersBySearching(@Query("q") q: string, @Query("teamId") teamId?: string) {
     return await this.userService.searchUsers(q, teamId);
   }
 
   @Get(":id")
   @UseGuards(UserJwtAuthGuard)
-  async getById(@Param("id") userId: string) {
+  async getUserById(@Param("id") userId: string) {
     return await this.userService.getById(userId);
   }
 
   // multiple
   @Get("multiple/:ids")
   @UseGuards(UserJwtAuthGuard)
-  async getByIds(@Param("ids") ids: string) {
+  async getMultipleUsersByIds(@Param("ids") ids: string) {
     return await this.userService.getByIds(ids.split(","));
   }
 
   // avatars
   @Post("avatars")
   @UseGuards(UserJwtAuthGuard)
-  async createUserAvatar(@Body() payload: CreateUserAvatarDto) {
+  async postUserAvatar(@Body() payload: CreateUserAvatarDto) {
     return await this.avatarService.create(payload);
   }
 
   @Get(":id/avatars")
   @UseGuards(UserJwtAuthGuard)
-  async getUserAvatar(@Param("id") userId: string, @Query("gameId") gameId?: string) {
+  async getUserAvatarsByUserId(
+    @Param("id") userId: string,
+    @Query("gameId") gameId?: string
+  ) {
     return await this.avatarService.getFilter(userId, gameId);
   }
 
   @Put("avatars/:id")
   @UseGuards(UserJwtAuthGuard)
-  async updateUserAvatar(
+  async putUserAvatarById(
     @Param("id") avatarId: string,
     @Body() payload: UpdateUserAvatarDto
   ) {
@@ -84,7 +87,7 @@ export class UserController {
 
   @Delete("avatars/:id")
   @UseGuards(UserJwtAuthGuard)
-  async daleteUserAvatar(@Param("id") avatarId: string) {
+  async daleteUserAvatarById(@Param("id") avatarId: string) {
     return await this.avatarService.delete(avatarId);
   }
 }
