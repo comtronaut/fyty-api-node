@@ -35,6 +35,8 @@ export class TrainingService {
         },
         training: {
           create: {
+            hostWinCount: payload.hostWinCount,
+            hostLoseCount: payload.hostLoseCount,
             hostId: payload.hostId,
             guestId: payload.guestId,
             isSubmitted: true
