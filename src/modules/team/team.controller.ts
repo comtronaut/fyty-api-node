@@ -101,7 +101,10 @@ export class TeamController {
   }
 
   @Put(":id/settings")
-  async putTeamSettingsByTeamId(@Param("id") teamId: string, @Body() payload: UpdateTeamSettingsDto) {
+  async putTeamSettingsByTeamId(
+    @Param("id") teamId: string,
+    @Body() payload: UpdateTeamSettingsDto
+  ) {
     return await this.teamSettingsService.update(payload);
   }
 

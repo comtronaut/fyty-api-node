@@ -69,7 +69,10 @@ export class UserController {
 
   @Get(":id/avatars")
   @UseGuards(UserJwtAuthGuard)
-  async getUserAvatarsByUserId(@Param("id") userId: string, @Query("gameId") gameId?: string) {
+  async getUserAvatarsByUserId(
+    @Param("id") userId: string,
+    @Query("gameId") gameId?: string
+  ) {
     return await this.avatarService.getFilter(userId, gameId);
   }
 
