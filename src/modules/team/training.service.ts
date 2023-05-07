@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { Team, TeamStats, Training, TrainingReport } from "@prisma/client";
+import { Team, TeamStats, Training, TrainingReport, TrainingStatus } from "@prisma/client";
 import { paginate } from "common/utils/pagination";
 import { diffMinute } from "common/utils/time";
 import {
@@ -39,6 +39,7 @@ export class TrainingService {
             hostLoseCount: payload.hostLoseCount,
             hostId: payload.hostId,
             guestId: payload.guestId,
+            status: TrainingStatus.ACCEPTED,
             isSubmitted: true
           }
         }
