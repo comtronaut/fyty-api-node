@@ -39,7 +39,6 @@ export class LobbyService {
     const userGameTeams = memberRes.map((e) => e.team);
     const userGameTeamIds = userGameTeams.map((e) => e.id);
 
-    // FIXME: remove room pending it's incorrect
     const [ res, roomPendings ] = await Promise.all([
       Promise.all(
         userGameTeams.map((team) =>

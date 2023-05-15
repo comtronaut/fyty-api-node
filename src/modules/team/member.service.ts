@@ -42,7 +42,9 @@ export class TeamMemberService {
 
     const [ , out ] = await Promise.all([
       this.prisma.teamPending.delete({
-        where: pending
+        where: {
+          id: pending.id
+        }
       }),
       this.prisma.teamMember.create({
         data: { ...data, role: MemberRole.MEMBER }
