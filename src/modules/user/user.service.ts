@@ -43,13 +43,14 @@ export class UserService {
   }
 
   async getDetailById(id: string) {
-    const { password, settings, avatars, ...info } = await this.prisma.user.findUniqueOrThrow({
-      where: { id },
-      include: {
-        settings: true,
-        avatars: true
-      }
-    });
+    const { password, settings, avatars, ...info }
+      = await this.prisma.user.findUniqueOrThrow({
+        where: { id },
+        include: {
+          settings: true,
+          avatars: true
+        }
+      });
 
     return {
       info,

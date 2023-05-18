@@ -90,6 +90,7 @@ Table Team {
   logoUrl String [not null, default: '']
   tier String [not null, default: '']
   isPrivate Boolean [not null, default: false]
+  bookBank String [not null, default: '']
   gameId String [not null]
   founderId String
   isDeleted Boolean [not null, default: false]
@@ -120,6 +121,8 @@ Table TeamLineup {
   imageUrl String [not null, default: '']
   name String [not null, default: 'new player']
   note String [not null, default: '']
+  updatedAt DateTime [not null]
+  createdAt DateTime [default: `now()`, not null]
 }
 
 Table TeamPending {
