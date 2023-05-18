@@ -29,6 +29,11 @@ export class MeController {
     return safeUser;
   }
 
+  @Get("detail")
+  async getMeDetail(@UserSubject() user: User) {
+    return this.userService.getDetailById(user.id);
+  }
+
   @Put()
   async putMeInfo(@UserSubject() user: User, @Body() payload: UpdateUserDto) {
     return await this.userService.update(user.id, payload);

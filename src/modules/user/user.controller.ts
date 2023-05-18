@@ -53,6 +53,12 @@ export class UserController {
     return await this.userService.getById(userId);
   }
 
+  @Get(":id/detail")
+  @UseGuards(UserJwtAuthGuard)
+  async getUserDetailById(@Param("id") userId: string) {
+    return await this.userService.getDetailById(userId);
+  }
+
   // multiple
   @Get("multiple/:ids")
   @UseGuards(UserJwtAuthGuard)

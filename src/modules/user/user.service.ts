@@ -42,6 +42,22 @@ export class UserService {
     return out;
   }
 
+  async getDetailById(id: string) {
+    const { password, settings, avatars, ...info } = await this.prisma.user.findUniqueOrThrow({
+      where: { id },
+      include: {
+        settings: true,
+        avatars: true
+      }
+    });
+
+    return {
+      info,
+      settings,
+      avatars
+    };
+  }
+
   async searchUsers(searchString: string, teamId?: string): Promise<SecuredUser[]> {
     const users = await this.prisma.user.findMany({
       where: {
