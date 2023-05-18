@@ -68,14 +68,13 @@ export class RoomService {
       // update team stats
       void Promise.all(
         rooms.map(({ startAt, endAt, members }) => {
-          const trainingMinute = Math.abs(dayjs(startAt).diff(dayjs(endAt), "minute"));
           const teamIds = members.map((e) => e.teamId);
 
           return this.prisma.teamStats.updateMany({
             where: { teamId: { in: teamIds } },
             data: {
               trainingMinute: {
-                increment: trainingMinute
+                increment: diffMinute(startAt, endAt)
               },
               completedTrainingCount: {
                 increment: 1
