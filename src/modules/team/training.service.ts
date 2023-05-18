@@ -76,7 +76,7 @@ export class TrainingService {
           trainingMinute: {
             increment: diffMinute(payload.startAt, payload.endAt)
           },
-          trainingCount: {
+          completedTrainingCount: {
             increment: 1
           }
         }
@@ -373,7 +373,7 @@ export class TrainingService {
     // update stats
     await this.resetParticipants(host, guest, { hostWinCount, hostLoseCount });
 
-    /* if (appointment) {
+    if (appointment) {
       const { startAt, endAt } = appointment;
 
       await this.prisma.teamStats.updateMany({
@@ -382,12 +382,15 @@ export class TrainingService {
           trainingMinute: {
             decrement: diffMinute(startAt, endAt)
           },
+          completedTrainingCount: {
+            decrement: 1
+          },
           trainingCount: {
             decrement: 1
           }
         }
       });
-    } */
+    }
 
     // delete training
     await this.prisma.training.delete({

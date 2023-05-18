@@ -16,6 +16,7 @@ import { CreateRoomDto, DeleteRoomDto, UpdateRoomDto } from "model/dto/room.dto"
 import { PrismaService } from "prisma/prisma.service";
 import { RoomSystemRemoval } from "types/sse-payload";
 import { NotifyService } from "../notification/lineNotify.service";
+import { diffMinute } from "common/utils/time";
 
 @Injectable()
 export class RoomService {
@@ -75,6 +76,9 @@ export class RoomService {
             data: {
               trainingMinute: {
                 increment: trainingMinute
+              },
+              completedTrainingCount: {
+                increment: 1
               },
               trainingCount: {
                 increment: 1
@@ -262,18 +266,57 @@ export class RoomService {
     });
 
     if (room.hostTeamId === payload.teamId) {
-      // notify
-      await this.lineNotify.searchUserForDisbanRoomNotify(payload.roomId);
-
-      await this.prisma.appointment.update({
+      const { members, ...appointment } = await this.prisma.appointment.update({
         where: { roomId: room.id },
         data: {
           isDeleted: true,
           room: {
             delete: true
           }
+        },
+        include: {
+          members: true
         }
       });
+
+      const currentMembers = members.filter((e) => !e.isLeft);
+      await this.prisma.appointmentMember.updateMany({
+        where: {
+          id: {
+            in: currentMembers.map((e) => e.id)
+          }
+        },
+        data: {
+          isLeft: true
+        }
+      });
+
+      // if is in training period
+      const currentTime = new Date().getTime();
+      const startTime = appointment.startAt.getTime();
+      const endTime = appointment.endAt.getTime();
+      if (currentTime > startTime && currentTime < endTime) {
+        await this.prisma.teamStats.updateMany({
+          where: {
+            teamId: {
+              in: currentMembers.map((e) => e.teamId)
+            }
+          },
+          data: {
+            trainingMinute: {
+              increment: diffMinute(startTime, currentTime)
+            },
+            leftWhileTrainingCount: {
+              increment: 1
+            },
+            trainingCount: {
+              increment: 1
+            }
+          }
+        });
+      }
+
+      void this.lineNotify.searchUserForDisbanRoomNotify(payload.roomId);
 
       return {
         roomId: room.id
@@ -408,9 +451,6 @@ export class RoomService {
       }
     });
 
-    // notify leaving room
-    void this.lineNotify.searchUserForLeaveNotify(roomMemberId, room.id);
-
     // update appointment member
     if (room.appointment) {
       await this.prisma.appointmentMember.update({
@@ -440,6 +480,32 @@ export class RoomService {
         }
       });
     }
+
+    // update team's stats
+    const currentTime = new Date().getTime();
+    const startTime = room.appointment?.startAt.getTime() ?? NaN;
+    const endTime = room.appointment?.endAt.getTime() ?? NaN;
+    if (currentTime > startTime && currentTime < endTime) {
+      await this.prisma.teamStats.update({
+        where: {
+          teamId: leavingMember.teamId
+        },
+        data: {
+          trainingMinute: {
+            increment: diffMinute(startTime, currentTime)
+          },
+          leftWhileTrainingCount: {
+            increment: 1
+          },
+          trainingCount: {
+            increment: 1
+          }
+        }
+      });
+    }
+
+    // notify leaving room
+    void this.lineNotify.searchUserForLeaveNotify(roomMemberId, room.id);
 
     return {
       res: {

@@ -179,6 +179,7 @@ model Team {
   logoUrl   String   @default("")
   tier      String   @default("")
   isPrivate Boolean  @default(false)
+  bookBank  String   @default("")
   game      Game     @relation(fields: [gameId], references: [id], onUpdate: Cascade)
   gameId    String
   founder   User?    @relation(fields: [founderId], references: [id], onUpdate: Cascade, onDelete: SetNull)
@@ -230,6 +231,8 @@ model TeamLineup {
   imageUrl   String      @default("")
   name       String      @default("new player")
   note       String      @default("")
+  updatedAt  DateTime    @updatedAt
+  createdAt  DateTime    @default(now())
 
   roomLineups        RoomLineup[]
   roomPendingLineups RoomPendingLineup[]
