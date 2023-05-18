@@ -31,7 +31,7 @@ export class MeController {
 
   @Get("detail")
   async getMeDetail(@UserSubject() user: User) {
-    return this.userService.getDetailById(user.id);
+    return await this.userService.getDetailById(user.id);
   }
 
   @Put()
