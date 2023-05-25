@@ -116,22 +116,22 @@ export class AppointmentService {
   }
 
   async update(id: string, data: UpdateAppointmentDto) {
-    return await this.prisma.appointment.update({
-      where: {
-        id
-      },
-      data: {
-        ...data,
-        ...((data.endAt || data.startAt) && {
-          room: {
-            update: {
-              startAt: data.startAt,
-              endAt: data.endAt
-            }
-          }
-        })
-      }
+    const appointment = await this.prisma.appointment.update({
+      where: { id },
+      data
     });
+
+    if ((data.endAt || data.startAt) && appointment.roomId) {
+      await this.prisma.room.updateMany({
+        where: { id: appointment.roomId },
+        data: {
+          ...(data.startAt && { startAt: data.startAt }),
+          ...(data.endAt && { endAt: data.endAt })
+        }
+      });
+    }
+
+    return appointment;
   }
 
   async delete(id: string, isDeletedBefore = false) {

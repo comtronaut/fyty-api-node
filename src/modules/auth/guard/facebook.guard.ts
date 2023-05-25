@@ -24,13 +24,13 @@ export type FacebookInfo = {
 export class FacebookAuthGuard extends AuthGuard("facebook") {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
-    const query = req.query;
+    const query = req.query ?? {};
 
     const { data: tokenData } = await axios.get(
       "https://graph.facebook.com/v16.0/oauth/access_token",
       {
         params: {
-          code: query["code"],
+          ...query,
           // "code_verifier": query.code_verifier,
           client_id: env.FACEBOOK_CLIENT_ID,
           client_secret: env.FACEBOOK_CLIENT_SECRET,
