@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import axios from "axios";
+import { compact } from "lodash";
 import { Nilable, Nullable } from "tsdef";
 import { z } from "zod";
 
@@ -8,7 +9,7 @@ export class ImageService {
   compareUrls(imageUrl: [Nilable<string>, Nilable<string>][]): string[] {
     return imageUrl.flatMap(([ oldUrl, newUrl ]) => {
       return oldUrl && newUrl && oldUrl !== newUrl
-        ? ([ this.extractCuidFromUrl(oldUrl) ].filter(Boolean) as string[])
+        ? compact([ this.extractCuidFromUrl(oldUrl) ])
         : [];
     });
   }

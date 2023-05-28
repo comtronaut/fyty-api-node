@@ -1,6 +1,7 @@
+import fs from "fs";
+
 import { AdminRole, PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
-import fs from "fs";
 
 const prisma = new PrismaClient();
 

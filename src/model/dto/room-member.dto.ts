@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
+import { createZodDto } from "nestjs-zod";
 
 import { RoomMemberOptionalDefaultsSchema } from "model/schema";
-import { createZodDto } from "nestjs-zod";
 
 export class CreateRoomMemberDto
   extends createZodDto(RoomMemberOptionalDefaultsSchema)

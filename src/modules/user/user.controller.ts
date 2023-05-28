@@ -9,9 +9,11 @@ import {
   Query,
   UseGuards
 } from "@nestjs/common";
+
 import { CreateUserAvatarDto, UpdateUserAvatarDto } from "model/dto/user-avatar.dto";
 import { CreateUserDto } from "model/dto/user.dto";
 import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
+
 import { UserAvatarService } from "./avatar.service";
 import { UserService } from "./user.service";
 

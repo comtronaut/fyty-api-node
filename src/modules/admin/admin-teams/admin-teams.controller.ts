@@ -8,6 +8,7 @@ import {
   Query,
   UseGuards
 } from "@nestjs/common";
+
 import { UpdateTeamDto } from "model/dto/team.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { TeamService } from "modules/team/team.service";

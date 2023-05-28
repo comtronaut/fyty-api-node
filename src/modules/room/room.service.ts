@@ -1,134 +1,20 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  MessageEvent,
-  Sse
-} from "@nestjs/common";
-import { Cron, CronExpression } from "@nestjs/schedule";
+import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
 import { PendingStatus, Room, RoomLineup, RoomMember, RoomStatus } from "@prisma/client";
-import dayjs from "dayjs";
-import { Observable, Subject, map } from "rxjs";
-import { EventSourceKey } from "common/constants/keys";
+
 import { getDayRangeWithin } from "common/utils/date";
+import { diffMinute } from "common/utils/time";
 import { CreateRoomMemberDto } from "model/dto/room-member.dto";
 import { CreateRoomDto, DeleteRoomDto, UpdateRoomDto } from "model/dto/room.dto";
 import { PrismaService } from "prisma/prisma.service";
-import { RoomSystemRemoval } from "types/sse-payload";
+
 import { NotifyService } from "../notification/lineNotify.service";
-import { diffMinute } from "common/utils/time";
 
 @Injectable()
 export class RoomService {
-  private readonly roomSystemRemoval = new Subject<RoomSystemRemoval>();
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly lineNotify: NotifyService
   ) {}
-
-  @Cron(CronExpression.EVERY_MINUTE, { timeZone: "Asia/Bangkok" })
-  async handleCron() {
-    try {
-      const timestamp = dayjs().add(5, "second").toDate();
-
-      const rooms = await this.prisma.room.findMany({
-        where: {
-          endAt: {
-            lte: timestamp
-          }
-        },
-        select: {
-          id: true,
-          hostTeamId: true,
-          startAt: true,
-          endAt: true,
-          game: {
-            select: {
-              teamCap: true
-            }
-          },
-          members: {
-            select: {
-              teamId: true
-            }
-          },
-          appointment: {
-            select: {
-              id: true
-            }
-          }
-        }
-      });
-
-      if (!rooms.length) {
-        return;
-      }
-
-      // update team stats
-      void Promise.all(
-        rooms.map(({ startAt, endAt, members }) => {
-          const teamIds = members.map((e) => e.teamId);
-
-          return this.prisma.teamStats.updateMany({
-            where: { teamId: { in: teamIds } },
-            data: {
-              trainingMinute: {
-                increment: diffMinute(startAt, endAt)
-              },
-              completedTrainingCount: {
-                increment: 1
-              },
-              trainingCount: {
-                increment: 1
-              }
-            }
-          });
-        })
-      );
-
-      await Promise.all([
-        // create training result
-        this.prisma.training.createMany({
-          data: rooms
-            .filter((e) =>
-              [
-                e.appointment,
-                e.members.length === e.game.teamCap,
-                e.members.filter((f) => f.teamId !== e.hostTeamId).length
-              ].every(Boolean)
-            )
-            .map((e) => ({
-              appointmentId: e.appointment!.id,
-              hostId: e.hostTeamId,
-              guestId: e.members.filter((f) => f.teamId !== e.hostTeamId)[0]!.teamId
-            }))
-        }),
-        // delete rooms
-        this.deleteMultiple(rooms.map((room) => room.id))
-      ]);
-
-      // send notifications
-      for (const room of rooms) {
-        this.roomSystemRemoval.next({
-          roomId: room.id,
-          appointmentId: room.appointment!.id,
-          isDone:
-            room.members.length > 1
-            && Boolean(room.members.filter((f) => f.teamId !== room.hostTeamId)[0])
-        });
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(err.message);
-      }
-    }
-  }
-
-  @Sse(EventSourceKey.RoomSystemRemoval)
-  sse(): Observable<MessageEvent> {
-    return this.roomSystemRemoval.pipe(map((data) => ({ data })));
-  }
 
   async create({ teamLineupIds, ...data }: CreateRoomDto): Promise<Room> {
     const {

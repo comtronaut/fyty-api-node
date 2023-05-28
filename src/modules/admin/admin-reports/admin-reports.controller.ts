@@ -8,6 +8,7 @@ import {
   Query,
   UseGuards
 } from "@nestjs/common";
+
 import { UpdateTrainingReportDto } from "model/dto/training-report.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { TrainingService } from "modules/team/training.service";

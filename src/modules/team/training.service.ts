@@ -1,5 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { Team, TeamStats, Training, TrainingReport, TrainingStatus } from "@prisma/client";
+import { compact } from "lodash";
+import { Nullable } from "tsdef";
+
 import { paginate } from "common/utils/pagination";
 import { diffMinute } from "common/utils/time";
 import {
@@ -8,7 +11,6 @@ import {
 } from "model/dto/training-report.dto";
 import { CreateTrainingDto, UpdateTrainingDto } from "model/dto/training.dto";
 import { PrismaService } from "prisma/prisma.service";
-import { Nullable } from "tsdef";
 import { Pagination } from "types/local";
 
 @Injectable()
@@ -71,7 +73,7 @@ export class TrainingService {
       );
 
       await this.prisma.teamStats.updateMany({
-        where: { teamId: { in: [ host!.id, guest!.id ].filter(Boolean) } },
+        where: { teamId: { in: compact([ host!.id, guest!.id ]) } },
         data: {
           trainingMinute: {
             increment: diffMinute(payload.startAt, payload.endAt)
@@ -177,22 +179,45 @@ export class TrainingService {
   }
 
   async update(id: string, data: UpdateTrainingDto): Promise<Training> {
-    const { host, guest, ...previousTraining }
-      = await this.prisma.training.findFirstOrThrow({
+    // update training count stats
+    if (data.isSubmitted) {
+      const { hostId, guestId } = await this.prisma.training.findUniqueOrThrow({
+        where: { id },
+        select: {
+          hostId: true,
+          guestId: true
+        }
+      });
+
+      await this.prisma.teamStats.updateMany({
+        where: {
+          teamId: { in: compact([ hostId, guestId ]) }
+        },
+        data: {
+          completedTrainingCount: {
+            increment: 1
+          }
+        }
+      });
+    }
+
+    const { host, guest, ...currentTraining } = await this.prisma.training.findFirstOrThrow(
+      {
         where: { id },
         include: {
           host: true,
           guest: true
         }
-      });
+      }
+    );
 
     if (Number.isFinite(data.hostWinCount) && Number.isFinite(data.hostLoseCount)) {
       await this.compareAndUpdateParticipants(
         host,
         guest,
         {
-          hostWinCount: previousTraining.hostWinCount,
-          hostLoseCount: previousTraining.hostLoseCount
+          hostWinCount: currentTraining.hostWinCount,
+          hostLoseCount: currentTraining.hostLoseCount
         },
         {
           hostWinCount: data.hostWinCount ?? null,
@@ -377,7 +402,7 @@ export class TrainingService {
       const { startAt, endAt } = appointment;
 
       await this.prisma.teamStats.updateMany({
-        where: { teamId: { in: [ host!.id, guest!.id ].filter(Boolean) } },
+        where: { teamId: { in: compact([ host!.id, guest!.id ]) } },
         data: {
           trainingMinute: {
             decrement: diffMinute(startAt, endAt)

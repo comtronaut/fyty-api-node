@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { UserAvatar } from "@prisma/client";
+
 import { CreateUserAvatarDto, UpdateUserAvatarDto } from "model/dto/user-avatar.dto";
 import { PrismaService } from "prisma/prisma.service";
 

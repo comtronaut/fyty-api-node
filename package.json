@@ -36,6 +36,7 @@
     "cache-manager": "^5.2.0",
     "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
+    "lodash": "^4.17.21",
     "nestjs-zod": "^2.3.2",
     "non-null": "^2.0.1",
     "passport": "^0.6.0",
@@ -56,6 +57,7 @@
     "@types/bcrypt": "5.0.0",
     "@types/express": "4.17.17",
     "@types/jest": "29.5.1",
+    "@types/lodash": "^4.14.195",
     "@types/node": "18.15.13",
     "@types/passport-jwt": "3.0.8",
     "@types/supertest": "2.0.12",
@@ -79,6 +81,7 @@
     "@zodios/core": "^10.9.0",
     "eslint": "8.38.0",
     "eslint-config-prettier": "8.8.0",
+    "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-prettier": "4.2.1",
     "prettier": "2.8.7"
   },

@@ -1,9 +1,10 @@
 import { Prisma } from "@prisma/client";
+import { createZodDto } from "nestjs-zod";
+
 import {
   UserSettingsOptionalDefaultsSchema,
   UserSettingsPartialSchema
 } from "model/schema";
-import { createZodDto } from "nestjs-zod";
 
 export class CreateUserSettingsDto
   extends createZodDto(UserSettingsOptionalDefaultsSchema)

@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
+import { createZodDto } from "nestjs-zod";
 
 import { TeamLineupOptionalDefaultsSchema, TeamLineupPartialSchema } from "model/schema";
-import { createZodDto } from "nestjs-zod";
 
 export class CreateTeamLineupDto
   extends createZodDto(TeamLineupOptionalDefaultsSchema)

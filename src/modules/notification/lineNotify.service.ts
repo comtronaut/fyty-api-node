@@ -1,10 +1,11 @@
-import { Inject, Injectable } from "@nestjs/common";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Inject, Injectable } from "@nestjs/common";
 import { MemberRole, PendingStatus } from "@prisma/client";
 import axios from "axios";
+import { Cache } from "cache-manager";
+
 import env from "common/env.config";
 import { PrismaService } from "prisma/prisma.service";
-import { Cache } from "cache-manager";
 
 @Injectable()
 export class NotifyService {

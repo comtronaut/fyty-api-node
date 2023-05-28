@@ -1,9 +1,11 @@
 import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
+
+import env from "common/env.config";
 import { AdminService } from "modules/admin/admin-admins/admin-admins-service";
 import { UserService } from "modules/user/user.service";
-import env from "common/env.config";
+
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { JwtStrategy, JwtStrategyAdmin } from "./strategy/jwt.strategy";

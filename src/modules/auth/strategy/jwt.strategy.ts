@@ -1,8 +1,10 @@
-import { ExtractJwt, Strategy } from "passport-jwt";
-import { PassportStrategy } from "@nestjs/passport";
 import { Injectable, UnauthorizedException } from "@nestjs/common";
-import env from "../../../common/env.config";
+import { PassportStrategy } from "@nestjs/passport";
 import type { JwtPayload } from "jsonwebtoken";
+import { ExtractJwt, Strategy } from "passport-jwt";
+
+import env from "../../../common/env.config";
+
 import { AuthService } from "../auth.service";
 
 @Injectable()

@@ -1,7 +1,8 @@
 import { Module } from "@nestjs/common";
-import { NotifyService } from "../notification/lineNotify.service";
+
 import { AppointmentController } from "./appointment.controller";
 import { AppointmentService } from "./appointment.service";
+import { NotifyService } from "../notification/lineNotify.service";
 
 @Module({
   imports: [],

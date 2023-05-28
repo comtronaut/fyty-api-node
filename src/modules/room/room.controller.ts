@@ -11,15 +11,17 @@ import {
   UseGuards
 } from "@nestjs/common";
 import { User } from "@prisma/client";
+
 import { UserSubject } from "common/subject.decorator";
 import { CreateRoomPendingDto } from "model/dto/room-pending.dto";
+import { UpdateRoomSettingDto } from "model/dto/room-settings.dto";
 import { DeleteRoomDto } from "model/dto/room.dto";
 import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
-import { ChatService } from "../chat/chat.service";
+
+import { LobbyService } from "./lobby.service";
 import { RoomPendingService } from "./pending.service";
 import { RoomService } from "./room.service";
-import { LobbyService } from "./lobby.service";
-import { UpdateRoomSettingDto } from "model/dto/room-settings.dto";
+import { ChatService } from "../chat/chat.service";
 
 @Controller("rooms")
 @UseGuards(UserJwtAuthGuard)

@@ -1,4 +1,5 @@
 import { Controller, Get, Query, Redirect } from "@nestjs/common";
+
 import { NotifyService } from "./lineNotify.service";
 
 @Controller("line-notify-callback")

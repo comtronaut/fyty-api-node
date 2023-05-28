@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
+import { createZodDto } from "nestjs-zod";
 
 import { UserAvatarOptionalDefaultsSchema, UserAvatarPartialSchema } from "model/schema";
-import { createZodDto } from "nestjs-zod";
 
 export class CreateUserAvatarDto
   extends createZodDto(UserAvatarOptionalDefaultsSchema)

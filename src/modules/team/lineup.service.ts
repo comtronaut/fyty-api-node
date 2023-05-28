@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { MemberRole, TeamLineup, User } from "@prisma/client";
+
 import { CreateTeamLineupDto, UpdateLineupDto } from "model/dto/team-lineup.dto";
 import { PrismaService } from "prisma/prisma.service";
 

@@ -1,8 +1,8 @@
 import { Prisma } from ".prisma/client";
-
-import { AppointmentOptionalDefaultsSchema, AppointmentPartialSchema } from "model/schema";
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
+
+import { AppointmentOptionalDefaultsSchema, AppointmentPartialSchema } from "model/schema";
 
 export class CreateAppointmentDto
   extends createZodDto(

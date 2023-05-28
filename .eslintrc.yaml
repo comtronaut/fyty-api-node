@@ -14,7 +14,34 @@ parserOptions:
 plugins:
   - "@typescript-eslint"
   - "@darraghor/nestjs-typed"
+  - import
 rules:
+  # import
+  import/order:
+    - warn
+    - newlines-between: always
+      alphabetize:
+        order: asc
+        caseInsensitive: false
+      pathGroups:
+        # internal
+        - pattern: "model/**"
+          group: parent
+        - pattern: "common/**"
+          group: parent
+        - pattern: "modules/**"
+          group: parent
+        - pattern: "types/**"
+          group: parent
+        - pattern: "prisma/**"
+          group: parent
+        # sibling
+        - pattern: "../**"
+          group: sibling
+      pathGroupsExcludedImportTypes:
+        - deep-object-diff
+        - fast-deep-equal
+
   # vanilla warn
   accessor-pairs:
     - warn

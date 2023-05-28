@@ -6,11 +6,13 @@ import {
   UnauthorizedException,
   UseGuards
 } from "@nestjs/common";
+import { Response } from "express";
+import URI from "urijs";
+
 import env from "common/env.config";
 import { UserSubject } from "common/subject.decorator";
-import { Response } from "express";
 import { LoginAdminQueryDto, LoginUserQueryDto, OAuthQueryDto } from "model/dto/auth.dto";
-import URI from "urijs";
+
 import { AuthService } from "./auth.service";
 import { FacebookAuthGuard, FacebookInfo } from "./guard/facebook.guard";
 import { GoogleAuthGuard, GoogleInfo } from "./guard/google.guard";

@@ -10,6 +10,7 @@ import {
   UseGuards
 } from "@nestjs/common";
 import { PendingStatus, User } from "@prisma/client";
+
 import { UserSubject } from "common/subject.decorator";
 import { CreateTeamMemberDto, UpdateTeamMemberDto } from "model/dto/team-member.dto";
 import { CreateTeamPendingDto, UpdateTeamPendingDto } from "model/dto/team-pending.dto";
@@ -22,12 +23,13 @@ import {
 import { UpdateTrainingDto } from "model/dto/training.dto";
 import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { AppointmentStatus } from "types/local";
-import { AppointmentService } from "../appointment/appointment.service";
+
 import { TeamMemberService } from "./member.service";
 import { TeamPendingService } from "./pending.service";
 import { TeamSettingsService } from "./settings.service";
 import { TeamService } from "./team.service";
 import { TrainingService } from "./training.service";
+import { AppointmentService } from "../appointment/appointment.service";
 
 @Controller("teams")
 @UseGuards(UserJwtAuthGuard)

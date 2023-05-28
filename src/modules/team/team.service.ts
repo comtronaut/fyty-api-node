@@ -1,12 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { MemberRole, Team, User } from "@prisma/client";
+
 import { paginate } from "common/utils/pagination";
 import { CreateTeamDto, UpdateTeamDto } from "model/dto/team.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
 import { TeamDetail } from "types/query-detail";
-import { RoomService } from "../room/room.service";
+
 import { NotifyService } from "../notification/lineNotify.service";
+import { RoomService } from "../room/room.service";
 
 @Injectable()
 export class TeamService {

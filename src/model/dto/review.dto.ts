@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
+import { createZodDto } from "nestjs-zod";
 
 import { ReviewOptionalDefaultsSchema, ReviewPartialSchema } from "model/schema";
-import { createZodDto } from "nestjs-zod";
 
 export class CreateReviewDto
   extends createZodDto(ReviewOptionalDefaultsSchema)

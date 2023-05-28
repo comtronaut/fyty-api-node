@@ -1,6 +1,8 @@
 import { Body, Controller, Delete, Param, Put, UseGuards } from "@nestjs/common";
+
 import { UpdateAppointmentDto } from "model/dto/appointment.dto";
 import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
+
 import { AppointmentService } from "./appointment.service";
 
 @Controller("appointments")

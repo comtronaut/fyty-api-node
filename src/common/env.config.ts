@@ -1,6 +1,7 @@
-import nonNull from "non-null";
-import { config } from "dotenv";
 import * as fs from "fs";
+
+import { config } from "dotenv";
+import nonNull from "non-null";
 
 function loadEnv() {
   process.env["HOST"] === "0.0.0.0"

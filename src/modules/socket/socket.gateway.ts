@@ -7,11 +7,13 @@ import {
   OnGatewayDisconnect
 } from "@nestjs/websockets";
 import { Socket, Server } from "socket.io";
+
 import { CreateRoomDto } from "model/dto/room.dto";
 import { RoomJoin, RoomDisband, RoomLeave, RoomModify } from "types/ws-payload";
-import { RoomService } from "../room/room.service";
-import { MessageService } from "../chat/message.service";
 import type * as WSPayloadType from "types/ws-payload";
+
+import { MessageService } from "../chat/message.service";
+import { RoomService } from "../room/room.service";
 
 @WebSocketGateway({
   cors: {

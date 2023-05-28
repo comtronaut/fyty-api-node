@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
+import { createZodDto } from "nestjs-zod";
 
 import { TeamPendingOptionalDefaultsSchema, TeamPendingPartialSchema } from "model/schema";
-import { createZodDto } from "nestjs-zod";
 
 export class CreateTeamPendingDto
   extends createZodDto(TeamPendingOptionalDefaultsSchema)

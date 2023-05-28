@@ -3,7 +3,9 @@ import { ExecutionContext } from "@nestjs/common/interfaces";
 import { AuthGuard } from "@nestjs/passport";
 import axios from "axios";
 import { Request } from "express";
+
 import env from "common/env.config";
+
 import { config } from "../common";
 
 export type FacebookInfo = {

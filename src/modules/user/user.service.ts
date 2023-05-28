@@ -1,11 +1,13 @@
-import { Inject, Injectable } from "@nestjs/common";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Inject, Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { Cache } from "cache-manager";
+
 import { CreateUserDto, UpdateUserDto } from "model/dto/user.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { SecuredUser } from "types/local";
+
 import { ImageService } from "../image/image.service";
 
 @Injectable()

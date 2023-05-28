@@ -1,8 +1,8 @@
 import { Prisma } from "@prisma/client";
+import { createZodDto } from "nestjs-zod";
 
 import { PasswordResetSessionPartialSchema } from "model/schema";
 import { PasswordResetSessionOptionalDefaultsSchema } from "model/schema";
-import { createZodDto } from "nestjs-zod";
 
 export class CreatePasswordResetSessionDto
   extends createZodDto(PasswordResetSessionOptionalDefaultsSchema)
