@@ -15,6 +15,13 @@ plugins:
   - "@typescript-eslint"
   - "@darraghor/nestjs-typed"
   - import
+overrides:
+  - files:
+      - "*.yaml"
+      - "*.yml"
+    parser: yaml-eslint-parser
+    extends:
+      - plugin:yml/standard
 rules:
   # import
   import/order:

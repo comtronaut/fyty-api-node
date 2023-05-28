@@ -47,7 +47,6 @@
     "rimraf": "^5.0.0",
     "rxjs": "^7.8.0",
     "urijs": "^1.19.11",
-    "validator": "^13.9.0",
     "zod": "^3.21.4"
   },
   "devDependencies": {
@@ -83,6 +82,7 @@
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-prettier": "4.2.1",
+    "eslint-plugin-yml": "^1.7.0",
     "prettier": "2.8.7"
   },
   "jest": {
