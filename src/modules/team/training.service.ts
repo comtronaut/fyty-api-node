@@ -254,57 +254,63 @@ export class TrainingService {
       return;
     }
 
-    if (host) {
-      await this.prisma.team.update({
-        where: { id: host.id },
+    if (isNewTie) {
+      await this.prisma.teamStats.updateMany({
+        where: {
+          teamId: { in: compact([ host?.id, guest?.id ]) }
+        },
         data: {
-          stats: {
-            update: {
-              winCount: {
-                increment: isNewHostWin ? 1 : 0
-              },
-              loseCount: {
-                increment: isNewHostLose ? 1 : 0
-              },
-              tieCount: {
-                increment: isNewTie ? 1 : 0
-              },
-              perGameWinCount: {
-                increment: (newRes.hostWinCount || 0) - (oldRes.hostWinCount || 0)
-              },
-              perGameLoseCount: {
-                increment: (newRes.hostLoseCount || 0) - (oldRes.hostLoseCount || 0)
-              }
-            }
+          tieCount: {
+            increment: isNewTie ? 1 : 0
+          },
+          perGameWinCount: {
+            increment: (newRes.hostWinCount || 0) - (oldRes.hostWinCount || 0)
+          },
+          perGameLoseCount: {
+            increment: (newRes.hostLoseCount || 0) - (oldRes.hostLoseCount || 0)
           }
         }
       });
     }
-    if (guest) {
-      await this.prisma.team.update({
-        where: { id: guest.id },
-        data: {
-          stats: {
-            update: {
-              winCount: {
-                increment: isNewHostWin ? 0 : 1
-              },
-              loseCount: {
-                increment: isNewHostLose ? 0 : 1
-              },
-              tieCount: {
-                increment: isNewTie ? 1 : 0
-              },
-              perGameWinCount: {
-                increment: (newRes.hostLoseCount || 0) - (oldRes.hostLoseCount || 0)
-              },
-              perGameLoseCount: {
-                increment: (newRes.hostWinCount || 0) - (oldRes.hostWinCount || 0)
-              }
+    else {
+      if (host) {
+        await this.prisma.teamStats.update({
+          where: { teamId: host.id },
+          data: {
+            winCount: {
+              increment: !isNewTie && isNewHostWin ? 1 : 0
+            },
+            loseCount: {
+              increment: !isNewTie && isNewHostLose ? 1 : 0
+            },
+            perGameWinCount: {
+              increment: (newRes.hostWinCount || 0) - (oldRes.hostWinCount || 0)
+            },
+            perGameLoseCount: {
+              increment: (newRes.hostLoseCount || 0) - (oldRes.hostLoseCount || 0)
             }
           }
-        }
-      });
+        });
+      }
+      if (guest) {
+        await this.prisma.teamStats.update({
+          where: { teamId: guest.id },
+          data: {
+            winCount: {
+              increment: isNewHostWin ? 0 : 1
+            },
+            loseCount: {
+              increment: isNewHostLose ? 0 : 1
+            },
+            perGameWinCount: {
+              increment: (newRes.hostLoseCount || 0) - (oldRes.hostLoseCount || 0)
+            },
+            perGameLoseCount: {
+              increment: (newRes.hostWinCount || 0) - (oldRes.hostWinCount || 0)
+            }
+          }
+        });
+      }
     }
   }
 
@@ -317,57 +323,63 @@ export class TrainingService {
     const isOldHostLose = (oldRes.hostWinCount || 0) < (oldRes.hostLoseCount || 0);
     const isOldTie = oldRes.hostWinCount === oldRes.hostLoseCount;
 
-    if (host) {
-      await this.prisma.team.update({
-        where: { id: host.id },
+    if (isOldTie) {
+      await this.prisma.teamStats.updateMany({
+        where: {
+          teamId: { in: compact([ host?.id, guest?.id ]) }
+        },
         data: {
-          stats: {
-            update: {
-              winCount: {
-                decrement: isOldHostWin ? 1 : 0
-              },
-              loseCount: {
-                decrement: isOldHostLose ? 1 : 0
-              },
-              tieCount: {
-                decrement: isOldTie ? 1 : 0
-              },
-              perGameWinCount: {
-                decrement: oldRes.hostWinCount || 0
-              },
-              perGameLoseCount: {
-                decrement: oldRes.hostLoseCount || 0
-              }
-            }
+          tieCount: {
+            decrement: isOldTie ? 1 : 0
+          },
+          perGameWinCount: {
+            decrement: (oldRes.hostWinCount || 0) - (oldRes.hostWinCount || 0)
+          },
+          perGameLoseCount: {
+            decrement: (oldRes.hostLoseCount || 0) - (oldRes.hostLoseCount || 0)
           }
         }
       });
     }
-    if (guest) {
-      await this.prisma.team.update({
-        where: { id: guest.id },
-        data: {
-          stats: {
-            update: {
-              winCount: {
-                decrement: isOldHostWin ? 0 : 1
-              },
-              loseCount: {
-                decrement: isOldHostLose ? 0 : 1
-              },
-              tieCount: {
-                decrement: isOldTie ? 1 : 0
-              },
-              perGameWinCount: {
-                decrement: oldRes.hostLoseCount || 0
-              },
-              perGameLoseCount: {
-                decrement: oldRes.hostWinCount || 0
-              }
+    else {
+      if (host) {
+        await this.prisma.teamStats.update({
+          where: { teamId: host.id },
+          data: {
+            winCount: {
+              decrement: isOldHostWin ? 1 : 0
+            },
+            loseCount: {
+              decrement: isOldHostLose ? 1 : 0
+            },
+            perGameWinCount: {
+              decrement: oldRes.hostWinCount || 0
+            },
+            perGameLoseCount: {
+              decrement: oldRes.hostLoseCount || 0
             }
           }
-        }
-      });
+        });
+      }
+      if (guest) {
+        await this.prisma.teamStats.update({
+          where: { teamId: guest.id },
+          data: {
+            winCount: {
+              decrement: isOldHostWin ? 0 : 1
+            },
+            loseCount: {
+              decrement: isOldHostLose ? 0 : 1
+            },
+            perGameWinCount: {
+              decrement: oldRes.hostLoseCount || 0
+            },
+            perGameLoseCount: {
+              decrement: oldRes.hostWinCount || 0
+            }
+          }
+        });
+      }
     }
   }
 
