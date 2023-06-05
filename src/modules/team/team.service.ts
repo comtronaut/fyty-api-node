@@ -149,9 +149,10 @@ export class TeamService {
         settings: {
           delete: true
         },
-        stats: {
+        // stat will not be deleted
+        /* stats: {
           delete: true
-        },
+        }, */
         lineups: {
           deleteMany: {}
         },

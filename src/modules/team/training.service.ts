@@ -271,8 +271,7 @@ export class TrainingService {
           }
         }
       });
-    }
-    else {
+    } else {
       if (host) {
         await this.prisma.teamStats.update({
           where: { teamId: host.id },
@@ -340,8 +339,7 @@ export class TrainingService {
           }
         }
       });
-    }
-    else {
+    } else {
       if (host) {
         await this.prisma.teamStats.update({
           where: { teamId: host.id },

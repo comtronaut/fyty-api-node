@@ -46,6 +46,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^5.0.0",
     "rxjs": "^7.8.0",
+    "ts-pattern": "^4.3.0",
     "urijs": "^1.19.11",
     "zod": "^3.21.4"
   },
