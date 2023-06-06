@@ -1,7 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { Team, TeamStats, Training, TrainingReport, TrainingStatus } from "@prisma/client";
+import {
+  Team,
+  TeamStats,
+  Training,
+  TrainingReport,
+  TrainingSource,
+  TrainingStatus
+} from "@prisma/client";
 import { compact } from "lodash";
 import { Nullable } from "tsdef";
+import { z } from "zod";
 
 import { paginate } from "common/utils/pagination";
 import { diffMinute } from "common/utils/time";
@@ -9,7 +17,11 @@ import {
   CreateTrainingReportDto,
   UpdateTrainingReportDto
 } from "model/dto/training-report.dto";
-import { CreateTrainingDto, UpdateTrainingDto } from "model/dto/training.dto";
+import {
+  CreateTrainingBypassDto,
+  CreateTrainingDto,
+  UpdateTrainingDto
+} from "model/dto/training.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
 
@@ -17,7 +29,26 @@ import { Pagination } from "types/local";
 export class TrainingService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createBypass(payload: any): Promise<Training> {
+  async createBypass(
+    payload: CreateTrainingBypassDto,
+    source: TrainingSource
+  ): Promise<Training> {
+    // create a designated team if the team didn't exist
+    if (!z.string().cuid().safeParse(payload.guestId).success) {
+      const hostTeam = await this.prisma.team.findUniqueOrThrow({
+        where: { id: payload.hostId },
+        select: { gameId: true }
+      });
+
+      await this.prisma.team.create({
+        data: {
+          gameId: hostTeam.gameId,
+          designatorTeamId: payload.hostId,
+          name: payload.guestId
+        }
+      });
+    }
+
     const { training } = await this.prisma.appointment.create({
       data: {
         startAt: payload.startAt,
@@ -42,7 +73,9 @@ export class TrainingService {
             hostId: payload.hostId,
             guestId: payload.guestId,
             status: TrainingStatus.ACCEPTED,
-            isSubmitted: true
+            isSubmitted: true,
+            source,
+            imageUrls: payload.imageUrls ?? []
           }
         }
       },

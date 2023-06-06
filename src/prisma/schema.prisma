@@ -56,12 +56,20 @@ enum MemberRole {
 enum TrainingStatus {
   // the training partner accepts the result
   ACCEPTED
-  // the training partner refuses the result
+  // the training partner refuses the result (explicitly)
   DENIED
   // halted by admin (via report)
   INEFFECTIVE
-  // the training partner  is not review
+  // expired by the system
+  EXPIRED
+  // the training partner hasn't review yet
   UNREVIEWED
+}
+
+enum TrainingSource {
+  SYSTEM
+  ADMIN
+  USER
 }
 
 enum PendingStatus {
@@ -90,6 +98,27 @@ model Game {
   reviews     Review[]
 }
 
+// notification
+model NotifUserRoomRegistration {
+  id          String   @id @default(cuid()) @db.Char(25)
+  user        User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId      String   @db.Char(25)
+  room        Room     @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomId      String   @db.Char(25)
+  unreadCount Int      @default(0)
+  lastSeenAt  DateTime @default(now())
+}
+
+model NotifUserSystem {
+  id        String    @id @default(cuid()) @db.Char(25)
+  user        User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId      String   @db.Char(25)
+  category  String
+  message   String
+  seenAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
 // room
 model Room {
   id         String     @id @default(cuid()) @db.Char(25)
@@ -108,12 +137,16 @@ model Room {
   updatedAt  DateTime   @updatedAt
   createdAt  DateTime   @default(now())
 
-  pendings    RoomPending[]
-  members     RoomMember[]
-  chat        Chat?
-  appointment Appointment?
-  lineups     RoomLineup[]
-  settings    RoomSettings?
+  userNotifRegistrations NotifUserRoomRegistration[]
+  pendings               RoomPending[]
+  members                RoomMember[]
+  chat                   Chat?
+  appointment            Appointment?
+  lineups                RoomLineup[]
+  settings               RoomSettings?
+
+  @@index([startAt])
+  @@index([endAt])
 }
 
 model RoomSettings {
@@ -173,20 +206,23 @@ model RoomPendingLineup {
 
 // team
 model Team {
-  id        String   @id @default(cuid()) @db.Char(25)
-  name      String
-  coverUrl  String   @default("")
-  logoUrl   String   @default("")
-  tier      String   @default("")
-  isPrivate Boolean  @default(false)
-  bookBank  String   @default("")
-  game      Game     @relation(fields: [gameId], references: [id], onUpdate: Cascade)
-  gameId    String
-  founder   User?    @relation(fields: [founderId], references: [id], onUpdate: Cascade, onDelete: SetNull)
-  founderId String?  @db.Char(25)
-  isDeleted Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id               String   @id @default(cuid()) @db.Char(25)
+  name             String
+  coverUrl         String   @default("")
+  logoUrl          String   @default("")
+  tier             String   @default("")
+  isPrivate        Boolean  @default(false)
+  bookBank         String   @default("")
+  game             Game     @relation(fields: [gameId], references: [id], onUpdate: Cascade)
+  gameId           String
+  founder          User?    @relation(fields: [founderId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  founderId        String?  @db.Char(25)
+  designatorTeam   Team?    @relation(fields: [designatorTeamId], references: [id], onUpdate: Cascade, onDelete: Cascade, name: "designator")
+  designatorTeamId String?  @db.Char(25)
+  isDeleted        Boolean  @default(false)
+  createdAt        DateTime @default(now())
 
+  designatedTeams    Team[]              @relation("designator")
   lineups            TeamLineup[]
   pendings           TeamPending[]
   members            TeamMember[]
@@ -234,6 +270,7 @@ model TeamLineup {
   updatedAt  DateTime    @updatedAt
   createdAt  DateTime    @default(now())
 
+  trainingLineups    TrainingLineup[]
   roomLineups        RoomLineup[]
   roomPendingLineups RoomPendingLineup[]
 }
@@ -276,16 +313,18 @@ model User {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
-  teamFounders         Team[]
-  teamPendings         TeamPending[]
-  teamMembers          TeamMember[]
-  avatars              UserAvatar[]
-  reviewers            Review[]              @relation("reviewer")
-  reviewees            Review[]              @relation("reviewee")
-  messages             Message[]
-  settings             UserSettings?
-  passwordResetSession PasswordResetSession?
-  trainingReports      TrainingReport[]
+  systemNotifs           NotifUserSystem[]
+  roomNotifRegistrations NotifUserRoomRegistration[]
+  teamFounders           Team[]
+  teamPendings           TeamPending[]
+  teamMembers            TeamMember[]
+  avatars                UserAvatar[]
+  reviewers              Review[]                    @relation("reviewer")
+  reviewees              Review[]                    @relation("reviewee")
+  messages               Message[]
+  settings               UserSettings?
+  passwordResetSession   PasswordResetSession?
+  trainingReports        TrainingReport[]
 }
 
 model UserSettings {
@@ -420,12 +459,27 @@ model Training {
   hostLoseCount Int?
   note          String         @default("")
   status        TrainingStatus @default(UNREVIEWED)
+  source        TrainingSource @default(SYSTEM)
   imageUrls     String[]       @default([])
   isSubmitted   Boolean        @default(false)
   updatedAt     DateTime       @updatedAt
   createdAt     DateTime       @default(now())
 
   reports TrainingReport[]
+  lineups TrainingLineup[]
+
+  @@index([createdAt, isSubmitted, source])
+  @@index([createdAt, status, source])
+}
+
+model TrainingLineup {
+  id         String     @id @default(cuid()) @db.Char(25)
+  training   Training   @relation(fields: [trainingId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  trainingId String     @db.Char(25)
+  lineup     TeamLineup @relation(fields: [lineupId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  lineupId   String     @db.Char(25)
+
+  @@unique([trainingId, lineupId])
 }
 
 model TrainingReport {

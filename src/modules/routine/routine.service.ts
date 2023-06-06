@@ -1,5 +1,6 @@
 import { Injectable, MessageEvent, Sse } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
+import { TrainingSource, TrainingStatus } from "@prisma/client";
 import dayjs from "dayjs";
 import { Observable, Subject, map } from "rxjs";
 
@@ -22,7 +23,7 @@ export class RoutineService {
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE, { timeZone: "Asia/Bangkok" })
-  async handleCron() {
+  async roomRoutine() {
     try {
       const timestamp = dayjs().add(5, "second").toDate();
 
@@ -109,6 +110,55 @@ export class RoutineService {
             && Boolean(room.members.filter((f) => f.teamId !== room.hostTeamId)[0])
         });
       }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
+    }
+  }
+
+  @Cron(CronExpression.EVERY_HOUR, { timeZone: "Asia/Bangkok" })
+  async trainingRoutine() {
+    try {
+      const nextToBeRemovedTime = dayjs().add(-1, "day").toDate();
+
+      // find out of valid submission time trainings
+      const toBeRemovedTrainings = await this.prisma.training.findMany({
+        where: {
+          createdAt: {
+            lte: nextToBeRemovedTime
+          },
+          isSubmitted: false,
+          source: TrainingSource.SYSTEM
+        }
+      });
+
+      // make all submitted, unreviewed trainings to be accepted
+      await this.prisma.training.updateMany({
+        where: {
+          createdAt: {
+            lte: nextToBeRemovedTime
+          },
+          status: TrainingStatus.UNREVIEWED,
+          source: TrainingSource.SYSTEM
+        },
+        data: {
+          status: TrainingStatus.ACCEPTED
+        }
+      });
+
+      if (!toBeRemovedTrainings.length) {
+        return;
+      }
+
+      await this.prisma.training.updateMany({
+        where: {
+          id: { in: toBeRemovedTrainings.map((e) => e.id) }
+        },
+        data: {
+          status: TrainingStatus.EXPIRED
+        }
+      });
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(err.message);

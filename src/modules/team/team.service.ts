@@ -123,6 +123,7 @@ export class TeamService {
       ...(filter.clause && {
         where: {
           isDeleted: false,
+          designatorTeamId: null,
           ...filter.clause,
           ...(filter.clause.name && {
             name: {

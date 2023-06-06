@@ -29,9 +29,7 @@ export const DECIMAL_STRING_REGEX = /^[0-9.,e+-bxffo_cp]+$|Infinity|NaN/;
 export const isValidDecimalInput = (
   v?: null | string | number | Prisma.DecimalJsLike
 ): v is string | number | Prisma.DecimalJsLike => {
-  if (v === undefined || v === null) {
-    return false;
-  }
+  if (v === undefined || v === null) {return false;}
   return (
     (typeof v === "object" && "d" in v && "e" in v && "s" in v && "toFixed" in v)
     || (typeof v === "string" && DECIMAL_STRING_REGEX.test(v))
@@ -91,6 +89,23 @@ export const MessageScalarFieldEnumSchema = z.enum([
   "teamId",
   "senderId",
   "message",
+  "createdAt"
+]);
+
+export const NotifUserRoomRegistrationScalarFieldEnumSchema = z.enum([
+  "id",
+  "userId",
+  "roomId",
+  "unreadCount",
+  "lastSeenAt"
+]);
+
+export const NotifUserSystemScalarFieldEnumSchema = z.enum([
+  "id",
+  "userId",
+  "category",
+  "message",
+  "seenAt",
   "createdAt"
 ]);
 
@@ -204,6 +219,7 @@ export const TeamScalarFieldEnumSchema = z.enum([
   "bookBank",
   "gameId",
   "founderId",
+  "designatorTeamId",
   "isDeleted",
   "createdAt"
 ]);
@@ -229,6 +245,8 @@ export const TeamStatsScalarFieldEnumSchema = z.enum([
   "updateAt"
 ]);
 
+export const TrainingLineupScalarFieldEnumSchema = z.enum([ "id", "trainingId", "lineupId" ]);
+
 export const TrainingReportScalarFieldEnumSchema = z.enum([
   "id",
   "reporterUserId",
@@ -250,6 +268,7 @@ export const TrainingScalarFieldEnumSchema = z.enum([
   "hostLoseCount",
   "note",
   "status",
+  "source",
   "imageUrls",
   "isSubmitted",
   "updatedAt",
@@ -324,10 +343,15 @@ export const TrainingStatusSchema = z.enum([
   "ACCEPTED",
   "DENIED",
   "INEFFECTIVE",
+  "EXPIRED",
   "UNREVIEWED"
 ]);
 
 export type TrainingStatusType = `${z.infer<typeof TrainingStatusSchema>}`;
+
+export const TrainingSourceSchema = z.enum([ "SYSTEM", "ADMIN", "USER" ]);
+
+export type TrainingSourceType = `${z.infer<typeof TrainingSourceSchema>}`;
 
 export const PendingStatusSchema = z.enum([ "INCOMING", "OUTGOING" ]);
 
@@ -377,6 +401,84 @@ export const GameOptionalDefaultsSchema = GameSchema.merge(
 );
 
 export type GameOptionalDefaults = z.infer<typeof GameOptionalDefaultsSchema>;
+
+// ///////////////////////////////////////
+// NOTIF USER ROOM REGISTRATION SCHEMA
+// ///////////////////////////////////////
+
+export const NotifUserRoomRegistrationSchema = z.object({
+  id: z.string().cuid(),
+  userId: z.string(),
+  roomId: z.string(),
+  unreadCount: z.number().int(),
+  lastSeenAt: z.coerce.date()
+});
+
+export type NotifUserRoomRegistration = z.infer<typeof NotifUserRoomRegistrationSchema>;
+
+// ///////////////////////////////////////
+// NOTIF USER ROOM REGISTRATION PARTIAL SCHEMA
+// ///////////////////////////////////////
+
+export const NotifUserRoomRegistrationPartialSchema
+  = NotifUserRoomRegistrationSchema.partial();
+
+export type NotifUserRoomRegistrationPartial = z.infer<
+  typeof NotifUserRoomRegistrationPartialSchema
+>;
+
+// NOTIF USER ROOM REGISTRATION OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const NotifUserRoomRegistrationOptionalDefaultsSchema
+  = NotifUserRoomRegistrationSchema.merge(
+    z.object({
+      id: z.string().cuid().optional(),
+      unreadCount: z.number().int().optional(),
+      lastSeenAt: z.coerce.date().optional()
+    })
+  );
+
+export type NotifUserRoomRegistrationOptionalDefaults = z.infer<
+  typeof NotifUserRoomRegistrationOptionalDefaultsSchema
+>;
+
+// ///////////////////////////////////////
+// NOTIF USER SYSTEM SCHEMA
+// ///////////////////////////////////////
+
+export const NotifUserSystemSchema = z.object({
+  id: z.string().cuid(),
+  userId: z.string(),
+  category: z.string(),
+  message: z.string(),
+  seenAt: z.coerce.date().nullish(),
+  createdAt: z.coerce.date()
+});
+
+export type NotifUserSystem = z.infer<typeof NotifUserSystemSchema>;
+
+// ///////////////////////////////////////
+// NOTIF USER SYSTEM PARTIAL SCHEMA
+// ///////////////////////////////////////
+
+export const NotifUserSystemPartialSchema = NotifUserSystemSchema.partial();
+
+export type NotifUserSystemPartial = z.infer<typeof NotifUserSystemPartialSchema>;
+
+// NOTIF USER SYSTEM OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const NotifUserSystemOptionalDefaultsSchema = NotifUserSystemSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
+
+export type NotifUserSystemOptionalDefaults = z.infer<
+  typeof NotifUserSystemOptionalDefaultsSchema
+>;
 
 // ///////////////////////////////////////
 // ROOM SCHEMA
@@ -605,6 +707,7 @@ export const TeamSchema = z.object({
   bookBank: z.string(),
   gameId: z.string(),
   founderId: z.string().nullish(),
+  designatorTeamId: z.string().nullish(),
   isDeleted: z.boolean(),
   createdAt: z.coerce.date()
 });
@@ -1216,6 +1319,7 @@ export type TeamStatsOptionalDefaults = z.infer<typeof TeamStatsOptionalDefaults
 
 export const TrainingSchema = z.object({
   status: TrainingStatusSchema,
+  source: TrainingSourceSchema,
   id: z.string().cuid(),
   appointmentId: z.string(),
   hostId: z.string().nullish(),
@@ -1245,6 +1349,7 @@ export type TrainingPartial = z.infer<typeof TrainingPartialSchema>;
 export const TrainingOptionalDefaultsSchema = TrainingSchema.merge(
   z.object({
     status: TrainingStatusSchema.optional(),
+    source: TrainingSourceSchema.optional(),
     id: z.string().cuid().optional(),
     note: z.string().optional(),
     imageUrls: z.string().array().optional(),
@@ -1255,6 +1360,39 @@ export const TrainingOptionalDefaultsSchema = TrainingSchema.merge(
 );
 
 export type TrainingOptionalDefaults = z.infer<typeof TrainingOptionalDefaultsSchema>;
+
+// ///////////////////////////////////////
+// TRAINING LINEUP SCHEMA
+// ///////////////////////////////////////
+
+export const TrainingLineupSchema = z.object({
+  id: z.string().cuid(),
+  trainingId: z.string(),
+  lineupId: z.string()
+});
+
+export type TrainingLineup = z.infer<typeof TrainingLineupSchema>;
+
+// ///////////////////////////////////////
+// TRAINING LINEUP PARTIAL SCHEMA
+// ///////////////////////////////////////
+
+export const TrainingLineupPartialSchema = TrainingLineupSchema.partial();
+
+export type TrainingLineupPartial = z.infer<typeof TrainingLineupPartialSchema>;
+
+// TRAINING LINEUP OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const TrainingLineupOptionalDefaultsSchema = TrainingLineupSchema.merge(
+  z.object({
+    id: z.string().cuid().optional()
+  })
+);
+
+export type TrainingLineupOptionalDefaults = z.infer<
+  typeof TrainingLineupOptionalDefaultsSchema
+>;
 
 // ///////////////////////////////////////
 // TRAINING REPORT SCHEMA

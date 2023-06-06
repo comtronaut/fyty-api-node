@@ -227,7 +227,7 @@ async function migrate(table: string): Promise<void> {
     .otherwise(noop);
 }
 
-main(() => migrate("user"))
+main(/* () => migrate("user") */ initData)
   .then(async () => {
     await prisma.$disconnect();
   })

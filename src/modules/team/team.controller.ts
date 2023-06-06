@@ -9,7 +9,8 @@ import {
   Query,
   UseGuards
 } from "@nestjs/common";
-import { PendingStatus, User } from "@prisma/client";
+import { PendingStatus, Team, TrainingSource, User } from "@prisma/client";
+import { isEmpty } from "lodash";
 
 import { UserSubject } from "common/subject.decorator";
 import { CreateTeamMemberDto, UpdateTeamMemberDto } from "model/dto/team-member.dto";
@@ -20,7 +21,7 @@ import {
   CreateTrainingReportDto,
   UpdateTrainingReportDto
 } from "model/dto/training-report.dto";
-import { UpdateTrainingDto } from "model/dto/training.dto";
+import { CreateTrainingBypassDto, UpdateTrainingDto } from "model/dto/training.dto";
 import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { AppointmentStatus } from "types/local";
 
@@ -50,10 +51,16 @@ export class TeamController {
 
   @Get()
   async getTeams(
+    @Query("q") q?: string,
     @Query("gameId") gameId?: string,
     @Query("perPage") perPage?: string,
     @Query("page") page?: string
   ) {
+    const clause: Partial<Team> = {
+      ...(gameId && { gameId }),
+      ...(q && { name: q })
+    };
+
     return await this.teamService.getByFilter({
       ...([ perPage, page ].every(Boolean) && {
         pagination: {
@@ -61,10 +68,8 @@ export class TeamController {
           perPage: Number(perPage)
         }
       }),
-      ...(gameId && {
-        clause: {
-          gameId
-        }
+      ...(!isEmpty(clause) && {
+        clause
       })
     });
   }
@@ -129,6 +134,14 @@ export class TeamController {
         perPage: Number(perPage)
       })
       : await this.trainingService.getByTeamId(teamId);
+  }
+
+  @Post(":id/trainings")
+  async createTrainingManually(
+    @Param("id") teamId: string,
+    @Body() payload: CreateTrainingBypassDto
+  ) {
+    return await this.trainingService.createBypass(payload, TrainingSource.USER);
   }
 
   @Get("trainings/:id")

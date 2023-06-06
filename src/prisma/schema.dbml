@@ -18,6 +18,23 @@ Table Game {
   desc String [not null, default: '']
 }
 
+Table NotifUserRoomRegistration {
+  id String [pk]
+  userId String [not null]
+  roomId String [not null]
+  unreadCount Int [not null, default: 0]
+  lastSeenAt DateTime [default: `now()`, not null]
+}
+
+Table NotifUserSystem {
+  id String [pk]
+  userId String [not null]
+  category String [not null]
+  message String [not null]
+  seenAt DateTime
+  createdAt DateTime [default: `now()`, not null]
+}
+
 Table Room {
   id String [pk]
   name String [not null]
@@ -93,6 +110,7 @@ Table Team {
   bookBank String [not null, default: '']
   gameId String [not null]
   founderId String
+  designatorTeamId String
   isDeleted Boolean [not null, default: false]
   createdAt DateTime [default: `now()`, not null]
 }
@@ -264,10 +282,21 @@ Table Training {
   hostLoseCount Int
   note String [not null, default: '']
   status TrainingStatus [not null, default: 'UNREVIEWED']
+  source TrainingSource [not null, default: 'SYSTEM']
   imageUrls String[] [not null]
   isSubmitted Boolean [not null, default: false]
   updatedAt DateTime [not null]
   createdAt DateTime [default: `now()`, not null]
+}
+
+Table TrainingLineup {
+  id String [pk]
+  trainingId String [not null]
+  lineupId String [not null]
+
+  indexes {
+    (trainingId, lineupId) [unique]
+  }
 }
 
 Table TrainingReport {
@@ -314,7 +343,14 @@ Enum TrainingStatus {
   ACCEPTED
   DENIED
   INEFFECTIVE
+  EXPIRED
   UNREVIEWED
+}
+
+Enum TrainingSource {
+  SYSTEM
+  ADMIN
+  USER
 }
 
 Enum PendingStatus {
@@ -325,6 +361,12 @@ Enum PendingStatus {
 Enum AdminRole {
   MANAGEMENT
 }
+
+Ref: NotifUserRoomRegistration.userId > User.id [delete: Cascade]
+
+Ref: NotifUserRoomRegistration.roomId > Room.id [delete: Cascade]
+
+Ref: NotifUserSystem.userId > User.id [delete: Cascade]
 
 Ref: Room.gameId > Game.id
 
@@ -353,6 +395,8 @@ Ref: RoomPendingLineup.teamLineupId > TeamLineup.id [delete: Cascade]
 Ref: Team.gameId > Game.id
 
 Ref: Team.founderId > User.id [delete: Set Null]
+
+Ref: Team.designatorTeamId - Team.id [delete: Cascade]
 
 Ref: TeamSettings.teamId - Team.id [delete: Cascade]
 
@@ -405,6 +449,10 @@ Ref: Training.appointmentId - Appointment.id [delete: Cascade]
 Ref: Training.hostId > Team.id [delete: Set Null]
 
 Ref: Training.guestId > Team.id [delete: Set Null]
+
+Ref: TrainingLineup.trainingId > Training.id [delete: Cascade]
+
+Ref: TrainingLineup.lineupId > TeamLineup.id [delete: Cascade]
 
 Ref: TrainingReport.reporterUserId > User.id [delete: Set Null]
 
