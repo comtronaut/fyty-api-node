@@ -53,6 +53,8 @@ export class TeamMemberService {
       })
     ]);
 
+    await this.deleteTeamPendingsOnUser(data.userId, team.gameId);
+
     // notify
     if (pending.status === PendingStatus.INCOMING) {
       void this.lineNotify.searchUserForTeamAcceptNotify(
@@ -69,6 +71,17 @@ export class TeamMemberService {
     }
 
     return out;
+  }
+
+  async deleteTeamPendingsOnUser(userId: string, gameId?: string): Promise<void> {
+    await this.prisma.teamPending.deleteMany({
+      where: {
+        userId,
+        ...(gameId && {
+          team: { gameId }
+        })
+      }
+    });
   }
 
   async update(teamMemberId: string, data: UpdateTeamMemberDto): Promise<TeamMember> {

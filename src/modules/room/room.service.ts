@@ -34,7 +34,6 @@ export class RoomService {
         chat: {
           create: {}
         },
-        // create room appointment
         appointment: {
           create: {
             startAt: data.startAt,
@@ -50,6 +49,7 @@ export class RoomService {
       include: { members: true }
     });
 
+    // create room lineups
     await this.prisma.roomLineup.createMany({
       data: teamLineupIds.map((teamLineupId) => ({
         teamLineupId,
@@ -400,11 +400,21 @@ export class RoomService {
     };
   }
 
-  async deleteMultiple(roomIds: string[], isDeletedBefore = false) {
-    await Promise.all(roomIds.map((id) => this.deleteSingle(id), isDeletedBefore));
+  async deleteMultiple(
+    roomIds: string[],
+    isDeletedBefore = false,
+    isMemberStatusPreserved = false
+  ) {
+    await Promise.all(
+      roomIds.map((id) => this.deleteSingle(id, isDeletedBefore, isMemberStatusPreserved))
+    );
   }
 
-  async deleteSingle(roomId: string, isDeletedBefore = false) {
+  async deleteSingle(
+    roomId: string,
+    isDeletedBefore = false,
+    isMemberStatusPreserved = false
+  ) {
     await this.prisma.appointment.update({
       where: { roomId },
       data: {
@@ -413,12 +423,14 @@ export class RoomService {
         room: {
           delete: true
         },
-        members: {
-          updateMany: {
-            where: {},
-            data: { isLeft: true }
+        ...(!isMemberStatusPreserved && {
+          members: {
+            updateMany: {
+              where: {},
+              data: { isLeft: true }
+            }
           }
-        }
+        })
       }
     });
   }

@@ -43,6 +43,11 @@ export class RoutineService {
               teamCap: true
             }
           },
+          lineups: {
+            select: {
+              teamLineupId: true
+            }
+          },
           members: {
             select: {
               teamId: true
@@ -93,11 +98,20 @@ export class RoutineService {
             .map((e) => ({
               appointmentId: e.appointment!.id,
               hostId: e.hostTeamId,
-              guestId: e.members.filter((f) => f.teamId !== e.hostTeamId)[0]!.teamId
+              guestId: e.members.filter((f) => f.teamId !== e.hostTeamId)[0]!.teamId,
+              lineups: {
+                createMany: {
+                  data: e.lineups.map((e) => ({ lineupId: e.teamLineupId }))
+                }
+              }
             }))
         }),
         // delete rooms
-        this.roomService.deleteMultiple(rooms.map((room) => room.id))
+        this.roomService.deleteMultiple(
+          rooms.map((room) => room.id),
+          false,
+          true
+        )
       ]);
 
       // send notifications

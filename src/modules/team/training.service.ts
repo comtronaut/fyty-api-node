@@ -33,6 +33,8 @@ export class TrainingService {
     payload: CreateTrainingBypassDto,
     source: TrainingSource
   ): Promise<Training> {
+    const { startAt, endAt, ...trainingPayload } = payload;
+
     // create a designated team if the team didn't exist
     if (!z.string().cuid().safeParse(payload.guestId).success) {
       const hostTeam = await this.prisma.team.findUniqueOrThrow({
@@ -51,8 +53,8 @@ export class TrainingService {
 
     const { training } = await this.prisma.appointment.create({
       data: {
-        startAt: payload.startAt,
-        endAt: payload.endAt,
+        startAt,
+        endAt,
         isDeleted: true,
         members: {
           create: [
@@ -68,14 +70,10 @@ export class TrainingService {
         },
         training: {
           create: {
-            hostWinCount: payload.hostWinCount,
-            hostLoseCount: payload.hostLoseCount,
-            hostId: payload.hostId,
-            guestId: payload.guestId,
+            ...trainingPayload,
             status: TrainingStatus.ACCEPTED,
             isSubmitted: true,
-            source,
-            imageUrls: payload.imageUrls ?? []
+            source
           }
         }
       },

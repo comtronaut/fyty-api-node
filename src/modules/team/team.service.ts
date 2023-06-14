@@ -35,6 +35,8 @@ export class TeamService {
       throw new Error("You already have team");
     }
 
+    await this.deleteTeamPendingsOnUser(user.id, data.gameId);
+
     return await this.prisma.team.create({
       data: {
         ...data,
@@ -50,6 +52,17 @@ export class TeamService {
         stats: {
           create: {}
         }
+      }
+    });
+  }
+
+  async deleteTeamPendingsOnUser(userId: string, gameId?: string): Promise<void> {
+    await this.prisma.teamPending.deleteMany({
+      where: {
+        userId,
+        ...(gameId && {
+          team: { gameId }
+        })
       }
     });
   }
