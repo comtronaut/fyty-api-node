@@ -14,7 +14,7 @@ export class ImageService {
     });
   }
 
-  private extractCuidFromUrl(url: string): Nullable<string> {
+  extractCuidFromUrl(url: string): Nullable<string> {
     const slices = url.split("/");
     const part = slices[slices.length - 1];
 

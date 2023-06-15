@@ -1,5 +1,7 @@
 import { Module } from "@nestjs/common";
 
+import { ImageService } from "modules/image/image.service";
+
 import { LobbyService } from "./lobby.service";
 import { RoomPendingService } from "./pending.service";
 import { RoomController } from "./room.controller";
@@ -18,7 +20,8 @@ import { TeamService } from "../team/team.service";
     TeamService,
     RoomPendingService,
     LobbyService,
-    NotifyService
+    NotifyService,
+    ImageService
   ]
 })
 export class RoomModule {}

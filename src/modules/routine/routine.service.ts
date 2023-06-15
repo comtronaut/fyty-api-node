@@ -2,10 +2,12 @@ import { Injectable, MessageEvent, Sse } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { TrainingSource, TrainingStatus } from "@prisma/client";
 import dayjs from "dayjs";
+import { compact } from "lodash";
 import { Observable, Subject, map } from "rxjs";
 
 import { EventSourceKey } from "common/constants/keys";
 import { diffMinute } from "common/utils/time";
+import { ImageService } from "modules/image/image.service";
 import { RoomService } from "modules/room/room.service";
 import { PrismaService } from "prisma/prisma.service";
 import { RoomSystemRemoval } from "types/sse-payload";
@@ -19,7 +21,8 @@ export class RoutineService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly roomService: RoomService,
-    private readonly notifyService: NotifyService
+    private readonly notifyService: NotifyService,
+    private readonly imageService: ImageService
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE, { timeZone: "Asia/Bangkok" })
@@ -57,6 +60,15 @@ export class RoutineService {
             select: {
               id: true
             }
+          },
+          chat: {
+            select: {
+              messages: {
+                select: {
+                  imageUrls: true
+                }
+              }
+            }
           }
         }
       });
@@ -64,6 +76,10 @@ export class RoutineService {
       if (!rooms.length) {
         return;
       }
+
+      const imageIds = rooms
+        .flatMap((e) => e.chat?.messages.flatMap((e) => e.imageUrls) ?? [])
+        .map((e) => this.imageService.extractCuidFromUrl(e));
 
       // update team stats
       void Promise.all(
@@ -106,6 +122,8 @@ export class RoutineService {
               }
             }))
         }),
+        // delete images
+        this.imageService.deleteImageByIds(compact(imageIds)),
         // delete rooms
         this.roomService.deleteMultiple(
           rooms.map((room) => room.id),

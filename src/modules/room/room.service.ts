@@ -5,15 +5,18 @@ import { getDayRangeWithin } from "common/utils/date";
 import { diffMinute } from "common/utils/time";
 import { CreateRoomMemberDto } from "model/dto/room-member.dto";
 import { CreateRoomDto, DeleteRoomDto, UpdateRoomDto } from "model/dto/room.dto";
+import { ImageService } from "modules/image/image.service";
 import { PrismaService } from "prisma/prisma.service";
 
 import { NotifyService } from "../notification/lineNotify.service";
+import { compact } from "lodash";
 
 @Injectable()
 export class RoomService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly lineNotify: NotifyService
+    private readonly lineNotify: NotifyService,
+    private readonly imageService: ImageService
   ) {}
 
   async create({ teamLineupIds, ...data }: CreateRoomDto): Promise<Room> {
@@ -58,7 +61,33 @@ export class RoomService {
       }))
     });
 
+    await this.createUserNotifRegistrationsFromTeamIds(room.id, [ data.hostTeamId ]);
+
     return room;
+  }
+
+  async createUserNotifRegistrationsFromTeamIds(roomId: string, teamIds: string[]): Promise<void> {
+    const teams = await this.prisma.team.findMany({
+      where: {
+        id: { in: teamIds }
+      },
+      select: {
+        members: {
+          select: {
+            userId: true
+          }
+        }
+      }
+    });
+
+    const userIds = teams.flatMap((e) => e.members.map((e) => e.userId));
+
+    await this.prisma.notifUserRoomRegistration.createMany({
+      data: userIds.map((userId) => ({
+        userId,
+        roomId
+      }))
+    });
   }
 
   async update(roomId: string, data: UpdateRoomDto): Promise<Room> {
@@ -147,7 +176,19 @@ export class RoomService {
   async disband(payload: DeleteRoomDto) {
     const room = await this.prisma.room.findUniqueOrThrow({
       where: { id: payload.roomId },
-      select: { id: true, hostTeamId: true }
+      select: {
+        id: true,
+        hostTeamId: true,
+        chat: {
+          select: {
+            messages: {
+              select: {
+                imageUrls: true
+              }
+            }
+          }
+        }
+      }
     });
 
     if (room.hostTeamId === payload.teamId) {
@@ -201,6 +242,14 @@ export class RoomService {
         });
       }
 
+      // delete images
+      const imageIds = room.chat?.messages
+        .flatMap((e) => e.imageUrls)
+        .map((e) => this.imageService.extractCuidFromUrl(e)) ?? [];
+
+      await this.imageService.deleteImageByIds(compact(imageIds));
+
+      // send notification
       void this.lineNotify.searchUserForDisbanRoomNotify(payload.roomId);
 
       return {
