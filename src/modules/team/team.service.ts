@@ -140,7 +140,8 @@ export class TeamService {
           ...filter.clause,
           ...(filter.clause.name && {
             name: {
-              contains: filter.clause.name
+              contains: filter.clause.name,
+              mode: "insensitive"
             }
           })
         }

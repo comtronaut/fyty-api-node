@@ -67,12 +67,14 @@ export class UserService {
         OR: [
           {
             displayName: {
-              contains: searchString
+              contains: searchString,
+              mode: "insensitive"
             }
           },
           {
             username: {
-              contains: searchString
+              contains: searchString,
+              mode: "insensitive"
             }
           }
         ]

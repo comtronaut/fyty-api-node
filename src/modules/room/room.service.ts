@@ -1,5 +1,6 @@
 import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
 import { PendingStatus, Room, RoomLineup, RoomMember, RoomStatus } from "@prisma/client";
+import { compact } from "lodash";
 
 import { getDayRangeWithin } from "common/utils/date";
 import { diffMinute } from "common/utils/time";
@@ -9,7 +10,6 @@ import { ImageService } from "modules/image/image.service";
 import { PrismaService } from "prisma/prisma.service";
 
 import { NotifyService } from "../notification/lineNotify.service";
-import { compact } from "lodash";
 
 @Injectable()
 export class RoomService {
@@ -66,7 +66,10 @@ export class RoomService {
     return room;
   }
 
-  async createUserNotifRegistrationsFromTeamIds(roomId: string, teamIds: string[]): Promise<void> {
+  async createUserNotifRegistrationsFromTeamIds(
+    roomId: string,
+    teamIds: string[]
+  ): Promise<void> {
     const teams = await this.prisma.team.findMany({
       where: {
         id: { in: teamIds }
@@ -243,9 +246,10 @@ export class RoomService {
       }
 
       // delete images
-      const imageIds = room.chat?.messages
-        .flatMap((e) => e.imageUrls)
-        .map((e) => this.imageService.extractCuidFromUrl(e)) ?? [];
+      const imageIds
+        = room.chat?.messages
+          .flatMap((e) => e.imageUrls)
+          .map((e) => this.imageService.extractCuidFromUrl(e)) ?? [];
 
       await this.imageService.deleteImageByIds(compact(imageIds));
 

@@ -1,130 +1,375 @@
-import { z } from 'zod';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from "@prisma/client";
+import { z } from "zod";
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // HELPER FUNCTIONS
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 // DECIMAL
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const DecimalJSLikeSchema: z.ZodType<Prisma.DecimalJsLike> = z.object({ d: z.array(z.number()), e: z.number(), s: z.number(), toFixed: z.function().args().returns(z.string()), });
+export const DecimalJSLikeSchema: z.ZodType<Prisma.DecimalJsLike> = z.object({
+  d: z.array(z.number()),
+  e: z.number(),
+  s: z.number(),
+  toFixed: z.function().args().returns(z.string())
+});
 
-export const DecimalJSLikeListSchema: z.ZodType<Prisma.DecimalJsLike[]> = z.object({ d: z.array(z.number()), e: z.number(), s: z.number(), toFixed: z.function().args().returns(z.string()), }).array();
+export const DecimalJSLikeListSchema: z.ZodType<Prisma.DecimalJsLike[]> = z
+  .object({
+    d: z.array(z.number()),
+    e: z.number(),
+    s: z.number(),
+    toFixed: z.function().args().returns(z.string())
+  })
+  .array();
 
 export const DECIMAL_STRING_REGEX = /^[0-9.,e+-bxffo_cp]+$|Infinity|NaN/;
 
-export const isValidDecimalInput =
-  (v?: null | string | number | Prisma.DecimalJsLike): v is string | number | Prisma.DecimalJsLike => {
-    if (v === undefined || v === null) return false;
-    return (
-      (typeof v === 'object' && 'd' in v && 'e' in v && 's' in v && 'toFixed' in v) ||
-      (typeof v === 'string' && DECIMAL_STRING_REGEX.test(v)) ||
-      typeof v === 'number'
-    )
-  };
+export const isValidDecimalInput = (
+  v?: null | string | number | Prisma.DecimalJsLike
+): v is string | number | Prisma.DecimalJsLike => {
+  if (v === undefined || v === null) {
+    return false;
+  }
+  return (
+    (typeof v === "object" && "d" in v && "e" in v && "s" in v && "toFixed" in v)
+    || (typeof v === "string" && DECIMAL_STRING_REGEX.test(v))
+    || typeof v === "number"
+  );
+};
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ENUMS
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const AdminScalarFieldEnumSchema = z.enum(['id','email','password','role','createdAt','updateAt']);
+export const AdminScalarFieldEnumSchema = z.enum([
+  "id",
+  "email",
+  "password",
+  "role",
+  "createdAt",
+  "updateAt"
+]);
 
-export const AppointmentMemberScalarFieldEnumSchema = z.enum(['id','appointmentId','teamId','isLeft','createdAt']);
+export const AppointmentMemberScalarFieldEnumSchema = z.enum([
+  "id",
+  "appointmentId",
+  "teamId",
+  "isLeft",
+  "createdAt"
+]);
 
-export const AppointmentScalarFieldEnumSchema = z.enum(['id','startAt','endAt','deletedBeforeAt','isDeleted','roomId','createdAt']);
+export const AppointmentScalarFieldEnumSchema = z.enum([
+  "id",
+  "startAt",
+  "endAt",
+  "deletedBeforeAt",
+  "isDeleted",
+  "roomId",
+  "createdAt"
+]);
 
-export const ChatScalarFieldEnumSchema = z.enum(['id','roomId']);
+export const ChatScalarFieldEnumSchema = z.enum([ "id", "roomId" ]);
 
-export const GameScalarFieldEnumSchema = z.enum(['id','name','teamCap','lineupCap','logoUrl','coverUrl','isActive','desc']);
+export const GameScalarFieldEnumSchema = z.enum([
+  "id",
+  "name",
+  "teamCap",
+  "lineupCap",
+  "logoUrl",
+  "coverUrl",
+  "isActive",
+  "desc"
+]);
 
-export const MessageScalarFieldEnumSchema = z.enum(['id','chatId','replyId','imageUrls','teamId','senderId','message','createdAt']);
+export const MessageScalarFieldEnumSchema = z.enum([
+  "id",
+  "chatId",
+  "replyId",
+  "imageUrls",
+  "teamId",
+  "senderId",
+  "message",
+  "createdAt"
+]);
 
-export const NotifUserRoomRegistrationScalarFieldEnumSchema = z.enum(['id','userId','roomId','unreadCount','lastSeenAt']);
+export const NotifUserRoomRegistrationScalarFieldEnumSchema = z.enum([
+  "id",
+  "userId",
+  "roomId",
+  "unreadCount",
+  "lastSeenAt"
+]);
 
-export const NotifUserSystemScalarFieldEnumSchema = z.enum(['id','userId','category','message','seenAt','createdAt']);
+export const NotifUserSystemScalarFieldEnumSchema = z.enum([
+  "id",
+  "userId",
+  "category",
+  "message",
+  "seenAt",
+  "createdAt"
+]);
 
-export const PasswordResetSessionScalarFieldEnumSchema = z.enum(['id','userId','token','attemptCount','expiredAt','updatedAt','createdAt']);
+export const PasswordResetSessionScalarFieldEnumSchema = z.enum([
+  "id",
+  "userId",
+  "token",
+  "attemptCount",
+  "expiredAt",
+  "updatedAt",
+  "createdAt"
+]);
 
-export const QueryModeSchema = z.enum(['default','insensitive']);
+export const QueryModeSchema = z.enum([ "default", "insensitive" ]);
 
-export const ReviewScalarFieldEnumSchema = z.enum(['id','content','ratingScore','reviewerId','revieweeId','gameId','createdAt']);
+export const ReviewScalarFieldEnumSchema = z.enum([
+  "id",
+  "content",
+  "ratingScore",
+  "reviewerId",
+  "revieweeId",
+  "gameId",
+  "createdAt"
+]);
 
-export const RoomLineupScalarFieldEnumSchema = z.enum(['id','teamLineupId','roomMemberId','roomId']);
+export const RoomLineupScalarFieldEnumSchema = z.enum([
+  "id",
+  "teamLineupId",
+  "roomMemberId",
+  "roomId"
+]);
 
-export const RoomMemberScalarFieldEnumSchema = z.enum(['id','teamId','roomId','joinedAt']);
+export const RoomMemberScalarFieldEnumSchema = z.enum([
+  "id",
+  "teamId",
+  "roomId",
+  "joinedAt"
+]);
 
-export const RoomPendingLineupScalarFieldEnumSchema = z.enum(['id','roomPendingId','teamLineupId']);
+export const RoomPendingLineupScalarFieldEnumSchema = z.enum([
+  "id",
+  "roomPendingId",
+  "teamLineupId"
+]);
 
-export const RoomPendingScalarFieldEnumSchema = z.enum(['id','teamId','roomId','status','createdAt']);
+export const RoomPendingScalarFieldEnumSchema = z.enum([
+  "id",
+  "teamId",
+  "roomId",
+  "status",
+  "createdAt"
+]);
 
-export const RoomScalarFieldEnumSchema = z.enum(['id','name','status','option','startAt','endAt','isPrivate','teamCount','note','gameId','hostTeamId','updatedAt','createdAt']);
+export const RoomScalarFieldEnumSchema = z.enum([
+  "id",
+  "name",
+  "status",
+  "option",
+  "startAt",
+  "endAt",
+  "isPrivate",
+  "teamCount",
+  "note",
+  "gameId",
+  "hostTeamId",
+  "updatedAt",
+  "createdAt"
+]);
 
-export const RoomSettingsScalarFieldEnumSchema = z.enum(['id','roomId']);
+export const RoomSettingsScalarFieldEnumSchema = z.enum([ "id", "roomId" ]);
 
-export const SortOrderSchema = z.enum(['asc','desc']);
+export const SortOrderSchema = z.enum([ "asc", "desc" ]);
 
-export const TeamLineupScalarFieldEnumSchema = z.enum(['id','teamId','avatarId','inGameId','isDefault','profileUrl','imageUrl','name','note','updatedAt','createdAt']);
+export const TeamLineupScalarFieldEnumSchema = z.enum([
+  "id",
+  "teamId",
+  "avatarId",
+  "inGameId",
+  "isDefault",
+  "profileUrl",
+  "imageUrl",
+  "name",
+  "note",
+  "updatedAt",
+  "createdAt"
+]);
 
-export const TeamMemberScalarFieldEnumSchema = z.enum(['id','role','teamId','userId','joinedAt']);
+export const TeamMemberScalarFieldEnumSchema = z.enum([
+  "id",
+  "role",
+  "teamId",
+  "userId",
+  "joinedAt"
+]);
 
-export const TeamPendingScalarFieldEnumSchema = z.enum(['id','teamId','userId','status','createdAt']);
+export const TeamPendingScalarFieldEnumSchema = z.enum([
+  "id",
+  "teamId",
+  "userId",
+  "status",
+  "createdAt"
+]);
 
-export const TeamScalarFieldEnumSchema = z.enum(['id','name','coverUrl','logoUrl','tier','isPrivate','bookBank','gameId','founderId','designatorTeamId','isDeleted','createdAt']);
+export const TeamScalarFieldEnumSchema = z.enum([
+  "id",
+  "name",
+  "coverUrl",
+  "logoUrl",
+  "tier",
+  "isPrivate",
+  "bookBank",
+  "gameId",
+  "founderId",
+  "designatorTeamId",
+  "isDeleted",
+  "createdAt"
+]);
 
-export const TeamSettingsScalarFieldEnumSchema = z.enum(['id','teamId','isJoiningEnabled']);
+export const TeamSettingsScalarFieldEnumSchema = z.enum([
+  "id",
+  "teamId",
+  "isJoiningEnabled"
+]);
 
-export const TeamStatsScalarFieldEnumSchema = z.enum(['id','teamId','leftWhileTrainingCount','completedTrainingCount','trainingMinute','trainingCount','winCount','loseCount','tieCount','perGameWinCount','perGameLoseCount','updateAt']);
+export const TeamStatsScalarFieldEnumSchema = z.enum([
+  "id",
+  "teamId",
+  "leftWhileTrainingCount",
+  "completedTrainingCount",
+  "trainingMinute",
+  "trainingCount",
+  "winCount",
+  "loseCount",
+  "tieCount",
+  "perGameWinCount",
+  "perGameLoseCount",
+  "updateAt"
+]);
 
-export const TrainingLineupScalarFieldEnumSchema = z.enum(['id','trainingId','lineupId']);
+export const TrainingLineupScalarFieldEnumSchema = z.enum([ "id", "trainingId", "lineupId" ]);
 
-export const TrainingReportScalarFieldEnumSchema = z.enum(['id','reporterUserId','reporterTeamId','trainingId','isAdminReviewed','heading','content','imageUrls','createdAt']);
+export const TrainingReportScalarFieldEnumSchema = z.enum([
+  "id",
+  "reporterUserId",
+  "reporterTeamId",
+  "trainingId",
+  "isAdminReviewed",
+  "heading",
+  "content",
+  "imageUrls",
+  "createdAt"
+]);
 
-export const TrainingScalarFieldEnumSchema = z.enum(['id','appointmentId','hostId','guestId','hostWinCount','hostLoseCount','note','status','source','imageUrls','isSubmitted','updatedAt','createdAt']);
+export const TrainingScalarFieldEnumSchema = z.enum([
+  "id",
+  "appointmentId",
+  "hostId",
+  "guestId",
+  "hostWinCount",
+  "hostLoseCount",
+  "note",
+  "status",
+  "source",
+  "imageUrls",
+  "isSubmitted",
+  "updatedAt",
+  "createdAt"
+]);
 
-export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCommitted','RepeatableRead','Serializable']);
+export const TransactionIsolationLevelSchema = z.enum([
+  "ReadUncommitted",
+  "ReadCommitted",
+  "RepeatableRead",
+  "Serializable"
+]);
 
-export const UserAvatarScalarFieldEnumSchema = z.enum(['id','inGameId','characterName','rank','ratingScore','gameId','userId']);
+export const UserAvatarScalarFieldEnumSchema = z.enum([
+  "id",
+  "inGameId",
+  "characterName",
+  "rank",
+  "ratingScore",
+  "gameId",
+  "userId"
+]);
 
-export const UserScalarFieldEnumSchema = z.enum(['id','username','updatedUsernameAt','mobilePhone','updatedMobilePhoneAt','password','displayName','email','updatedEmailAt','bio','portraitUrl','coverUrl','isVerified','isDeactivated','facebookId','googleId','lineId','lineToken','firstLoginAt','lastLoginAt','createdAt','updatedAt']);
+export const UserScalarFieldEnumSchema = z.enum([
+  "id",
+  "username",
+  "updatedUsernameAt",
+  "mobilePhone",
+  "updatedMobilePhoneAt",
+  "password",
+  "displayName",
+  "email",
+  "updatedEmailAt",
+  "bio",
+  "portraitUrl",
+  "coverUrl",
+  "isVerified",
+  "isDeactivated",
+  "facebookId",
+  "googleId",
+  "lineId",
+  "lineToken",
+  "firstLoginAt",
+  "lastLoginAt",
+  "createdAt",
+  "updatedAt"
+]);
 
-export const UserSettingsScalarFieldEnumSchema = z.enum(['id','userId','isNotifiedBeforeTrainingMinute','isTeamNotified','isMeNotified','isRoomNotified','lang']);
+export const UserSettingsScalarFieldEnumSchema = z.enum([
+  "id",
+  "userId",
+  "isNotifiedBeforeTrainingMinute",
+  "isTeamNotified",
+  "isMeNotified",
+  "isRoomNotified",
+  "lang"
+]);
 
-export const LangSchema = z.enum(['TH','EN']);
+export const LangSchema = z.enum([ "TH", "EN" ]);
 
-export type LangType = `${z.infer<typeof LangSchema>}`
+export type LangType = `${z.infer<typeof LangSchema>}`;
 
-export const RoomStatusSchema = z.enum(['AVAILABLE','UNAVAILABLE','CONFIRMED','FULL']);
+export const RoomStatusSchema = z.enum([ "AVAILABLE", "UNAVAILABLE", "CONFIRMED", "FULL" ]);
 
-export type RoomStatusType = `${z.infer<typeof RoomStatusSchema>}`
+export type RoomStatusType = `${z.infer<typeof RoomStatusSchema>}`;
 
-export const MemberRoleSchema = z.enum(['HEAD_COACH','LEADER','MANAGER','MEMBER']);
+export const MemberRoleSchema = z.enum([ "HEAD_COACH", "LEADER", "MANAGER", "MEMBER" ]);
 
-export type MemberRoleType = `${z.infer<typeof MemberRoleSchema>}`
+export type MemberRoleType = `${z.infer<typeof MemberRoleSchema>}`;
 
-export const TrainingStatusSchema = z.enum(['ACCEPTED','DENIED','INEFFECTIVE','EXPIRED','UNREVIEWED']);
+export const TrainingStatusSchema = z.enum([
+  "ACCEPTED",
+  "DENIED",
+  "INEFFECTIVE",
+  "EXPIRED",
+  "UNREVIEWED"
+]);
 
-export type TrainingStatusType = `${z.infer<typeof TrainingStatusSchema>}`
+export type TrainingStatusType = `${z.infer<typeof TrainingStatusSchema>}`;
 
-export const TrainingSourceSchema = z.enum(['SYSTEM','ADMIN','USER']);
+export const TrainingSourceSchema = z.enum([ "SYSTEM", "ADMIN", "USER" ]);
 
-export type TrainingSourceType = `${z.infer<typeof TrainingSourceSchema>}`
+export type TrainingSourceType = `${z.infer<typeof TrainingSourceSchema>}`;
 
-export const PendingStatusSchema = z.enum(['INCOMING','OUTGOING']);
+export const PendingStatusSchema = z.enum([ "INCOMING", "OUTGOING" ]);
 
-export type PendingStatusType = `${z.infer<typeof PendingStatusSchema>}`
+export type PendingStatusType = `${z.infer<typeof PendingStatusSchema>}`;
 
-export const AdminRoleSchema = z.enum(['MANAGEMENT']);
+export const AdminRoleSchema = z.enum([ "MANAGEMENT" ]);
 
-export type AdminRoleType = `${z.infer<typeof AdminRoleSchema>}`
+export type AdminRoleType = `${z.infer<typeof AdminRoleSchema>}`;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // MODELS
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // GAME SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const GameSchema = z.object({
   id: z.string(),
@@ -134,65 +379,75 @@ export const GameSchema = z.object({
   logoUrl: z.string(),
   coverUrl: z.string(),
   isActive: z.boolean(),
-  desc: z.string(),
-})
+  desc: z.string()
+});
 
-export type Game = z.infer<typeof GameSchema>
+export type Game = z.infer<typeof GameSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // GAME PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const GamePartialSchema = GameSchema.partial()
+export const GamePartialSchema = GameSchema.partial();
 
-export type GamePartial = z.infer<typeof GamePartialSchema>
+export type GamePartial = z.infer<typeof GamePartialSchema>;
 
 // GAME OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const GameOptionalDefaultsSchema = GameSchema.merge(z.object({
-  isActive: z.boolean().optional(),
-  desc: z.string().optional(),
-}))
+export const GameOptionalDefaultsSchema = GameSchema.merge(
+  z.object({
+    isActive: z.boolean().optional(),
+    desc: z.string().optional()
+  })
+);
 
-export type GameOptionalDefaults = z.infer<typeof GameOptionalDefaultsSchema>
+export type GameOptionalDefaults = z.infer<typeof GameOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // NOTIF USER ROOM REGISTRATION SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const NotifUserRoomRegistrationSchema = z.object({
   id: z.string().cuid(),
   userId: z.string(),
   roomId: z.string(),
   unreadCount: z.number().int(),
-  lastSeenAt: z.coerce.date(),
-})
+  lastSeenAt: z.coerce.date()
+});
 
-export type NotifUserRoomRegistration = z.infer<typeof NotifUserRoomRegistrationSchema>
+export type NotifUserRoomRegistration = z.infer<typeof NotifUserRoomRegistrationSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // NOTIF USER ROOM REGISTRATION PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const NotifUserRoomRegistrationPartialSchema = NotifUserRoomRegistrationSchema.partial()
+export const NotifUserRoomRegistrationPartialSchema
+  = NotifUserRoomRegistrationSchema.partial();
 
-export type NotifUserRoomRegistrationPartial = z.infer<typeof NotifUserRoomRegistrationPartialSchema>
+export type NotifUserRoomRegistrationPartial = z.infer<
+  typeof NotifUserRoomRegistrationPartialSchema
+>;
 
 // NOTIF USER ROOM REGISTRATION OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const NotifUserRoomRegistrationOptionalDefaultsSchema = NotifUserRoomRegistrationSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  unreadCount: z.number().int().optional(),
-  lastSeenAt: z.coerce.date().optional(),
-}))
+export const NotifUserRoomRegistrationOptionalDefaultsSchema
+  = NotifUserRoomRegistrationSchema.merge(
+    z.object({
+      id: z.string().cuid().optional(),
+      unreadCount: z.number().int().optional(),
+      lastSeenAt: z.coerce.date().optional()
+    })
+  );
 
-export type NotifUserRoomRegistrationOptionalDefaults = z.infer<typeof NotifUserRoomRegistrationOptionalDefaultsSchema>
+export type NotifUserRoomRegistrationOptionalDefaults = z.infer<
+  typeof NotifUserRoomRegistrationOptionalDefaultsSchema
+>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // NOTIF USER SYSTEM SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const NotifUserSystemSchema = z.object({
   id: z.string().cuid(),
@@ -200,32 +455,36 @@ export const NotifUserSystemSchema = z.object({
   category: z.string(),
   message: z.string(),
   seenAt: z.coerce.date().nullish(),
-  createdAt: z.coerce.date(),
-})
+  createdAt: z.coerce.date()
+});
 
-export type NotifUserSystem = z.infer<typeof NotifUserSystemSchema>
+export type NotifUserSystem = z.infer<typeof NotifUserSystemSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // NOTIF USER SYSTEM PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const NotifUserSystemPartialSchema = NotifUserSystemSchema.partial()
+export const NotifUserSystemPartialSchema = NotifUserSystemSchema.partial();
 
-export type NotifUserSystemPartial = z.infer<typeof NotifUserSystemPartialSchema>
+export type NotifUserSystemPartial = z.infer<typeof NotifUserSystemPartialSchema>;
 
 // NOTIF USER SYSTEM OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const NotifUserSystemOptionalDefaultsSchema = NotifUserSystemSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  createdAt: z.coerce.date().optional(),
-}))
+export const NotifUserSystemOptionalDefaultsSchema = NotifUserSystemSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
 
-export type NotifUserSystemOptionalDefaults = z.infer<typeof NotifUserSystemOptionalDefaultsSchema>
+export type NotifUserSystemOptionalDefaults = z.infer<
+  typeof NotifUserSystemOptionalDefaultsSchema
+>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ROOM SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const RoomSchema = z.object({
   status: RoomStatusSchema,
@@ -240,189 +499,205 @@ export const RoomSchema = z.object({
   gameId: z.string(),
   hostTeamId: z.string(),
   updatedAt: z.coerce.date(),
-  createdAt: z.coerce.date(),
-})
+  createdAt: z.coerce.date()
+});
 
-export type Room = z.infer<typeof RoomSchema>
+export type Room = z.infer<typeof RoomSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ROOM PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const RoomPartialSchema = RoomSchema.partial()
+export const RoomPartialSchema = RoomSchema.partial();
 
-export type RoomPartial = z.infer<typeof RoomPartialSchema>
+export type RoomPartial = z.infer<typeof RoomPartialSchema>;
 
 // ROOM OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const RoomOptionalDefaultsSchema = RoomSchema.merge(z.object({
-  status: RoomStatusSchema.optional(),
-  id: z.string().cuid().optional(),
-  option: z.string().optional(),
-  isPrivate: z.boolean().optional(),
-  teamCount: z.number().int().optional(),
-  note: z.string().optional(),
-  updatedAt: z.coerce.date().optional(),
-  createdAt: z.coerce.date().optional(),
-}))
+export const RoomOptionalDefaultsSchema = RoomSchema.merge(
+  z.object({
+    status: RoomStatusSchema.optional(),
+    id: z.string().cuid().optional(),
+    option: z.string().optional(),
+    isPrivate: z.boolean().optional(),
+    teamCount: z.number().int().optional(),
+    note: z.string().optional(),
+    updatedAt: z.coerce.date().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
 
-export type RoomOptionalDefaults = z.infer<typeof RoomOptionalDefaultsSchema>
+export type RoomOptionalDefaults = z.infer<typeof RoomOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ROOM SETTINGS SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const RoomSettingsSchema = z.object({
   id: z.string().cuid(),
-  roomId: z.string(),
-})
+  roomId: z.string()
+});
 
-export type RoomSettings = z.infer<typeof RoomSettingsSchema>
+export type RoomSettings = z.infer<typeof RoomSettingsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ROOM SETTINGS PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const RoomSettingsPartialSchema = RoomSettingsSchema.partial()
+export const RoomSettingsPartialSchema = RoomSettingsSchema.partial();
 
-export type RoomSettingsPartial = z.infer<typeof RoomSettingsPartialSchema>
+export type RoomSettingsPartial = z.infer<typeof RoomSettingsPartialSchema>;
 
 // ROOM SETTINGS OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const RoomSettingsOptionalDefaultsSchema = RoomSettingsSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-}))
+export const RoomSettingsOptionalDefaultsSchema = RoomSettingsSchema.merge(
+  z.object({
+    id: z.string().cuid().optional()
+  })
+);
 
-export type RoomSettingsOptionalDefaults = z.infer<typeof RoomSettingsOptionalDefaultsSchema>
+export type RoomSettingsOptionalDefaults = z.infer<
+  typeof RoomSettingsOptionalDefaultsSchema
+>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ROOM MEMBER SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const RoomMemberSchema = z.object({
   id: z.string().cuid(),
   teamId: z.string(),
   roomId: z.string(),
-  joinedAt: z.coerce.date(),
-})
+  joinedAt: z.coerce.date()
+});
 
-export type RoomMember = z.infer<typeof RoomMemberSchema>
+export type RoomMember = z.infer<typeof RoomMemberSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ROOM MEMBER PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const RoomMemberPartialSchema = RoomMemberSchema.partial()
+export const RoomMemberPartialSchema = RoomMemberSchema.partial();
 
-export type RoomMemberPartial = z.infer<typeof RoomMemberPartialSchema>
+export type RoomMemberPartial = z.infer<typeof RoomMemberPartialSchema>;
 
 // ROOM MEMBER OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const RoomMemberOptionalDefaultsSchema = RoomMemberSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  joinedAt: z.coerce.date().optional(),
-}))
+export const RoomMemberOptionalDefaultsSchema = RoomMemberSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    joinedAt: z.coerce.date().optional()
+  })
+);
 
-export type RoomMemberOptionalDefaults = z.infer<typeof RoomMemberOptionalDefaultsSchema>
+export type RoomMemberOptionalDefaults = z.infer<typeof RoomMemberOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ROOM LINEUP SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const RoomLineupSchema = z.object({
   id: z.string().cuid(),
   teamLineupId: z.string(),
   roomMemberId: z.string(),
-  roomId: z.string(),
-})
+  roomId: z.string()
+});
 
-export type RoomLineup = z.infer<typeof RoomLineupSchema>
+export type RoomLineup = z.infer<typeof RoomLineupSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ROOM LINEUP PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const RoomLineupPartialSchema = RoomLineupSchema.partial()
+export const RoomLineupPartialSchema = RoomLineupSchema.partial();
 
-export type RoomLineupPartial = z.infer<typeof RoomLineupPartialSchema>
+export type RoomLineupPartial = z.infer<typeof RoomLineupPartialSchema>;
 
 // ROOM LINEUP OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const RoomLineupOptionalDefaultsSchema = RoomLineupSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-}))
+export const RoomLineupOptionalDefaultsSchema = RoomLineupSchema.merge(
+  z.object({
+    id: z.string().cuid().optional()
+  })
+);
 
-export type RoomLineupOptionalDefaults = z.infer<typeof RoomLineupOptionalDefaultsSchema>
+export type RoomLineupOptionalDefaults = z.infer<typeof RoomLineupOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ROOM PENDING SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const RoomPendingSchema = z.object({
   status: PendingStatusSchema,
   id: z.string().cuid(),
   teamId: z.string(),
   roomId: z.string(),
-  createdAt: z.coerce.date(),
-})
+  createdAt: z.coerce.date()
+});
 
-export type RoomPending = z.infer<typeof RoomPendingSchema>
+export type RoomPending = z.infer<typeof RoomPendingSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ROOM PENDING PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const RoomPendingPartialSchema = RoomPendingSchema.partial()
+export const RoomPendingPartialSchema = RoomPendingSchema.partial();
 
-export type RoomPendingPartial = z.infer<typeof RoomPendingPartialSchema>
+export type RoomPendingPartial = z.infer<typeof RoomPendingPartialSchema>;
 
 // ROOM PENDING OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const RoomPendingOptionalDefaultsSchema = RoomPendingSchema.merge(z.object({
-  status: PendingStatusSchema.optional(),
-  id: z.string().cuid().optional(),
-  createdAt: z.coerce.date().optional(),
-}))
+export const RoomPendingOptionalDefaultsSchema = RoomPendingSchema.merge(
+  z.object({
+    status: PendingStatusSchema.optional(),
+    id: z.string().cuid().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
 
-export type RoomPendingOptionalDefaults = z.infer<typeof RoomPendingOptionalDefaultsSchema>
+export type RoomPendingOptionalDefaults = z.infer<typeof RoomPendingOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ROOM PENDING LINEUP SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const RoomPendingLineupSchema = z.object({
   id: z.string().cuid(),
   roomPendingId: z.string(),
-  teamLineupId: z.string(),
-})
+  teamLineupId: z.string()
+});
 
-export type RoomPendingLineup = z.infer<typeof RoomPendingLineupSchema>
+export type RoomPendingLineup = z.infer<typeof RoomPendingLineupSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ROOM PENDING LINEUP PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const RoomPendingLineupPartialSchema = RoomPendingLineupSchema.partial()
+export const RoomPendingLineupPartialSchema = RoomPendingLineupSchema.partial();
 
-export type RoomPendingLineupPartial = z.infer<typeof RoomPendingLineupPartialSchema>
+export type RoomPendingLineupPartial = z.infer<typeof RoomPendingLineupPartialSchema>;
 
 // ROOM PENDING LINEUP OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const RoomPendingLineupOptionalDefaultsSchema = RoomPendingLineupSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-}))
+export const RoomPendingLineupOptionalDefaultsSchema = RoomPendingLineupSchema.merge(
+  z.object({
+    id: z.string().cuid().optional()
+  })
+);
 
-export type RoomPendingLineupOptionalDefaults = z.infer<typeof RoomPendingLineupOptionalDefaultsSchema>
+export type RoomPendingLineupOptionalDefaults = z.infer<
+  typeof RoomPendingLineupOptionalDefaultsSchema
+>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TEAM SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const TeamSchema = z.object({
   id: z.string().cuid(),
@@ -436,101 +711,109 @@ export const TeamSchema = z.object({
   founderId: z.string().nullish(),
   designatorTeamId: z.string().nullish(),
   isDeleted: z.boolean(),
-  createdAt: z.coerce.date(),
-})
+  createdAt: z.coerce.date()
+});
 
-export type Team = z.infer<typeof TeamSchema>
+export type Team = z.infer<typeof TeamSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TEAM PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const TeamPartialSchema = TeamSchema.partial()
+export const TeamPartialSchema = TeamSchema.partial();
 
-export type TeamPartial = z.infer<typeof TeamPartialSchema>
+export type TeamPartial = z.infer<typeof TeamPartialSchema>;
 
 // TEAM OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const TeamOptionalDefaultsSchema = TeamSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  coverUrl: z.string().optional(),
-  logoUrl: z.string().optional(),
-  tier: z.string().optional(),
-  isPrivate: z.boolean().optional(),
-  bookBank: z.string().optional(),
-  isDeleted: z.boolean().optional(),
-  createdAt: z.coerce.date().optional(),
-}))
+export const TeamOptionalDefaultsSchema = TeamSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    coverUrl: z.string().optional(),
+    logoUrl: z.string().optional(),
+    tier: z.string().optional(),
+    isPrivate: z.boolean().optional(),
+    bookBank: z.string().optional(),
+    isDeleted: z.boolean().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
 
-export type TeamOptionalDefaults = z.infer<typeof TeamOptionalDefaultsSchema>
+export type TeamOptionalDefaults = z.infer<typeof TeamOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TEAM SETTINGS SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const TeamSettingsSchema = z.object({
   id: z.string().cuid(),
   teamId: z.string(),
-  isJoiningEnabled: z.boolean(),
-})
+  isJoiningEnabled: z.boolean()
+});
 
-export type TeamSettings = z.infer<typeof TeamSettingsSchema>
+export type TeamSettings = z.infer<typeof TeamSettingsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TEAM SETTINGS PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const TeamSettingsPartialSchema = TeamSettingsSchema.partial()
+export const TeamSettingsPartialSchema = TeamSettingsSchema.partial();
 
-export type TeamSettingsPartial = z.infer<typeof TeamSettingsPartialSchema>
+export type TeamSettingsPartial = z.infer<typeof TeamSettingsPartialSchema>;
 
 // TEAM SETTINGS OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const TeamSettingsOptionalDefaultsSchema = TeamSettingsSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  isJoiningEnabled: z.boolean().optional(),
-}))
+export const TeamSettingsOptionalDefaultsSchema = TeamSettingsSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    isJoiningEnabled: z.boolean().optional()
+  })
+);
 
-export type TeamSettingsOptionalDefaults = z.infer<typeof TeamSettingsOptionalDefaultsSchema>
+export type TeamSettingsOptionalDefaults = z.infer<
+  typeof TeamSettingsOptionalDefaultsSchema
+>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TEAM MEMBER SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const TeamMemberSchema = z.object({
   role: MemberRoleSchema,
   id: z.string().cuid(),
   teamId: z.string(),
   userId: z.string(),
-  joinedAt: z.coerce.date(),
-})
+  joinedAt: z.coerce.date()
+});
 
-export type TeamMember = z.infer<typeof TeamMemberSchema>
+export type TeamMember = z.infer<typeof TeamMemberSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TEAM MEMBER PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const TeamMemberPartialSchema = TeamMemberSchema.partial()
+export const TeamMemberPartialSchema = TeamMemberSchema.partial();
 
-export type TeamMemberPartial = z.infer<typeof TeamMemberPartialSchema>
+export type TeamMemberPartial = z.infer<typeof TeamMemberPartialSchema>;
 
 // TEAM MEMBER OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const TeamMemberOptionalDefaultsSchema = TeamMemberSchema.merge(z.object({
-  role: MemberRoleSchema.optional(),
-  id: z.string().cuid().optional(),
-  joinedAt: z.coerce.date().optional(),
-}))
+export const TeamMemberOptionalDefaultsSchema = TeamMemberSchema.merge(
+  z.object({
+    role: MemberRoleSchema.optional(),
+    id: z.string().cuid().optional(),
+    joinedAt: z.coerce.date().optional()
+  })
+);
 
-export type TeamMemberOptionalDefaults = z.infer<typeof TeamMemberOptionalDefaultsSchema>
+export type TeamMemberOptionalDefaults = z.infer<typeof TeamMemberOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TEAM LINEUP SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const TeamLineupSchema = z.object({
   id: z.string().cuid(),
@@ -543,71 +826,75 @@ export const TeamLineupSchema = z.object({
   name: z.string(),
   note: z.string(),
   updatedAt: z.coerce.date(),
-  createdAt: z.coerce.date(),
-})
+  createdAt: z.coerce.date()
+});
 
-export type TeamLineup = z.infer<typeof TeamLineupSchema>
+export type TeamLineup = z.infer<typeof TeamLineupSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TEAM LINEUP PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const TeamLineupPartialSchema = TeamLineupSchema.partial()
+export const TeamLineupPartialSchema = TeamLineupSchema.partial();
 
-export type TeamLineupPartial = z.infer<typeof TeamLineupPartialSchema>
+export type TeamLineupPartial = z.infer<typeof TeamLineupPartialSchema>;
 
 // TEAM LINEUP OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const TeamLineupOptionalDefaultsSchema = TeamLineupSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  isDefault: z.boolean().optional(),
-  profileUrl: z.string().optional(),
-  imageUrl: z.string().optional(),
-  name: z.string().optional(),
-  note: z.string().optional(),
-  updatedAt: z.coerce.date().optional(),
-  createdAt: z.coerce.date().optional(),
-}))
+export const TeamLineupOptionalDefaultsSchema = TeamLineupSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    isDefault: z.boolean().optional(),
+    profileUrl: z.string().optional(),
+    imageUrl: z.string().optional(),
+    name: z.string().optional(),
+    note: z.string().optional(),
+    updatedAt: z.coerce.date().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
 
-export type TeamLineupOptionalDefaults = z.infer<typeof TeamLineupOptionalDefaultsSchema>
+export type TeamLineupOptionalDefaults = z.infer<typeof TeamLineupOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TEAM PENDING SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const TeamPendingSchema = z.object({
   status: PendingStatusSchema,
   id: z.string().cuid(),
   teamId: z.string(),
   userId: z.string(),
-  createdAt: z.coerce.date(),
-})
+  createdAt: z.coerce.date()
+});
 
-export type TeamPending = z.infer<typeof TeamPendingSchema>
+export type TeamPending = z.infer<typeof TeamPendingSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TEAM PENDING PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const TeamPendingPartialSchema = TeamPendingSchema.partial()
+export const TeamPendingPartialSchema = TeamPendingSchema.partial();
 
-export type TeamPendingPartial = z.infer<typeof TeamPendingPartialSchema>
+export type TeamPendingPartial = z.infer<typeof TeamPendingPartialSchema>;
 
 // TEAM PENDING OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const TeamPendingOptionalDefaultsSchema = TeamPendingSchema.merge(z.object({
-  status: PendingStatusSchema.optional(),
-  id: z.string().cuid().optional(),
-  createdAt: z.coerce.date().optional(),
-}))
+export const TeamPendingOptionalDefaultsSchema = TeamPendingSchema.merge(
+  z.object({
+    status: PendingStatusSchema.optional(),
+    id: z.string().cuid().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
 
-export type TeamPendingOptionalDefaults = z.infer<typeof TeamPendingOptionalDefaultsSchema>
+export type TeamPendingOptionalDefaults = z.infer<typeof TeamPendingOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // USER SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const UserSchema = z.object({
   id: z.string().cuid(),
@@ -631,38 +918,40 @@ export const UserSchema = z.object({
   firstLoginAt: z.coerce.date().nullish(),
   lastLoginAt: z.coerce.date().nullish(),
   createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-})
+  updatedAt: z.coerce.date()
+});
 
-export type User = z.infer<typeof UserSchema>
+export type User = z.infer<typeof UserSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // USER PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const UserPartialSchema = UserSchema.partial()
+export const UserPartialSchema = UserSchema.partial();
 
-export type UserPartial = z.infer<typeof UserPartialSchema>
+export type UserPartial = z.infer<typeof UserPartialSchema>;
 
 // USER OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const UserOptionalDefaultsSchema = UserSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  bio: z.string().optional(),
-  portraitUrl: z.string().optional(),
-  coverUrl: z.string().optional(),
-  isVerified: z.boolean().optional(),
-  isDeactivated: z.boolean().optional(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-}))
+export const UserOptionalDefaultsSchema = UserSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    bio: z.string().optional(),
+    portraitUrl: z.string().optional(),
+    coverUrl: z.string().optional(),
+    isVerified: z.boolean().optional(),
+    isDeactivated: z.boolean().optional(),
+    createdAt: z.coerce.date().optional(),
+    updatedAt: z.coerce.date().optional()
+  })
+);
 
-export type UserOptionalDefaults = z.infer<typeof UserOptionalDefaultsSchema>
+export type UserOptionalDefaults = z.infer<typeof UserOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // USER SETTINGS SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const UserSettingsSchema = z.object({
   lang: LangSchema,
@@ -671,36 +960,40 @@ export const UserSettingsSchema = z.object({
   isNotifiedBeforeTrainingMinute: z.number().int(),
   isTeamNotified: z.boolean(),
   isMeNotified: z.boolean(),
-  isRoomNotified: z.boolean(),
-})
+  isRoomNotified: z.boolean()
+});
 
-export type UserSettings = z.infer<typeof UserSettingsSchema>
+export type UserSettings = z.infer<typeof UserSettingsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // USER SETTINGS PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const UserSettingsPartialSchema = UserSettingsSchema.partial()
+export const UserSettingsPartialSchema = UserSettingsSchema.partial();
 
-export type UserSettingsPartial = z.infer<typeof UserSettingsPartialSchema>
+export type UserSettingsPartial = z.infer<typeof UserSettingsPartialSchema>;
 
 // USER SETTINGS OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const UserSettingsOptionalDefaultsSchema = UserSettingsSchema.merge(z.object({
-  lang: LangSchema.optional(),
-  id: z.string().cuid().optional(),
-  isNotifiedBeforeTrainingMinute: z.number().int().optional(),
-  isTeamNotified: z.boolean().optional(),
-  isMeNotified: z.boolean().optional(),
-  isRoomNotified: z.boolean().optional(),
-}))
+export const UserSettingsOptionalDefaultsSchema = UserSettingsSchema.merge(
+  z.object({
+    lang: LangSchema.optional(),
+    id: z.string().cuid().optional(),
+    isNotifiedBeforeTrainingMinute: z.number().int().optional(),
+    isTeamNotified: z.boolean().optional(),
+    isMeNotified: z.boolean().optional(),
+    isRoomNotified: z.boolean().optional()
+  })
+);
 
-export type UserSettingsOptionalDefaults = z.infer<typeof UserSettingsOptionalDefaultsSchema>
+export type UserSettingsOptionalDefaults = z.infer<
+  typeof UserSettingsOptionalDefaultsSchema
+>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // PASSWORD RESET SESSION SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const PasswordResetSessionSchema = z.object({
   id: z.string().cuid(),
@@ -709,104 +1002,130 @@ export const PasswordResetSessionSchema = z.object({
   attemptCount: z.number().int(),
   expiredAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  createdAt: z.coerce.date(),
-})
+  createdAt: z.coerce.date()
+});
 
-export type PasswordResetSession = z.infer<typeof PasswordResetSessionSchema>
+export type PasswordResetSession = z.infer<typeof PasswordResetSessionSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // PASSWORD RESET SESSION PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const PasswordResetSessionPartialSchema = PasswordResetSessionSchema.partial()
+export const PasswordResetSessionPartialSchema = PasswordResetSessionSchema.partial();
 
-export type PasswordResetSessionPartial = z.infer<typeof PasswordResetSessionPartialSchema>
+export type PasswordResetSessionPartial = z.infer<typeof PasswordResetSessionPartialSchema>;
 
 // PASSWORD RESET SESSION OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const PasswordResetSessionOptionalDefaultsSchema = PasswordResetSessionSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  attemptCount: z.number().int().optional(),
-  updatedAt: z.coerce.date().optional(),
-  createdAt: z.coerce.date().optional(),
-}))
+export const PasswordResetSessionOptionalDefaultsSchema = PasswordResetSessionSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    attemptCount: z.number().int().optional(),
+    updatedAt: z.coerce.date().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
 
-export type PasswordResetSessionOptionalDefaults = z.infer<typeof PasswordResetSessionOptionalDefaultsSchema>
+export type PasswordResetSessionOptionalDefaults = z.infer<
+  typeof PasswordResetSessionOptionalDefaultsSchema
+>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // USER AVATAR SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const UserAvatarSchema = z.object({
   id: z.string().cuid(),
   inGameId: z.string(),
   characterName: z.string(),
   rank: z.string(),
-  ratingScore: z.union([z.number(),z.string(),DecimalJSLikeSchema,]).refine((v) => isValidDecimalInput(v), { message: "Field 'ratingScore' must be a Decimal. Location: ['Models', 'UserAvatar']",  }),
+  ratingScore: z
+    .union([ z.number(), z.string(), DecimalJSLikeSchema ])
+    .refine((v) => isValidDecimalInput(v), {
+      message: "Field 'ratingScore' must be a Decimal. Location: ['Models', 'UserAvatar']"
+    }),
   gameId: z.string(),
-  userId: z.string(),
-})
+  userId: z.string()
+});
 
-export type UserAvatar = z.infer<typeof UserAvatarSchema>
+export type UserAvatar = z.infer<typeof UserAvatarSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // USER AVATAR PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const UserAvatarPartialSchema = UserAvatarSchema.partial()
+export const UserAvatarPartialSchema = UserAvatarSchema.partial();
 
-export type UserAvatarPartial = z.infer<typeof UserAvatarPartialSchema>
+export type UserAvatarPartial = z.infer<typeof UserAvatarPartialSchema>;
 
 // USER AVATAR OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const UserAvatarOptionalDefaultsSchema = UserAvatarSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  characterName: z.string().optional(),
-  ratingScore: z.union([z.number(),z.string(),DecimalJSLikeSchema,]).refine((v) => isValidDecimalInput(v), { message: "Field 'ratingScore' must be a Decimal. Location: ['Models', 'UserAvatar']",  }).optional(),
-}))
+export const UserAvatarOptionalDefaultsSchema = UserAvatarSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    characterName: z.string().optional(),
+    ratingScore: z
+      .union([ z.number(), z.string(), DecimalJSLikeSchema ])
+      .refine((v) => isValidDecimalInput(v), {
+        message: "Field 'ratingScore' must be a Decimal. Location: ['Models', 'UserAvatar']"
+      })
+      .optional()
+  })
+);
 
-export type UserAvatarOptionalDefaults = z.infer<typeof UserAvatarOptionalDefaultsSchema>
+export type UserAvatarOptionalDefaults = z.infer<typeof UserAvatarOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // REVIEW SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const ReviewSchema = z.object({
   id: z.string().cuid(),
   content: z.string(),
-  ratingScore: z.union([z.number(),z.string(),DecimalJSLikeSchema,]).refine((v) => isValidDecimalInput(v), { message: "Field 'ratingScore' must be a Decimal. Location: ['Models', 'Review']",  }),
+  ratingScore: z
+    .union([ z.number(), z.string(), DecimalJSLikeSchema ])
+    .refine((v) => isValidDecimalInput(v), {
+      message: "Field 'ratingScore' must be a Decimal. Location: ['Models', 'Review']"
+    }),
   reviewerId: z.string().nullish(),
   revieweeId: z.string(),
   gameId: z.string(),
-  createdAt: z.coerce.date(),
-})
+  createdAt: z.coerce.date()
+});
 
-export type Review = z.infer<typeof ReviewSchema>
+export type Review = z.infer<typeof ReviewSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // REVIEW PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const ReviewPartialSchema = ReviewSchema.partial()
+export const ReviewPartialSchema = ReviewSchema.partial();
 
-export type ReviewPartial = z.infer<typeof ReviewPartialSchema>
+export type ReviewPartial = z.infer<typeof ReviewPartialSchema>;
 
 // REVIEW OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const ReviewOptionalDefaultsSchema = ReviewSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  ratingScore: z.union([z.number(),z.string(),DecimalJSLikeSchema,]).refine((v) => isValidDecimalInput(v), { message: "Field 'ratingScore' must be a Decimal. Location: ['Models', 'Review']",  }).optional(),
-  createdAt: z.coerce.date().optional(),
-}))
+export const ReviewOptionalDefaultsSchema = ReviewSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    ratingScore: z
+      .union([ z.number(), z.string(), DecimalJSLikeSchema ])
+      .refine((v) => isValidDecimalInput(v), {
+        message: "Field 'ratingScore' must be a Decimal. Location: ['Models', 'Review']"
+      })
+      .optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
 
-export type ReviewOptionalDefaults = z.infer<typeof ReviewOptionalDefaultsSchema>
+export type ReviewOptionalDefaults = z.infer<typeof ReviewOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // APPOINTMENT SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const AppointmentSchema = z.object({
   id: z.string().cuid(),
@@ -815,94 +1134,102 @@ export const AppointmentSchema = z.object({
   deletedBeforeAt: z.coerce.date().nullish(),
   isDeleted: z.boolean(),
   roomId: z.string().nullish(),
-  createdAt: z.coerce.date(),
-})
+  createdAt: z.coerce.date()
+});
 
-export type Appointment = z.infer<typeof AppointmentSchema>
+export type Appointment = z.infer<typeof AppointmentSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // APPOINTMENT PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const AppointmentPartialSchema = AppointmentSchema.partial()
+export const AppointmentPartialSchema = AppointmentSchema.partial();
 
-export type AppointmentPartial = z.infer<typeof AppointmentPartialSchema>
+export type AppointmentPartial = z.infer<typeof AppointmentPartialSchema>;
 
 // APPOINTMENT OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const AppointmentOptionalDefaultsSchema = AppointmentSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  isDeleted: z.boolean().optional(),
-  createdAt: z.coerce.date().optional(),
-}))
+export const AppointmentOptionalDefaultsSchema = AppointmentSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    isDeleted: z.boolean().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
 
-export type AppointmentOptionalDefaults = z.infer<typeof AppointmentOptionalDefaultsSchema>
+export type AppointmentOptionalDefaults = z.infer<typeof AppointmentOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // APPOINTMENT MEMBER SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const AppointmentMemberSchema = z.object({
   id: z.string().cuid(),
   appointmentId: z.string(),
   teamId: z.string(),
   isLeft: z.boolean(),
-  createdAt: z.coerce.date(),
-})
+  createdAt: z.coerce.date()
+});
 
-export type AppointmentMember = z.infer<typeof AppointmentMemberSchema>
+export type AppointmentMember = z.infer<typeof AppointmentMemberSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // APPOINTMENT MEMBER PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const AppointmentMemberPartialSchema = AppointmentMemberSchema.partial()
+export const AppointmentMemberPartialSchema = AppointmentMemberSchema.partial();
 
-export type AppointmentMemberPartial = z.infer<typeof AppointmentMemberPartialSchema>
+export type AppointmentMemberPartial = z.infer<typeof AppointmentMemberPartialSchema>;
 
 // APPOINTMENT MEMBER OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const AppointmentMemberOptionalDefaultsSchema = AppointmentMemberSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  isLeft: z.boolean().optional(),
-  createdAt: z.coerce.date().optional(),
-}))
+export const AppointmentMemberOptionalDefaultsSchema = AppointmentMemberSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    isLeft: z.boolean().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
 
-export type AppointmentMemberOptionalDefaults = z.infer<typeof AppointmentMemberOptionalDefaultsSchema>
+export type AppointmentMemberOptionalDefaults = z.infer<
+  typeof AppointmentMemberOptionalDefaultsSchema
+>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // CHAT SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const ChatSchema = z.object({
   id: z.string().cuid(),
-  roomId: z.string(),
-})
+  roomId: z.string()
+});
 
-export type Chat = z.infer<typeof ChatSchema>
+export type Chat = z.infer<typeof ChatSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // CHAT PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const ChatPartialSchema = ChatSchema.partial()
+export const ChatPartialSchema = ChatSchema.partial();
 
-export type ChatPartial = z.infer<typeof ChatPartialSchema>
+export type ChatPartial = z.infer<typeof ChatPartialSchema>;
 
 // CHAT OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const ChatOptionalDefaultsSchema = ChatSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-}))
+export const ChatOptionalDefaultsSchema = ChatSchema.merge(
+  z.object({
+    id: z.string().cuid().optional()
+  })
+);
 
-export type ChatOptionalDefaults = z.infer<typeof ChatOptionalDefaultsSchema>
+export type ChatOptionalDefaults = z.infer<typeof ChatOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // MESSAGE SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const MessageSchema = z.object({
   id: z.string().cuid(),
@@ -912,33 +1239,35 @@ export const MessageSchema = z.object({
   teamId: z.string().nullish(),
   senderId: z.string().nullish(),
   message: z.string(),
-  createdAt: z.coerce.date(),
-})
+  createdAt: z.coerce.date()
+});
 
-export type Message = z.infer<typeof MessageSchema>
+export type Message = z.infer<typeof MessageSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // MESSAGE PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const MessagePartialSchema = MessageSchema.partial()
+export const MessagePartialSchema = MessageSchema.partial();
 
-export type MessagePartial = z.infer<typeof MessagePartialSchema>
+export type MessagePartial = z.infer<typeof MessagePartialSchema>;
 
 // MESSAGE OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const MessageOptionalDefaultsSchema = MessageSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  imageUrls: z.string().array().optional(),
-  createdAt: z.coerce.date().optional(),
-}))
+export const MessageOptionalDefaultsSchema = MessageSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    imageUrls: z.string().array().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
 
-export type MessageOptionalDefaults = z.infer<typeof MessageOptionalDefaultsSchema>
+export type MessageOptionalDefaults = z.infer<typeof MessageOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TEAM STATS SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const TeamStatsSchema = z.object({
   id: z.string().cuid(),
@@ -952,41 +1281,43 @@ export const TeamStatsSchema = z.object({
   tieCount: z.number().int(),
   perGameWinCount: z.number().int(),
   perGameLoseCount: z.number().int(),
-  updateAt: z.coerce.date(),
-})
+  updateAt: z.coerce.date()
+});
 
-export type TeamStats = z.infer<typeof TeamStatsSchema>
+export type TeamStats = z.infer<typeof TeamStatsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TEAM STATS PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const TeamStatsPartialSchema = TeamStatsSchema.partial()
+export const TeamStatsPartialSchema = TeamStatsSchema.partial();
 
-export type TeamStatsPartial = z.infer<typeof TeamStatsPartialSchema>
+export type TeamStatsPartial = z.infer<typeof TeamStatsPartialSchema>;
 
 // TEAM STATS OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const TeamStatsOptionalDefaultsSchema = TeamStatsSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  leftWhileTrainingCount: z.number().int().optional(),
-  completedTrainingCount: z.number().int().optional(),
-  trainingMinute: z.number().int().optional(),
-  trainingCount: z.number().int().optional(),
-  winCount: z.number().int().optional(),
-  loseCount: z.number().int().optional(),
-  tieCount: z.number().int().optional(),
-  perGameWinCount: z.number().int().optional(),
-  perGameLoseCount: z.number().int().optional(),
-  updateAt: z.coerce.date().optional(),
-}))
+export const TeamStatsOptionalDefaultsSchema = TeamStatsSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    leftWhileTrainingCount: z.number().int().optional(),
+    completedTrainingCount: z.number().int().optional(),
+    trainingMinute: z.number().int().optional(),
+    trainingCount: z.number().int().optional(),
+    winCount: z.number().int().optional(),
+    loseCount: z.number().int().optional(),
+    tieCount: z.number().int().optional(),
+    perGameWinCount: z.number().int().optional(),
+    perGameLoseCount: z.number().int().optional(),
+    updateAt: z.coerce.date().optional()
+  })
+);
 
-export type TeamStatsOptionalDefaults = z.infer<typeof TeamStatsOptionalDefaultsSchema>
+export type TeamStatsOptionalDefaults = z.infer<typeof TeamStatsOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TRAINING SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const TrainingSchema = z.object({
   status: TrainingStatusSchema,
@@ -1001,67 +1332,73 @@ export const TrainingSchema = z.object({
   imageUrls: z.string().array(),
   isSubmitted: z.boolean(),
   updatedAt: z.coerce.date(),
-  createdAt: z.coerce.date(),
-})
+  createdAt: z.coerce.date()
+});
 
-export type Training = z.infer<typeof TrainingSchema>
+export type Training = z.infer<typeof TrainingSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TRAINING PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const TrainingPartialSchema = TrainingSchema.partial()
+export const TrainingPartialSchema = TrainingSchema.partial();
 
-export type TrainingPartial = z.infer<typeof TrainingPartialSchema>
+export type TrainingPartial = z.infer<typeof TrainingPartialSchema>;
 
 // TRAINING OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const TrainingOptionalDefaultsSchema = TrainingSchema.merge(z.object({
-  status: TrainingStatusSchema.optional(),
-  source: TrainingSourceSchema.optional(),
-  id: z.string().cuid().optional(),
-  note: z.string().optional(),
-  imageUrls: z.string().array().optional(),
-  isSubmitted: z.boolean().optional(),
-  updatedAt: z.coerce.date().optional(),
-  createdAt: z.coerce.date().optional(),
-}))
+export const TrainingOptionalDefaultsSchema = TrainingSchema.merge(
+  z.object({
+    status: TrainingStatusSchema.optional(),
+    source: TrainingSourceSchema.optional(),
+    id: z.string().cuid().optional(),
+    note: z.string().optional(),
+    imageUrls: z.string().array().optional(),
+    isSubmitted: z.boolean().optional(),
+    updatedAt: z.coerce.date().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
 
-export type TrainingOptionalDefaults = z.infer<typeof TrainingOptionalDefaultsSchema>
+export type TrainingOptionalDefaults = z.infer<typeof TrainingOptionalDefaultsSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TRAINING LINEUP SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const TrainingLineupSchema = z.object({
   id: z.string().cuid(),
   trainingId: z.string(),
-  lineupId: z.string(),
-})
+  lineupId: z.string()
+});
 
-export type TrainingLineup = z.infer<typeof TrainingLineupSchema>
+export type TrainingLineup = z.infer<typeof TrainingLineupSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TRAINING LINEUP PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const TrainingLineupPartialSchema = TrainingLineupSchema.partial()
+export const TrainingLineupPartialSchema = TrainingLineupSchema.partial();
 
-export type TrainingLineupPartial = z.infer<typeof TrainingLineupPartialSchema>
+export type TrainingLineupPartial = z.infer<typeof TrainingLineupPartialSchema>;
 
 // TRAINING LINEUP OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const TrainingLineupOptionalDefaultsSchema = TrainingLineupSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-}))
+export const TrainingLineupOptionalDefaultsSchema = TrainingLineupSchema.merge(
+  z.object({
+    id: z.string().cuid().optional()
+  })
+);
 
-export type TrainingLineupOptionalDefaults = z.infer<typeof TrainingLineupOptionalDefaultsSchema>
+export type TrainingLineupOptionalDefaults = z.infer<
+  typeof TrainingLineupOptionalDefaultsSchema
+>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TRAINING REPORT SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const TrainingReportSchema = z.object({
   id: z.string().cuid(),
@@ -1072,34 +1409,38 @@ export const TrainingReportSchema = z.object({
   heading: z.string(),
   content: z.string(),
   imageUrls: z.string().array(),
-  createdAt: z.coerce.date(),
-})
+  createdAt: z.coerce.date()
+});
 
-export type TrainingReport = z.infer<typeof TrainingReportSchema>
+export type TrainingReport = z.infer<typeof TrainingReportSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // TRAINING REPORT PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const TrainingReportPartialSchema = TrainingReportSchema.partial()
+export const TrainingReportPartialSchema = TrainingReportSchema.partial();
 
-export type TrainingReportPartial = z.infer<typeof TrainingReportPartialSchema>
+export type TrainingReportPartial = z.infer<typeof TrainingReportPartialSchema>;
 
 // TRAINING REPORT OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const TrainingReportOptionalDefaultsSchema = TrainingReportSchema.merge(z.object({
-  id: z.string().cuid().optional(),
-  isAdminReviewed: z.boolean().optional(),
-  imageUrls: z.string().array().optional(),
-  createdAt: z.coerce.date().optional(),
-}))
+export const TrainingReportOptionalDefaultsSchema = TrainingReportSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    isAdminReviewed: z.boolean().optional(),
+    imageUrls: z.string().array().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
 
-export type TrainingReportOptionalDefaults = z.infer<typeof TrainingReportOptionalDefaultsSchema>
+export type TrainingReportOptionalDefaults = z.infer<
+  typeof TrainingReportOptionalDefaultsSchema
+>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ADMIN SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
 export const AdminSchema = z.object({
   role: AdminRoleSchema,
@@ -1107,27 +1448,29 @@ export const AdminSchema = z.object({
   email: z.string().email(),
   password: z.string(),
   createdAt: z.coerce.date(),
-  updateAt: z.coerce.date(),
-})
+  updateAt: z.coerce.date()
+});
 
-export type Admin = z.infer<typeof AdminSchema>
+export type Admin = z.infer<typeof AdminSchema>;
 
-/////////////////////////////////////////
+// ///////////////////////////////////////
 // ADMIN PARTIAL SCHEMA
-/////////////////////////////////////////
+// ///////////////////////////////////////
 
-export const AdminPartialSchema = AdminSchema.partial()
+export const AdminPartialSchema = AdminSchema.partial();
 
-export type AdminPartial = z.infer<typeof AdminPartialSchema>
+export type AdminPartial = z.infer<typeof AdminPartialSchema>;
 
 // ADMIN OPTIONAL DEFAULTS SCHEMA
-//------------------------------------------------------
+// ------------------------------------------------------
 
-export const AdminOptionalDefaultsSchema = AdminSchema.merge(z.object({
-  role: AdminRoleSchema.optional(),
-  id: z.string().cuid().optional(),
-  createdAt: z.coerce.date().optional(),
-  updateAt: z.coerce.date().optional(),
-}))
+export const AdminOptionalDefaultsSchema = AdminSchema.merge(
+  z.object({
+    role: AdminRoleSchema.optional(),
+    id: z.string().cuid().optional(),
+    createdAt: z.coerce.date().optional(),
+    updateAt: z.coerce.date().optional()
+  })
+);
 
-export type AdminOptionalDefaults = z.infer<typeof AdminOptionalDefaultsSchema>
+export type AdminOptionalDefaults = z.infer<typeof AdminOptionalDefaultsSchema>;

@@ -205,6 +205,11 @@ export class TrainingService {
             endAt: true
           }
         }
+      },
+      orderBy: {
+        appointment: {
+          startAt: "desc"
+        }
       }
     });
   }

@@ -1,10 +1,18 @@
 import dayjs from "dayjs";
 
-export function getDayRangeWithin(rawDate: any): { start: Date; end: Date } {
+export function getDayRangeWithin(
+  rawDate: any,
+  timezoneShift?: number
+): { start: Date; end: Date } {
   const today = new Date(rawDate);
 
-  const dayStart = dayjs(today).startOf("day").toDate();
-  const dayEnd = dayjs(today).endOf("day").toDate();
+  const dayStart = dayjs(today).startOf("day");
+  const dayEnd = dayjs(today).endOf("day");
 
-  return { start: dayStart, end: dayEnd };
+  if (timezoneShift) {
+    dayStart.add(timezoneShift, "hour");
+    dayEnd.add(timezoneShift, "hour");
+  }
+
+  return { start: dayStart.toDate(), end: dayEnd.toDate() };
 }

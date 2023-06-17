@@ -7,7 +7,7 @@ import { RoomPendingOptionalDefaultsSchema } from "model/schema";
 export class CreateRoomPendingDto
   extends createZodDto(
     RoomPendingOptionalDefaultsSchema.extend({
-      teamLineupIds: z.string().array().nonempty()
+      teamLineupIds: z.string().array()
     })
   )
   implements Prisma.RoomPendingUncheckedCreateInput {}

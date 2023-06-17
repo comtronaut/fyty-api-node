@@ -15,7 +15,7 @@ export class LobbyService {
   ) {}
 
   async getLobbyByGameId(gameId: string, date: string, user: User): Promise<LobbyDetail> {
-    const { start, end } = getDayRangeWithin(date);
+    const { start, end } = getDayRangeWithin(date, 7);
 
     const [ rooms, memberRes ] = await Promise.all([
       this.prisma.room.findMany({
