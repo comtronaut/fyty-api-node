@@ -67,7 +67,7 @@ export class TrainingService {
               isLeft: true
             },
             {
-              teamId: payload.guestId,
+              teamId: newGuestId ?? payload.guestId,
               isLeft: true
             }
           ]
