@@ -1,6 +1,7 @@
 import { CacheModule } from "@nestjs/cache-manager";
 import { Module } from "@nestjs/common";
 import { APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
+import { EventEmitterModule } from "@nestjs/event-emitter";
 import { ZodSerializerInterceptor, ZodValidationPipe } from "nestjs-zod";
 
 import { RoutineModule } from "modules/routine/routine.module";
@@ -37,6 +38,7 @@ import { PrismaModule } from "./prisma/prisma.module";
     SocketModule,
     PrismaModule,
     RoutineModule,
+    EventEmitterModule.forRoot(),
     CacheModule.register({
       ttl: 1000 * 60 * 60,
       isGlobal: true

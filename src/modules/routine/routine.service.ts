@@ -1,28 +1,25 @@
-import { Injectable, MessageEvent, Sse } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { TrainingSource, TrainingStatus } from "@prisma/client";
 import dayjs from "dayjs";
 import { compact } from "lodash";
-import { Observable, Subject, map } from "rxjs";
 
-import { EventSourceKey } from "common/constants/keys";
 import { diffMinute } from "common/utils/time";
 import { ImageService } from "modules/image/image.service";
 import { RoomService } from "modules/room/room.service";
 import { PrismaService } from "prisma/prisma.service";
-import { RoomSystemRemoval } from "types/sse-payload";
 
 import { NotifyService } from "../notification/lineNotify.service";
 
 @Injectable()
 export class RoutineService {
-  private readonly roomSystemRemoval = new Subject<RoomSystemRemoval>();
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly roomService: RoomService,
     private readonly notifyService: NotifyService,
-    private readonly imageService: ImageService
+    private readonly imageService: ImageService,
+    private readonly eventEmitter: EventEmitter2
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE, { timeZone: "Asia/Bangkok" })
@@ -108,7 +105,7 @@ export class RoutineService {
 
       await Promise.all([
         // create training result
-        trainingCreatableRooms.map((e) => (
+        ...trainingCreatableRooms.map((e) => (
           this.prisma.training.create({
             data: {
               appointmentId: e.appointment!.id,
@@ -133,15 +130,12 @@ export class RoutineService {
       ]);
 
       // send notifications
-      for (const room of rooms) {
-        this.roomSystemRemoval.next({
-          roomId: room.id,
-          appointmentId: room.appointment!.id,
-          isDone:
-            room.members.length > 1
-            && Boolean(room.members.filter((f) => f.teamId !== room.hostTeamId)[0])
-        });
-      }
+      rooms.map((room) => (
+        this.eventEmitter.emit(
+          "socket.room-system-removal",
+          { roomId: room.id }
+        )
+      ));
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(err.message);
@@ -196,10 +190,5 @@ export class RoutineService {
         console.error(err.message);
       }
     }
-  }
-
-  @Sse(EventSourceKey.RoomSystemRemoval)
-  sse(): Observable<MessageEvent> {
-    return this.roomSystemRemoval.pipe(map((data) => ({ data })));
   }
 }

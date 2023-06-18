@@ -14,6 +14,7 @@ import type * as WSPayloadType from "types/ws-payload";
 
 import { MessageService } from "../chat/message.service";
 import { RoomService } from "../room/room.service";
+import { OnEvent } from "@nestjs/event-emitter";
 
 @WebSocketGateway({
   cors: {
@@ -29,6 +30,11 @@ implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
   ) {}
 
   @WebSocketServer() server: Server;
+
+  @OnEvent("socket.room-system-removal")
+  handleRoomSystemRemoval(payload: any) {
+    this.server.emit(`res/room/${payload.roomId}/disband`, payload);
+  }
 
   // message
   @SubscribeMessage("message")
