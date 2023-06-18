@@ -47,7 +47,13 @@ export class TrainingService {
         data: {
           gameId: hostTeam.gameId,
           designatorTeamId: payload.hostId,
-          name: guestId
+          name: guestId,
+          settings: {
+            create: {}
+          },
+          stats: {
+            create: {}
+          }
         },
         select: { id: true }
       });
