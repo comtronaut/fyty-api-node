@@ -2,9 +2,13 @@ import { Logger } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 
 import { AppModule } from "./app.module";
 import env from "./common/env.config";
+
+dayjs.extend(utc);
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {

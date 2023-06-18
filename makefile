@@ -1,7 +1,7 @@
 remote_host := 159.223.80.31
 port_prod := 8001
 port_dev := 8002
-app_name := fyty-api
+app_name_prod := fyty-api
 app_name_dev := fyty-api-dev
 
 # usage example: make git m="your message"
