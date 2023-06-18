@@ -64,11 +64,11 @@ export class TrainingService {
           create: [
             {
               teamId: payload.hostId,
-              isLeft: true
+              isLeft: false
             },
             {
               teamId: newGuestId ?? payload.guestId,
-              isLeft: true
+              isLeft: false
             }
           ]
         },
