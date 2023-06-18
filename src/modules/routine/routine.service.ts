@@ -100,18 +100,17 @@ export class RoutineService {
         })
       );
 
+      const trainingCreatableRooms = rooms.filter((e) =>
+        e.appointment
+        && e.members.length === e.game.teamCap
+        && e.members.filter((f) => f.teamId !== e.hostTeamId).length
+      );
+
       await Promise.all([
         // create training result
-        this.prisma.training.createMany({
-          data: rooms
-            .filter((e) =>
-              [
-                e.appointment,
-                e.members.length === e.game.teamCap,
-                e.members.filter((f) => f.teamId !== e.hostTeamId).length
-              ].every(Boolean)
-            )
-            .map((e) => ({
+        trainingCreatableRooms.map((e) => (
+          this.prisma.training.create({
+            data: {
               appointmentId: e.appointment!.id,
               hostId: e.hostTeamId,
               guestId: e.members.filter((f) => f.teamId !== e.hostTeamId)[0]!.teamId,
@@ -120,8 +119,9 @@ export class RoutineService {
                   data: e.lineups.map((e) => ({ lineupId: e.teamLineupId }))
                 }
               }
-            }))
-        }),
+            }
+          })
+        )),
         // delete images
         this.imageService.deleteImageByIds(compact(imageIds)),
         // delete rooms
