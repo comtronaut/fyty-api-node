@@ -115,7 +115,7 @@ model NotifUserRoomRegistration {
   userId        String   @db.Char(25)
   room          Room     @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   roomId        String   @db.Char(25)
-  latestMessage String
+  latestMessage String   @default("")
   unreadCount   Int      @default(0)
   lastSeenAt    DateTime @default(now())
 

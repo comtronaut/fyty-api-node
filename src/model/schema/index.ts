@@ -469,6 +469,7 @@ export const NotifUserRoomRegistrationOptionalDefaultsSchema
   = NotifUserRoomRegistrationSchema.merge(
     z.object({
       id: z.string().cuid().optional(),
+      latestMessage: z.string().optional(),
       unreadCount: z.number().int().optional(),
       lastSeenAt: z.coerce.date().optional()
     })

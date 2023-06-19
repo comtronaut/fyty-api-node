@@ -22,7 +22,7 @@ Table NotifUserRoomRegistration {
   id String [pk]
   userId String [not null]
   roomId String [not null]
-  latestMessage String [not null]
+  latestMessage String [not null, default: '']
   unreadCount Int [not null, default: 0]
   lastSeenAt DateTime [default: `now()`, not null]
 }
