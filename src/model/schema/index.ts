@@ -29,9 +29,7 @@ export const DECIMAL_STRING_REGEX = /^[0-9.,e+-bxffo_cp]+$|Infinity|NaN/;
 export const isValidDecimalInput = (
   v?: null | string | number | Prisma.DecimalJsLike
 ): v is string | number | Prisma.DecimalJsLike => {
-  if (v === undefined || v === null) {
-    return false;
-  }
+  if (v === undefined || v === null) {return false;}
   return (
     (typeof v === "object" && "d" in v && "e" in v && "s" in v && "toFixed" in v)
     || (typeof v === "string" && DECIMAL_STRING_REGEX.test(v))
@@ -57,6 +55,14 @@ export const AppointmentMemberScalarFieldEnumSchema = z.enum([
   "appointmentId",
   "teamId",
   "isLeft",
+  "createdAt"
+]);
+
+export const AppointmentPendingScalarFieldEnumSchema = z.enum([
+  "id",
+  "appointmentId",
+  "inviterTeamId",
+  "inviteeTeamId",
   "createdAt"
 ]);
 
@@ -98,15 +104,31 @@ export const NotifUserRoomRegistrationScalarFieldEnumSchema = z.enum([
   "id",
   "userId",
   "roomId",
+  "latestMessage",
   "unreadCount",
   "lastSeenAt"
 ]);
 
-export const NotifUserSystemScalarFieldEnumSchema = z.enum([
+export const NotificationActionScalarFieldEnumSchema = z.enum([
   "id",
-  "userId",
-  "category",
+  "notificationId",
+  "response",
+  "teamPendingId",
+  "roomPendingId",
+  "appointmentPendingId",
+  "updatedAt"
+]);
+
+export const NotificationCollectionScalarFieldEnumSchema = z.enum([ "id", "userId" ]);
+
+export const NotificationScalarFieldEnumSchema = z.enum([
+  "id",
+  "collectionId",
+  "source",
+  "title",
   "message",
+  "senderUserId",
+  "senderTeamId",
   "seenAt",
   "createdAt"
 ]);
@@ -363,6 +385,16 @@ export const AdminRoleSchema = z.enum([ "MANAGEMENT" ]);
 
 export type AdminRoleType = `${z.infer<typeof AdminRoleSchema>}`;
 
+export const NotificationSourceSchema = z.enum([ "SYSTEM", "USER" ]);
+
+export type NotificationSourceType = `${z.infer<typeof NotificationSourceSchema>}`;
+
+export const NotificationActionResponseSchema = z.enum([ "ACCEPTED", "DENIED" ]);
+
+export type NotificationActionResponseType = `${z.infer<
+  typeof NotificationActionResponseSchema
+>}`;
+
 // ///////////////////////////////////////
 // MODELS
 // ///////////////////////////////////////
@@ -412,6 +444,7 @@ export const NotifUserRoomRegistrationSchema = z.object({
   id: z.string().cuid(),
   userId: z.string(),
   roomId: z.string(),
+  latestMessage: z.string(),
   unreadCount: z.number().int(),
   lastSeenAt: z.coerce.date()
 });
@@ -446,40 +479,116 @@ export type NotifUserRoomRegistrationOptionalDefaults = z.infer<
 >;
 
 // ///////////////////////////////////////
-// NOTIF USER SYSTEM SCHEMA
+// NOTIFICATION SCHEMA
 // ///////////////////////////////////////
 
-export const NotifUserSystemSchema = z.object({
+export const NotificationSchema = z.object({
+  source: NotificationSourceSchema,
   id: z.string().cuid(),
-  userId: z.string(),
-  category: z.string(),
+  collectionId: z.string(),
+  title: z.string(),
   message: z.string(),
+  senderUserId: z.string().nullish(),
+  senderTeamId: z.string().nullish(),
   seenAt: z.coerce.date().nullish(),
   createdAt: z.coerce.date()
 });
 
-export type NotifUserSystem = z.infer<typeof NotifUserSystemSchema>;
+export type Notification = z.infer<typeof NotificationSchema>;
 
 // ///////////////////////////////////////
-// NOTIF USER SYSTEM PARTIAL SCHEMA
+// NOTIFICATION PARTIAL SCHEMA
 // ///////////////////////////////////////
 
-export const NotifUserSystemPartialSchema = NotifUserSystemSchema.partial();
+export const NotificationPartialSchema = NotificationSchema.partial();
 
-export type NotifUserSystemPartial = z.infer<typeof NotifUserSystemPartialSchema>;
+export type NotificationPartial = z.infer<typeof NotificationPartialSchema>;
 
-// NOTIF USER SYSTEM OPTIONAL DEFAULTS SCHEMA
+// NOTIFICATION OPTIONAL DEFAULTS SCHEMA
 // ------------------------------------------------------
 
-export const NotifUserSystemOptionalDefaultsSchema = NotifUserSystemSchema.merge(
+export const NotificationOptionalDefaultsSchema = NotificationSchema.merge(
   z.object({
     id: z.string().cuid().optional(),
     createdAt: z.coerce.date().optional()
   })
 );
 
-export type NotifUserSystemOptionalDefaults = z.infer<
-  typeof NotifUserSystemOptionalDefaultsSchema
+export type NotificationOptionalDefaults = z.infer<
+  typeof NotificationOptionalDefaultsSchema
+>;
+
+// ///////////////////////////////////////
+// NOTIFICATION ACTION SCHEMA
+// ///////////////////////////////////////
+
+export const NotificationActionSchema = z.object({
+  response: NotificationActionResponseSchema.nullish(),
+  id: z.string().cuid(),
+  notificationId: z.string(),
+  teamPendingId: z.string().nullish(),
+  roomPendingId: z.string().nullish(),
+  appointmentPendingId: z.string().nullish(),
+  updatedAt: z.coerce.date()
+});
+
+export type NotificationAction = z.infer<typeof NotificationActionSchema>;
+
+// ///////////////////////////////////////
+// NOTIFICATION ACTION PARTIAL SCHEMA
+// ///////////////////////////////////////
+
+export const NotificationActionPartialSchema = NotificationActionSchema.partial();
+
+export type NotificationActionPartial = z.infer<typeof NotificationActionPartialSchema>;
+
+// NOTIFICATION ACTION OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const NotificationActionOptionalDefaultsSchema = NotificationActionSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    updatedAt: z.coerce.date().optional()
+  })
+);
+
+export type NotificationActionOptionalDefaults = z.infer<
+  typeof NotificationActionOptionalDefaultsSchema
+>;
+
+// ///////////////////////////////////////
+// NOTIFICATION COLLECTION SCHEMA
+// ///////////////////////////////////////
+
+export const NotificationCollectionSchema = z.object({
+  id: z.string().cuid(),
+  userId: z.string()
+});
+
+export type NotificationCollection = z.infer<typeof NotificationCollectionSchema>;
+
+// ///////////////////////////////////////
+// NOTIFICATION COLLECTION PARTIAL SCHEMA
+// ///////////////////////////////////////
+
+export const NotificationCollectionPartialSchema = NotificationCollectionSchema.partial();
+
+export type NotificationCollectionPartial = z.infer<
+  typeof NotificationCollectionPartialSchema
+>;
+
+// NOTIFICATION COLLECTION OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const NotificationCollectionOptionalDefaultsSchema
+  = NotificationCollectionSchema.merge(
+    z.object({
+      id: z.string().cuid().optional()
+    })
+  );
+
+export type NotificationCollectionOptionalDefaults = z.infer<
+  typeof NotificationCollectionOptionalDefaultsSchema
 >;
 
 // ///////////////////////////////////////
@@ -1159,6 +1268,42 @@ export const AppointmentOptionalDefaultsSchema = AppointmentSchema.merge(
 );
 
 export type AppointmentOptionalDefaults = z.infer<typeof AppointmentOptionalDefaultsSchema>;
+
+// ///////////////////////////////////////
+// APPOINTMENT PENDING SCHEMA
+// ///////////////////////////////////////
+
+export const AppointmentPendingSchema = z.object({
+  id: z.string().cuid(),
+  appointmentId: z.string(),
+  inviterTeamId: z.string(),
+  inviteeTeamId: z.string(),
+  createdAt: z.coerce.date()
+});
+
+export type AppointmentPending = z.infer<typeof AppointmentPendingSchema>;
+
+// ///////////////////////////////////////
+// APPOINTMENT PENDING PARTIAL SCHEMA
+// ///////////////////////////////////////
+
+export const AppointmentPendingPartialSchema = AppointmentPendingSchema.partial();
+
+export type AppointmentPendingPartial = z.infer<typeof AppointmentPendingPartialSchema>;
+
+// APPOINTMENT PENDING OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const AppointmentPendingOptionalDefaultsSchema = AppointmentPendingSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
+
+export type AppointmentPendingOptionalDefaults = z.infer<
+  typeof AppointmentPendingOptionalDefaultsSchema
+>;
 
 // ///////////////////////////////////////
 // APPOINTMENT MEMBER SCHEMA

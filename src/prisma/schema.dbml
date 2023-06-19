@@ -22,17 +22,36 @@ Table NotifUserRoomRegistration {
   id String [pk]
   userId String [not null]
   roomId String [not null]
+  latestMessage String [not null]
   unreadCount Int [not null, default: 0]
   lastSeenAt DateTime [default: `now()`, not null]
 }
 
-Table NotifUserSystem {
+Table Notification {
   id String [pk]
-  userId String [not null]
-  category String [not null]
+  collectionId String [not null]
+  source NotificationSource [not null]
+  title String [not null]
   message String [not null]
+  senderUserId String
+  senderTeamId String
   seenAt DateTime
   createdAt DateTime [default: `now()`, not null]
+}
+
+Table NotificationAction {
+  id String [pk]
+  notificationId String [unique, not null]
+  response NotificationActionResponse
+  teamPendingId String
+  roomPendingId String
+  appointmentPendingId String
+  updatedAt DateTime [not null]
+}
+
+Table NotificationCollection {
+  id String [pk]
+  userId String [unique, not null]
 }
 
 Table Room {
@@ -230,6 +249,18 @@ Table Appointment {
   createdAt DateTime [default: `now()`, not null]
 }
 
+Table AppointmentPending {
+  id String [pk]
+  appointmentId String [unique, not null]
+  inviterTeamId String [not null]
+  inviteeTeamId String [not null]
+  createdAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (appointmentId, inviterTeamId, inviteeTeamId) [unique]
+  }
+}
+
 Table AppointmentMember {
   id String [pk]
   appointmentId String [not null]
@@ -362,11 +393,35 @@ Enum AdminRole {
   MANAGEMENT
 }
 
+Enum NotificationSource {
+  SYSTEM
+  USER
+}
+
+Enum NotificationActionResponse {
+  ACCEPTED
+  DENIED
+}
+
 Ref: NotifUserRoomRegistration.userId > User.id [delete: Cascade]
 
 Ref: NotifUserRoomRegistration.roomId > Room.id [delete: Cascade]
 
-Ref: NotifUserSystem.userId > User.id [delete: Cascade]
+Ref: Notification.collectionId > NotificationCollection.id [delete: Cascade]
+
+Ref: Notification.senderUserId > User.id [delete: Cascade]
+
+Ref: Notification.senderTeamId > Team.id [delete: Cascade]
+
+Ref: NotificationAction.notificationId - Notification.id [delete: Cascade]
+
+Ref: NotificationAction.teamPendingId > TeamPending.id [delete: Set Null]
+
+Ref: NotificationAction.roomPendingId > RoomPending.id [delete: Set Null]
+
+Ref: NotificationAction.appointmentPendingId > AppointmentPending.id [delete: Set Null]
+
+Ref: NotificationCollection.userId - User.id [delete: Cascade]
 
 Ref: Room.gameId > Game.id
 
@@ -427,6 +482,12 @@ Ref: Review.revieweeId > User.id [delete: Set Null]
 Ref: Review.gameId > Game.id
 
 Ref: Appointment.roomId - Room.id [delete: Set Null]
+
+Ref: AppointmentPending.appointmentId - Appointment.id [delete: Cascade]
+
+Ref: AppointmentPending.inviterTeamId > Team.id [delete: Cascade]
+
+Ref: AppointmentPending.inviteeTeamId > Team.id [delete: Cascade]
 
 Ref: AppointmentMember.appointmentId > Appointment.id [delete: Cascade]
 

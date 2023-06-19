@@ -81,6 +81,16 @@ enum AdminRole {
   MANAGEMENT
 }
 
+enum NotificationSource {
+  SYSTEM
+  USER
+}
+
+enum NotificationActionResponse {
+  ACCEPTED
+  DENIED
+}
+
 // game
 model Game {
   id        String  @id
@@ -100,23 +110,57 @@ model Game {
 
 // notification
 model NotifUserRoomRegistration {
-  id          String   @id @default(cuid()) @db.Char(25)
-  user        User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  userId      String   @db.Char(25)
-  room        Room     @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  roomId      String   @db.Char(25)
-  unreadCount Int      @default(0)
-  lastSeenAt  DateTime @default(now())
+  id            String   @id @default(cuid()) @db.Char(25)
+  user          User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId        String   @db.Char(25)
+  room          Room     @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  roomId        String   @db.Char(25)
+  latestMessage String
+  unreadCount   Int      @default(0)
+  lastSeenAt    DateTime @default(now())
+
+  @@index([userId])
 }
 
-model NotifUserSystem {
-  id        String    @id @default(cuid()) @db.Char(25)
-  user        User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  userId      String   @db.Char(25)
-  category  String
-  message   String
-  seenAt    DateTime?
-  createdAt DateTime  @default(now())
+model Notification {
+  id           String                 @id @default(cuid()) @db.Char(25)
+  collection   NotificationCollection @relation(fields: [collectionId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  collectionId String                 @db.Char(25)
+  source       NotificationSource
+  title        String
+  message      String
+  senderUser   User?                  @relation(fields: [senderUserId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  senderUserId String?                @db.Char(25)
+  senderTeam   Team?                  @relation(fields: [senderTeamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  senderTeamId String?                @db.Char(25)
+  seenAt       DateTime?
+  createdAt    DateTime               @default(now())
+
+  action NotificationAction?
+
+  @@index([collectionId])
+}
+
+model NotificationAction {
+  id                   String                      @id @default(cuid()) @db.Char(25)
+  notification         Notification                @relation(fields: [notificationId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  notificationId       String                      @unique @db.Char(25)
+  response             NotificationActionResponse?
+  teamPending          TeamPending?                @relation(fields: [teamPendingId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  teamPendingId        String?                     @db.Char(25)
+  roomPending          RoomPending?                @relation(fields: [roomPendingId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  roomPendingId        String?                     @db.Char(25)
+  appointmentPending   AppointmentPending?         @relation(fields: [appointmentPendingId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  appointmentPendingId String?                     @db.Char(25)
+  updatedAt            DateTime                    @updatedAt
+}
+
+model NotificationCollection {
+  id     String @id @default(cuid()) @db.Char(25)
+  user   User   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId String @unique @db.Char(25)
+
+  notifications Notification[]
 }
 
 // room
@@ -189,7 +233,8 @@ model RoomPending {
   status    PendingStatus @default(INCOMING)
   createdAt DateTime      @default(now())
 
-  lineups RoomPendingLineup[]
+  lineups                   RoomPendingLineup[]
+  linkedNotificationActions NotificationAction[]
 
   @@unique([teamId, roomId])
 }
@@ -222,20 +267,23 @@ model Team {
   isDeleted        Boolean  @default(false)
   createdAt        DateTime @default(now())
 
-  designatedTeams    Team[]              @relation("designator")
-  lineups            TeamLineup[]
-  pendings           TeamPending[]
-  members            TeamMember[]
-  roomHosts          Room[]
-  roomPendings       RoomPending[]
-  roomMembers        RoomMember[]
-  messages           Message[]
-  appointmentMembers AppointmentMember[]
-  trainingHosts      Training[]          @relation("host")
-  trainingGuests     Training[]          @relation("guest")
-  stats              TeamStats?
-  settings           TeamSettings?
-  trainingReports    TrainingReport[]
+  sendingNotifications Notification[]
+  designatedTeams      Team[]               @relation("designator")
+  lineups              TeamLineup[]
+  pendings             TeamPending[]
+  members              TeamMember[]
+  roomHosts            Room[]
+  roomPendings         RoomPending[]
+  roomMembers          RoomMember[]
+  messages             Message[]
+  appointmentMembers   AppointmentMember[]
+  appointmentInviters  AppointmentPending[] @relation("inviter")
+  appointmentInvitees  AppointmentPending[] @relation("invitee")
+  trainingHosts        Training[]           @relation("host")
+  trainingGuests       Training[]           @relation("guest")
+  stats                TeamStats?
+  settings             TeamSettings?
+  trainingReports      TrainingReport[]
 }
 
 model TeamSettings {
@@ -284,6 +332,8 @@ model TeamPending {
   status    PendingStatus @default(INCOMING)
   createdAt DateTime      @default(now())
 
+  linkedNotificationActions NotificationAction[]
+
   @@unique([teamId, userId])
 }
 
@@ -313,8 +363,9 @@ model User {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
-  systemNotifs           NotifUserSystem[]
+  notificationCollection NotificationCollection?
   roomNotifRegistrations NotifUserRoomRegistration[]
+  sendingNotifications   Notification[]
   teamFounders           Team[]
   teamPendings           TeamPending[]
   teamMembers            TeamMember[]
@@ -363,6 +414,7 @@ model UserAvatar {
   teamLineups TeamLineup[]
 }
 
+// review
 model Review {
   id          String   @id @default(cuid()) @db.Char(25)
   content     String
@@ -389,6 +441,22 @@ model Appointment {
 
   members  AppointmentMember[]
   training Training?
+  pending  AppointmentPending?
+}
+
+model AppointmentPending {
+  id            String      @id @default(cuid()) @db.Char(25)
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  appointmentId String      @unique @db.Char(25)
+  inviterTeam   Team        @relation(fields: [inviterTeamId], references: [id], onUpdate: Cascade, onDelete: Cascade, name: "inviter")
+  inviterTeamId String      @db.Char(25)
+  inviteeTeam   Team        @relation(fields: [inviteeTeamId], references: [id], onUpdate: Cascade, onDelete: Cascade, name: "invitee")
+  inviteeTeamId String      @db.Char(25)
+  createdAt     DateTime    @default(now())
+
+  linkedNotificationActions NotificationAction[]
+
+  @@unique([appointmentId, inviterTeamId, inviteeTeamId])
 }
 
 model AppointmentMember {
@@ -427,6 +495,8 @@ model Message {
   createdAt DateTime @default(now())
 
   repliedMessages Message[] @relation("reply")
+
+  @@index([chatId])
 }
 
 // stats

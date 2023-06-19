@@ -1,3 +1,4 @@
+import { OnEvent } from "@nestjs/event-emitter";
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -14,7 +15,6 @@ import type * as WSPayloadType from "types/ws-payload";
 
 import { MessageService } from "../chat/message.service";
 import { RoomService } from "../room/room.service";
-import { OnEvent } from "@nestjs/event-emitter";
 
 @WebSocketGateway({
   cors: {
@@ -33,7 +33,10 @@ implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 
   @OnEvent("socket.room-system-removal")
   handleRoomSystemRemoval(payload: any) {
-    this.server.emit(`res/room/${payload.roomId}/disband`, payload);
+    this.server.emit(`res/room/${payload.roomId}/disband`, {
+      ...payload,
+      isManual: false
+    });
   }
 
   // message
@@ -66,7 +69,10 @@ implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
   async disbandRoom(client: Socket, payload: RoomDisband): Promise<void> {
     const res = await this.roomService.disband(payload);
     this.server.emit("res/room/disband", res);
-    this.server.emit(`res/room/${payload.roomId}/disband`, res);
+    this.server.emit(`res/room/${payload.roomId}/disband`, {
+      ...res,
+      isManual: true
+    });
   }
 
   @SubscribeMessage("room/leave")

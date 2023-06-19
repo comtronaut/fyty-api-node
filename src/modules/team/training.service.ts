@@ -33,11 +33,11 @@ export class TrainingService {
     payload: CreateTrainingBypassDto,
     source: TrainingSource
   ): Promise<Training> {
-    const { startAt, endAt, guestId, ...trainingPayload } = payload;
+    const { startAt, endAt, ...trainingPayload } = payload;
 
     // create a designated team if the team didn't exist
     let newGuestId = null;
-    if (!z.string().cuid().safeParse(guestId).success) {
+    if (!z.string().cuid().safeParse(payload.guestId).success) {
       const hostTeam = await this.prisma.team.findUniqueOrThrow({
         where: { id: payload.hostId },
         select: { gameId: true }
@@ -47,7 +47,7 @@ export class TrainingService {
         data: {
           gameId: hostTeam.gameId,
           designatorTeamId: payload.hostId,
-          name: guestId,
+          name: payload.guestId,
           settings: {
             create: {}
           },

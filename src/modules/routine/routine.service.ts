@@ -97,15 +97,16 @@ export class RoutineService {
         })
       );
 
-      const trainingCreatableRooms = rooms.filter((e) =>
-        e.appointment
-        && e.members.length === e.game.teamCap
-        && e.members.filter((f) => f.teamId !== e.hostTeamId).length
+      const trainingCreatableRooms = rooms.filter(
+        (e) =>
+          e.appointment
+          && e.members.length === e.game.teamCap
+          && e.members.filter((f) => f.teamId !== e.hostTeamId).length
       );
 
       await Promise.all([
         // create training result
-        ...trainingCreatableRooms.map((e) => (
+        ...trainingCreatableRooms.map((e) =>
           this.prisma.training.create({
             data: {
               appointmentId: e.appointment!.id,
@@ -118,7 +119,7 @@ export class RoutineService {
               }
             }
           })
-        )),
+        ),
         // delete images
         this.imageService.deleteImageByIds(compact(imageIds)),
         // delete rooms
@@ -130,12 +131,9 @@ export class RoutineService {
       ]);
 
       // send notifications
-      rooms.map((room) => (
-        this.eventEmitter.emit(
-          "socket.room-system-removal",
-          { roomId: room.id }
-        )
-      ));
+      rooms.map((room) =>
+        this.eventEmitter.emit("socket.room-system-removal", { roomId: room.id })
+      );
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(err.message);

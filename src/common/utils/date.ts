@@ -6,8 +6,12 @@ export function getDayRangeWithin(
 ): { start: Date; end: Date } {
   const today = new Date(rawDate);
 
-  const dayStart = timezoneOffset ? dayjs(today).utcOffset(timezoneOffset * 60) : dayjs(today);
-  const dayEnd = timezoneOffset ? dayjs(today).utcOffset(timezoneOffset * 60) : dayjs(today);
+  const dayStart = timezoneOffset
+    ? dayjs(today).utcOffset(timezoneOffset * 60)
+    : dayjs(today);
+  const dayEnd = timezoneOffset
+    ? dayjs(today).utcOffset(timezoneOffset * 60)
+    : dayjs(today);
 
   return {
     start: dayStart.startOf("day").toDate(),
