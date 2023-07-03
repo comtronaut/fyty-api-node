@@ -1,11 +1,9 @@
-import { Admin, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { createZodDto } from "nestjs-zod";
 
 import { AdminOptionalDefaultsSchema, AdminPartialSchema, AdminSchema } from "model/schema";
 
-export class AdminDto
-  extends createZodDto(AdminSchema)
-  implements Admin {}
+export class AdminDto extends createZodDto(AdminSchema) {}
 
 export class CreateAdminDto
   extends createZodDto(AdminOptionalDefaultsSchema)

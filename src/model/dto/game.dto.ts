@@ -1,4 +1,4 @@
-import { Prisma } from ".prisma/client";
+import { Prisma } from "@prisma/client";
 import { createZodDto } from "nestjs-zod";
 
 import { GameOptionalDefaultsSchema, GamePartialSchema } from "model/schema";

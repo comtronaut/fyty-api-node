@@ -317,7 +317,7 @@ paths:
                 $ref: "#/components/schemas/UserAvatarDto"
       tags: *a2
     delete:
-      operationId: daleteUserAvatarById
+      operationId: deleteUserAvatarById
       parameters:
         - name: id
           required: true
@@ -325,12 +325,8 @@ paths:
           schema:
             type: string
       responses:
-        default:
+        "204":
           description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/"
       tags: *a2
   /password-reset-session/info:
     get:
@@ -1600,10 +1596,7 @@ info:
   version: "1.0"
   contact: {}
 tags: []
-servers:
-  - url: https://api.fyty-esport.com
-    description: null
-    variables: null
+servers: []
 components:
   securitySchemes:
     bearer:

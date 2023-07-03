@@ -9,14 +9,13 @@ import {
   Query,
   UseGuards
 } from "@nestjs/common";
-import { ApiQuery, ApiResponse, ApiTags, getSchemaPath } from "@nestjs/swagger";
+import { ApiNoContentResponse, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 import {
   CreateUserAvatarDto,
   UpdateUserAvatarDto,
   UserAvatarDto
 } from "model/dto/user-avatar.dto";
-import { UserSettingsDto } from "model/dto/user-settings.dto";
 import {
   CreateUserDto,
   SecureUserDto,
@@ -123,8 +122,8 @@ export class UserController {
 
   @Delete("avatars/:id")
   @UseGuards(UserJwtAuthGuard)
-  @ApiResponse({ type: "object" })
-  async daleteUserAvatarById(@Param("id") avatarId: string): Promise<void> {
+  @ApiNoContentResponse()
+  async deleteUserAvatarById(@Param("id") avatarId: string): Promise<void> {
     return await this.avatarService.delete(avatarId);
   }
 }

@@ -1,4 +1,4 @@
-import { Prisma, UserAvatar } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { createZodDto } from "nestjs-zod";
 
 import {
@@ -7,9 +7,7 @@ import {
   UserAvatarSchema
 } from "model/schema";
 
-export class UserAvatarDto
-  extends createZodDto(UserAvatarSchema)
-  implements Omit<UserAvatar, "ratingScore"> {}
+export class UserAvatarDto extends createZodDto(UserAvatarSchema) {}
 
 export class CreateUserAvatarDto
   extends createZodDto(UserAvatarOptionalDefaultsSchema)

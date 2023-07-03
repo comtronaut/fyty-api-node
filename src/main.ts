@@ -1,7 +1,6 @@
 import { Logger } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { NestExpressApplication } from "@nestjs/platform-express";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { patchNestJsSwagger } from "nestjs-zod";
@@ -13,7 +12,7 @@ dayjs.extend(utc);
 
 patchNestJsSwagger();
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors:
       env.SERVER_ORIGIN === "https://api.fyty-esport.com"
@@ -27,19 +26,6 @@ async function bootstrap() {
         : true,
     bodyParser: true
   });
-
-  // swagger api document
-  if (env.SERVER_ORIGIN !== "https://api.fyty-esport.com") {
-    const config = new DocumentBuilder()
-      .setTitle("FyTy API")
-      .setVersion("1.0")
-      .addBearerAuth()
-      .build();
-    const document = SwaggerModule.createDocument(app, config, {
-      operationIdFactory: (_, methodKey) => methodKey
-    });
-    SwaggerModule.setup("", app, document);
-  }
 
   // binding
   const port = process.env["PORT"] || 3000;
