@@ -2,10 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { MemberRole, Team, User } from "@prisma/client";
 
 import { paginate } from "common/utils/pagination";
-import { CreateTeamDto, UpdateTeamDto } from "model/dto/team.dto";
+import { CreateTeamDto, TeamDetailResponseDto, UpdateTeamDto } from "model/dto/team.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
-import { TeamDetail } from "types/query-detail";
 
 import { NotifyService } from "../notification/lineNotify.service";
 import { RoomService } from "../room/room.service";
@@ -67,7 +66,7 @@ export class TeamService {
     });
   }
 
-  async getDetailById(teamId: string): Promise<TeamDetail> {
+  async getDetailById(teamId: string): Promise<TeamDetailResponseDto> {
     const {
       settings,
       stats,

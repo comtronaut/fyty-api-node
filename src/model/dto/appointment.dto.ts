@@ -1,4 +1,4 @@
-import { Prisma } from ".prisma/client";
+import { Prisma } from "@prisma/client";
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
@@ -12,9 +12,10 @@ export class CreateAppointmentDto
   )
   implements Prisma.AppointmentUncheckedCreateInput {}
 
-export class UpdateAppointmentDto extends createZodDto(
-  AppointmentPartialSchema.pick({
-    startAt: true,
-    endAt: true
-  })
-) {}
+export class UpdateAppointmentDto
+  extends createZodDto(
+    AppointmentPartialSchema.pick({
+      startAt: true,
+      endAt: true
+    })
+  ) {}

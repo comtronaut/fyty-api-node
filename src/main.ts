@@ -4,11 +4,14 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { patchNestJsSwagger } from "nestjs-zod";
 
 import { AppModule } from "./app.module";
 import env from "./common/env.config";
 
 dayjs.extend(utc);
+
+patchNestJsSwagger();
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -32,7 +35,9 @@ async function bootstrap() {
       .setVersion("1.0")
       .addBearerAuth()
       .build();
-    const document = SwaggerModule.createDocument(app, config);
+    const document = SwaggerModule.createDocument(app, config, {
+      operationIdFactory: (_, methodKey) => methodKey
+    });
     SwaggerModule.setup("", app, document);
   }
 

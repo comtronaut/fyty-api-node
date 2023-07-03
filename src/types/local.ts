@@ -1,5 +1,3 @@
-import type { User } from "@prisma/client";
-
 export type Pagination = {
   /**
    * This parameter specifies the current page number that the user is on.
@@ -12,7 +10,5 @@ export type Pagination = {
    */
   perPage: number;
 };
-
-export type SecuredUser = Omit<User, "password">;
 
 export type AppointmentStatus = "UPCOMING" | "ONGOING";

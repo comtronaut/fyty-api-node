@@ -1,0 +1,2470 @@
+openapi: 3.0.0
+paths:
+  /auth/login:
+    get:
+      operationId: loginUser
+      parameters:
+        - name: username
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: password
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessTokenDto"
+      tags:
+        &a1
+        - Auth
+  /auth/admin/login:
+    get:
+      operationId: loginAdmin
+      parameters:
+        - name: email
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: password
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessTokenDto"
+      tags: *a1
+  /auth/user/google:
+    get:
+      operationId: getGoogleUser
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a1
+  /auth/user/facebook:
+    get:
+      operationId: facebookLoginRedirect
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a1
+  /auth/google:
+    get:
+      operationId: redirectToGoogle
+      parameters:
+        - name: nonce
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: code_challenge_method
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: code_challenge
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: state
+          required: false
+          in: query
+          schema:
+            type: string
+      responses:
+        "302":
+          description: ""
+      tags: *a1
+  /auth/facebook:
+    get:
+      operationId: redirectToFacebook
+      parameters:
+        - name: nonce
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: code_challenge_method
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: code_challenge
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: state
+          required: false
+          in: query
+          schema:
+            type: string
+      responses:
+        "302":
+          description: ""
+      tags: *a1
+  /users:
+    post:
+      operationId: addUser
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserDto"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecureUserDto"
+      tags:
+        &a2
+        - Users
+    get:
+      operationId: getUsersBySearching
+      parameters:
+        - name: q
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: teamId
+          required: false
+          in: query
+          schema:
+            type: string
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SecureUserDto"
+      tags: *a2
+  /users/validation:
+    get:
+      operationId: getUserDedup
+      parameters:
+        - name: username
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: mobilePhone
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: email
+          required: false
+          in: query
+          schema:
+            type: string
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserValidationResponseDto"
+      tags: *a2
+  "/users/{id}":
+    get:
+      operationId: getUserById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecureUserDto"
+      tags: *a2
+  "/users/{id}/detail":
+    get:
+      operationId: getUserDetailById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  info:
+                    $ref: "#/components/schemas/SecureUserDto"
+                  settings:
+                    nullable: true
+                    $ref: "#/components/schemas/UserSettingsDto"
+                  avatars:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/UserAvatarDto"
+      tags: *a2
+  "/users/multiple/{ids}":
+    get:
+      operationId: getMultipleUsersByIds
+      parameters:
+        - name: ids
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SecureUserDto"
+      tags: *a2
+  /users/avatars:
+    post:
+      operationId: postUserAvatar
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserAvatarDto"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAvatarDto"
+      tags: *a2
+  "/users/{id}/avatars":
+    get:
+      operationId: getUserAvatarsByUserId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: gameId
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserAvatarDto"
+      tags: *a2
+  "/users/avatars/{id}":
+    put:
+      operationId: putUserAvatarById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserAvatarDto"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAvatarDto"
+      tags: *a2
+    delete:
+      operationId: daleteUserAvatarById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/"
+      tags: *a2
+  /password-reset-session/info:
+    get:
+      operationId: getInfo
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /password-reset-session/request:
+    post:
+      operationId: requestToken
+      parameters: []
+      responses:
+        "201":
+          description: ""
+  /password-reset-session/reset:
+    post:
+      operationId: addUser
+      parameters: []
+      responses:
+        "201":
+          description: ""
+  /games:
+    get:
+      operationId: getGames
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /teams:
+    post:
+      operationId: postTeam
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTeamDto"
+      responses:
+        "201":
+          description: ""
+    get:
+      operationId: getTeams
+      parameters:
+        - name: q
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: gameId
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: perPage
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: page
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/teams/{id}":
+    get:
+      operationId: getTeamById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+    put:
+      operationId: putTeamById
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTeamDto"
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: deleteTeamById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/teams/multiple/{ids}":
+    get:
+      operationId: getMultipleTeamsByIds
+      parameters:
+        - name: ids
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/teams/{id}/detail":
+    get:
+      operationId: getTeamDetail
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/teams/{id}/settings":
+    get:
+      operationId: getTeamSettingsByTeamId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+    put:
+      operationId: putTeamSettingsByTeamId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTeamSettingsDto"
+      responses:
+        "200":
+          description: ""
+  "/teams/{id}/stats":
+    get:
+      operationId: getTeamStatsByTeamId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/teams/{id}/trainings":
+    get:
+      operationId: getTeamTrainingsByTeamId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: perPage
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: page
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+    post:
+      operationId: createTrainingManually
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTrainingBypassDto"
+      responses:
+        "201":
+          description: ""
+  "/teams/trainings/{id}":
+    get:
+      operationId: getTrainingById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+    put:
+      operationId: putTrainingById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTrainingDto"
+      responses:
+        "200":
+          description: ""
+  "/teams/trainings/{id}/reports":
+    get:
+      operationId: getReportByTrainingId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+    post:
+      operationId: postReportByTrainingId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTrainingReportDto"
+      responses:
+        "201":
+          description: ""
+  "/teams/trainings/reports/{id}":
+    get:
+      operationId: getReportById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+    put:
+      operationId: putReportById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTrainingReportDto"
+      responses:
+        "200":
+          description: ""
+  "/teams/{id}/appointments":
+    get:
+      operationId: getAppointmentsByTeamId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: status
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/teams/{id}/members":
+    get:
+      operationId: getTeamMemberByTeamId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /teams/members:
+    post:
+      operationId: postTeamMember
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTeamMemberDto"
+      responses:
+        "201":
+          description: ""
+  "/teams/members/{id}":
+    put:
+      operationId: putTeamMemberByTeamId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTeamMemberDto"
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: deleteTeamMemberById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/teams/members/{id}/leave":
+    delete:
+      operationId: deleteTeamMemberByIdAsLeaving
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/teams/{id}/pendings":
+    get:
+      operationId: getTeamPendingsByTeamId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: status
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /teams/pendings:
+    post:
+      operationId: postTeamPending
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTeamPendingDto"
+      responses:
+        "201":
+          description: ""
+  "/teams/pendings/{id}":
+    put:
+      operationId: putTeamPendingById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTeamPendingDto"
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: deleteTeamPendingById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /lineups:
+    post:
+      operationId: postTeamLineup
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTeamLineupDto"
+      responses:
+        "201":
+          description: ""
+    get:
+      operationId: getTeamLineups
+      parameters:
+        - name: teamId
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/lineups/{id}":
+    put:
+      operationId: putTeamLineupById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLineupDto"
+      responses:
+        "200":
+          description: ""
+    get:
+      operationId: getTeamLineupById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: deleteTeamLineupById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/lineups/participant/{id}":
+    get:
+      operationId: getTeamLineupsByRoomMemberId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /rooms:
+    get:
+      operationId: getRooms
+      parameters:
+        - name: gameId
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: name
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: date
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/rooms/teams/{id}":
+    get:
+      operationId: getHostedRooms
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: isJoined
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: isPending
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: isHosted
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /rooms/lobby:
+    get:
+      operationId: getRoomsLobby
+      parameters:
+        - name: date
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: gameId
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/rooms/{id}":
+    get:
+      operationId: getRoomById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /rooms/disband:
+    delete:
+      operationId: deleteRoom
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteRoomDto"
+      responses:
+        "200":
+          description: ""
+  "/rooms/{id}/settings":
+    get:
+      operationId: getRoomSettingsByRoomId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/rooms/settings/{id}":
+    put:
+      operationId: putRoomSettings
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/rooms/{id}/detail":
+    get:
+      operationId: getRoomDetailById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/rooms/{id}/chat":
+    get:
+      operationId: getRoomChatWithMessages
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/rooms/{id}/pendings":
+    get:
+      operationId: getRoomsPendingsByRoomId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+    post:
+      operationId: postRoomPendingByRoomId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRoomPendingDto"
+      responses:
+        "201":
+          description: ""
+  "/rooms/pendings/{id}":
+    delete:
+      operationId: deleteRoomPendingById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/chats/{id}":
+    get:
+      operationId: getChatById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/appointments/{id}":
+    put:
+      operationId: update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAppointmentDto"
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /reviews:
+    post:
+      operationId: createReview
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewDto"
+      responses:
+        "201":
+          description: ""
+    get:
+      operationId: getReview
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  "/reviews/{id}":
+    get:
+      operationId: getReviewById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /me:
+    get:
+      operationId: getMeInfo
+      parameters: []
+      responses:
+        "200":
+          description: ""
+    put:
+      operationId: putMeInfo
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserDto"
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: deleteMeInfo
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /me/detail:
+    get:
+      operationId: getMeDetail
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /me/settings:
+    get:
+      operationId: getMeSettings
+      parameters: []
+      responses:
+        "200":
+          description: ""
+    put:
+      operationId: putMeSettings
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserSettingsDto"
+      responses:
+        "200":
+          description: ""
+  /me/avatars:
+    get:
+      operationId: getMeAvatars
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /me/teams:
+    get:
+      operationId: getMeTeams
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /me/appointments:
+    get:
+      operationId: getMeAppointments
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /me/teams/pendings:
+    get:
+      operationId: getMeTeamPendings
+      parameters:
+        - name: status
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /admin/reports:
+    get:
+      operationId: getAll
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  "/admin/reports/{id}":
+    put:
+      operationId: updateTeam
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTrainingReportDto"
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: deleteTeam
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /admin/trainings:
+    get:
+      operationId: getAll
+      parameters: []
+      responses:
+        "200":
+          description: ""
+    post:
+      operationId: create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTrainingBypassDto"
+      responses:
+        "201":
+          description: ""
+  "/admin/trainings/{id}":
+    get:
+      operationId: getById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+    put:
+      operationId: updateTeam
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTrainingDto"
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: deleteTeam
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /admin/admins:
+    post:
+      operationId: createAdminAccount
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAdminDto"
+      responses:
+        "201":
+          description: ""
+    get:
+      operationId: getAllAdmin
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /admin/admins/me:
+    get:
+      operationId: getMeAdmin
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  "/admin/admins/{id}":
+    get:
+      operationId: getAdmin
+      parameters: []
+      responses:
+        "200":
+          description: ""
+    put:
+      operationId: updateAdminData
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAdminDto"
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: deleteAdmin
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /admin/games:
+    post:
+      operationId: addGame
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGameDto"
+      responses:
+        "201":
+          description: ""
+  "/admin/games/{id}":
+    put:
+      operationId: updateGame
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateGameDto"
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: deleteGame
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /admin/users:
+    get:
+      operationId: getAll
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  "/admin/users/{id}":
+    get:
+      operationId: get
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+    put:
+      operationId: update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAppointmentDto"
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /admin/teams:
+    get:
+      operationId: getAllTeam
+      parameters:
+        - name: q
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: page
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: perPage
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/admin/teams/{id}":
+    get:
+      operationId: getTeam
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+    put:
+      operationId: updateTeam
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTeamDto"
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: deleteTeam
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /admin/rooms:
+    get:
+      operationId: getRooms
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  "/admin/rooms/{id}":
+    get:
+      operationId: getRoomsById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+    put:
+      operationId: updateRoomsById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRoomDto"
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: deleteRoom
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/admin/rooms/{id}/participants":
+    get:
+      operationId: getRoomParticipantsById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/admin/rooms/{id}/roomlineup":
+    get:
+      operationId: getRoomLineupById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  "/admin/users/{id}/member":
+    get:
+      operationId: getAppointmentMember
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /notify:
+    post:
+      operationId: sendNotification
+      parameters: []
+      responses:
+        "201":
+          description: ""
+    get:
+      operationId: getLine
+      parameters:
+        - name: user_id
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /line-notify-callback:
+    get:
+      operationId: callback
+      parameters:
+        - name: code
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: state
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+info:
+  title: FyTy API
+  description: ""
+  version: "1.0"
+  contact: {}
+tags: []
+servers:
+  - url: https://api.fyty-esport.com
+    description: null
+    variables: null
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    AccessTokenDto:
+      type: object
+      properties:
+        accessToken:
+          type: string
+      required:
+        - accessToken
+    CreateUserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+        username:
+          type: string
+        updatedUsernameAt:
+          nullable: true
+        mobilePhone:
+          type: string
+        updatedMobilePhoneAt:
+          nullable: true
+        password:
+          type: string
+        displayName:
+          type: string
+        email:
+          type: string
+          format: email
+          nullable: true
+        updatedEmailAt:
+          nullable: true
+        bio:
+          type: string
+        portraitUrl:
+          type: string
+        coverUrl:
+          type: string
+        isVerified:
+          type: boolean
+        isDeactivated:
+          type: boolean
+        facebookId:
+          type: string
+          nullable: true
+        googleId:
+          type: string
+          nullable: true
+        lineId:
+          type: string
+          nullable: true
+        lineToken:
+          type: string
+          nullable: true
+        firstLoginAt:
+          nullable: true
+        lastLoginAt:
+          nullable: true
+        createdAt: {}
+        updatedAt: {}
+      required:
+        - username
+        - mobilePhone
+        - password
+        - displayName
+    SecureUserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+        username:
+          type: string
+        updatedUsernameAt:
+          nullable: true
+        mobilePhone:
+          type: string
+        updatedMobilePhoneAt:
+          nullable: true
+        displayName:
+          type: string
+        email:
+          type: string
+          format: email
+          nullable: true
+        updatedEmailAt:
+          nullable: true
+        bio:
+          type: string
+        portraitUrl:
+          type: string
+        coverUrl:
+          type: string
+        isVerified:
+          type: boolean
+        isDeactivated:
+          type: boolean
+        facebookId:
+          type: string
+          nullable: true
+        googleId:
+          type: string
+          nullable: true
+        lineId:
+          type: string
+          nullable: true
+        lineToken:
+          type: string
+          nullable: true
+        firstLoginAt:
+          nullable: true
+        lastLoginAt:
+          nullable: true
+        createdAt: {}
+        updatedAt: {}
+      required:
+        - id
+        - username
+        - mobilePhone
+        - displayName
+        - bio
+        - portraitUrl
+        - coverUrl
+        - isVerified
+        - isDeactivated
+        - createdAt
+        - updatedAt
+    UserValidationResponseDto:
+      type: object
+      properties:
+        username:
+          type: boolean
+        mobilePhone:
+          type: boolean
+        email:
+          type: boolean
+    CreateUserAvatarDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+        inGameId:
+          type: string
+        characterName:
+          type: string
+        rank:
+          type: string
+        ratingScore:
+          oneOf:
+            - type: number
+            - type: string
+            - type: object
+              properties:
+                d:
+                  type: array
+                  items:
+                    type: number
+                e:
+                  type: number
+                s:
+                  type: number
+                toFixed: {}
+              required:
+                - d
+                - e
+                - s
+                - toFixed
+        gameId:
+          type: string
+        userId:
+          type: string
+      required:
+        - inGameId
+        - rank
+        - gameId
+        - userId
+    UserAvatarDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+        inGameId:
+          type: string
+        characterName:
+          type: string
+        rank:
+          type: string
+        ratingScore:
+          oneOf:
+            - type: number
+            - type: string
+            - type: object
+              properties:
+                d:
+                  type: array
+                  items:
+                    type: number
+                e:
+                  type: number
+                s:
+                  type: number
+                toFixed: {}
+              required:
+                - d
+                - e
+                - s
+                - toFixed
+        gameId:
+          type: string
+        userId:
+          type: string
+      required:
+        - id
+        - inGameId
+        - characterName
+        - rank
+        - ratingScore
+        - gameId
+        - userId
+    UpdateUserAvatarDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+        inGameId:
+          type: string
+        characterName:
+          type: string
+        rank:
+          type: string
+        ratingScore:
+          oneOf:
+            - type: number
+            - type: string
+            - type: object
+              properties:
+                d:
+                  type: array
+                  items:
+                    type: number
+                e:
+                  type: number
+                s:
+                  type: number
+                toFixed: {}
+              required:
+                - d
+                - e
+                - s
+                - toFixed
+        gameId:
+          type: string
+        userId:
+          type: string
+    CreateTeamDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+        name:
+          type: string
+        coverUrl:
+          type: string
+        logoUrl:
+          type: string
+        tier:
+          type: string
+        isPrivate:
+          type: boolean
+        bookBank:
+          type: string
+        gameId:
+          type: string
+        founderId:
+          type: string
+          nullable: true
+        designatorTeamId:
+          type: string
+          nullable: true
+        isDeleted:
+          type: boolean
+        createdAt: {}
+      required:
+        - name
+        - gameId
+    UpdateTeamDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+        name:
+          type: string
+        coverUrl:
+          type: string
+        logoUrl:
+          type: string
+        tier:
+          type: string
+        isPrivate:
+          type: boolean
+        bookBank:
+          type: string
+        gameId:
+          type: string
+        founderId:
+          type: string
+          nullable: true
+        designatorTeamId:
+          type: string
+          nullable: true
+        isDeleted:
+          type: boolean
+        createdAt: {}
+    UpdateTeamSettingsDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+        teamId:
+          type: string
+        isJoiningEnabled:
+          type: boolean
+    CreateTrainingBypassDto:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            &a3
+            - ACCEPTED
+            - DENIED
+            - INEFFECTIVE
+            - EXPIRED
+            - UNREVIEWED
+        source:
+          type: string
+          enum:
+            &a4
+            - SYSTEM
+            - ADMIN
+            - USER
+        id:
+          type: string
+          format: cuid
+        hostId:
+          type: string
+        guestId:
+          type: string
+        hostWinCount:
+          type: integer
+          nullable: true
+        hostLoseCount:
+          type: integer
+          nullable: true
+        note:
+          type: string
+        imageUrls:
+          type: array
+          items:
+            type: string
+        isSubmitted:
+          type: boolean
+        updatedAt: {}
+        createdAt: {}
+        startAt: {}
+        endAt: {}
+      required:
+        - hostId
+        - guestId
+        - hostWinCount
+        - hostLoseCount
+        - startAt
+        - endAt
+    UpdateTrainingDto:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: *a3
+        source:
+          type: string
+          enum: *a4
+        id:
+          type: string
+          format: cuid
+        appointmentId:
+          type: string
+        hostId:
+          type: string
+          nullable: true
+        guestId:
+          type: string
+          nullable: true
+        hostWinCount:
+          type: integer
+          nullable: true
+        hostLoseCount:
+          type: integer
+          nullable: true
+        note:
+          type: string
+        imageUrls:
+          type: array
+          items:
+            type: string
+        isSubmitted:
+          type: boolean
+        updatedAt: {}
+        createdAt: {}
+    CreateTrainingReportDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+        reporterUserId:
+          type: string
+          nullable: true
+        reporterTeamId:
+          type: string
+          nullable: true
+        trainingId:
+          type: string
+        isAdminReviewed:
+          type: boolean
+        heading:
+          type: string
+        content:
+          type: string
+        imageUrls:
+          type: array
+          items:
+            type: string
+        createdAt: {}
+      required:
+        - trainingId
+        - heading
+        - content
+    UpdateTrainingReportDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+        reporterUserId:
+          type: string
+          nullable: true
+        reporterTeamId:
+          type: string
+          nullable: true
+        trainingId:
+          type: string
+        isAdminReviewed:
+          type: boolean
+        heading:
+          type: string
+        content:
+          type: string
+        imageUrls:
+          type: array
+          items:
+            type: string
+        createdAt: {}
+    CreateTeamMemberDto:
+      type: object
+      properties:
+        role:
+          type: string
+          enum:
+            &a5
+            - HEAD_COACH
+            - LEADER
+            - MANAGER
+            - MEMBER
+        id:
+          type: string
+          format: cuid
+        teamId:
+          type: string
+        userId:
+          type: string
+        joinedAt: {}
+      required:
+        - teamId
+        - userId
+    UpdateTeamMemberDto:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: *a5
+        id:
+          type: string
+          format: cuid
+        teamId:
+          type: string
+        userId:
+          type: string
+        joinedAt: {}
+    CreateTeamPendingDto:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            &a6
+            - INCOMING
+            - OUTGOING
+        id:
+          type: string
+          format: cuid
+        teamId:
+          type: string
+        userId:
+          type: string
+        createdAt: {}
+      required:
+        - teamId
+        - userId
+    UpdateTeamPendingDto:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: *a6
+        id:
+          type: string
+          format: cuid
+        teamId:
+          type: string
+        userId:
+          type: string
+        createdAt: {}
+    CreateTeamLineupDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+        teamId:
+          type: string
+        avatarId:
+          type: string
+          nullable: true
+        inGameId:
+          type: string
+          nullable: true
+        isDefault:
+          type: boolean
+        profileUrl:
+          type: string
+        imageUrl:
+          type: string
+        name:
+          type: string
+        note:
+          type: string
+        updatedAt: {}
+        createdAt: {}
+      required:
+        - teamId
+    UpdateLineupDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+        teamId:
+          type: string
+        avatarId:
+          type: string
+          nullable: true
+        inGameId:
+          type: string
+          nullable: true
+        isDefault:
+          type: boolean
+        profileUrl:
+          type: string
+        imageUrl:
+          type: string
+        name:
+          type: string
+        note:
+          type: string
+        updatedAt: {}
+        createdAt: {}
+    DeleteRoomDto:
+      type: object
+      properties:
+        roomId:
+          type: string
+          format: cuid
+        teamId:
+          type: string
+          format: cuid
+      required:
+        - roomId
+        - teamId
+    CreateRoomPendingDto:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: *a6
+        id:
+          type: string
+          format: cuid
+        teamId:
+          type: string
+        roomId:
+          type: string
+        createdAt: {}
+        teamLineupIds:
+          type: array
+          items:
+            type: string
+      required:
+        - teamId
+        - roomId
+        - teamLineupIds
+    UpdateAppointmentDto:
+      type: object
+      properties:
+        startAt: {}
+        endAt: {}
+    CreateReviewDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+        content:
+          type: string
+        ratingScore:
+          oneOf:
+            - type: number
+            - type: string
+            - type: object
+              properties:
+                d:
+                  type: array
+                  items:
+                    type: number
+                e:
+                  type: number
+                s:
+                  type: number
+                toFixed: {}
+              required:
+                - d
+                - e
+                - s
+                - toFixed
+        reviewerId:
+          type: string
+          nullable: true
+        revieweeId:
+          type: string
+        gameId:
+          type: string
+        createdAt: {}
+      required:
+        - content
+        - revieweeId
+        - gameId
+    UpdateUserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: cuid
+        username:
+          type: string
+        updatedUsernameAt:
+          nullable: true
+        mobilePhone:
+          type: string
+        updatedMobilePhoneAt:
+          nullable: true
+        password:
+          type: string
+        displayName:
+          type: string
+        email:
+          type: string
+          format: email
+          nullable: true
+        updatedEmailAt:
+          nullable: true
+        bio:
+          type: string
+        portraitUrl:
+          type: string
+        coverUrl:
+          type: string
+        isVerified:
+          type: boolean
+        isDeactivated:
+          type: boolean
+        facebookId:
+          type: string
+          nullable: true
+        googleId:
+          type: string
+          nullable: true
+        lineId:
+          type: string
+          nullable: true
+        lineToken:
+          type: string
+          nullable: true
+        firstLoginAt:
+          nullable: true
+        lastLoginAt:
+          nullable: true
+        createdAt: {}
+        updatedAt: {}
+    UpdateUserSettingsDto:
+      type: object
+      properties:
+        lang:
+          type: string
+          enum:
+            - TH
+            - EN
+        id:
+          type: string
+          format: cuid
+        userId:
+          type: string
+        isNotifiedBeforeTrainingMinute:
+          type: integer
+        isTeamNotified:
+          type: boolean
+        isMeNotified:
+          type: boolean
+        isRoomNotified:
+          type: boolean
+    CreateAdminDto:
+      type: object
+      properties:
+        role:
+          type: string
+          enum:
+            &a7
+            - MANAGEMENT
+        id:
+          type: string
+          format: cuid
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        createdAt: {}
+        updateAt: {}
+      required:
+        - email
+        - password
+    UpdateAdminDto:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: *a7
+        id:
+          type: string
+          format: cuid
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        createdAt: {}
+        updateAt: {}
+    CreateGameDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        teamCap:
+          type: integer
+        lineupCap:
+          type: integer
+        logoUrl:
+          type: string
+        coverUrl:
+          type: string
+        isActive:
+          type: boolean
+        desc:
+          type: string
+      required:
+        - id
+        - name
+        - teamCap
+        - lineupCap
+        - logoUrl
+        - coverUrl
+    UpdateGameDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        teamCap:
+          type: integer
+        lineupCap:
+          type: integer
+        logoUrl:
+          type: string
+        coverUrl:
+          type: string
+        isActive:
+          type: boolean
+        desc:
+          type: string
+    UpdateRoomDto:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - AVAILABLE
+            - UNAVAILABLE
+            - CONFIRMED
+            - FULL
+        id:
+          type: string
+          format: cuid
+        name:
+          type: string
+        option:
+          type: string
+        startAt: {}
+        endAt: {}
+        isPrivate:
+          type: boolean
+        teamCount:
+          type: integer
+        note:
+          type: string
+        gameId:
+          type: string
+        hostTeamId:
+          type: string
+        updatedAt: {}
+        createdAt: {}
