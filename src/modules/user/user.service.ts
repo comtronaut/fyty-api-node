@@ -66,6 +66,16 @@ export class UserService {
   }
 
   async searchUsers(searchString: string, teamId?: string): Promise<SecureUserDto[]> {
+    let gameId = null;
+    if (teamId) {
+      const { gameId: teamGameId } = await this.prisma.team.findUniqueOrThrow({
+        where: { id: teamId },
+        select: { gameId: true }
+      });
+
+      gameId = teamGameId;
+    }
+
     const users = await this.prisma.user.findMany({
       where: {
         OR: [
@@ -81,7 +91,16 @@ export class UserService {
               mode: "insensitive"
             }
           }
-        ]
+        ],
+        ...(gameId && {
+          teamMembers: {
+            none: {
+              team: {
+                gameId
+              }
+            }
+          }
+        })
       },
       take: 10
     });
