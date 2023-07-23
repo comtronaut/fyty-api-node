@@ -2,7 +2,12 @@ import { Prisma } from "@prisma/client";
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
-import { AppointmentOptionalDefaultsSchema, AppointmentPartialSchema, AppointmentSchema, TeamSchema } from "model/schema";
+import {
+  AppointmentOptionalDefaultsSchema,
+  AppointmentPartialSchema,
+  AppointmentSchema,
+  TeamSchema
+} from "model/schema";
 
 export class CreateAppointmentDto
   extends createZodDto(
@@ -12,18 +17,16 @@ export class CreateAppointmentDto
   )
   implements Prisma.AppointmentUncheckedCreateInput {}
 
-export class UpdateAppointmentDto
-  extends createZodDto(
-    AppointmentPartialSchema.pick({
-      startAt: true,
-      endAt: true
-    })
-  ) {}
+export class UpdateAppointmentDto extends createZodDto(
+  AppointmentPartialSchema.pick({
+    startAt: true,
+    endAt: true
+  })
+) {}
 
-export class AppointmentPackResponseDto
-  extends createZodDto(
-    z.object({
-      appointment: AppointmentSchema,
-      team: TeamSchema.nullable()
-    })
-  ) {}
+export class AppointmentPackResponseDto extends createZodDto(
+  z.object({
+    appointment: AppointmentSchema,
+    team: TeamSchema.nullable()
+  })
+) {}

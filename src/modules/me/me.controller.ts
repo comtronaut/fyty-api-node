@@ -46,7 +46,10 @@ export class MeController {
 
   @Put()
   @ApiResponse({ type: SecureUserDto })
-  async putMeInfo(@UserSubject() user: User, @Body() payload: UpdateUserDto): Promise<SecureUserDto> {
+  async putMeInfo(
+    @UserSubject() user: User,
+    @Body() payload: UpdateUserDto
+  ): Promise<SecureUserDto> {
     return await this.userService.update(user.id, payload);
   }
 
@@ -65,7 +68,10 @@ export class MeController {
 
   @Put("settings")
   @ApiResponse({ type: UserSettingsDto })
-  async putMeSettings(@UserSubject() user: User, @Body() payload: UpdateUserSettingsDto): Promise<UserSettingsDto> {
+  async putMeSettings(
+    @UserSubject() user: User,
+    @Body() payload: UpdateUserSettingsDto
+  ): Promise<UserSettingsDto> {
     return await this.settingsService.updateByUserId(user.id, payload);
   }
 
@@ -86,7 +92,9 @@ export class MeController {
   // appointments
   @Get("appointments")
   @ApiResponse({ type: [ AppointmentPackResponseDto ] })
-  async getMeAppointments(@UserSubject() user: User): Promise<AppointmentPackResponseDto[]> {
+  async getMeAppointments(
+    @UserSubject() user: User
+  ): Promise<AppointmentPackResponseDto[]> {
     return await this.appointmentService.getOthersOfUser(user.id);
   }
 

@@ -2,7 +2,13 @@ import { Prisma } from "@prisma/client";
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
-import { RoomOptionalDefaultsSchema, RoomPartialSchema, RoomPendingSchema, RoomSchema, TeamSchema } from "model/schema";
+import {
+  RoomOptionalDefaultsSchema,
+  RoomPartialSchema,
+  RoomPendingSchema,
+  RoomSchema,
+  TeamSchema
+} from "model/schema";
 
 export class CreateRoomDto
   extends createZodDto(
@@ -30,6 +36,4 @@ export class LobbyDetailResponseDto extends createZodDto(
     pendingRoomIds: z.string().cuid().array(),
     roomPendings: RoomPendingSchema.array()
   })
-) {
-
-}
+) {}

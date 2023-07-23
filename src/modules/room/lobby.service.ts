@@ -14,7 +14,11 @@ export class LobbyService {
     private readonly roomService: RoomService
   ) {}
 
-  async getLobbyByGameId(gameId: string, date: string, user: User): Promise<LobbyDetailResponseDto> {
+  async getLobbyByGameId(
+    gameId: string,
+    date: string,
+    user: User
+  ): Promise<LobbyDetailResponseDto> {
     const { start, end } = getDayRangeWithin(date, 7);
 
     const [ rooms, memberRes ] = await Promise.all([

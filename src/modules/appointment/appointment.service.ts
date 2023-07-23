@@ -1,7 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { Appointment, AppointmentMember, Team } from "@prisma/client";
 
-import { AppointmentPackResponseDto, UpdateAppointmentDto } from "model/dto/appointment.dto";
+import {
+  AppointmentPackResponseDto,
+  UpdateAppointmentDto
+} from "model/dto/appointment.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { AppointmentStatus } from "types/local";
 
