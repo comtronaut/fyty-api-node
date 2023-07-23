@@ -1096,8 +1096,15 @@ paths:
       operationId: getMeInfo
       parameters: []
       responses:
-        "200":
+        default:
           description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecureUserDto"
+      tags:
+        &a3
+        - Me
     put:
       operationId: putMeInfo
       parameters: []
@@ -1108,28 +1115,54 @@ paths:
             schema:
               $ref: "#/components/schemas/UpdateUserDto"
       responses:
-        "200":
+        default:
           description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecureUserDto"
+      tags: *a3
     delete:
       operationId: deleteMeInfo
       parameters: []
       responses:
-        "200":
+        "204":
           description: ""
+      tags: *a3
   /me/detail:
     get:
       operationId: getMeDetail
       parameters: []
       responses:
-        "200":
+        default:
           description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  info:
+                    $ref: "#/components/schemas/SecureUserDto"
+                  settings:
+                    nullable: true
+                    $ref: "#/components/schemas/UserSettingsDto"
+                  avatars:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/UserAvatarDto"
+      tags: *a3
   /me/settings:
     get:
       operationId: getMeSettings
       parameters: []
       responses:
-        "200":
+        default:
           description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSettingsDto"
+      tags: *a3
     put:
       operationId: putMeSettings
       parameters: []
@@ -1140,15 +1173,27 @@ paths:
             schema:
               $ref: "#/components/schemas/UpdateUserSettingsDto"
       responses:
-        "200":
+        default:
           description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSettingsDto"
+      tags: *a3
   /me/avatars:
     get:
       operationId: getMeAvatars
       parameters: []
       responses:
-        "200":
+        default:
           description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserAvatarDto"
+      tags: *a3
   /me/teams:
     get:
       operationId: getMeTeams
@@ -1156,6 +1201,7 @@ paths:
       responses:
         "200":
           description: ""
+      tags: *a3
   /me/appointments:
     get:
       operationId: getMeAppointments
@@ -1163,6 +1209,7 @@ paths:
       responses:
         "200":
           description: ""
+      tags: *a3
   /me/teams/pendings:
     get:
       operationId: getMeTeamPendings
@@ -1175,6 +1222,7 @@ paths:
       responses:
         "200":
           description: ""
+      tags: *a3
   /admin/reports:
     get:
       operationId: getAll
@@ -1937,7 +1985,7 @@ components:
         status:
           type: string
           enum:
-            &a3
+            &a4
             - ACCEPTED
             - DENIED
             - INEFFECTIVE
@@ -1946,7 +1994,7 @@ components:
         source:
           type: string
           enum:
-            &a4
+            &a5
             - SYSTEM
             - ADMIN
             - USER
@@ -1987,10 +2035,10 @@ components:
       properties:
         status:
           type: string
-          enum: *a3
+          enum: *a4
         source:
           type: string
-          enum: *a4
+          enum: *a5
         id:
           type: string
           format: cuid
@@ -2078,7 +2126,7 @@ components:
         role:
           type: string
           enum:
-            &a5
+            &a6
             - HEAD_COACH
             - LEADER
             - MANAGER
@@ -2099,7 +2147,7 @@ components:
       properties:
         role:
           type: string
-          enum: *a5
+          enum: *a6
         id:
           type: string
           format: cuid
@@ -2114,7 +2162,7 @@ components:
         status:
           type: string
           enum:
-            &a6
+            &a7
             - INCOMING
             - OUTGOING
         id:
@@ -2133,7 +2181,7 @@ components:
       properties:
         status:
           type: string
-          enum: *a6
+          enum: *a7
         id:
           type: string
           format: cuid
@@ -2213,7 +2261,7 @@ components:
       properties:
         status:
           type: string
-          enum: *a6
+          enum: *a7
         id:
           type: string
           format: cuid
@@ -2327,14 +2375,42 @@ components:
           nullable: true
         createdAt: {}
         updatedAt: {}
-    UpdateUserSettingsDto:
+    UserSettingsDto:
       type: object
       properties:
         lang:
           type: string
           enum:
+            &a8
             - TH
             - EN
+        id:
+          type: string
+          format: cuid
+        userId:
+          type: string
+        isNotifiedBeforeTrainingMinute:
+          type: integer
+        isTeamNotified:
+          type: boolean
+        isMeNotified:
+          type: boolean
+        isRoomNotified:
+          type: boolean
+      required:
+        - lang
+        - id
+        - userId
+        - isNotifiedBeforeTrainingMinute
+        - isTeamNotified
+        - isMeNotified
+        - isRoomNotified
+    UpdateUserSettingsDto:
+      type: object
+      properties:
+        lang:
+          type: string
+          enum: *a8
         id:
           type: string
           format: cuid
@@ -2354,7 +2430,7 @@ components:
         role:
           type: string
           enum:
-            &a7
+            &a9
             - MANAGEMENT
         id:
           type: string
@@ -2374,7 +2450,7 @@ components:
       properties:
         role:
           type: string
-          enum: *a7
+          enum: *a9
         id:
           type: string
           format: cuid

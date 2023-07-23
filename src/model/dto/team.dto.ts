@@ -14,6 +14,10 @@ import {
   UserSchema
 } from "model/schema";
 
+export class TeamDto
+  extends createZodDto(TeamSchema)
+  implements Prisma.TeamUncheckedCreateInput {}
+
 export class CreateTeamDto
   extends createZodDto(TeamOptionalDefaultsSchema)
   implements Prisma.TeamUncheckedCreateInput {}
