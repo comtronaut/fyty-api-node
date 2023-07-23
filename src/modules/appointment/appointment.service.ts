@@ -147,8 +147,8 @@ export class AppointmentService {
           delete: true
         },
         members: {
-          update: {
-            where: {},
+          updateMany: {
+            where: { appointmentId: id },
             data: { isLeft: true }
           }
         }
