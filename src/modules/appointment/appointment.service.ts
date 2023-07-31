@@ -1,10 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { Appointment, AppointmentMember, Team } from "@prisma/client";
 
-import { UpdateAppointmentDto } from "model/dto/appointment.dto";
+import {
+  AppointmentPackResponseDto,
+  UpdateAppointmentDto
+} from "model/dto/appointment.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { AppointmentStatus } from "types/local";
-import { AppointmentPack } from "types/query-detail";
 
 @Injectable()
 export class AppointmentService {
@@ -29,7 +31,7 @@ export class AppointmentService {
   async getOthersOfTeam(
     teamId: string,
     status?: AppointmentStatus
-  ): Promise<AppointmentPack[]> {
+  ): Promise<AppointmentPackResponseDto[]> {
     const res = await this.prisma.appointmentMember.findMany({
       where: {
         teamId,
@@ -66,7 +68,7 @@ export class AppointmentService {
     );
   }
 
-  async getOthersOfUser(userId: string): Promise<AppointmentPack[]> {
+  async getOthersOfUser(userId: string): Promise<AppointmentPackResponseDto[]> {
     const res = await this.prisma.teamMember.findMany({
       where: { userId },
       select: {
@@ -145,8 +147,8 @@ export class AppointmentService {
           delete: true
         },
         members: {
-          update: {
-            where: {},
+          updateMany: {
+            where: { appointmentId: id },
             data: { isLeft: true }
           }
         }

@@ -12,16 +12,8 @@ export class OAuthQueryDto extends createZodDto(
     .partial()
 ) {}
 
-export class LoginUserQueryDto extends createZodDto(
+export class AccessTokenDto extends createZodDto(
   z.object({
-    username: z.string(),
-    password: z.string()
-  })
-) {}
-
-export class LoginAdminQueryDto extends createZodDto(
-  z.object({
-    email: z.string().email(),
-    password: z.string()
+    accessToken: z.string()
   })
 ) {}

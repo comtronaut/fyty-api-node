@@ -24,7 +24,7 @@ export type FacebookInfo = {
 
 @Injectable()
 export class FacebookAuthGuard extends AuthGuard("facebook") {
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  override async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
     const query = req.query ?? {};
 

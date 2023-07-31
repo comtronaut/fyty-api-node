@@ -4,9 +4,13 @@ import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { Cache } from "cache-manager";
 
-import { CreateUserDto, UpdateUserDto } from "model/dto/user.dto";
+import {
+  CreateUserDto,
+  SecureUserDto,
+  UpdateUserDto,
+  UserDetailResponseDto
+} from "model/dto/user.dto";
 import { PrismaService } from "prisma/prisma.service";
-import { SecuredUser } from "types/local";
 
 import { ImageService } from "../image/image.service";
 
@@ -18,12 +22,12 @@ export class UserService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
 
-  async getAllUser(): Promise<SecuredUser[]> {
+  async getAllUser(): Promise<SecureUserDto[]> {
     const users = await this.prisma.user.findMany();
     return users.map(({ password, ...e }) => e);
   }
 
-  async getByIds(ids: string[]): Promise<SecuredUser[]> {
+  async getByIds(ids: string[]): Promise<SecureUserDto[]> {
     const users = await this.prisma.user.findMany({ where: { id: { in: ids } } });
     return users.map(({ password, ...e }) => e);
   }
@@ -44,7 +48,7 @@ export class UserService {
     return out;
   }
 
-  async getDetailById(id: string) {
+  async getDetailById(id: string): Promise<UserDetailResponseDto> {
     const { password, settings, avatars, ...info }
       = await this.prisma.user.findUniqueOrThrow({
         where: { id },
@@ -61,7 +65,17 @@ export class UserService {
     };
   }
 
-  async searchUsers(searchString: string, teamId?: string): Promise<SecuredUser[]> {
+  async searchUsers(searchString: string, teamId?: string): Promise<SecureUserDto[]> {
+    let gameId = null;
+    if (teamId) {
+      const { gameId: teamGameId } = await this.prisma.team.findUniqueOrThrow({
+        where: { id: teamId },
+        select: { gameId: true }
+      });
+
+      gameId = teamGameId;
+    }
+
     const users = await this.prisma.user.findMany({
       where: {
         OR: [
@@ -77,7 +91,16 @@ export class UserService {
               mode: "insensitive"
             }
           }
-        ]
+        ],
+        ...(gameId && {
+          teamMembers: {
+            none: {
+              team: {
+                gameId
+              }
+            }
+          }
+        })
       },
       take: 10
     });
@@ -85,7 +108,7 @@ export class UserService {
     return users.map(({ password, ...e }) => e);
   }
 
-  async create(data: CreateUserDto): Promise<SecuredUser> {
+  async create(data: CreateUserDto): Promise<SecureUserDto> {
     const passwordHash = await bcrypt.hash(data.password, 12);
     const createdContent = { ...data, password: passwordHash };
 
@@ -103,7 +126,7 @@ export class UserService {
     return userData;
   }
 
-  async update(id: string, data: UpdateUserDto): Promise<SecuredUser> {
+  async update(id: string, data: UpdateUserDto): Promise<SecureUserDto> {
     const oldUserData = await this.prisma.user.findUniqueOrThrow({
       where: { id },
       select: { portraitUrl: true, coverUrl: true }

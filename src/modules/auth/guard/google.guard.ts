@@ -29,7 +29,7 @@ export type GoogleInfo = {
 
 @Injectable()
 export class GoogleAuthGuard extends AuthGuard("google") {
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  override async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
     const query = req.query;
 

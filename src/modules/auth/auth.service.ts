@@ -1,5 +1,4 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { BadRequestException } from "@nestjs/common/exceptions";
 import { Admin, User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
@@ -91,46 +90,38 @@ export class AuthService {
   }
 
   async adminLogin(email: Admin["email"], password: Admin["password"]) {
-    try {
-      const admin = await this.prisma.admin.findUniqueOrThrow({
-        where: {
-          email
-        }
-      });
-
-      if (admin && bcrypt.compareSync(password, admin.password)) {
-        const { password, ...adminData } = admin;
-        const accessToken = this.getAdminAccessToken(adminData.id);
-        return { ...adminData, ...accessToken };
-      } else {
-        throw new UnauthorizedException("email or password is incorrect.");
+    const admin = await this.prisma.admin.findUniqueOrThrow({
+      where: {
+        email
       }
-    } catch (error) {
-      throw new BadRequestException(error.message);
+    });
+
+    if (admin && bcrypt.compareSync(password, admin.password)) {
+      const { password, ...adminData } = admin;
+      const accessToken = this.getAdminAccessToken(adminData.id);
+      return { ...adminData, ...accessToken };
+    } else {
+      throw new UnauthorizedException("email or password is incorrect.");
     }
   }
 
   async loginLocal(usernameOrEmail: string, password: string) {
-    try {
-      const user = await this.prisma.user.findFirstOrThrow({
-        where: {
-          OR: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
-        }
-      });
-
-      if (!this.isValidPassword(user, password)) {
-        throw new UnauthorizedException("username or password is incorrect.");
+    const user = await this.prisma.user.findFirstOrThrow({
+      where: {
+        OR: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
       }
+    });
 
-      await this.userService.update(user.id, {
-        lastLoginAt: new Date(),
-        ...(!user.firstLoginAt && { firstLoginAt: new Date() })
-      });
-
-      return this.getAccessToken(user.id);
-    } catch (err) {
-      throw new UnauthorizedException(err.message);
+    if (!this.isValidPassword(user, password)) {
+      throw new UnauthorizedException("username or password is incorrect.");
     }
+
+    await this.userService.update(user.id, {
+      lastLoginAt: new Date(),
+      ...(!user.firstLoginAt && { firstLoginAt: new Date() })
+    });
+
+    return this.getAccessToken(user.id);
   }
 
   private isValidPassword(user: User, inPassword: User["password"]) {

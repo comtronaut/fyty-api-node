@@ -41,42 +41,12 @@ export const isValidDecimalInput = (
 // ENUMS
 // ///////////////////////////////////////
 
-export const AdminScalarFieldEnumSchema = z.enum([
-  "id",
-  "email",
-  "password",
-  "role",
-  "createdAt",
-  "updateAt"
+export const TransactionIsolationLevelSchema = z.enum([
+  "ReadUncommitted",
+  "ReadCommitted",
+  "RepeatableRead",
+  "Serializable"
 ]);
-
-export const AppointmentMemberScalarFieldEnumSchema = z.enum([
-  "id",
-  "appointmentId",
-  "teamId",
-  "isLeft",
-  "createdAt"
-]);
-
-export const AppointmentPendingScalarFieldEnumSchema = z.enum([
-  "id",
-  "appointmentId",
-  "inviterTeamId",
-  "inviteeTeamId",
-  "createdAt"
-]);
-
-export const AppointmentScalarFieldEnumSchema = z.enum([
-  "id",
-  "startAt",
-  "endAt",
-  "deletedBeforeAt",
-  "isDeleted",
-  "roomId",
-  "createdAt"
-]);
-
-export const ChatScalarFieldEnumSchema = z.enum([ "id", "roomId" ]);
 
 export const GameScalarFieldEnumSchema = z.enum([
   "id",
@@ -89,17 +59,6 @@ export const GameScalarFieldEnumSchema = z.enum([
   "desc"
 ]);
 
-export const MessageScalarFieldEnumSchema = z.enum([
-  "id",
-  "chatId",
-  "replyId",
-  "imageUrls",
-  "teamId",
-  "senderId",
-  "message",
-  "createdAt"
-]);
-
 export const NotifUserRoomRegistrationScalarFieldEnumSchema = z.enum([
   "id",
   "userId",
@@ -108,18 +67,6 @@ export const NotifUserRoomRegistrationScalarFieldEnumSchema = z.enum([
   "unreadCount",
   "lastSeenAt"
 ]);
-
-export const NotificationActionScalarFieldEnumSchema = z.enum([
-  "id",
-  "notificationId",
-  "response",
-  "teamPendingId",
-  "roomPendingId",
-  "appointmentPendingId",
-  "updatedAt"
-]);
-
-export const NotificationCollectionScalarFieldEnumSchema = z.enum([ "id", "userId" ]);
 
 export const NotificationScalarFieldEnumSchema = z.enum([
   "id",
@@ -133,55 +80,17 @@ export const NotificationScalarFieldEnumSchema = z.enum([
   "createdAt"
 ]);
 
-export const PasswordResetSessionScalarFieldEnumSchema = z.enum([
+export const NotificationActionScalarFieldEnumSchema = z.enum([
   "id",
-  "userId",
-  "token",
-  "attemptCount",
-  "expiredAt",
-  "updatedAt",
-  "createdAt"
-]);
-
-export const QueryModeSchema = z.enum([ "default", "insensitive" ]);
-
-export const ReviewScalarFieldEnumSchema = z.enum([
-  "id",
-  "content",
-  "ratingScore",
-  "reviewerId",
-  "revieweeId",
-  "gameId",
-  "createdAt"
-]);
-
-export const RoomLineupScalarFieldEnumSchema = z.enum([
-  "id",
-  "teamLineupId",
-  "roomMemberId",
-  "roomId"
-]);
-
-export const RoomMemberScalarFieldEnumSchema = z.enum([
-  "id",
-  "teamId",
-  "roomId",
-  "joinedAt"
-]);
-
-export const RoomPendingLineupScalarFieldEnumSchema = z.enum([
-  "id",
+  "notificationId",
+  "response",
+  "teamPendingId",
   "roomPendingId",
-  "teamLineupId"
+  "appointmentPendingId",
+  "updatedAt"
 ]);
 
-export const RoomPendingScalarFieldEnumSchema = z.enum([
-  "id",
-  "teamId",
-  "roomId",
-  "status",
-  "createdAt"
-]);
+export const NotificationCollectionScalarFieldEnumSchema = z.enum([ "id", "userId" ]);
 
 export const RoomScalarFieldEnumSchema = z.enum([
   "id",
@@ -201,36 +110,32 @@ export const RoomScalarFieldEnumSchema = z.enum([
 
 export const RoomSettingsScalarFieldEnumSchema = z.enum([ "id", "roomId" ]);
 
-export const SortOrderSchema = z.enum([ "asc", "desc" ]);
-
-export const TeamLineupScalarFieldEnumSchema = z.enum([
+export const RoomMemberScalarFieldEnumSchema = z.enum([
   "id",
   "teamId",
-  "avatarId",
-  "inGameId",
-  "isDefault",
-  "profileUrl",
-  "imageUrl",
-  "name",
-  "note",
-  "updatedAt",
-  "createdAt"
-]);
-
-export const TeamMemberScalarFieldEnumSchema = z.enum([
-  "id",
-  "role",
-  "teamId",
-  "userId",
+  "roomId",
   "joinedAt"
 ]);
 
-export const TeamPendingScalarFieldEnumSchema = z.enum([
+export const RoomLineupScalarFieldEnumSchema = z.enum([
+  "id",
+  "teamLineupId",
+  "roomMemberId",
+  "roomId"
+]);
+
+export const RoomPendingScalarFieldEnumSchema = z.enum([
   "id",
   "teamId",
-  "userId",
+  "roomId",
   "status",
   "createdAt"
+]);
+
+export const RoomPendingLineupScalarFieldEnumSchema = z.enum([
+  "id",
+  "roomPendingId",
+  "teamLineupId"
 ]);
 
 export const TeamScalarFieldEnumSchema = z.enum([
@@ -254,66 +159,34 @@ export const TeamSettingsScalarFieldEnumSchema = z.enum([
   "isJoiningEnabled"
 ]);
 
-export const TeamStatsScalarFieldEnumSchema = z.enum([
+export const TeamMemberScalarFieldEnumSchema = z.enum([
+  "id",
+  "role",
+  "teamId",
+  "userId",
+  "joinedAt"
+]);
+
+export const TeamLineupScalarFieldEnumSchema = z.enum([
   "id",
   "teamId",
-  "leftWhileTrainingCount",
-  "completedTrainingCount",
-  "trainingMinute",
-  "trainingCount",
-  "winCount",
-  "loseCount",
-  "tieCount",
-  "perGameWinCount",
-  "perGameLoseCount",
-  "updateAt"
-]);
-
-export const TrainingLineupScalarFieldEnumSchema = z.enum([ "id", "trainingId", "lineupId" ]);
-
-export const TrainingReportScalarFieldEnumSchema = z.enum([
-  "id",
-  "reporterUserId",
-  "reporterTeamId",
-  "trainingId",
-  "isAdminReviewed",
-  "heading",
-  "content",
-  "imageUrls",
-  "createdAt"
-]);
-
-export const TrainingScalarFieldEnumSchema = z.enum([
-  "id",
-  "appointmentId",
-  "hostId",
-  "guestId",
-  "hostWinCount",
-  "hostLoseCount",
+  "avatarId",
+  "inGameId",
+  "isDefault",
+  "profileUrl",
+  "imageUrl",
+  "name",
   "note",
-  "status",
-  "source",
-  "imageUrls",
-  "isSubmitted",
   "updatedAt",
   "createdAt"
 ]);
 
-export const TransactionIsolationLevelSchema = z.enum([
-  "ReadUncommitted",
-  "ReadCommitted",
-  "RepeatableRead",
-  "Serializable"
-]);
-
-export const UserAvatarScalarFieldEnumSchema = z.enum([
+export const TeamPendingScalarFieldEnumSchema = z.enum([
   "id",
-  "inGameId",
-  "characterName",
-  "rank",
-  "ratingScore",
-  "gameId",
-  "userId"
+  "teamId",
+  "userId",
+  "status",
+  "createdAt"
 ]);
 
 export const UserScalarFieldEnumSchema = z.enum([
@@ -350,6 +223,135 @@ export const UserSettingsScalarFieldEnumSchema = z.enum([
   "isRoomNotified",
   "lang"
 ]);
+
+export const PasswordResetSessionScalarFieldEnumSchema = z.enum([
+  "id",
+  "userId",
+  "token",
+  "attemptCount",
+  "expiredAt",
+  "updatedAt",
+  "createdAt"
+]);
+
+export const UserAvatarScalarFieldEnumSchema = z.enum([
+  "id",
+  "inGameId",
+  "characterName",
+  "rank",
+  "ratingScore",
+  "gameId",
+  "userId"
+]);
+
+export const ReviewScalarFieldEnumSchema = z.enum([
+  "id",
+  "content",
+  "ratingScore",
+  "reviewerId",
+  "revieweeId",
+  "gameId",
+  "createdAt"
+]);
+
+export const AppointmentScalarFieldEnumSchema = z.enum([
+  "id",
+  "startAt",
+  "endAt",
+  "deletedBeforeAt",
+  "isDeleted",
+  "roomId",
+  "createdAt"
+]);
+
+export const AppointmentPendingScalarFieldEnumSchema = z.enum([
+  "id",
+  "appointmentId",
+  "inviterTeamId",
+  "inviteeTeamId",
+  "createdAt"
+]);
+
+export const AppointmentMemberScalarFieldEnumSchema = z.enum([
+  "id",
+  "appointmentId",
+  "teamId",
+  "isLeft",
+  "createdAt"
+]);
+
+export const ChatScalarFieldEnumSchema = z.enum([ "id", "roomId" ]);
+
+export const MessageScalarFieldEnumSchema = z.enum([
+  "id",
+  "chatId",
+  "replyId",
+  "imageUrls",
+  "teamId",
+  "senderId",
+  "message",
+  "createdAt"
+]);
+
+export const TeamStatsScalarFieldEnumSchema = z.enum([
+  "id",
+  "teamId",
+  "leftWhileTrainingCount",
+  "completedTrainingCount",
+  "trainingMinute",
+  "trainingCount",
+  "winCount",
+  "loseCount",
+  "tieCount",
+  "perGameWinCount",
+  "perGameLoseCount",
+  "updateAt"
+]);
+
+export const TrainingScalarFieldEnumSchema = z.enum([
+  "id",
+  "appointmentId",
+  "hostId",
+  "guestId",
+  "hostWinCount",
+  "hostLoseCount",
+  "note",
+  "status",
+  "source",
+  "imageUrls",
+  "isSubmitted",
+  "updatedAt",
+  "createdAt"
+]);
+
+export const TrainingLineupScalarFieldEnumSchema = z.enum([ "id", "trainingId", "lineupId" ]);
+
+export const TrainingReportScalarFieldEnumSchema = z.enum([
+  "id",
+  "reporterUserId",
+  "reporterTeamId",
+  "trainingId",
+  "isAdminReviewed",
+  "heading",
+  "content",
+  "imageUrls",
+  "createdAt"
+]);
+
+export const AdminScalarFieldEnumSchema = z.enum([
+  "id",
+  "email",
+  "password",
+  "role",
+  "createdAt",
+  "updateAt"
+]);
+
+export const SortOrderSchema = z.enum([ "asc", "desc" ]);
+
+export const QueryModeSchema = z.enum([ "default", "insensitive" ]);
+
+export const NullsOrderSchema = z.enum([ "first", "last" ]);
 
 export const LangSchema = z.enum([ "TH", "EN" ]);
 

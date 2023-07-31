@@ -16,7 +16,7 @@ docker-deploy.%:
 	docker rmi ${app_name_$*}
 	scp ./${app_name_$*}.tar.xz ${remote_host}:/root/
 	rm ./${app_name_$*}.tar.xz
-	ssh -t ${remote_host} 'docker rm -f $$(docker ps -f name=^/${app_name_$*}$$ -q) 2>/dev/null || true \
+	ssh -t ${remote_host} 'docker rm -f ${app_name_$*} 2>/dev/null || true \
     &&  docker rmi -f ${app_name_$*}:latest 2>/dev/null || true \
     &&  docker load < /root/${app_name_$*}.tar.xz \
     &&  rm /root/${app_name_$*}.tar.xz \

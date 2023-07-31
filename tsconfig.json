@@ -17,11 +17,11 @@
 
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true,
-    "strictNullChecks": true,
-    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "strict": false,
+    "strict": true,
 
     "types": ["tsdef"],
   },
