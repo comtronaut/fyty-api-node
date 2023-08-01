@@ -54,21 +54,24 @@ enum MemberRole {
 }
 
 enum TrainingStatus {
-  // the training partner accepts the result
+  /// The training partner accepts the result.
   ACCEPTED
-  // the training partner refuses the result (explicitly)
+  /// The training partner refuses the result (explicitly).
   DENIED
-  // halted by admin (via report)
+  /// Halted by admin (via report).
   INEFFECTIVE
-  // expired by the system
+  /// Expired by the system.
   EXPIRED
-  // the training partner hasn't review yet
+  /// The training partner hasn't review yet.
   UNREVIEWED
 }
 
 enum TrainingSource {
+  /// From system automation or cron jobs.
   SYSTEM
+  /// Manually uploaded by a system admin.
   ADMIN
+  /// Manually uploaded by a user, typically a team manager.
   USER
 }
 
@@ -500,6 +503,7 @@ model Message {
 }
 
 // stats
+/// Stats for each team. One team has one of this table.
 model TeamStats {
   id                     String   @id @default(cuid()) @db.Char(25)
   team                   Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -517,6 +521,11 @@ model TeamStats {
 }
 
 // FIXME: the table is support only 2-team games
+/// Training result after a room was dissolved by the system, recording participants scores and images.
+///
+/// **[LOGIC]** After a room was dissolve by the system, the participants need to manually submit their training result.
+///
+/// **[LOGIC]** The table would typically set its status to `EXPIRED` after 24 of no submission response from the participant.
 model Training {
   id            String         @id @default(cuid()) @db.Char(25)
   appointment   Appointment    @relation(fields: [appointmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -527,10 +536,15 @@ model Training {
   guestId       String?        @db.Char(25)
   hostWinCount  Int?
   hostLoseCount Int?
+  /// Note from participants.
   note          String         @default("")
+  /// Submission status.
   status        TrainingStatus @default(UNREVIEWED)
+  /// Source of the result, typically from the system.
   source        TrainingSource @default(SYSTEM)
+  /// Result images from participants. Participants need to upload images manually.
   imageUrls     String[]       @default([])
+  /// State, mark as submitted when a participant upload the result.
   isSubmitted   Boolean        @default(false)
   updatedAt     DateTime       @updatedAt
   createdAt     DateTime       @default(now())

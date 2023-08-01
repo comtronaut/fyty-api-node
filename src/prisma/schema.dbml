@@ -302,6 +302,8 @@ Table TeamStats {
   perGameWinCount Int [not null, default: 0]
   perGameLoseCount Int [not null, default: 0]
   updateAt DateTime [not null]
+
+  Note: 'Stats for each team. One team has one of this table.'
 }
 
 Table Training {
@@ -311,13 +313,19 @@ Table Training {
   guestId String
   hostWinCount Int
   hostLoseCount Int
-  note String [not null, default: '']
-  status TrainingStatus [not null, default: 'UNREVIEWED']
-  source TrainingSource [not null, default: 'SYSTEM']
-  imageUrls String[] [not null]
-  isSubmitted Boolean [not null, default: false]
+  note String [not null, default: '', note: 'Note from participants.']
+  status TrainingStatus [not null, default: 'UNREVIEWED', note: 'Submission status.']
+  source TrainingSource [not null, default: 'SYSTEM', note: 'Source of the result, typically from the system.']
+  imageUrls String[] [not null, note: 'Result images from participants. Participants need to upload images manually.']
+  isSubmitted Boolean [not null, default: false, note: 'State, mark as submitted when a participant upload the result.']
   updatedAt DateTime [not null]
   createdAt DateTime [default: `now()`, not null]
+
+  Note: 'Training result after a room was dissolved by the system, recording participants scores and images.
+
+**[LOGIC]** After a room was dissolve by the system, the participants need to manually submit their training result.
+
+**[LOGIC]** The table would typically set its status to `EXPIRED` after 24 of no submission response from the participant.'
 }
 
 Table TrainingLineup {
