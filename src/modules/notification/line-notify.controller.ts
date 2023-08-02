@@ -3,7 +3,7 @@ import { Response } from "express";
 
 import { Debug } from "common/debug.decorator";
 
-import { NotifyService } from "./lineNotify.service";
+import { NotifyService } from "./line-notify.service";
 
 @Controller("notify")
 export class LineNotifyController {

@@ -6,7 +6,7 @@ import { CreateTeamDto, TeamDetailResponseDto, UpdateTeamDto } from "model/dto/t
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
 
-import { NotifyService } from "../notification/lineNotify.service";
+import { NotifyService } from "../notification/line-notify.service";
 import { RoomService } from "../room/room.service";
 
 @Injectable()

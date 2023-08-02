@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Post, Query } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 
-import { UserRecoverySessionService } from "./password-reset-sessions.service";
+import { UserRecoverySessionService } from "./user-recovery-session.service";
 
-@Controller("password-reset-session")
+@Controller("user-recovery-session")
 export class UserRecoverySessionController {
   constructor(private readonly service: UserRecoverySessionService) {}
 

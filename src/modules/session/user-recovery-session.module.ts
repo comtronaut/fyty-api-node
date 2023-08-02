@@ -2,8 +2,8 @@ import { Module } from "@nestjs/common";
 
 import { PrismaService } from "prisma/prisma.service";
 
-import { UserRecoverySessionController } from "./password-reset-sessions.controller";
-import { UserRecoverySessionService } from "./password-reset-sessions.service";
+import { UserRecoverySessionController } from "./user-recovery-session.controller";
+import { UserRecoverySessionService } from "./user-recovery-session.service";
 
 @Module({
   imports: [],

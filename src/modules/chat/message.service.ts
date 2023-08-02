@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
 import { CreateMessageDto } from "model/dto/message.dto";
-import { NotifyService } from "modules/notification/lineNotify.service";
+import { NotifyService } from "modules/notification/line-notify.service";
 import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()

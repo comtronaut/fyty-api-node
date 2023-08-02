@@ -9,7 +9,7 @@ import { TeamController } from "./team.controller";
 import { TeamService } from "./team.service";
 import { TrainingService } from "./training.service";
 import { AppointmentService } from "../appointment/appointment.service";
-import { NotifyService } from "../notification/lineNotify.service";
+import { NotifyService } from "../notification/line-notify.service";
 import { RoomService } from "../room/room.service";
 
 @Module({

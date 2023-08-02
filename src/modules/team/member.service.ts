@@ -5,7 +5,7 @@ import { CreateTeamMemberDto, UpdateTeamMemberDto } from "model/dto/team-member.
 import { PrismaService } from "prisma/prisma.service";
 
 import { TeamService } from "./team.service";
-import { NotifyService } from "../notification/lineNotify.service";
+import { NotifyService } from "../notification/line-notify.service";
 
 @Injectable()
 export class TeamMemberService {

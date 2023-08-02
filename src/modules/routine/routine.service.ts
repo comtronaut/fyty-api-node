@@ -10,7 +10,7 @@ import { ImageService } from "modules/image/image.service";
 import { RoomService } from "modules/room/room.service";
 import { PrismaService } from "prisma/prisma.service";
 
-import { NotifyService } from "../notification/lineNotify.service";
+import { NotifyService } from "../notification/line-notify.service";
 
 @Injectable()
 export class RoutineService {

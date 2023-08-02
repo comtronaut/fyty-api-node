@@ -1,6 +1,6 @@
 import { Controller, Get, Query, Redirect } from "@nestjs/common";
 
-import { NotifyService } from "./lineNotify.service";
+import { NotifyService } from "./line-notify.service";
 
 @Controller("line-notify-callback")
 export class CallbackController {
