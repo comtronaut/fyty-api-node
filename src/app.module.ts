@@ -14,7 +14,7 @@ import { NotifyModule } from "modules/notification/lineNotify.module";
 import { ReviewModule } from "modules/review/review.module";
 import { RoomModule } from "modules/room/room.module";
 import { RoutineModule } from "modules/routine/routine.module";
-import { PasswordResetSessionModule } from "modules/session/password-reset-sessions.module";
+import { UserRecoverySessionModule } from "modules/session/password-reset-sessions.module";
 import { SocketModule } from "modules/socket/socket.module";
 import { TeamModule } from "modules/team/team.module";
 import { UserModule } from "modules/user/user.module";
@@ -24,7 +24,7 @@ import { PrismaModule } from "prisma/prisma.module";
   imports: [
     AuthModule,
     UserModule,
-    PasswordResetSessionModule,
+    UserRecoverySessionModule,
     GameModule,
     TeamModule,
     RoomModule,

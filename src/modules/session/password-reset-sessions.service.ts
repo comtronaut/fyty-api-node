@@ -4,23 +4,23 @@ import * as bcrypt from "bcrypt";
 import dayjs from "dayjs";
 
 import {
-  CreatePasswordResetSessionDto,
-  UpdatePasswordResetSessionDto
+  CreateUserRecoverySessionDto,
+  UpdateUserRecoverySessionDto
 } from "model/dto/password-reset-session.dto";
 import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
-export class PasswordResetSessionService {
+export class UserRecoverySessionService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async get(where: Prisma.PasswordResetSessionWhereUniqueInput) {
-    return await this.prisma.passwordResetSession.findUniqueOrThrow({
+  async get(where: Prisma.UserRecoverySessionWhereUniqueInput) {
+    return await this.prisma.userRecoverySession.findUniqueOrThrow({
       where
     });
   }
 
   async resetToken(token: string, password: string) {
-    const session = await this.prisma.passwordResetSession.findUniqueOrThrow({
+    const session = await this.prisma.userRecoverySession.findUniqueOrThrow({
       where: { token }
     });
     const hashedPassword = bcrypt.hashSync(password, 12);
@@ -52,19 +52,19 @@ export class PasswordResetSessionService {
     return session;
   }
 
-  async create(data: CreatePasswordResetSessionDto) {
-    return await this.prisma.passwordResetSession.create({ data });
+  async create(data: CreateUserRecoverySessionDto) {
+    return await this.prisma.userRecoverySession.create({ data });
   }
 
-  async update(id: string, data: UpdatePasswordResetSessionDto) {
-    return await this.prisma.passwordResetSession.update({
+  async update(id: string, data: UpdateUserRecoverySessionDto) {
+    return await this.prisma.userRecoverySession.update({
       where: { id },
       data
     });
   }
 
   async delete(id: string) {
-    return await this.prisma.passwordResetSession.delete({
+    return await this.prisma.userRecoverySession.delete({
       where: { id }
     });
   }

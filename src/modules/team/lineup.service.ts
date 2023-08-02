@@ -40,10 +40,10 @@ export class LineupService {
   }
 
   async getByRoomMemberId(memberid: string): Promise<TeamLineup[]> {
-    const { roomLineups } = await this.prisma.roomMember.findUniqueOrThrow({
+    const { lineups } = await this.prisma.roomMember.findUniqueOrThrow({
       where: { id: memberid },
       select: {
-        roomLineups: {
+        lineups: {
           select: {
             teamLineup: true
           }
@@ -51,7 +51,7 @@ export class LineupService {
       }
     });
 
-    return roomLineups.map((e) => e.teamLineup);
+    return lineups.map((e) => e.teamLineup);
   }
 
   async deleteById(userId: string, lineupId: string) {
