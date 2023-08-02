@@ -1,14 +1,16 @@
 import { Module } from "@nestjs/common";
 
+import { AppointmentService } from "modules/appointment/appointment.service";
+import { LineNotifyService } from "modules/notification/line-notify.service";
+import { NotificationService } from "modules/notification/notification.service";
+import { RoomService } from "modules/room/room.service";
+import { TeamPendingService } from "modules/team/services/pending.service";
+import { TeamService } from "modules/team/services/team.service";
+import { UserAvatarService } from "modules/user/services/avatar.service";
+import { UserSettingsService } from "modules/user/services/settings.service";
+import { UserService } from "modules/user/services/user.service";
+
 import { MeController } from "./me.controller";
-import { AppointmentService } from "../appointment/appointment.service";
-import { LineNotifyService } from "../notification/line-notify.service";
-import { RoomService } from "../room/room.service";
-import { TeamPendingService } from "../team/services/pending.service";
-import { TeamService } from "../team/services/team.service";
-import { UserAvatarService } from "../user/services/avatar.service";
-import { UserSettingsService } from "../user/services/settings.service";
-import { UserService } from "../user/services/user.service";
 
 @Module({
   imports: [],
@@ -21,7 +23,8 @@ import { UserService } from "../user/services/user.service";
     AppointmentService,
     TeamPendingService,
     RoomService,
-    LineNotifyService
+    LineNotifyService,
+    NotificationService
   ]
 })
 export class MeModule {}

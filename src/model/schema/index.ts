@@ -29,9 +29,7 @@ export const DECIMAL_STRING_REGEX = /^[0-9.,e+-bxffo_cp]+$|Infinity|NaN/;
 export const isValidDecimalInput = (
   v?: null | string | number | Prisma.DecimalJsLike
 ): v is string | number | Prisma.DecimalJsLike => {
-  if (v === undefined || v === null) {
-    return false;
-  }
+  if (v === undefined || v === null) {return false;}
   return (
     (typeof v === "object" && "d" in v && "e" in v && "s" in v && "toFixed" in v)
     || (typeof v === "string" && DECIMAL_STRING_REGEX.test(v))
@@ -106,7 +104,7 @@ export const NotifUserRoomRegistrationScalarFieldEnumSchema = z.enum([
 
 export const NotificationScalarFieldEnumSchema = z.enum([
   "id",
-  "collectionId",
+  "receiverUserId",
   "source",
   "title",
   "message",
@@ -125,8 +123,6 @@ export const NotificationActionScalarFieldEnumSchema = z.enum([
   "appointmentPendingId",
   "updatedAt"
 ]);
-
-export const NotificationCollectionScalarFieldEnumSchema = z.enum([ "id", "userId" ]);
 
 export const RoomScalarFieldEnumSchema = z.enum([
   "id",
@@ -646,7 +642,7 @@ export type NotifUserRoomRegistrationOptionalDefaults = z.infer<
 export const NotificationSchema = z.object({
   source: NotificationSourceSchema,
   id: z.string().cuid(),
-  collectionId: z.string(),
+  receiverUserId: z.string(),
   title: z.string(),
   message: z.string(),
   senderUserId: z.string().nullish(),
@@ -715,41 +711,6 @@ export const NotificationActionOptionalDefaultsSchema = NotificationActionSchema
 
 export type NotificationActionOptionalDefaults = z.infer<
   typeof NotificationActionOptionalDefaultsSchema
->;
-
-// ///////////////////////////////////////
-// NOTIFICATION COLLECTION SCHEMA
-// ///////////////////////////////////////
-
-export const NotificationCollectionSchema = z.object({
-  id: z.string().cuid(),
-  userId: z.string()
-});
-
-export type NotificationCollection = z.infer<typeof NotificationCollectionSchema>;
-
-// ///////////////////////////////////////
-// NOTIFICATION COLLECTION PARTIAL SCHEMA
-// ///////////////////////////////////////
-
-export const NotificationCollectionPartialSchema = NotificationCollectionSchema.partial();
-
-export type NotificationCollectionPartial = z.infer<
-  typeof NotificationCollectionPartialSchema
->;
-
-// NOTIFICATION COLLECTION OPTIONAL DEFAULTS SCHEMA
-// ------------------------------------------------------
-
-export const NotificationCollectionOptionalDefaultsSchema
-  = NotificationCollectionSchema.merge(
-    z.object({
-      id: z.string().cuid().optional()
-    })
-  );
-
-export type NotificationCollectionOptionalDefaults = z.infer<
-  typeof NotificationCollectionOptionalDefaultsSchema
 >;
 
 // ///////////////////////////////////////

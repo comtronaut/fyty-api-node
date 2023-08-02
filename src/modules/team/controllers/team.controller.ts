@@ -157,6 +157,11 @@ export class TeamController {
     return await this.trainingService.update(trainingId, payload);
   }
 
+  @Get("trainings/:id/lineups")
+  async getTrainingLineupsById(@Param("id") trainingId: string) {
+    return await this.trainingService.getTrainingLineupsById(trainingId);
+  }
+
   // training report
   @Get("trainings/:id/reports")
   async getReportByTrainingId(@Param("id") trainingId: string) {

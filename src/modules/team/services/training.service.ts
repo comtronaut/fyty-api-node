@@ -3,6 +3,7 @@ import {
   Team,
   TeamStats,
   Training,
+  TrainingLineup,
   TrainingReport,
   TrainingSource,
   TrainingStatus
@@ -147,6 +148,10 @@ export class TrainingService {
         }
       }
     });
+  }
+
+  async getTrainingLineupsById(trainingId: string): Promise<TrainingLineup[]> {
+    return await this.prisma.trainingLineup.findMany({ where: { trainingId } });
   }
 
   async getAllReports(): Promise<TrainingReport[]> {

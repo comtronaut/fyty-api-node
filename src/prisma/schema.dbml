@@ -67,7 +67,7 @@ Table NotifUserRoomRegistration {
 
 Table Notification {
   id String [pk]
-  collectionId String [not null]
+  receiverUserId String [not null]
   source NotificationSource [not null]
   title String [not null]
   message String [not null]
@@ -85,11 +85,6 @@ Table NotificationAction {
   roomPendingId String
   appointmentPendingId String
   updatedAt DateTime [not null]
-}
-
-Table NotificationCollection {
-  id String [pk]
-  userId String [unique, not null]
 }
 
 Table Room {
@@ -465,7 +460,7 @@ Ref: NotifUserRoomRegistration.userId > User.id [delete: Cascade]
 
 Ref: NotifUserRoomRegistration.roomId > Room.id [delete: Cascade]
 
-Ref: Notification.collectionId > NotificationCollection.id [delete: Cascade]
+Ref: Notification.receiverUserId > User.id [delete: Cascade]
 
 Ref: Notification.senderUserId > User.id [delete: Cascade]
 
@@ -478,8 +473,6 @@ Ref: NotificationAction.teamPendingId > TeamPending.id [delete: Set Null]
 Ref: NotificationAction.roomPendingId > RoomPending.id [delete: Set Null]
 
 Ref: NotificationAction.appointmentPendingId > AppointmentPending.id [delete: Set Null]
-
-Ref: NotificationCollection.userId - User.id [delete: Cascade]
 
 Ref: Room.gameId > Game.id
 

@@ -44,10 +44,17 @@ implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
   }
 
   @OnEvent("socket.room-system-removal")
-  handleRoomSystemRemoval(payload: any) {
+  handleRoomSystemRemoval(payload: { roomId: string }) {
     this.server?.emit(`res/room/${payload.roomId}/disband`, {
       ...payload,
       isManual: false
+    });
+  }
+
+  @OnEvent("socket.notification-room-message")
+  handleChatMessage(payload: { receiverUserId: string; message: string }) {
+    this.server?.emit(`res/notification/${payload.receiverUserId}/disband`, {
+      receiverUserId: payload.receiverUserId
     });
   }
 

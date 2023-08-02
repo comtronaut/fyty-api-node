@@ -662,12 +662,10 @@ export class LineNotifyService {
     }
   }
 
-  // Chat
-  async searchUserForChatNotify(chatId: string, teamId: string) {
-    const chat = await this.prisma.chat.findFirst({
-      where: {
-        id: chatId
-      }
+  // chat
+  async sendChatMessageNotificationToOthers(chatId: string, teamId: string) {
+    const chat = await this.prisma.chat.findUnique({
+      where: { id: chatId }
     });
 
     const roomMemberRes = await this.prisma.roomMember.findMany({
