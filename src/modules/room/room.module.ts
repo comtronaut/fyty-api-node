@@ -8,8 +8,8 @@ import { RoomController } from "./room.controller";
 import { RoomService } from "./room.service";
 import { ChatModule } from "../chat/chat.module";
 import { ChatService } from "../chat/chat.service";
-import { NotifyService } from "../notification/line-notify.service";
-import { TeamService } from "../team/team.service";
+import { LineNotifyService } from "../notification/line-notify.service";
+import { TeamService } from "../team/services/team.service";
 
 @Module({
   imports: [ ChatModule ],
@@ -20,7 +20,7 @@ import { TeamService } from "../team/team.service";
     TeamService,
     RoomPendingService,
     LobbyService,
-    NotifyService,
+    LineNotifyService,
     ImageService
   ]
 })

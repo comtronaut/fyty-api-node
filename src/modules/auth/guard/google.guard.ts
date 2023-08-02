@@ -6,7 +6,7 @@ import { Request } from "express";
 
 import env from "common/env.config";
 
-import { config } from "../common";
+import { CONFIG } from "../common";
 
 export type GoogleInfo = {
   iss: string;
@@ -43,14 +43,14 @@ export class GoogleAuthGuard extends AuthGuard("google") {
         redirect_uri: env.GOOGLE_REDIRECT_URI,
         grant_type: "authorization_code"
       },
-      config
+      CONFIG
     );
 
     const { data: userInfo } = await axios.get("https://oauth2.googleapis.com/tokeninfo", {
       params: {
         id_token: tokenData.id_token
       },
-      ...config
+      ...CONFIG
     });
 
     req.user = userInfo;

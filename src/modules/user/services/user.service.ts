@@ -10,9 +10,8 @@ import {
   UpdateUserDto,
   UserDetailResponseDto
 } from "model/dto/user.dto";
+import { ImageService } from "modules/image/image.service";
 import { PrismaService } from "prisma/prisma.service";
-
-import { ImageService } from "../image/image.service";
 
 @Injectable()
 export class UserService {

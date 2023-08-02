@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 
 export function getDayRangeWithin(
-  rawDate: any,
+  rawDate: ConstructorParameters<typeof Date>[0],
   timezoneOffset?: number
 ): { start: Date; end: Date } {
   const today = new Date(rawDate);

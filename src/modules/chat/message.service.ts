@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 
 import { CreateMessageDto } from "model/dto/message.dto";
-import { NotifyService } from "modules/notification/line-notify.service";
+import { LineNotifyService } from "modules/notification/line-notify.service";
 import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
 export class MessageService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly lineNotify: NotifyService
+    private readonly lineNotify: LineNotifyService
   ) {}
 
   async create({ waitingKey, ...data }: CreateMessageDto & { waitingKey: string }) {

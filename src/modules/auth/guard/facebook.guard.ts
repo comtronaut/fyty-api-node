@@ -6,7 +6,7 @@ import { Request } from "express";
 
 import env from "common/env.config";
 
-import { config } from "../common";
+import { CONFIG } from "../common";
 
 export type FacebookInfo = {
   id: string;
@@ -38,7 +38,7 @@ export class FacebookAuthGuard extends AuthGuard("facebook") {
           client_secret: env.FACEBOOK_CLIENT_SECRET,
           redirect_uri: env.FACEBOOK_REDIRECT_URI
         },
-        ...config
+        ...CONFIG
       }
     );
 
@@ -47,7 +47,7 @@ export class FacebookAuthGuard extends AuthGuard("facebook") {
         fields: [ "id", "name", "email", "picture" ].join(","),
         access_token: tokenData.access_token
       },
-      ...config
+      ...CONFIG
     });
 
     req.user = userInfo;

@@ -1,10 +1,10 @@
 import { Controller, Get, Query, Redirect } from "@nestjs/common";
 
-import { NotifyService } from "./line-notify.service";
+import { LineNotifyService } from "./line-notify.service";
 
 @Controller("line-notify-callback")
-export class CallbackController {
-  constructor(private readonly lineNotifyService: NotifyService) {}
+export class LineNotifyCallbackController {
+  constructor(private readonly lineNotifyService: LineNotifyService) {}
 
   @Get()
   @Redirect("https://www.fyty-esport.com")

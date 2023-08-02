@@ -1,16 +1,17 @@
 import { Module } from "@nestjs/common";
 
-import { LineupController } from "./lineup.controller";
-import { LineupService } from "./lineup.service";
-import { TeamMemberService } from "./member.service";
-import { TeamPendingService } from "./pending.service";
-import { TeamSettingsService } from "./settings.service";
-import { TeamController } from "./team.controller";
-import { TeamService } from "./team.service";
-import { TrainingService } from "./training.service";
-import { AppointmentService } from "../appointment/appointment.service";
-import { NotifyService } from "../notification/line-notify.service";
-import { RoomService } from "../room/room.service";
+import { AppointmentService } from "modules/appointment/appointment.service";
+import { LineNotifyService } from "modules/notification/line-notify.service";
+import { RoomService } from "modules/room/room.service";
+
+import { LineupController } from "./controllers/lineup.controller";
+import { TeamController } from "./controllers/team.controller";
+import { LineupService } from "./services/lineup.service";
+import { TeamMemberService } from "./services/member.service";
+import { TeamPendingService } from "./services/pending.service";
+import { TeamSettingsService } from "./services/settings.service";
+import { TeamService } from "./services/team.service";
+import { TrainingService } from "./services/training.service";
 
 @Module({
   imports: [],
@@ -21,10 +22,10 @@ import { RoomService } from "../room/room.service";
     TeamMemberService,
     TeamSettingsService,
     TeamPendingService,
+    TrainingService,
     AppointmentService,
     RoomService,
-    TrainingService,
-    NotifyService
+    LineNotifyService
   ]
 })
 export class TeamModule {}

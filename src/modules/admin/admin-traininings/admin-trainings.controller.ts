@@ -13,7 +13,7 @@ import { TrainingSource } from "@prisma/client";
 
 import { CreateTrainingBypassDto, UpdateTrainingDto } from "model/dto/training.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
-import { TrainingService } from "modules/team/training.service";
+import { TrainingService } from "modules/team/services/training.service";
 
 @Controller("admin/trainings")
 @UseGuards(AdminJwtAuthGuard)

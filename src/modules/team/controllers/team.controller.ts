@@ -12,6 +12,7 @@ import {
 import { PendingStatus, Team, TrainingSource, User } from "@prisma/client";
 import { isEmpty } from "lodash";
 
+import { AppointmentService } from "../../appointment/appointment.service";
 import { UserSubject } from "common/subject.decorator";
 import { CreateTeamMemberDto, UpdateTeamMemberDto } from "model/dto/team-member.dto";
 import { CreateTeamPendingDto, UpdateTeamPendingDto } from "model/dto/team-pending.dto";
@@ -25,12 +26,11 @@ import { CreateTrainingBypassDto, UpdateTrainingDto } from "model/dto/training.d
 import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { AppointmentStatus } from "types/local";
 
-import { TeamMemberService } from "./member.service";
-import { TeamPendingService } from "./pending.service";
-import { TeamSettingsService } from "./settings.service";
-import { TeamService } from "./team.service";
-import { TrainingService } from "./training.service";
-import { AppointmentService } from "../appointment/appointment.service";
+import { TeamMemberService } from "../services/member.service";
+import { TeamPendingService } from "../services/pending.service";
+import { TeamSettingsService } from "../services/settings.service";
+import { TeamService } from "../services/team.service";
+import { TrainingService } from "../services/training.service";
 
 @Controller("teams")
 @UseGuards(UserJwtAuthGuard)

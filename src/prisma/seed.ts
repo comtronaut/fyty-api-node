@@ -2,13 +2,10 @@ import fs from "fs";
 
 import { AdminRole, PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
-import dayjs from "dayjs";
-import { camelCase, compact, noop } from "lodash";
+import { noop } from "lodash";
 import { match } from "ts-pattern";
-import { AnyFunction, Nullable } from "tsdef";
+import { AnyFunction } from "tsdef";
 import { z } from "zod";
-
-import { Team, Training } from "model/schema";
 
 const prisma = new PrismaClient();
 
@@ -43,141 +40,6 @@ async function initData() {
 
   // await migrate("user");
 }
-
-async function recalculateStats() {
-  await prisma.teamStats.deleteMany({
-    where: {}
-  });
-
-  const teams = await prisma.team.findMany({
-    where: {},
-    select: { id: true }
-  });
-
-  await prisma.teamStats.createMany({
-    data: teams.map(({ id }) => ({
-      teamId: id
-    }))
-  });
-
-  // after reset
-  const trainings = await prisma.training.findMany({
-    where: {},
-    include: {
-      host: true,
-      guest: true,
-      appointment: true
-    }
-  });
-
-  for (const [ i, training ] of trainings.entries()) {
-    console.log(`completing: ${i + 1}/${trainings.length}`);
-    /* await compareAndUpdateParticipants(
-      training.host!,
-      training.guest!,
-      {
-        hostLoseCount: null,
-        hostWinCount: null
-      },
-      {
-        hostLoseCount: training.hostLoseCount,
-        hostWinCount: training.hostWinCount
-      }
-    );
-
-    await prisma.teamStats.updateMany({
-      where: { teamId: { in: compact([ training.host!.id, training.guest!.id ]) } },
-      data: {
-        trainingMinute: {
-          increment: diffMinute(training.appointment.startAt, training.appointment.endAt)
-        },
-        trainingCount: {
-          increment: 1
-        }
-      }
-    }); */
-  }
-}
-
-/* function diffMinute(
-  startAt: Parameters<typeof dayjs>[0],
-  endAt: Parameters<typeof dayjs>[0]
-): number {
-  return Math.abs(dayjs(startAt).diff(dayjs(endAt), "minute"));
-}
-
-async function compareAndUpdateParticipants(
-  host: Nullable<Team>,
-  guest: Nullable<Team>,
-  oldRes: Pick<Training, "hostWinCount" | "hostLoseCount">,
-  newRes: Pick<Training, "hostWinCount" | "hostLoseCount">
-) {
-  const fromNull = oldRes.hostWinCount === null && Number.isFinite(newRes.hostLoseCount);
-
-  const isNewHostWin = (newRes.hostWinCount || 0) > (newRes.hostLoseCount || 0);
-  const isNewHostLose = (newRes.hostWinCount || 0) < (newRes.hostLoseCount || 0);
-  const isNewTie = newRes.hostWinCount === newRes.hostLoseCount;
-
-  if (!fromNull) {
-    return;
-  }
-
-  const data = {
-    completedTrainingCount: {
-      increment: 1
-    },
-    perGameWinCount: {
-      increment: (newRes.hostWinCount || 0) - (oldRes.hostWinCount || 0)
-    },
-    perGameLoseCount: {
-      increment: (newRes.hostLoseCount || 0) - (oldRes.hostLoseCount || 0)
-    }
-  };
-
-  if (isNewTie) {
-    await prisma.teamStats.updateMany({
-      where: {
-        teamId: { in: compact([ host?.id, guest?.id ]) }
-      },
-      data: {
-        tieCount: {
-          increment: isNewTie ? 1 : 0
-        },
-        ...data
-      }
-    });
-  }
-  else {
-    if (host) {
-      await prisma.teamStats.update({
-        where: { teamId: host.id },
-        data: {
-          winCount: {
-            increment: !isNewTie && isNewHostWin ? 1 : 0
-          },
-          loseCount: {
-            increment: !isNewTie && isNewHostLose ? 1 : 0
-          },
-          ...data
-        }
-      });
-    }
-    if (guest) {
-      await prisma.teamStats.update({
-        where: { teamId: guest.id },
-        data: {
-          winCount: {
-            increment: isNewHostWin ? 0 : 1
-          },
-          loseCount: {
-            increment: isNewHostLose ? 0 : 1
-          },
-          ...data
-        }
-      });
-    }
-  }
-} */
 
 async function main(fn: AnyFunction) {
   await fn();

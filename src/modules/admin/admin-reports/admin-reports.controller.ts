@@ -11,7 +11,7 @@ import {
 
 import { UpdateTrainingReportDto } from "model/dto/training-report.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
-import { TrainingService } from "modules/team/training.service";
+import { TrainingService } from "modules/team/services/training.service";
 
 @Controller("admin/reports")
 @UseGuards(AdminJwtAuthGuard)

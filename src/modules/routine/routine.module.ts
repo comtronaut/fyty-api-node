@@ -5,11 +5,11 @@ import { ImageService } from "modules/image/image.service";
 import { RoomService } from "modules/room/room.service";
 
 import { RoutineService } from "./routine.service";
-import { NotifyService } from "../notification/line-notify.service";
+import { LineNotifyService } from "../notification/line-notify.service";
 
 @Module({
   imports: [ ScheduleModule.forRoot() ],
   controllers: [],
-  providers: [ RoutineService, RoomService, NotifyService, ImageService ]
+  providers: [ RoutineService, RoomService, LineNotifyService, ImageService ]
 })
 export class RoutineModule {}

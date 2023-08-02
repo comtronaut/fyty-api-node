@@ -10,14 +10,14 @@ import { ImageService } from "modules/image/image.service";
 import { RoomService } from "modules/room/room.service";
 import { PrismaService } from "prisma/prisma.service";
 
-import { NotifyService } from "../notification/line-notify.service";
+import { LineNotifyService } from "../notification/line-notify.service";
 
 @Injectable()
 export class RoutineService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly roomService: RoomService,
-    private readonly notifyService: NotifyService,
+    private readonly notifyService: LineNotifyService,
     private readonly imageService: ImageService,
     private readonly eventEmitter: EventEmitter2
   ) {}
@@ -113,7 +113,9 @@ export class RoutineService {
             guestId: e.members.filter((f) => f.teamId !== e.hostTeamId)[0]!.teamId,
             lineups: {
               createMany: {
-                data: e.members.flatMap((m) => m.lineups).map((e) => ({ lineupId: e.teamLineupId }))
+                data: e.members
+                  .flatMap((m) => m.lineups)
+                  .map((e) => ({ lineupId: e.teamLineupId }))
               }
             }
           }))

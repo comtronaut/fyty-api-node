@@ -1,18 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { MemberRole, PendingStatus, TeamMember, User } from "@prisma/client";
 
+import { LineNotifyService } from "../../notification/line-notify.service";
 import { CreateTeamMemberDto, UpdateTeamMemberDto } from "model/dto/team-member.dto";
 import { PrismaService } from "prisma/prisma.service";
 
 import { TeamService } from "./team.service";
-import { NotifyService } from "../notification/line-notify.service";
 
 @Injectable()
 export class TeamMemberService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly teamService: TeamService,
-    private readonly lineNotify: NotifyService
+    private readonly lineNotify: LineNotifyService
   ) {}
 
   async create(data: CreateTeamMemberDto) {

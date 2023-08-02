@@ -3,18 +3,17 @@ import { MemberRole, Team, User } from "@prisma/client";
 
 import { paginate } from "common/utils/pagination";
 import { CreateTeamDto, TeamDetailResponseDto, UpdateTeamDto } from "model/dto/team.dto";
+import { LineNotifyService } from "modules/notification/line-notify.service";
+import { RoomService } from "modules/room/room.service";
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
-
-import { NotifyService } from "../notification/line-notify.service";
-import { RoomService } from "../room/room.service";
 
 @Injectable()
 export class TeamService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly roomService: RoomService,
-    private readonly lineNotify: NotifyService
+    private readonly lineNotify: LineNotifyService
   ) {}
 
   async create(user: User, data: CreateTeamDto): Promise<Team> {

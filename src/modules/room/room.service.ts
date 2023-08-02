@@ -14,13 +14,13 @@ import { CreateRoomDto, DeleteRoomDto, UpdateRoomDto } from "model/dto/room.dto"
 import { ImageService } from "modules/image/image.service";
 import { PrismaService } from "prisma/prisma.service";
 
-import { NotifyService } from "../notification/line-notify.service";
+import { LineNotifyService } from "../notification/line-notify.service";
 
 @Injectable()
 export class RoomService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly lineNotify: NotifyService,
+    private readonly lineNotify: LineNotifyService,
     private readonly imageService: ImageService
   ) {}
 
@@ -180,7 +180,7 @@ export class RoomService {
   async getByFilter(
     clause: Partial<{ gameId: string; name: string; date: string }>
   ): Promise<Room[]> {
-    const { start, end } = getDayRangeWithin(clause.date);
+    const { start, end } = getDayRangeWithin(clause.date ?? new Date());
 
     return await this.prisma.room.findMany({
       where: {

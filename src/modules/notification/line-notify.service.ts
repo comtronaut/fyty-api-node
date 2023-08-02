@@ -8,7 +8,7 @@ import env from "common/env.config";
 import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
-export class NotifyService {
+export class LineNotifyService {
   constructor(
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
