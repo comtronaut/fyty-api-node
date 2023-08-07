@@ -1,15 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
+import { NotificationActionResponse } from "@prisma/client";
 
-import {
-  NotifUserRoomRegistrationDto,
-  UpdateNotifUserRoomRegistrationDto
-} from "model/dto/notif-user-room-registration.dto";
-import {
-  NotificationDto,
-  NotificationPackResponseDto,
-  UpdateNotificationDto
-} from "model/dto/notification.dto";
+import { NotifUserRoomRegistrationDto } from "model/dto/notif-user-room-registration.dto";
+import { NotificationDto, NotificationPackResponseDto } from "model/dto/notification.dto";
 import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
@@ -24,7 +18,11 @@ export class NotificationService {
       = await this.prisma.user.findUniqueOrThrow({
         where: { id: userId },
         select: {
-          receivingNotifications: true,
+          receivingNotifications: {
+            include: {
+              action: true
+            }
+          },
           roomNotifRegistrations: true
         }
       });
@@ -32,23 +30,41 @@ export class NotificationService {
     return { receivingNotifications, roomNotifRegistrations };
   }
 
-  async updateNotificationById(
-    id: string,
-    data: UpdateNotificationDto
-  ): Promise<NotificationDto> {
+  async markAsReadNotificationById(id: string): Promise<NotificationDto> {
     return await this.prisma.notification.update({
       where: { id },
-      data
+      data: {
+        seenAt: new Date()
+      }
     });
   }
 
-  async updateNotifUserRoomRegistrationById(
+  async performActionNotificationById(
     id: string,
-    data: UpdateNotifUserRoomRegistrationDto
+    action: NotificationActionResponse
+  ): Promise<NotificationDto> {
+    return await this.prisma.notification.update({
+      where: { id },
+      data: {
+        seenAt: new Date(),
+        action: {
+          update: {
+            response: action
+          }
+        }
+      }
+    });
+  }
+
+  async markAsReadNotifUserRoomRegistrationById(
+    id: string
   ): Promise<NotifUserRoomRegistrationDto> {
     return await this.prisma.notifUserRoomRegistration.update({
       where: { id },
-      data
+      data: {
+        unreadCount: 0,
+        latestMessage: ""
+      }
     });
   }
 

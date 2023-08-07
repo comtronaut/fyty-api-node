@@ -1,9 +1,6 @@
-import { Body, Controller, Param, Put } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Param, Put } from "@nestjs/common";
 
-import {
-  NotifUserRoomRegistrationDto,
-  UpdateNotifUserRoomRegistrationDto
-} from "model/dto/notif-user-room-registration.dto";
+import { NotifUserRoomRegistrationDto } from "model/dto/notif-user-room-registration.dto";
 import { NotificationDto, UpdateNotificationDto } from "model/dto/notification.dto";
 
 import { NotificationService } from "./notification.service";
@@ -12,19 +9,30 @@ import { NotificationService } from "./notification.service";
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
-  @Put(":id")
-  async putNotificationById(
+  @Put(":id/mark-as-read")
+  async markAsReadNotificationById(@Param("id") id: string): Promise<NotificationDto> {
+    return await this.notificationService.markAsReadNotificationById(id);
+  }
+
+  @Put(":id/action")
+  async putResponseOnNotificationById(
     @Param("id") id: string,
     @Body() payload: UpdateNotificationDto
   ): Promise<NotificationDto> {
-    return await this.notificationService.updateNotificationById(id, payload);
+    if (!payload.response) {
+      throw new BadRequestException("response cannot be omitted or null value");
+    }
+
+    return await this.notificationService.performActionNotificationById(
+      id,
+      payload.response
+    );
   }
 
-  @Put("room-registrations/:id")
-  async putRoomRegistrationById(
-    @Param("id") id: string,
-    @Body() payload: UpdateNotifUserRoomRegistrationDto
+  @Put("room-registrations/:id/mark-as-read")
+  async markAsReadRoomRegistrationById(
+    @Param("id") id: string
   ): Promise<NotifUserRoomRegistrationDto> {
-    return await this.notificationService.updateNotifUserRoomRegistrationById(id, payload);
+    return await this.notificationService.markAsReadNotifUserRoomRegistrationById(id);
   }
 }
