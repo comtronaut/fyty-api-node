@@ -2,7 +2,6 @@ import fs from "fs";
 
 import { AdminRole, PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
-import { noop } from "lodash";
 import { match } from "ts-pattern";
 import { AnyFunction } from "tsdef";
 import { z } from "zod";
@@ -86,7 +85,7 @@ async function migrate(table: string): Promise<void> {
     .with("team_member", () => prisma.teamMember.createMany({ data }))
     .with("appointment", () => prisma.appointment.createMany({ data }))
     .with("appointment_member", () => prisma.appointmentMember.createMany({ data }))
-    .otherwise(noop);
+    .otherwise(() => null);
 }
 
 main(/* () => migrate("user") */ initData)
