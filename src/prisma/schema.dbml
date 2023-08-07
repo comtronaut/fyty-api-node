@@ -18,6 +18,43 @@ Table Game {
   desc String [not null, default: '']
 }
 
+Table Event {
+  id String [pk]
+  gameId String [not null]
+  type EventType [not null]
+  name String [not null]
+  description String [not null]
+  coverUrl String [not null]
+  maxParticipantCount Int
+  isHidden Boolean [not null, default: false]
+  signupStartAt DateTime [not null]
+  signupEndAt DateTime [not null]
+  startAt DateTime [not null]
+  endAt DateTime [not null]
+  updatedAt DateTime [not null]
+  createdAt DateTime [default: `now()`, not null]
+}
+
+Table EventRound {
+  id String [pk]
+  eventId String [not null]
+  startAt DateTime [not null]
+  endAt DateTime [not null]
+  updatedAt DateTime [not null]
+}
+
+Table EventParticipant {
+  id String [pk]
+  eventId String [not null]
+  teamId String [not null]
+  updatedAt DateTime [not null]
+  joinedAt DateTime [default: `now()`, not null]
+
+  indexes {
+    (eventId, teamId) [unique]
+  }
+}
+
 Table NotifUserRoomRegistration {
   id String [pk]
   userId String [not null]
@@ -25,11 +62,12 @@ Table NotifUserRoomRegistration {
   latestMessage String [not null, default: '']
   unreadCount Int [not null, default: 0]
   lastSeenAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
 }
 
 Table Notification {
   id String [pk]
-  collectionId String [not null]
+  receiverUserId String [not null]
   source NotificationSource [not null]
   title String [not null]
   message String [not null]
@@ -49,11 +87,6 @@ Table NotificationAction {
   updatedAt DateTime [not null]
 }
 
-Table NotificationCollection {
-  id String [pk]
-  userId String [unique, not null]
-}
-
 Table Room {
   id String [pk]
   name String [not null]
@@ -66,6 +99,7 @@ Table Room {
   note String [not null, default: '']
   gameId String [not null]
   hostTeamId String [not null]
+  appointmentId String [unique, not null]
   updatedAt DateTime [not null]
   createdAt DateTime [default: `now()`, not null]
 }
@@ -90,10 +124,9 @@ Table RoomLineup {
   id String [pk]
   teamLineupId String [not null]
   roomMemberId String [not null]
-  roomId String [not null]
 
   indexes {
-    (teamLineupId, roomMemberId, roomId) [unique]
+    (teamLineupId, roomMemberId) [unique]
   }
 }
 
@@ -209,7 +242,7 @@ Table UserSettings {
   lang Lang [not null, default: 'TH']
 }
 
-Table PasswordResetSession {
+Table UserRecoverySession {
   id String [pk]
   userId String [unique, not null]
   token String [unique, not null]
@@ -245,7 +278,7 @@ Table Appointment {
   endAt DateTime [not null]
   deletedBeforeAt DateTime
   isDeleted Boolean [not null, default: false]
-  roomId String [unique]
+  eventRoundId String
   createdAt DateTime [default: `now()`, not null]
 }
 
@@ -411,11 +444,23 @@ Enum NotificationActionResponse {
   DENIED
 }
 
+Enum EventType {
+  TOURNAMENT
+}
+
+Ref: Event.gameId > Game.id
+
+Ref: EventRound.eventId > Event.id [delete: Cascade]
+
+Ref: EventParticipant.eventId > Event.id [delete: Cascade]
+
+Ref: EventParticipant.teamId > Team.id [delete: Cascade]
+
 Ref: NotifUserRoomRegistration.userId > User.id [delete: Cascade]
 
 Ref: NotifUserRoomRegistration.roomId > Room.id [delete: Cascade]
 
-Ref: Notification.collectionId > NotificationCollection.id [delete: Cascade]
+Ref: Notification.receiverUserId > User.id [delete: Cascade]
 
 Ref: Notification.senderUserId > User.id [delete: Cascade]
 
@@ -429,11 +474,11 @@ Ref: NotificationAction.roomPendingId > RoomPending.id [delete: Set Null]
 
 Ref: NotificationAction.appointmentPendingId > AppointmentPending.id [delete: Set Null]
 
-Ref: NotificationCollection.userId - User.id [delete: Cascade]
-
 Ref: Room.gameId > Game.id
 
 Ref: Room.hostTeamId > Team.id
+
+Ref: Room.appointmentId - Appointment.id [delete: Cascade]
 
 Ref: RoomSettings.roomId - Room.id [delete: Cascade]
 
@@ -444,8 +489,6 @@ Ref: RoomMember.roomId > Room.id [delete: Cascade]
 Ref: RoomLineup.teamLineupId > TeamLineup.id [delete: Cascade]
 
 Ref: RoomLineup.roomMemberId > RoomMember.id [delete: Cascade]
-
-Ref: RoomLineup.roomId > Room.id [delete: Cascade]
 
 Ref: RoomPending.teamId > Team.id [delete: Cascade]
 
@@ -477,7 +520,7 @@ Ref: TeamPending.userId > User.id [delete: Cascade]
 
 Ref: UserSettings.userId - User.id [delete: Cascade]
 
-Ref: PasswordResetSession.userId - User.id [delete: Cascade]
+Ref: UserRecoverySession.userId - User.id [delete: Cascade]
 
 Ref: UserAvatar.gameId > Game.id
 
@@ -489,7 +532,7 @@ Ref: Review.revieweeId > User.id [delete: Set Null]
 
 Ref: Review.gameId > Game.id
 
-Ref: Appointment.roomId - Room.id [delete: Set Null]
+Ref: Appointment.eventRoundId > EventRound.id [delete: Set Null]
 
 Ref: AppointmentPending.appointmentId - Appointment.id [delete: Cascade]
 

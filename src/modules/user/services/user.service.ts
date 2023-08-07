@@ -10,9 +10,8 @@ import {
   UpdateUserDto,
   UserDetailResponseDto
 } from "model/dto/user.dto";
+import { ImageService } from "modules/image/image.service";
 import { PrismaService } from "prisma/prisma.service";
-
-import { ImageService } from "../image/image.service";
 
 @Injectable()
 export class UserService {
@@ -159,7 +158,7 @@ export class UserService {
     return out;
   }
 
-  async delete(id: string): Promise<void> {
+  async deleteById(id: string): Promise<void> {
     await Promise.all([
       this.prisma.user.delete({ where: { id } }),
       this.cacheManager.del(`user:${id}`)

@@ -3,7 +3,7 @@ import { PassportStrategy } from "@nestjs/passport";
 import type { JwtPayload } from "jsonwebtoken";
 import { ExtractJwt, Strategy } from "passport-jwt";
 
-import env from "../../../common/env.config";
+import env from "common/env.config";
 
 import { AuthService } from "../auth.service";
 

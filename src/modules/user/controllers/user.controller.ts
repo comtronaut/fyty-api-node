@@ -24,8 +24,8 @@ import {
 } from "model/dto/user.dto";
 import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 
-import { UserAvatarService } from "./avatar.service";
-import { UserService } from "./user.service";
+import { UserAvatarService } from "../services/avatar.service";
+import { UserService } from "../services/user.service";
 
 @Controller("users")
 @ApiTags("Users")
@@ -124,6 +124,6 @@ export class UserController {
   @UseGuards(UserJwtAuthGuard)
   @ApiNoContentResponse()
   async deleteUserAvatarById(@Param("id") avatarId: string): Promise<void> {
-    return await this.avatarService.delete(avatarId);
+    return await this.avatarService.deleteById(avatarId);
   }
 }

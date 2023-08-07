@@ -3,6 +3,7 @@ import {
   Team,
   TeamStats,
   Training,
+  TrainingLineup,
   TrainingReport,
   TrainingSource,
   TrainingStatus
@@ -19,7 +20,7 @@ import {
 } from "model/dto/training-report.dto";
 import {
   CreateTrainingBypassDto,
-  CreateTrainingDto,
+  TrainingResponseDto,
   UpdateTrainingDto
 } from "model/dto/training.dto";
 import { PrismaService } from "prisma/prisma.service";
@@ -130,39 +131,27 @@ export class TrainingService {
     return training!;
   }
 
-  async create(data: CreateTrainingDto): Promise<Training> {
-    return await this.prisma.training.create({
-      data
+  async getAll(): Promise<TrainingResponseDto[]> {
+    return await this.prisma.training.findMany({
+      include: {
+        appointment: true
+      }
     });
   }
 
-  async getAll(): Promise<Training[]> {
-    return await this.prisma.training.findMany({
-      include: {
-        appointment: {
-          select: {
-            startAt: true,
-            endAt: true
-          }
-        }
-      }
-    });
+  async getTrainingLineupsById(trainingId: string): Promise<TrainingLineup[]> {
+    return await this.prisma.trainingLineup.findMany({ where: { trainingId } });
   }
 
   async getAllReports(): Promise<TrainingReport[]> {
     return await this.prisma.trainingReport.findMany();
   }
 
-  async getById(id: string): Promise<Training> {
+  async getById(id: string): Promise<TrainingResponseDto> {
     return await this.prisma.training.findUniqueOrThrow({
       where: { id },
       include: {
-        appointment: {
-          select: {
-            startAt: true,
-            endAt: true
-          }
-        }
+        appointment: true
       }
     });
   }
@@ -197,25 +186,20 @@ export class TrainingService {
     });
   }
 
-  async getTeamStats(teamId: string): Promise<TeamStats | null> {
+  async getTeamStatsByTeamId(teamId: string): Promise<TeamStats> {
     return await this.prisma.teamStats.findUniqueOrThrow({
       where: { teamId }
     });
   }
 
-  async getByTeamId(teamId: string, pagination?: Pagination): Promise<Training[]> {
+  async getByTeamId(teamId: string, pagination?: Pagination): Promise<TrainingResponseDto[]> {
     return await this.prisma.training.findMany({
       ...(pagination && paginate(pagination)),
       where: {
         OR: [{ hostId: teamId }, { guestId: teamId }]
       },
       include: {
-        appointment: {
-          select: {
-            startAt: true,
-            endAt: true
-          }
-        }
+        appointment: true
       },
       orderBy: {
         appointment: {
@@ -248,7 +232,7 @@ export class TrainingService {
       });
     }
 
-    const { host, guest, ...currentTraining } = await this.prisma.training.findFirstOrThrow(
+    const { host, guest, ...currentTraining } = await this.prisma.training.findUniqueOrThrow(
       {
         where: { id },
         include: {
@@ -428,13 +412,13 @@ export class TrainingService {
     }
   }
 
-  async deleteReport(id: string): Promise<void> {
+  async deleteReportById(id: string): Promise<void> {
     await this.prisma.trainingReport.delete({
       where: { id }
     });
   }
 
-  async delete(id: string): Promise<void> {
+  async deleteById(id: string): Promise<void> {
     const { host, guest, appointment, ...previousTraining }
       = await this.prisma.training.findUniqueOrThrow({
         where: { id },

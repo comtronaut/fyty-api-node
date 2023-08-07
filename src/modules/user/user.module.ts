@@ -1,12 +1,14 @@
 import { Module } from "@nestjs/common";
 
-import { UserAvatarService } from "./avatar.service";
-import { UserController } from "./user.controller";
-import { UserService } from "./user.service";
+import { UserRecoverySessionController } from "./controllers/recovery-session.controller";
+import { UserController } from "./controllers/user.controller";
+import { UserAvatarService } from "./services/avatar.service";
+import { UserRecoverySessionService } from "./services/recovery-session.service";
+import { UserService } from "./services/user.service";
 
 @Module({
   imports: [],
-  controllers: [ UserController ],
-  providers: [ UserService, UserAvatarService ]
+  controllers: [ UserController, UserRecoverySessionController ],
+  providers: [ UserService, UserAvatarService, UserRecoverySessionService ]
 })
 export class UserModule {}

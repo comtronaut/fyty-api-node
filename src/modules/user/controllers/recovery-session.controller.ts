@@ -1,14 +1,14 @@
 import { Body, Controller, Get, Post, Query } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 
-import { PasswordResetSessionService } from "./password-reset-sessions.service";
+import { UserRecoverySessionService } from "../services/recovery-session.service";
 
-@Controller("password-reset-session")
-export class PasswordResetSessionController {
-  constructor(private readonly service: PasswordResetSessionService) {}
+@Controller("user-recovery-session")
+export class UserRecoverySessionController {
+  constructor(private readonly service: UserRecoverySessionService) {}
 
   @Get("info")
-  async getInfo(@Query() query: Prisma.PasswordResetSessionWhereUniqueInput) {
+  async getInfo(@Query() query: Prisma.UserRecoverySessionWhereUniqueInput) {
     return await this.service.get(query);
   }
 

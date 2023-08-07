@@ -3,14 +3,14 @@ import { RoomPending } from "@prisma/client";
 
 import { RoomPendingError } from "common/constants/errors";
 import { CreateRoomPendingDto } from "model/dto/room-pending.dto";
-import { NotifyService } from "modules/notification/lineNotify.service";
+import { LineNotifyService } from "modules/notification/line-notify.service";
 import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
 export class RoomPendingService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly lineNotify: NotifyService
+    private readonly lineNotify: LineNotifyService
   ) {}
 
   async create(roomId: string, payload: CreateRoomPendingDto) {

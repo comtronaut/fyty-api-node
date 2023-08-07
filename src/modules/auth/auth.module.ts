@@ -4,7 +4,7 @@ import { PassportModule } from "@nestjs/passport";
 
 import env from "common/env.config";
 import { AdminService } from "modules/admin/admin-admins/admin-admins-service";
-import { UserService } from "modules/user/user.service";
+import { UserService } from "modules/user/services/user.service";
 
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";

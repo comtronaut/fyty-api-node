@@ -3,11 +3,11 @@ import { Response } from "express";
 
 import { Debug } from "common/debug.decorator";
 
-import { NotifyService } from "./lineNotify.service";
+import { LineNotifyService } from "./line-notify.service";
 
 @Controller("notify")
 export class LineNotifyController {
-  constructor(private lineNotifyService: NotifyService) {}
+  constructor(private lineNotifyService: LineNotifyService) {}
 
   @Post()
   @Debug()

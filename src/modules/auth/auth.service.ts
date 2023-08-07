@@ -5,7 +5,7 @@ import * as jwt from "jsonwebtoken";
 
 import env from "common/env.config";
 import { AdminService } from "modules/admin/admin-admins/admin-admins-service";
-import { UserService } from "modules/user/user.service";
+import { UserService } from "modules/user/services/user.service";
 import { PrismaService } from "prisma/prisma.service";
 
 import { FacebookInfo } from "./guard/facebook.guard";

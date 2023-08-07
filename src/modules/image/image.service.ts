@@ -18,9 +18,7 @@ export class ImageService {
     const slices = url.split("/");
     const part = slices[slices.length - 1];
 
-    return part && z.string().cuid().safeParse(part).success
-      ? part
-      : null;
+    return part && z.string().cuid().safeParse(part).success ? part : null;
   }
 
   async deleteImageByIds(ids: string[]): Promise<void> {

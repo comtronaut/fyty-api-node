@@ -8,7 +8,7 @@ import env from "common/env.config";
 import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
-export class NotifyService {
+export class LineNotifyService {
   constructor(
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
@@ -662,12 +662,10 @@ export class NotifyService {
     }
   }
 
-  // Chat
-  async searchUserForChatNotify(chatId: string, teamId: string) {
-    const chat = await this.prisma.chat.findFirst({
-      where: {
-        id: chatId
-      }
+  // chat
+  async sendChatMessageNotificationToOthers(chatId: string, teamId: string) {
+    const chat = await this.prisma.chat.findUnique({
+      where: { id: chatId }
     });
 
     const roomMemberRes = await this.prisma.roomMember.findMany({

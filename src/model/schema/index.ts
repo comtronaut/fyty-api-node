@@ -29,7 +29,9 @@ export const DECIMAL_STRING_REGEX = /^[0-9.,e+-bxffo_cp]+$|Infinity|NaN/;
 export const isValidDecimalInput = (
   v?: null | string | number | Prisma.DecimalJsLike
 ): v is string | number | Prisma.DecimalJsLike => {
-  if (v === undefined || v === null) {return false;}
+  if (v === undefined || v === null) {
+    return false;
+  }
   return (
     (typeof v === "object" && "d" in v && "e" in v && "s" in v && "toFixed" in v)
     || (typeof v === "string" && DECIMAL_STRING_REGEX.test(v))
@@ -59,18 +61,52 @@ export const GameScalarFieldEnumSchema = z.enum([
   "desc"
 ]);
 
+export const EventScalarFieldEnumSchema = z.enum([
+  "id",
+  "gameId",
+  "type",
+  "name",
+  "description",
+  "coverUrl",
+  "maxParticipantCount",
+  "isHidden",
+  "signupStartAt",
+  "signupEndAt",
+  "startAt",
+  "endAt",
+  "updatedAt",
+  "createdAt"
+]);
+
+export const EventRoundScalarFieldEnumSchema = z.enum([
+  "id",
+  "eventId",
+  "startAt",
+  "endAt",
+  "updatedAt"
+]);
+
+export const EventParticipantScalarFieldEnumSchema = z.enum([
+  "id",
+  "eventId",
+  "teamId",
+  "updatedAt",
+  "joinedAt"
+]);
+
 export const NotifUserRoomRegistrationScalarFieldEnumSchema = z.enum([
   "id",
   "userId",
   "roomId",
   "latestMessage",
   "unreadCount",
-  "lastSeenAt"
+  "lastSeenAt",
+  "updatedAt"
 ]);
 
 export const NotificationScalarFieldEnumSchema = z.enum([
   "id",
-  "collectionId",
+  "receiverUserId",
   "source",
   "title",
   "message",
@@ -90,8 +126,6 @@ export const NotificationActionScalarFieldEnumSchema = z.enum([
   "updatedAt"
 ]);
 
-export const NotificationCollectionScalarFieldEnumSchema = z.enum([ "id", "userId" ]);
-
 export const RoomScalarFieldEnumSchema = z.enum([
   "id",
   "name",
@@ -104,6 +138,7 @@ export const RoomScalarFieldEnumSchema = z.enum([
   "note",
   "gameId",
   "hostTeamId",
+  "appointmentId",
   "updatedAt",
   "createdAt"
 ]);
@@ -120,8 +155,7 @@ export const RoomMemberScalarFieldEnumSchema = z.enum([
 export const RoomLineupScalarFieldEnumSchema = z.enum([
   "id",
   "teamLineupId",
-  "roomMemberId",
-  "roomId"
+  "roomMemberId"
 ]);
 
 export const RoomPendingScalarFieldEnumSchema = z.enum([
@@ -224,7 +258,7 @@ export const UserSettingsScalarFieldEnumSchema = z.enum([
   "lang"
 ]);
 
-export const PasswordResetSessionScalarFieldEnumSchema = z.enum([
+export const UserRecoverySessionScalarFieldEnumSchema = z.enum([
   "id",
   "userId",
   "token",
@@ -260,7 +294,7 @@ export const AppointmentScalarFieldEnumSchema = z.enum([
   "endAt",
   "deletedBeforeAt",
   "isDeleted",
-  "roomId",
+  "eventRoundId",
   "createdAt"
 ]);
 
@@ -397,6 +431,10 @@ export type NotificationActionResponseType = `${z.infer<
   typeof NotificationActionResponseSchema
 >}`;
 
+export const EventTypeSchema = z.enum([ "TOURNAMENT" ]);
+
+export type EventTypeType = `${z.infer<typeof EventTypeSchema>}`;
+
 // ///////////////////////////////////////
 // MODELS
 // ///////////////////////////////////////
@@ -439,6 +477,122 @@ export const GameOptionalDefaultsSchema = GameSchema.merge(
 export type GameOptionalDefaults = z.infer<typeof GameOptionalDefaultsSchema>;
 
 // ///////////////////////////////////////
+// EVENT SCHEMA
+// ///////////////////////////////////////
+
+export const EventSchema = z.object({
+  type: EventTypeSchema,
+  id: z.string().cuid(),
+  gameId: z.string(),
+  name: z.string(),
+  description: z.string(),
+  coverUrl: z.string(),
+  maxParticipantCount: z.number().int().nullish(),
+  isHidden: z.boolean(),
+  signupStartAt: z.coerce.date(),
+  signupEndAt: z.coerce.date(),
+  startAt: z.coerce.date(),
+  endAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  createdAt: z.coerce.date()
+});
+
+export type Event = z.infer<typeof EventSchema>;
+
+// ///////////////////////////////////////
+// EVENT PARTIAL SCHEMA
+// ///////////////////////////////////////
+
+export const EventPartialSchema = EventSchema.partial();
+
+export type EventPartial = z.infer<typeof EventPartialSchema>;
+
+// EVENT OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const EventOptionalDefaultsSchema = EventSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    isHidden: z.boolean().optional(),
+    updatedAt: z.coerce.date().optional(),
+    createdAt: z.coerce.date().optional()
+  })
+);
+
+export type EventOptionalDefaults = z.infer<typeof EventOptionalDefaultsSchema>;
+
+// ///////////////////////////////////////
+// EVENT ROUND SCHEMA
+// ///////////////////////////////////////
+
+export const EventRoundSchema = z.object({
+  id: z.string().cuid(),
+  eventId: z.string(),
+  startAt: z.coerce.date(),
+  endAt: z.coerce.date(),
+  updatedAt: z.coerce.date()
+});
+
+export type EventRound = z.infer<typeof EventRoundSchema>;
+
+// ///////////////////////////////////////
+// EVENT ROUND PARTIAL SCHEMA
+// ///////////////////////////////////////
+
+export const EventRoundPartialSchema = EventRoundSchema.partial();
+
+export type EventRoundPartial = z.infer<typeof EventRoundPartialSchema>;
+
+// EVENT ROUND OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const EventRoundOptionalDefaultsSchema = EventRoundSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    updatedAt: z.coerce.date().optional()
+  })
+);
+
+export type EventRoundOptionalDefaults = z.infer<typeof EventRoundOptionalDefaultsSchema>;
+
+// ///////////////////////////////////////
+// EVENT PARTICIPANT SCHEMA
+// ///////////////////////////////////////
+
+export const EventParticipantSchema = z.object({
+  id: z.string().cuid(),
+  eventId: z.string(),
+  teamId: z.string(),
+  updatedAt: z.coerce.date(),
+  joinedAt: z.coerce.date()
+});
+
+export type EventParticipant = z.infer<typeof EventParticipantSchema>;
+
+// ///////////////////////////////////////
+// EVENT PARTICIPANT PARTIAL SCHEMA
+// ///////////////////////////////////////
+
+export const EventParticipantPartialSchema = EventParticipantSchema.partial();
+
+export type EventParticipantPartial = z.infer<typeof EventParticipantPartialSchema>;
+
+// EVENT PARTICIPANT OPTIONAL DEFAULTS SCHEMA
+// ------------------------------------------------------
+
+export const EventParticipantOptionalDefaultsSchema = EventParticipantSchema.merge(
+  z.object({
+    id: z.string().cuid().optional(),
+    updatedAt: z.coerce.date().optional(),
+    joinedAt: z.coerce.date().optional()
+  })
+);
+
+export type EventParticipantOptionalDefaults = z.infer<
+  typeof EventParticipantOptionalDefaultsSchema
+>;
+
+// ///////////////////////////////////////
 // NOTIF USER ROOM REGISTRATION SCHEMA
 // ///////////////////////////////////////
 
@@ -448,7 +602,8 @@ export const NotifUserRoomRegistrationSchema = z.object({
   roomId: z.string(),
   latestMessage: z.string(),
   unreadCount: z.number().int(),
-  lastSeenAt: z.coerce.date()
+  lastSeenAt: z.coerce.date(),
+  updatedAt: z.coerce.date()
 });
 
 export type NotifUserRoomRegistration = z.infer<typeof NotifUserRoomRegistrationSchema>;
@@ -473,7 +628,8 @@ export const NotifUserRoomRegistrationOptionalDefaultsSchema
       id: z.string().cuid().optional(),
       latestMessage: z.string().optional(),
       unreadCount: z.number().int().optional(),
-      lastSeenAt: z.coerce.date().optional()
+      lastSeenAt: z.coerce.date().optional(),
+      updatedAt: z.coerce.date().optional()
     })
   );
 
@@ -488,7 +644,7 @@ export type NotifUserRoomRegistrationOptionalDefaults = z.infer<
 export const NotificationSchema = z.object({
   source: NotificationSourceSchema,
   id: z.string().cuid(),
-  collectionId: z.string(),
+  receiverUserId: z.string(),
   title: z.string(),
   message: z.string(),
   senderUserId: z.string().nullish(),
@@ -560,41 +716,6 @@ export type NotificationActionOptionalDefaults = z.infer<
 >;
 
 // ///////////////////////////////////////
-// NOTIFICATION COLLECTION SCHEMA
-// ///////////////////////////////////////
-
-export const NotificationCollectionSchema = z.object({
-  id: z.string().cuid(),
-  userId: z.string()
-});
-
-export type NotificationCollection = z.infer<typeof NotificationCollectionSchema>;
-
-// ///////////////////////////////////////
-// NOTIFICATION COLLECTION PARTIAL SCHEMA
-// ///////////////////////////////////////
-
-export const NotificationCollectionPartialSchema = NotificationCollectionSchema.partial();
-
-export type NotificationCollectionPartial = z.infer<
-  typeof NotificationCollectionPartialSchema
->;
-
-// NOTIFICATION COLLECTION OPTIONAL DEFAULTS SCHEMA
-// ------------------------------------------------------
-
-export const NotificationCollectionOptionalDefaultsSchema
-  = NotificationCollectionSchema.merge(
-    z.object({
-      id: z.string().cuid().optional()
-    })
-  );
-
-export type NotificationCollectionOptionalDefaults = z.infer<
-  typeof NotificationCollectionOptionalDefaultsSchema
->;
-
-// ///////////////////////////////////////
 // ROOM SCHEMA
 // ///////////////////////////////////////
 
@@ -610,6 +731,7 @@ export const RoomSchema = z.object({
   note: z.string(),
   gameId: z.string(),
   hostTeamId: z.string(),
+  appointmentId: z.string(),
   updatedAt: z.coerce.date(),
   createdAt: z.coerce.date()
 });
@@ -714,8 +836,7 @@ export type RoomMemberOptionalDefaults = z.infer<typeof RoomMemberOptionalDefaul
 export const RoomLineupSchema = z.object({
   id: z.string().cuid(),
   teamLineupId: z.string(),
-  roomMemberId: z.string(),
-  roomId: z.string()
+  roomMemberId: z.string()
 });
 
 export type RoomLineup = z.infer<typeof RoomLineupSchema>;
@@ -1104,10 +1225,10 @@ export type UserSettingsOptionalDefaults = z.infer<
 >;
 
 // ///////////////////////////////////////
-// PASSWORD RESET SESSION SCHEMA
+// USER RECOVERY SESSION SCHEMA
 // ///////////////////////////////////////
 
-export const PasswordResetSessionSchema = z.object({
+export const UserRecoverySessionSchema = z.object({
   id: z.string().cuid(),
   userId: z.string(),
   token: z.string(),
@@ -1117,20 +1238,20 @@ export const PasswordResetSessionSchema = z.object({
   createdAt: z.coerce.date()
 });
 
-export type PasswordResetSession = z.infer<typeof PasswordResetSessionSchema>;
+export type UserRecoverySession = z.infer<typeof UserRecoverySessionSchema>;
 
 // ///////////////////////////////////////
-// PASSWORD RESET SESSION PARTIAL SCHEMA
+// USER RECOVERY SESSION PARTIAL SCHEMA
 // ///////////////////////////////////////
 
-export const PasswordResetSessionPartialSchema = PasswordResetSessionSchema.partial();
+export const UserRecoverySessionPartialSchema = UserRecoverySessionSchema.partial();
 
-export type PasswordResetSessionPartial = z.infer<typeof PasswordResetSessionPartialSchema>;
+export type UserRecoverySessionPartial = z.infer<typeof UserRecoverySessionPartialSchema>;
 
-// PASSWORD RESET SESSION OPTIONAL DEFAULTS SCHEMA
+// USER RECOVERY SESSION OPTIONAL DEFAULTS SCHEMA
 // ------------------------------------------------------
 
-export const PasswordResetSessionOptionalDefaultsSchema = PasswordResetSessionSchema.merge(
+export const UserRecoverySessionOptionalDefaultsSchema = UserRecoverySessionSchema.merge(
   z.object({
     id: z.string().cuid().optional(),
     attemptCount: z.number().int().optional(),
@@ -1139,8 +1260,8 @@ export const PasswordResetSessionOptionalDefaultsSchema = PasswordResetSessionSc
   })
 );
 
-export type PasswordResetSessionOptionalDefaults = z.infer<
-  typeof PasswordResetSessionOptionalDefaultsSchema
+export type UserRecoverySessionOptionalDefaults = z.infer<
+  typeof UserRecoverySessionOptionalDefaultsSchema
 >;
 
 // ///////////////////////////////////////
@@ -1245,7 +1366,7 @@ export const AppointmentSchema = z.object({
   endAt: z.coerce.date(),
   deletedBeforeAt: z.coerce.date().nullish(),
   isDeleted: z.boolean(),
-  roomId: z.string().nullish(),
+  eventRoundId: z.string().nullish(),
   createdAt: z.coerce.date()
 });
 
@@ -1417,6 +1538,9 @@ export type MessageOptionalDefaults = z.infer<typeof MessageOptionalDefaultsSche
 // TEAM STATS SCHEMA
 // ///////////////////////////////////////
 
+/**
+ * Stats for each team. One team has one of this table.
+ */
 export const TeamStatsSchema = z.object({
   id: z.string().cuid(),
   teamId: z.string(),
@@ -1467,8 +1591,21 @@ export type TeamStatsOptionalDefaults = z.infer<typeof TeamStatsOptionalDefaults
 // TRAINING SCHEMA
 // ///////////////////////////////////////
 
+/**
+ * Training result after a room was dissolved by the system, recording participants scores and images.
+ *
+ * **[LOGIC]** After a room was dissolve by the system, the participants need to manually submit their training result.
+ *
+ * **[LOGIC]** The table would typically set its status to `EXPIRED` after 24 of no submission response from the participant.
+ */
 export const TrainingSchema = z.object({
+  /**
+   * Submission status.
+   */
   status: TrainingStatusSchema,
+  /**
+   * Source of the result, typically from the system.
+   */
   source: TrainingSourceSchema,
   id: z.string().cuid(),
   appointmentId: z.string(),
@@ -1476,8 +1613,17 @@ export const TrainingSchema = z.object({
   guestId: z.string().nullish(),
   hostWinCount: z.number().int().nullish(),
   hostLoseCount: z.number().int().nullish(),
+  /**
+   * Note from participants.
+   */
   note: z.string(),
+  /**
+   * Result images from participants. Participants need to upload images manually.
+   */
   imageUrls: z.string().array(),
+  /**
+   * State, mark as submitted when a participant upload the result.
+   */
   isSubmitted: z.boolean(),
   updatedAt: z.coerce.date(),
   createdAt: z.coerce.date()
@@ -1498,11 +1644,26 @@ export type TrainingPartial = z.infer<typeof TrainingPartialSchema>;
 
 export const TrainingOptionalDefaultsSchema = TrainingSchema.merge(
   z.object({
+    /**
+     * Submission status.
+     */
     status: TrainingStatusSchema.optional(),
+    /**
+     * Source of the result, typically from the system.
+     */
     source: TrainingSourceSchema.optional(),
     id: z.string().cuid().optional(),
+    /**
+     * Note from participants.
+     */
     note: z.string().optional(),
+    /**
+     * Result images from participants. Participants need to upload images manually.
+     */
     imageUrls: z.string().array().optional(),
+    /**
+     * State, mark as submitted when a participant upload the result.
+     */
     isSubmitted: z.boolean().optional(),
     updatedAt: z.coerce.date().optional(),
     createdAt: z.coerce.date().optional()

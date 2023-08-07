@@ -10,14 +10,14 @@ import { ImageService } from "modules/image/image.service";
 import { RoomService } from "modules/room/room.service";
 import { PrismaService } from "prisma/prisma.service";
 
-import { NotifyService } from "../notification/lineNotify.service";
+import { LineNotifyService } from "../notification/line-notify.service";
 
 @Injectable()
 export class RoutineService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly roomService: RoomService,
-    private readonly notifyService: NotifyService,
+    private readonly notifyService: LineNotifyService,
     private readonly imageService: ImageService,
     private readonly eventEmitter: EventEmitter2
   ) {}
@@ -43,14 +43,14 @@ export class RoutineService {
               teamCap: true
             }
           },
-          lineups: {
-            select: {
-              teamLineupId: true
-            }
-          },
           members: {
             select: {
-              teamId: true
+              teamId: true,
+              lineups: {
+                select: {
+                  teamLineupId: true
+                }
+              }
             }
           },
           appointment: {
@@ -106,20 +106,20 @@ export class RoutineService {
 
       await Promise.all([
         // create training result
-        ...trainingCreatableRooms.map((e) =>
-          this.prisma.training.create({
-            data: {
-              appointmentId: e.appointment!.id,
-              hostId: e.hostTeamId,
-              guestId: e.members.filter((f) => f.teamId !== e.hostTeamId)[0]!.teamId,
-              lineups: {
-                createMany: {
-                  data: e.lineups.map((e) => ({ lineupId: e.teamLineupId }))
-                }
+        this.prisma.training.createMany({
+          data: trainingCreatableRooms.map((e) => ({
+            appointmentId: e.appointment!.id,
+            hostId: e.hostTeamId,
+            guestId: e.members.filter((f) => f.teamId !== e.hostTeamId)[0]!.teamId,
+            lineups: {
+              createMany: {
+                data: e.members
+                  .flatMap((m) => m.lineups)
+                  .map((e) => ({ lineupId: e.teamLineupId }))
               }
             }
-          })
-        ),
+          }))
+        }),
         // delete images
         this.imageService.deleteImageByIds(compact(imageIds)),
         // delete rooms

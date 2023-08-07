@@ -15,7 +15,7 @@ import { UserSubject } from "common/subject.decorator";
 import { CreateTeamLineupDto, UpdateLineupDto } from "model/dto/team-lineup.dto";
 import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 
-import { LineupService } from "./lineup.service";
+import { LineupService } from "../services/lineup.service";
 
 @Controller("lineups")
 @UseGuards(UserJwtAuthGuard)

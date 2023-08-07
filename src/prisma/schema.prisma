@@ -94,6 +94,10 @@ enum NotificationActionResponse {
   DENIED
 }
 
+enum EventType {
+  TOURNAMENT
+}
+
 // game
 model Game {
   id        String  @id
@@ -105,10 +109,59 @@ model Game {
   isActive  Boolean @default(true)
   desc      String  @default("")
 
+  events      Event[]
   teams       Team[]
   rooms       Room[]
   userAvatars UserAvatar[]
   reviews     Review[]
+}
+
+model Event {
+  id                  String    @id @default(cuid()) @db.Char(25)
+  game                Game      @relation(fields: [gameId], references: [id], onUpdate: Cascade)
+  gameId              String
+  type                EventType
+  name                String
+  description         String
+  coverUrl            String
+  maxParticipantCount Int?
+  isHidden            Boolean   @default(false)
+  signupStartAt       DateTime
+  signupEndAt         DateTime
+  startAt             DateTime
+  endAt               DateTime
+  updatedAt           DateTime  @updatedAt
+  createdAt           DateTime  @default(now())
+
+  rounds       EventRound[]
+  participants EventParticipant[]
+}
+
+model EventRound {
+  id        String   @id @default(cuid()) @db.Char(25)
+  event     Event    @relation(fields: [eventId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  eventId   String   @db.Char(25)
+  startAt   DateTime
+  endAt     DateTime
+  updatedAt DateTime @updatedAt
+
+  appointments Appointment[]
+
+  @@index([eventId])
+}
+
+model EventParticipant {
+  id        String   @id @default(cuid()) @db.Char(25)
+  event     Event    @relation(fields: [eventId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  eventId   String   @db.Char(25)
+  team      Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId    String   @db.Char(25)
+  updatedAt DateTime @updatedAt
+  joinedAt  DateTime @default(now())
+
+  @@unique([eventId, teamId])
+  @@index([eventId])
+  @@index([teamId])
 }
 
 // notification
@@ -121,27 +174,28 @@ model NotifUserRoomRegistration {
   latestMessage String   @default("")
   unreadCount   Int      @default(0)
   lastSeenAt    DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([userId])
 }
 
 model Notification {
-  id           String                 @id @default(cuid()) @db.Char(25)
-  collection   NotificationCollection @relation(fields: [collectionId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  collectionId String                 @db.Char(25)
-  source       NotificationSource
-  title        String
-  message      String
-  senderUser   User?                  @relation(fields: [senderUserId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  senderUserId String?                @db.Char(25)
-  senderTeam   Team?                  @relation(fields: [senderTeamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  senderTeamId String?                @db.Char(25)
-  seenAt       DateTime?
-  createdAt    DateTime               @default(now())
+  id             String             @id @default(cuid()) @db.Char(25)
+  receiverUser   User               @relation(fields: [receiverUserId], references: [id], onUpdate: Cascade, onDelete: Cascade, name: "receiver")
+  receiverUserId String             @db.Char(25)
+  source         NotificationSource
+  title          String
+  message        String
+  senderUser     User?              @relation(fields: [senderUserId], references: [id], onUpdate: Cascade, onDelete: Cascade, name: "sender")
+  senderUserId   String?            @db.Char(25)
+  senderTeam     Team?              @relation(fields: [senderTeamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  senderTeamId   String?            @db.Char(25)
+  seenAt         DateTime?
+  createdAt      DateTime           @default(now())
 
   action NotificationAction?
 
-  @@index([collectionId])
+  @@index([receiverUserId])
 }
 
 model NotificationAction {
@@ -158,38 +212,30 @@ model NotificationAction {
   updatedAt            DateTime                    @updatedAt
 }
 
-model NotificationCollection {
-  id     String @id @default(cuid()) @db.Char(25)
-  user   User   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  userId String @unique @db.Char(25)
-
-  notifications Notification[]
-}
-
 // room
 model Room {
-  id         String     @id @default(cuid()) @db.Char(25)
-  name       String
-  status     RoomStatus @default(AVAILABLE)
-  option     String     @default("")
-  startAt    DateTime
-  endAt      DateTime
-  isPrivate  Boolean    @default(false)
-  teamCount  Int        @default(1)
-  note       String     @default("")
-  game       Game       @relation(fields: [gameId], references: [id], onUpdate: Cascade)
-  gameId     String
-  hostTeam   Team       @relation(fields: [hostTeamId], references: [id], onUpdate: Cascade)
-  hostTeamId String     @db.Char(25)
-  updatedAt  DateTime   @updatedAt
-  createdAt  DateTime   @default(now())
+  id            String      @id @default(cuid()) @db.Char(25)
+  name          String
+  status        RoomStatus  @default(AVAILABLE)
+  option        String      @default("")
+  startAt       DateTime
+  endAt         DateTime
+  isPrivate     Boolean     @default(false)
+  teamCount     Int         @default(1)
+  note          String      @default("")
+  game          Game        @relation(fields: [gameId], references: [id], onUpdate: Cascade)
+  gameId        String
+  hostTeam      Team        @relation(fields: [hostTeamId], references: [id], onUpdate: Cascade)
+  hostTeamId    String      @db.Char(25)
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  appointmentId String      @unique @db.Char(25)
+  updatedAt     DateTime    @updatedAt
+  createdAt     DateTime    @default(now())
 
   userNotifRegistrations NotifUserRoomRegistration[]
   pendings               RoomPending[]
   members                RoomMember[]
   chat                   Chat?
-  appointment            Appointment?
-  lineups                RoomLineup[]
   settings               RoomSettings?
 
   @@index([startAt])
@@ -210,7 +256,7 @@ model RoomMember {
   roomId   String   @db.Char(25)
   joinedAt DateTime @default(now())
 
-  roomLineups RoomLineup[]
+  lineups RoomLineup[]
 
   @@unique([teamId, roomId])
 }
@@ -221,10 +267,8 @@ model RoomLineup {
   teamLineupId String     @db.Char(25)
   roomMember   RoomMember @relation(fields: [roomMemberId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   roomMemberId String     @db.Char(25)
-  room         Room       @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  roomId       String     @db.Char(25)
 
-  @@unique([teamLineupId, roomMemberId, roomId])
+  @@unique([teamLineupId, roomMemberId])
 }
 
 model RoomPending {
@@ -270,22 +314,23 @@ model Team {
   isDeleted        Boolean  @default(false)
   createdAt        DateTime @default(now())
 
-  sendingNotifications Notification[]
   designatedTeams      Team[]               @relation("designator")
   lineups              TeamLineup[]
   pendings             TeamPending[]
   members              TeamMember[]
+  stats                TeamStats?
+  settings             TeamSettings?
   roomHosts            Room[]
   roomPendings         RoomPending[]
   roomMembers          RoomMember[]
   messages             Message[]
+  sendingNotifications Notification[]
+  eventParticipants    EventParticipant[]
   appointmentMembers   AppointmentMember[]
   appointmentInviters  AppointmentPending[] @relation("inviter")
   appointmentInvitees  AppointmentPending[] @relation("invitee")
   trainingHosts        Training[]           @relation("host")
   trainingGuests       Training[]           @relation("guest")
-  stats                TeamStats?
-  settings             TeamSettings?
   trainingReports      TrainingReport[]
 }
 
@@ -366,9 +411,9 @@ model User {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
-  notificationCollection NotificationCollection?
   roomNotifRegistrations NotifUserRoomRegistration[]
-  sendingNotifications   Notification[]
+  receivingNotifications Notification[]              @relation("receiver")
+  sendingNotifications   Notification[]              @relation("sender")
   teamFounders           Team[]
   teamPendings           TeamPending[]
   teamMembers            TeamMember[]
@@ -377,7 +422,7 @@ model User {
   reviewees              Review[]                    @relation("reviewee")
   messages               Message[]
   settings               UserSettings?
-  passwordResetSession   PasswordResetSession?
+  recoverySession        UserRecoverySession?
   trainingReports        TrainingReport[]
 }
 
@@ -392,7 +437,7 @@ model UserSettings {
   lang                           Lang    @default(TH)
 }
 
-model PasswordResetSession {
+model UserRecoverySession {
   id           String   @id @default(cuid()) @db.Char(25)
   user         User     @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userId       String   @unique @db.Char(25)
@@ -433,16 +478,17 @@ model Review {
 
 // appointment
 model Appointment {
-  id              String    @id @default(cuid()) @db.Char(25)
+  id              String      @id @default(cuid()) @db.Char(25)
   startAt         DateTime
   endAt           DateTime
   deletedBeforeAt DateTime?
-  isDeleted       Boolean   @default(false)
-  room            Room?     @relation(fields: [roomId], references: [id], onUpdate: Cascade, onDelete: SetNull)
-  roomId          String?   @unique @db.Char(25)
-  createdAt       DateTime  @default(now())
+  isDeleted       Boolean     @default(false)
+  eventRound      EventRound? @relation(fields: [eventRoundId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  eventRoundId    String?     @db.Char(25)
+  createdAt       DateTime    @default(now())
 
   members  AppointmentMember[]
+  room     Room?
   training Training?
   pending  AppointmentPending?
 }

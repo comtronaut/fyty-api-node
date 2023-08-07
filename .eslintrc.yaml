@@ -175,6 +175,7 @@ rules:
     - consistent
 
   # typescript
+  "@typescript-eslint/no-unused-vars": warn
   "@typescript-eslint/no-floating-promises": error
 
   # vanilla default

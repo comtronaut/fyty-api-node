@@ -17,11 +17,11 @@ export class AppointmentService {
   }
 
   async getById(id: string): Promise<Appointment> {
-    return await this.prisma.appointment.findFirstOrThrow({ where: { id } });
+    return await this.prisma.appointment.findUniqueOrThrow({ where: { id } });
   }
 
   async getMembersById(id: string): Promise<AppointmentMember[]> {
-    const { members } = await this.prisma.appointment.findFirstOrThrow({
+    const { members } = await this.prisma.appointment.findUniqueOrThrow({
       where: { id },
       select: { members: true }
     });
@@ -121,23 +121,25 @@ export class AppointmentService {
   async update(id: string, data: UpdateAppointmentDto) {
     const appointment = await this.prisma.appointment.update({
       where: { id },
-      data
+      data: {
+        ...data,
+        ...((data.endAt || data.startAt) && {
+          room: {
+            update: {
+              data: {
+                ...(data.startAt && { startAt: data.startAt }),
+                ...(data.endAt && { endAt: data.endAt })
+              }
+            }
+          }
+        })
+      }
     });
-
-    if ((data.endAt || data.startAt) && appointment.roomId) {
-      await this.prisma.room.updateMany({
-        where: { id: appointment.roomId },
-        data: {
-          ...(data.startAt && { startAt: data.startAt }),
-          ...(data.endAt && { endAt: data.endAt })
-        }
-      });
-    }
 
     return appointment;
   }
 
-  async delete(id: string, isDeletedBefore = false) {
+  async deleteById(id: string, isDeletedBefore = false) {
     await this.prisma.appointment.update({
       where: { id },
       data: {

@@ -4,19 +4,20 @@ import { PendingStatus, User } from "@prisma/client";
 
 import { UserSubject } from "common/subject.decorator";
 import { AppointmentPackResponseDto } from "model/dto/appointment.dto";
+import { NotificationPackResponseDto } from "model/dto/notification.dto";
 import { TeamPendingDto } from "model/dto/team-pending.dto";
 import { TeamDto } from "model/dto/team.dto";
 import { UserAvatarDto } from "model/dto/user-avatar.dto";
 import { UpdateUserSettingsDto, UserSettingsDto } from "model/dto/user-settings.dto";
 import { SecureUserDto, UpdateUserDto, UserDetailResponseDto } from "model/dto/user.dto";
+import { AppointmentService } from "modules/appointment/appointment.service";
 import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
-
-import { AppointmentService } from "../appointment/appointment.service";
-import { TeamPendingService } from "../team/pending.service";
-import { TeamService } from "../team/team.service";
-import { UserAvatarService } from "../user/avatar.service";
-import { UserSettingsService } from "../user/settings.service";
-import { UserService } from "../user/user.service";
+import { NotificationService } from "modules/notification/notification.service";
+import { TeamPendingService } from "modules/team/services/pending.service";
+import { TeamService } from "modules/team/services/team.service";
+import { UserAvatarService } from "modules/user/services/avatar.service";
+import { UserSettingsService } from "modules/user/services/settings.service";
+import { UserService } from "modules/user/services/user.service";
 
 @Controller("me")
 @ApiTags("Me")
@@ -28,7 +29,8 @@ export class MeController {
     private readonly settingsService: UserSettingsService,
     private readonly teamService: TeamService,
     private readonly appointmentService: AppointmentService,
-    private readonly teamPendingService: TeamPendingService
+    private readonly teamPendingService: TeamPendingService,
+    private readonly notificationService: NotificationService
   ) {}
 
   @Get()
@@ -56,7 +58,7 @@ export class MeController {
   @Delete()
   @ApiNoContentResponse()
   async deleteMeInfo(@UserSubject() user: User): Promise<void> {
-    return await this.userService.delete(user.id);
+    return await this.userService.deleteById(user.id);
   }
 
   // settings
@@ -106,5 +108,13 @@ export class MeController {
     @Query("status") status?: PendingStatus
   ): Promise<TeamPendingDto[]> {
     return await this.teamPendingService.getTeamPendingByUser(user.id, status);
+  }
+
+  // notifications
+  @Get("notifications")
+  async getMeNotifications(
+    @UserSubject() user: User
+  ): Promise<NotificationPackResponseDto> {
+    return await this.notificationService.getNotificationsByUserId(user.id);
   }
 }
