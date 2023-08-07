@@ -20,6 +20,9 @@ export class NotificationPackResponseDto extends createZodDto(
     receivingNotifications: NotificationSchema.extend({
       action: NotificationActionSchema.nullable()
     }).array(),
-    roomNotifRegistrations: NotifUserRoomRegistrationSchema.array()
+    roomNotifRegistrations: NotifUserRoomRegistrationSchema.array(),
+    meNotifyingCount: z.number().nonnegative().int(),
+    roomMessageNotifyingCount: z.number().nonnegative().int(),
+    teamNotifyingCount: z.number().nonnegative().int()
   })
 ) {}

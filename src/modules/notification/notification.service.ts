@@ -14,7 +14,7 @@ export class NotificationService {
   ) {}
 
   async getNotificationsByUserId(userId: string): Promise<NotificationPackResponseDto> {
-    const { receivingNotifications, roomNotifRegistrations }
+    const { receivingNotifications, roomNotifRegistrations, teamPendings, teamMembers }
       = await this.prisma.user.findUniqueOrThrow({
         where: { id: userId },
         select: {
@@ -23,11 +23,51 @@ export class NotificationService {
               action: true
             }
           },
-          roomNotifRegistrations: true
+          roomNotifRegistrations: true,
+          teamPendings: {
+            where: { status: "OUTGOING" },
+            select: { id: true }
+          },
+          teamMembers: {
+            select: {
+              team: {
+                select: {
+                  pendings: {
+                    where: { status: "INCOMING" },
+                    select: { id: true }
+                  },
+                  roomHosts: {
+                    select: {
+                      pendings: {
+                        where: { status: "INCOMING" },
+                        select: { id: true }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       });
 
-    return { receivingNotifications, roomNotifRegistrations };
+    const meNotifyingCount = teamPendings.length;
+    const roomMessageNotifyingCount = roomNotifRegistrations.reduce((acc, x) => acc + x.unreadCount, 0);
+    const teamNotifyingCount = teamMembers.reduce(
+      (acc, { team }) =>
+        acc
+        + team.pendings.length
+        + team.roomHosts.reduce((acc, x) => acc + x.pendings.length, 0),
+      0
+    );
+
+    return {
+      receivingNotifications,
+      roomNotifRegistrations,
+      meNotifyingCount,
+      roomMessageNotifyingCount,
+      teamNotifyingCount
+    };
   }
 
   async markAsReadNotificationById(id: string): Promise<NotificationDto> {
@@ -62,8 +102,7 @@ export class NotificationService {
     return await this.prisma.notifUserRoomRegistration.update({
       where: { id },
       data: {
-        unreadCount: 0,
-        latestMessage: ""
+        unreadCount: 0
       }
     });
   }
