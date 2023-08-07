@@ -28,6 +28,6 @@ export class AdminUsersController {
   // constraint
   @Delete(":id")
   async deleteUser(@Param("id") userId: User["id"]) {
-    return await this.userService.delete(userId);
+    return await this.userService.deleteById(userId);
   }
 }

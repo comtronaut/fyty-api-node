@@ -20,7 +20,6 @@ import {
 } from "model/dto/training-report.dto";
 import {
   CreateTrainingBypassDto,
-  CreateTrainingDto,
   UpdateTrainingDto
 } from "model/dto/training.dto";
 import { PrismaService } from "prisma/prisma.service";
@@ -129,12 +128,6 @@ export class TrainingService {
     }
 
     return training!;
-  }
-
-  async create(data: CreateTrainingDto): Promise<Training> {
-    return await this.prisma.training.create({
-      data
-    });
   }
 
   async getAll(): Promise<Training[]> {
@@ -433,13 +426,13 @@ export class TrainingService {
     }
   }
 
-  async deleteReport(id: string): Promise<void> {
+  async deleteReportById(id: string): Promise<void> {
     await this.prisma.trainingReport.delete({
       where: { id }
     });
   }
 
-  async delete(id: string): Promise<void> {
+  async deleteById(id: string): Promise<void> {
     const { host, guest, appointment, ...previousTraining }
       = await this.prisma.training.findUniqueOrThrow({
         where: { id },

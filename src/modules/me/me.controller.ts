@@ -58,7 +58,7 @@ export class MeController {
   @Delete()
   @ApiNoContentResponse()
   async deleteMeInfo(@UserSubject() user: User): Promise<void> {
-    return await this.userService.delete(user.id);
+    return await this.userService.deleteById(user.id);
   }
 
   // settings

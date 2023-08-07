@@ -158,7 +158,7 @@ export class UserService {
     return out;
   }
 
-  async delete(id: string): Promise<void> {
+  async deleteById(id: string): Promise<void> {
     await Promise.all([
       this.prisma.user.delete({ where: { id } }),
       this.cacheManager.del(`user:${id}`)

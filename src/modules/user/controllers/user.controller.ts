@@ -124,6 +124,6 @@ export class UserController {
   @UseGuards(UserJwtAuthGuard)
   @ApiNoContentResponse()
   async deleteUserAvatarById(@Param("id") avatarId: string): Promise<void> {
-    return await this.avatarService.delete(avatarId);
+    return await this.avatarService.deleteById(avatarId);
   }
 }

@@ -28,7 +28,7 @@ export class UserRecoverySessionService {
       where: { id: session.userId },
       data: { password: hashedPassword }
     });
-    await this.delete(session.id);
+    await this.deleteById(session.id);
 
     return updatedUser;
   }
@@ -63,7 +63,7 @@ export class UserRecoverySessionService {
     });
   }
 
-  async delete(id: string) {
+  async deleteById(id: string) {
     return await this.prisma.userRecoverySession.delete({
       where: { id }
     });

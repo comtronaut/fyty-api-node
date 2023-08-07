@@ -44,6 +44,6 @@ export class AdminTrainingsController {
 
   @Delete(":id")
   async deleteTeam(@Param("id") trainingId: string) {
-    return await this.trainingService.delete(trainingId);
+    return await this.trainingService.deleteById(trainingId);
   }
 }

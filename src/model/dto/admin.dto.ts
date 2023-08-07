@@ -3,8 +3,6 @@ import { createZodDto } from "nestjs-zod";
 
 import { AdminOptionalDefaultsSchema, AdminPartialSchema, AdminSchema } from "model/schema";
 
-export class AdminDto extends createZodDto(AdminSchema) {}
-
 export class CreateAdminDto
   extends createZodDto(AdminOptionalDefaultsSchema)
   implements Prisma.AdminUncheckedCreateInput {}

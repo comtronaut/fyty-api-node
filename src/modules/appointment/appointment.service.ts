@@ -139,7 +139,7 @@ export class AppointmentService {
     return appointment;
   }
 
-  async delete(id: string, isDeletedBefore = false) {
+  async deleteById(id: string, isDeletedBefore = false) {
     await this.prisma.appointment.update({
       where: { id },
       data: {

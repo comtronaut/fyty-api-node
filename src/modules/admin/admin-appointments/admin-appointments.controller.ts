@@ -31,6 +31,6 @@ export class AdminAppointmentsController {
 
   @Delete(":id")
   async delete(@Param("id") appiontmentId: string) {
-    return await this.appointmentService.delete(appiontmentId, true);
+    return await this.appointmentService.deleteById(appiontmentId, true);
   }
 }
