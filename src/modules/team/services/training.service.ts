@@ -20,6 +20,7 @@ import {
 } from "model/dto/training-report.dto";
 import {
   CreateTrainingBypassDto,
+  TrainingResponseDto,
   UpdateTrainingDto
 } from "model/dto/training.dto";
 import { PrismaService } from "prisma/prisma.service";
@@ -130,15 +131,10 @@ export class TrainingService {
     return training!;
   }
 
-  async getAll(): Promise<Training[]> {
+  async getAll(): Promise<TrainingResponseDto[]> {
     return await this.prisma.training.findMany({
       include: {
-        appointment: {
-          select: {
-            startAt: true,
-            endAt: true
-          }
-        }
+        appointment: true
       }
     });
   }
@@ -151,16 +147,11 @@ export class TrainingService {
     return await this.prisma.trainingReport.findMany();
   }
 
-  async getById(id: string): Promise<Training> {
+  async getById(id: string): Promise<TrainingResponseDto> {
     return await this.prisma.training.findUniqueOrThrow({
       where: { id },
       include: {
-        appointment: {
-          select: {
-            startAt: true,
-            endAt: true
-          }
-        }
+        appointment: true
       }
     });
   }
@@ -195,25 +186,20 @@ export class TrainingService {
     });
   }
 
-  async getTeamStats(teamId: string): Promise<TeamStats | null> {
+  async getTeamStatsByTeamId(teamId: string): Promise<TeamStats> {
     return await this.prisma.teamStats.findUniqueOrThrow({
       where: { teamId }
     });
   }
 
-  async getByTeamId(teamId: string, pagination?: Pagination): Promise<Training[]> {
+  async getByTeamId(teamId: string, pagination?: Pagination): Promise<TrainingResponseDto[]> {
     return await this.prisma.training.findMany({
       ...(pagination && paginate(pagination)),
       where: {
         OR: [{ hostId: teamId }, { guestId: teamId }]
       },
       include: {
-        appointment: {
-          select: {
-            startAt: true,
-            endAt: true
-          }
-        }
+        appointment: true
       },
       orderBy: {
         appointment: {
@@ -246,7 +232,7 @@ export class TrainingService {
       });
     }
 
-    const { host, guest, ...currentTraining } = await this.prisma.training.findFirstOrThrow(
+    const { host, guest, ...currentTraining } = await this.prisma.training.findUniqueOrThrow(
       {
         where: { id },
         include: {

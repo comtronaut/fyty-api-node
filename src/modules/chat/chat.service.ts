@@ -12,14 +12,14 @@ export class ChatService {
   }
 
   async getChatWithMessages(chatId: string) {
-    return await this.prisma.chat.findFirstOrThrow({
+    return await this.prisma.chat.findUniqueOrThrow({
       where: { id: chatId },
       include: { messages: true }
     });
   }
 
   async getChatWithMessagesByRoomId(roomId: string) {
-    return await this.prisma.chat.findFirstOrThrow({
+    return await this.prisma.chat.findUniqueOrThrow({
       where: { roomId },
       include: { messages: true }
     });

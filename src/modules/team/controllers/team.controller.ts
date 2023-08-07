@@ -118,7 +118,7 @@ export class TeamController {
   // stats
   @Get(":id/stats")
   async getTeamStatsByTeamId(@Param("id") teamId: string) {
-    return await this.trainingService.getTeamStats(teamId);
+    return await this.trainingService.getTeamStatsByTeamId(teamId);
   }
 
   // trainings

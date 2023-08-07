@@ -17,11 +17,11 @@ export class AppointmentService {
   }
 
   async getById(id: string): Promise<Appointment> {
-    return await this.prisma.appointment.findFirstOrThrow({ where: { id } });
+    return await this.prisma.appointment.findUniqueOrThrow({ where: { id } });
   }
 
   async getMembersById(id: string): Promise<AppointmentMember[]> {
-    const { members } = await this.prisma.appointment.findFirstOrThrow({
+    const { members } = await this.prisma.appointment.findUniqueOrThrow({
       where: { id },
       select: { members: true }
     });

@@ -5,7 +5,8 @@ import { z } from "zod";
 import {
   AppointmentSchema,
   TrainingOptionalDefaultsSchema,
-  TrainingPartialSchema
+  TrainingPartialSchema,
+  TrainingSchema
 } from "model/schema";
 
 export class CreateTrainingDto
@@ -35,3 +36,10 @@ export class CreateTrainingBypassDto
       })
   )
   implements Omit<Prisma.TrainingUncheckedCreateInput, "appointmentId"> {}
+
+export class TrainingResponseDto
+  extends createZodDto(
+    TrainingSchema.extend({
+      appointment: AppointmentSchema
+    })
+  ) {}
