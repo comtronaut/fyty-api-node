@@ -106,20 +106,22 @@ export class RoutineService {
 
       await Promise.all([
         // create training result
-        this.prisma.training.createMany({
-          data: trainingCreatableRooms.map((e) => ({
-            appointmentId: e.appointment!.id,
-            hostId: e.hostTeamId,
-            guestId: e.members.filter((f) => f.teamId !== e.hostTeamId)[0]!.teamId,
-            lineups: {
-              createMany: {
-                data: e.members
-                  .flatMap((m) => m.lineups)
-                  .map((e) => ({ lineupId: e.teamLineupId }))
+        ...trainingCreatableRooms.map((e) => (
+          this.prisma.training.create({
+            data: {
+              appointmentId: e.appointment!.id,
+              hostId: e.hostTeamId,
+              guestId: e.members.filter((f) => f.teamId !== e.hostTeamId)[0]!.teamId,
+              lineups: {
+                createMany: {
+                  data: e.members
+                    .flatMap((m) => m.lineups)
+                    .map((e) => ({ lineupId: e.teamLineupId }))
+                }
               }
             }
-          }))
-        }),
+          })
+        )),
         // delete images
         this.imageService.deleteImageByIds(compact(imageIds)),
         // delete rooms
