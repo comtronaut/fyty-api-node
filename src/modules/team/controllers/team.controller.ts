@@ -33,7 +33,6 @@ import { TeamService } from "../services/team.service";
 import { TrainingService } from "../services/training.service";
 
 @Controller("teams")
-@UseGuards(UserJwtAuthGuard)
 export class TeamController {
   constructor(
     private readonly teamService: TeamService,
@@ -45,6 +44,7 @@ export class TeamController {
   ) {}
 
   @Post()
+  @UseGuards(UserJwtAuthGuard)
   async postTeam(@UserSubject() user: User, @Body() payload: CreateTeamDto) {
     return await this.teamService.create(user, payload);
   }
@@ -80,11 +80,13 @@ export class TeamController {
   }
 
   @Put(":id")
+  @UseGuards(UserJwtAuthGuard)
   async putTeamById(@UserSubject() user: User, @Body() payload: UpdateTeamDto) {
     return await this.teamService.update(payload);
   }
 
   @Delete(":id")
+  @UseGuards(UserJwtAuthGuard)
   async deleteTeamById(@UserSubject() user: User, @Param("id") teamId: string) {
     return await this.teamService.deleteByUser(user.id, teamId);
   }
@@ -108,6 +110,7 @@ export class TeamController {
   }
 
   @Put(":id/settings")
+  @UseGuards(UserJwtAuthGuard)
   async putTeamSettingsByTeamId(
     @Param("id") teamId: string,
     @Body() payload: UpdateTeamSettingsDto
@@ -137,6 +140,7 @@ export class TeamController {
   }
 
   @Post(":id/trainings")
+  @UseGuards(UserJwtAuthGuard)
   async createTrainingManually(
     @Param("id") teamId: string,
     @Body() payload: CreateTrainingBypassDto
@@ -150,6 +154,7 @@ export class TeamController {
   }
 
   @Put("trainings/:id")
+  @UseGuards(UserJwtAuthGuard)
   async putTrainingById(
     @Param("id") trainingId: string,
     @Body() payload: UpdateTrainingDto
@@ -169,6 +174,7 @@ export class TeamController {
   }
 
   @Post("trainings/:id/reports")
+  @UseGuards(UserJwtAuthGuard)
   async postReportByTrainingId(
     @Param("id") trainingId: string,
     @Body() payload: CreateTrainingReportDto
@@ -182,6 +188,7 @@ export class TeamController {
   }
 
   @Put("trainings/reports/:id")
+  @UseGuards(UserJwtAuthGuard)
   async putReportById(
     @Param("id") reportId: string,
     @Body() payload: UpdateTrainingReportDto
@@ -205,11 +212,13 @@ export class TeamController {
   }
 
   @Post("members")
+  @UseGuards(UserJwtAuthGuard)
   async postTeamMember(@Body() payload: CreateTeamMemberDto) {
     return await this.teamMemberService.create(payload);
   }
 
   @Put("members/:id")
+  @UseGuards(UserJwtAuthGuard)
   async putTeamMemberByTeamId(
     @Param("id") teamMemberId: string,
     @Body() payload: UpdateTeamMemberDto
@@ -218,11 +227,13 @@ export class TeamController {
   }
 
   @Delete("members/:id")
+  @UseGuards(UserJwtAuthGuard)
   async deleteTeamMemberById(@Param("id") teamMemberId: string, @UserSubject() user: User) {
     return await this.teamMemberService.kickMember(teamMemberId, user);
   }
 
   @Delete("members/:id/leave")
+  @UseGuards(UserJwtAuthGuard)
   async deleteTeamMemberByIdAsLeaving(@Param("id") teamMemberId: string) {
     return this.teamMemberService.leaveTeam(teamMemberId);
   }
@@ -237,11 +248,13 @@ export class TeamController {
   }
 
   @Post("pendings")
+  @UseGuards(UserJwtAuthGuard)
   async postTeamPending(@Body() payload: CreateTeamPendingDto) {
     return await this.teamPendingService.createTeamPending(payload);
   }
 
   @Put("pendings/:id")
+  @UseGuards(UserJwtAuthGuard)
   async putTeamPendingById(
     @Param("id") teamPendingId: string,
     @Body() payload: UpdateTeamPendingDto
@@ -250,6 +263,7 @@ export class TeamController {
   }
 
   @Delete("pendings/:id")
+  @UseGuards(UserJwtAuthGuard)
   async deleteTeamPendingById(@Param("id") teamPendingId: string) {
     return await this.teamPendingService.discard(teamPendingId);
   }
