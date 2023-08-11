@@ -14,7 +14,7 @@ export class AdminAdminsController {
   constructor(private readonly adminService: AdminAdminsService) {}
 
   @Post()
-  async createAdminAccount(@Body() payload: CreateAdminDto) {
+  async createAdminAsAdmin(@Body() payload: CreateAdminDto) {
     return await this.adminService.createAdmin(payload);
   }
 
