@@ -6,21 +6,21 @@ import { GameService } from "modules/game/game.service";
 
 @Controller("admin/games")
 @UseGuards(AdminJwtAuthGuard)
-export class GamesController {
+export class AdminGamesController {
   constructor(private readonly gameService: GameService) {}
 
   @Post()
-  async addGame(@Body() payload: CreateGameDto) {
+  async createGameAsAdmin(@Body() payload: CreateGameDto) {
     return await this.gameService.create(payload);
   }
 
   @Put(":id")
-  async updateGame(@Param("id") gameId: string, @Body() payload: UpdateGameDto) {
-    return await this.gameService.update(gameId, payload);
+  async updateGameByIdAsAdmin(@Param("id") id: string, @Body() payload: UpdateGameDto) {
+    return await this.gameService.update(id, payload);
   }
 
   @Delete(":id")
-  async deleteGame(@Param("id") gameId: string) {
-    return await this.gameService.delete(gameId);
+  async deleteGameByIdAsAdmin(@Param("id") id: string) {
+    return await this.gameService.delete(id);
   }
 }

@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, Put, UseGuards } from "@nestjs/common";
-import dayjs from "dayjs";
 
 import { UpdateRoomDto } from "model/dto/room.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
@@ -11,32 +10,32 @@ export class AdminRoomsController {
   constructor(private readonly roomService: RoomService) {}
 
   @Get()
-  async getRooms() {
+  async getAllRoomsAsAdmin() {
     return await this.roomService.getByFilter({});
   }
 
   @Get(":id")
-  async getRoomsById(@Param("id") roomId: string) {
-    return await this.roomService.getById(roomId);
+  async getRoomByIdAsAdmin(@Param("id") id: string) {
+    return await this.roomService.getById(id);
   }
 
   @Get(":id/participants")
-  async getRoomParticipantsById(@Param("id") roomId: string) {
-    return await this.roomService.getRoomMembersByRoomId(roomId);
+  async getRoomParticipantsByRoomIdAsAdmin(@Param("id") id: string) {
+    return await this.roomService.getRoomMembersByRoomId(id);
   }
 
-  @Get(":id/roomlineup")
-  async getRoomLineupById(@Param("id") roomId: string) {
-    return await this.roomService.getRoomLineupsByRoomId(roomId);
+  @Get(":id/lineups")
+  async getRoomLineupsByRoomIdAsAdmin(@Param("id") id: string) {
+    return await this.roomService.getRoomLineupsByRoomId(id);
   }
 
   @Put(":id")
-  async updateRoomsById(@Param("id") roomId: string, @Body() payload: UpdateRoomDto) {
-    return await this.roomService.update(roomId, payload);
+  async updateRoomsByIdAsAdmin(@Param("id") id: string, @Body() payload: UpdateRoomDto) {
+    return await this.roomService.update(id, payload);
   }
 
   @Delete(":id")
-  async deleteRoom(@Param("id") roomId: string) {
-    return await this.roomService.deleteSingle(roomId, true);
+  async deleteRoomByIdAsAdmin(@Param("id") id: string) {
+    return await this.roomService.deleteSingle(id, true);
   }
 }

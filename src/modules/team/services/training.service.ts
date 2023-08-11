@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import {
   Team,
-  TeamStats,
   Training,
   TrainingLineup,
   TrainingReport,
@@ -186,9 +185,15 @@ export class TrainingService {
     });
   }
 
-  async getTeamStatsByTeamId(teamId: string): Promise<TeamStats> {
-    return await this.prisma.teamStats.findUniqueOrThrow({
-      where: { teamId }
+  async getFilter(filter: {
+    pagination?: Pagination;
+    clause: Partial<Omit<Training, "imageUrls">>;
+  }): Promise<Training[]> {
+    return await this.prisma.training.findMany({
+      ...(filter.pagination && paginate(filter.pagination)),
+      ...(filter.clause && {
+        where: filter.clause
+      })
     });
   }
 

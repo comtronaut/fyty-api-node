@@ -1,12 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import { Admin } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 
 import { CreateAdminDto, UpdateAdminDto } from "model/dto/admin.dto";
 import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
-export class AdminService {
+export class AdminAdminsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createAdmin(payload: CreateAdminDto) {
@@ -23,7 +22,7 @@ export class AdminService {
     return await this.prisma.admin.findMany();
   }
 
-  async getAdminById(adminId: Admin["id"]) {
+  async getAdminById(adminId: string) {
     return await this.prisma.admin.findUniqueOrThrow({
       where: {
         id: adminId
@@ -31,7 +30,7 @@ export class AdminService {
     });
   }
 
-  async updateAdminData(adminId: Admin["id"], payload: UpdateAdminDto) {
+  async updateAdminData(adminId: string, payload: UpdateAdminDto) {
     const adminData = payload;
 
     if (payload.password) {
@@ -47,7 +46,7 @@ export class AdminService {
     });
   }
 
-  async deleteAdmin(adminId: Admin["id"]) {
+  async deleteAdmin(adminId: string) {
     return await this.prisma.admin.delete({
       where: {
         id: adminId

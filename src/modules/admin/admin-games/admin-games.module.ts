@@ -2,10 +2,10 @@ import { Module } from "@nestjs/common";
 
 import { GameService } from "modules/game/game.service";
 
-import { GamesController } from "./admin-games.controller";
+import { AdminGamesController } from "./admin-games.controller";
 
 @Module({
-  controllers: [ GamesController ],
+  controllers: [ AdminGamesController ],
   providers: [ GameService ]
 })
 export class AdminGamesModule {}

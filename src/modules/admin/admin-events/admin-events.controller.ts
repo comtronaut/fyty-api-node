@@ -40,10 +40,7 @@ export class AdminEventsController {
   }
 
   @Put(":id")
-  async updateEventByIdAsAdmin(
-    @Param("id") id: string,
-    @Body() payload: UpdateEventDto
-  ) {
+  async updateEventByIdAsAdmin(@Param("id") id: string, @Body() payload: UpdateEventDto) {
     return await this.eventService.updateEventById(id, payload);
   }
 

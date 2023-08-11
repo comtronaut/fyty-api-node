@@ -6,12 +6,12 @@ import { UserSubject } from "common/subject.decorator";
 import { CreateAdminDto, UpdateAdminDto } from "model/dto/admin.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 
-import { AdminService } from "./admin-admins-service";
+import { AdminAdminsService } from "./admin-admins.service";
 
 @Controller("admin/admins")
 @UseGuards(AdminJwtAuthGuard)
-export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+export class AdminAdminsController {
+  constructor(private readonly adminService: AdminAdminsService) {}
 
   @Post()
   async createAdminAccount(@Body() payload: CreateAdminDto) {
@@ -29,20 +29,17 @@ export class AdminController {
   }
 
   @Get(":id")
-  async getAdmin(@Param("id") adminId: Admin["id"]) {
+  async getAdmin(@Param("id") adminId: string) {
     return await this.adminService.getAdminById(adminId);
   }
 
   @Put(":id")
-  async updateAdminData(
-    @Param("id") adminId: Admin["id"],
-    @Body() payload: UpdateAdminDto
-  ) {
+  async updateAdminData(@Param("id") adminId: string, @Body() payload: UpdateAdminDto) {
     return await this.adminService.updateAdminData(adminId, payload);
   }
 
   @Delete(":id")
-  async deleteAdmin(@Param("id") adminId: Admin["id"]) {
+  async deleteAdmin(@Param("id") adminId: string) {
     return await this.adminService.deleteAdmin(adminId);
   }
 }

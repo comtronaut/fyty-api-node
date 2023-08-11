@@ -19,12 +19,12 @@ export class AdminTeamsController {
   constructor(private readonly adminTeamsService: TeamService) {}
 
   @Get()
-  async getAllTeam(
+  async getAllTeamsAsAdmin(
     @Query("q") q?: string,
     @Query("page") page?: string,
     @Query("perPage") perPage?: string
   ) {
-    return await this.adminTeamsService.getByFilter({
+    return await this.adminTeamsService.getFilter({
       ...([ page, perPage ].every(Boolean) && {
         pagination: {
           page: Number(page),
@@ -38,17 +38,17 @@ export class AdminTeamsController {
   }
 
   @Get(":id")
-  async getTeam(@Param("id") teamId: string) {
-    return await this.adminTeamsService.getById(teamId);
+  async getTeamByIdAsAdmin(@Param("id") id: string) {
+    return await this.adminTeamsService.getById(id);
   }
 
   @Put(":id")
-  async updateTeam(@Param("id") teamId: string, @Body() payload: UpdateTeamDto) {
+  async updateTeamByIdAsAdmin(@Param("id") id: string, @Body() payload: UpdateTeamDto) {
     return await this.adminTeamsService.update(payload);
   }
 
   @Delete(":id")
-  async deleteTeam(@Param("id") teamId: string) {
-    return await this.adminTeamsService.deleteSoftly(teamId);
+  async deleteTeamByIdAsAdmin(@Param("id") id: string) {
+    return await this.adminTeamsService.deleteSoftly(id);
   }
 }

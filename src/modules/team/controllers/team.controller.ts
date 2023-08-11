@@ -61,7 +61,7 @@ export class TeamController {
       ...(q && { name: q })
     };
 
-    return await this.teamService.getByFilter({
+    return await this.teamService.getFilter({
       ...([ perPage, page ].every(Boolean) && {
         pagination: {
           page: Number(page),
@@ -121,7 +121,7 @@ export class TeamController {
   // stats
   @Get(":id/stats")
   async getTeamStatsByTeamId(@Param("id") teamId: string) {
-    return await this.trainingService.getTeamStatsByTeamId(teamId);
+    return await this.teamService.getStatsByTeamId(teamId);
   }
 
   // trainings

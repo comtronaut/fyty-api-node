@@ -19,22 +19,22 @@ export class AdminReportsController {
   constructor(private readonly trainingService: TrainingService) {}
 
   @Get()
-  async getAll(@Query() query: Record<string, string> = {}) {
+  async getAllTrainingReportsAsAdmin(@Query() query: Record<string, string> = {}) {
     const { q, page, perPage } = query;
 
     return await this.trainingService.getAllReports();
   }
 
   @Put(":id")
-  async updateTeam(
-    @Param("id") reportId: string,
+  async updateTrainingReportByIdAsAdmin(
+    @Param("id") id: string,
     @Body() payload: UpdateTrainingReportDto
   ) {
-    return await this.trainingService.updateReport(reportId, payload);
+    return await this.trainingService.updateReport(id, payload);
   }
 
   @Delete(":id")
-  async deleteTeam(@Param("id") reportId: string) {
-    return await this.trainingService.deleteById(reportId);
+  async deleteTrainingReportByIdAsAdmin(@Param("id") id: string) {
+    return await this.trainingService.deleteById(id);
   }
 }

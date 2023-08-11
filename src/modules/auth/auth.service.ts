@@ -4,7 +4,7 @@ import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 
 import env from "common/env.config";
-import { AdminService } from "modules/admin/admin-admins/admin-admins-service";
+import { AdminAdminsService } from "modules/admin/admin-admins/admin-admins.service";
 import { UserService } from "modules/user/services/user.service";
 import { PrismaService } from "prisma/prisma.service";
 
@@ -16,7 +16,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
-    private readonly adminService: AdminService
+    private readonly adminService: AdminAdminsService
   ) {}
 
   async loginFacebook(user: FacebookInfo) {
@@ -85,11 +85,11 @@ export class AuthService {
     return await this.userService.getById(id);
   }
 
-  async getAdminById(adminId: Admin["id"]) {
+  async getAdminById(adminId: string) {
     return await this.adminService.getAdminById(adminId);
   }
 
-  async adminLogin(email: Admin["email"], password: Admin["password"]) {
+  async adminLogin(email: string, password: string) {
     const admin = await this.prisma.admin.findUniqueOrThrow({
       where: {
         email

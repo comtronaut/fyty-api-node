@@ -21,29 +21,40 @@ export class AdminTrainingsController {
   constructor(private readonly trainingService: TrainingService) {}
 
   @Get()
-  async getAll(@Query() query: Record<string, string> = {}) {
-    const { q, page, perPage } = query;
+  async getAllTrainingsAsAdmin(@Query() query: Record<string, string> = {}) {
+    const { page, perPage } = query;
 
-    return await this.trainingService.getAll();
+    return await this.trainingService.getFilter({
+      ...([ page, perPage ].every(Boolean) && {
+        pagination: {
+          page: Number(page),
+          perPage: Number(perPage)
+        }
+      }),
+      clause: {}
+    });
   }
 
   @Post()
-  async create(@Body() payload: CreateTrainingBypassDto) {
+  async createTrainingAsAdmin(@Body() payload: CreateTrainingBypassDto) {
     return await this.trainingService.createBypass(payload, TrainingSource.ADMIN);
   }
 
   @Get(":id")
-  async getById(@Param("id") trainingId: string) {
-    return await this.trainingService.getById(trainingId);
+  async getTrainingByIdAsAdmin(@Param("id") id: string) {
+    return await this.trainingService.getById(id);
   }
 
   @Put(":id")
-  async updateTeam(@Param("id") trainingId: string, @Body() payload: UpdateTrainingDto) {
-    return await this.trainingService.update(trainingId, payload);
+  async updateTrainingByIdAsAdmin(
+    @Param("id") id: string,
+    @Body() payload: UpdateTrainingDto
+  ) {
+    return await this.trainingService.update(id, payload);
   }
 
   @Delete(":id")
-  async deleteTeam(@Param("id") trainingId: string) {
-    return await this.trainingService.deleteById(trainingId);
+  async deleteTrainingByIdAsAdmin(@Param("id") id: string) {
+    return await this.trainingService.deleteById(id);
   }
 }

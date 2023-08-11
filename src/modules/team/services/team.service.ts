@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { MemberRole, Team, User } from "@prisma/client";
+import { MemberRole, Team, TeamStats, User } from "@prisma/client";
 
 import { paginate } from "common/utils/pagination";
 import { CreateTeamDto, TeamDetailResponseDto, UpdateTeamDto } from "model/dto/team.dto";
@@ -125,7 +125,13 @@ export class TeamService {
     return memberRes.map((e) => e.team);
   }
 
-  async getByFilter(filter: {
+  async getStatsByTeamId(teamId: string): Promise<TeamStats> {
+    return await this.prisma.teamStats.findUniqueOrThrow({
+      where: { teamId }
+    });
+  }
+
+  async getFilter(filter: {
     pagination?: Pagination;
     clause?: Partial<Team>;
   }): Promise<Team[]> {
