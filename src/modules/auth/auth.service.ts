@@ -93,13 +93,15 @@ export class AuthService {
     const admin = await this.prisma.admin.findUniqueOrThrow({
       where: {
         email
+      },
+      select: {
+        id: true,
+        password: true
       }
     });
 
     if (admin && bcrypt.compareSync(password, admin.password)) {
-      const { password, ...adminData } = admin;
-      const accessToken = this.getAdminAccessToken(adminData.id);
-      return { ...adminData, ...accessToken };
+      return this.getAdminAccessToken(admin.id);
     } else {
       throw new UnauthorizedException("email or password is incorrect.");
     }

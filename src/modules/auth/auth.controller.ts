@@ -37,7 +37,7 @@ export class AuthController {
   async loginAdmin(
     @Query("email") email: string,
     @Query("password") password: string
-  ): Promise<AccessTokenDto & SecureAdminDto> {
+  ): Promise<AccessTokenDto> {
     return await this.authService.adminLogin(email, password);
   }
 

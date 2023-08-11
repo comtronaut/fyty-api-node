@@ -19,27 +19,27 @@ export class AdminAdminsController {
   }
 
   @Get()
-  async getAllAdmin() {
+  async getAllAdminsAsAdmin() {
     return await this.adminService.getAllAdmin();
   }
 
   @Get("me")
-  async getMeAdmin(@UserSubject() user: Admin) {
+  async getMeAdminInfo(@UserSubject() user: Admin) {
     return user;
   }
 
   @Get(":id")
-  async getAdmin(@Param("id") adminId: string) {
-    return await this.adminService.getAdminById(adminId);
+  async getAdminByIdAsAdmin(@Param("id") id: string) {
+    return await this.adminService.getAdminById(id);
   }
 
   @Put(":id")
-  async updateAdminData(@Param("id") adminId: string, @Body() payload: UpdateAdminDto) {
-    return await this.adminService.updateAdminData(adminId, payload);
+  async updateAdminByIdAsAdmin(@Param("id") id: string, @Body() payload: UpdateAdminDto) {
+    return await this.adminService.updateAdminData(id, payload);
   }
 
   @Delete(":id")
-  async deleteAdmin(@Param("id") adminId: string) {
-    return await this.adminService.deleteAdmin(adminId);
+  async deleteAdminByIdAsAdmin(@Param("id") id: string) {
+    return await this.adminService.deleteAdmin(id);
   }
 }
