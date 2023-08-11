@@ -3,7 +3,7 @@ import { Event, Room } from "@prisma/client";
 import { compact } from "lodash";
 
 import { paginate } from "common/utils/pagination";
-import { CreateEventDto } from "model/dto/event.dto";
+import { CreateEventDto, UpdateEventDto } from "model/dto/event.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
 
@@ -37,6 +37,13 @@ export class EventService {
     });
   }
 
+  async updateEventById(id: string, data: UpdateEventDto) {
+    return await this.prisma.event.update({
+      where: { id },
+      data
+    });
+  }
+
   async joinParticipantIntoEvent(eventId: string, teamId: string) {
     return await this.prisma.eventParticipant.create({
       data: {
@@ -52,11 +59,11 @@ export class EventService {
     });
   }
 
-  async getEventsFilter(filter: { pagination?: Pagination; cluase: Partial<Event> }) {
+  async getEventsFilter(filter: { pagination?: Pagination; clause: Partial<Event> }) {
     return await this.prisma.event.findMany({
       ...(filter.pagination && paginate(filter.pagination)),
-      ...(filter.cluase && {
-        where: filter.cluase
+      ...(filter.clause && {
+        where: filter.clause
       })
     });
   }

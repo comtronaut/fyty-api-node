@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 
 import { AdminAdminsModule } from "./admin-admins/admin-admins.module";
 import { AdminAppoinmentsModule } from "./admin-appointments/admin-appointments.module";
+import { AdminEventsModule } from "./admin-events/admin-events.module";
 import { AdminGamesModule } from "./admin-games/admin-games.module";
 import { AdminReportsModule } from "./admin-reports/admin-reports.module";
 import { AdminRoomsModule } from "./admin-rooms/admin-rooms.module";
@@ -13,6 +14,7 @@ import { AdminUsersModule } from "./admin-users/admin-users.module";
   imports: [
     AdminReportsModule,
     AdminTrainingsModule,
+    AdminEventsModule,
     AdminAdminsModule,
     AdminGamesModule,
     AdminUsersModule,
