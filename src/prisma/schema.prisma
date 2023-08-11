@@ -408,6 +408,8 @@ model User {
   lineToken            String?   @unique
   firstLoginAt         DateTime?
   lastLoginAt          DateTime?
+  designatorAdmin      Admin?    @relation(fields: [designatorAdminId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  designatorAdminId    String?   @unique @db.Char(25)
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
@@ -636,4 +638,6 @@ model Admin {
   role      AdminRole @default(MANAGEMENT)
   createdAt DateTime  @default(now())
   updateAt  DateTime  @updatedAt
+
+  designatedUser User?
 }

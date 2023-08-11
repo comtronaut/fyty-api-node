@@ -244,6 +244,7 @@ export const UserScalarFieldEnumSchema = z.enum([
   "lineToken",
   "firstLoginAt",
   "lastLoginAt",
+  "designatorAdminId",
   "createdAt",
   "updatedAt"
 ]);
@@ -1150,6 +1151,7 @@ export const UserSchema = z.object({
   lineToken: z.string().nullish(),
   firstLoginAt: z.coerce.date().nullish(),
   lastLoginAt: z.coerce.date().nullish(),
+  designatorAdminId: z.string().nullish(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date()
 });
