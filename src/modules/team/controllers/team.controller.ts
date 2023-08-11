@@ -235,7 +235,7 @@ export class TeamController {
   @Delete("members/:id/leave")
   @UseGuards(UserJwtAuthGuard)
   async deleteTeamMemberByIdAsLeaving(@Param("id") teamMemberId: string) {
-    return this.teamMemberService.leaveTeam(teamMemberId);
+    return await this.teamMemberService.leaveTeam(teamMemberId);
   }
 
   // pendings

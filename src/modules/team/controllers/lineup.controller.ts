@@ -53,6 +53,6 @@ export class LineupController {
 
   @Delete(":id")
   async deleteTeamLineupById(@UserSubject() user: User, @Param("id") lineupId: string) {
-    return this.lineupService.deleteById(user.id, lineupId);
+    return await this.lineupService.deleteById(user.id, lineupId);
   }
 }

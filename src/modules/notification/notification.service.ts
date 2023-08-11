@@ -52,7 +52,10 @@ export class NotificationService {
       });
 
     const meNotifyingCount = teamPendings.length;
-    const roomMessageNotifyingCount = roomNotifRegistrations.reduce((acc, x) => acc + x.unreadCount, 0);
+    const roomMessageNotifyingCount = roomNotifRegistrations.reduce(
+      (acc, x) => acc + x.unreadCount,
+      0
+    );
     const teamNotifyingCount = teamMembers.reduce(
       (acc, { team }) =>
         acc

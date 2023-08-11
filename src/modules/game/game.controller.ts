@@ -8,6 +8,6 @@ export class GameController {
 
   @Get()
   async getGames() {
-    return this.gameService.getAll();
+    return await this.gameService.getAll();
   }
 }

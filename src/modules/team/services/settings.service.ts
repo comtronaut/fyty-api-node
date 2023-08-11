@@ -9,11 +9,11 @@ export class TeamSettingsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getByTeamId(teamId: string): Promise<TeamSettings> {
-    return this.prisma.teamSettings.findUniqueOrThrow({ where: { teamId } });
+    return await this.prisma.teamSettings.findUniqueOrThrow({ where: { teamId } });
   }
 
   async update(data: UpdateLineupDto): Promise<TeamSettings> {
-    return this.prisma.teamSettings.update({
+    return await this.prisma.teamSettings.update({
       where: { teamId: data.teamId },
       data
     });

@@ -37,9 +37,8 @@ export class CreateTrainingBypassDto
   )
   implements Omit<Prisma.TrainingUncheckedCreateInput, "appointmentId"> {}
 
-export class TrainingResponseDto
-  extends createZodDto(
-    TrainingSchema.extend({
-      appointment: AppointmentSchema
-    })
-  ) {}
+export class TrainingResponseDto extends createZodDto(
+  TrainingSchema.extend({
+    appointment: AppointmentSchema
+  })
+) {}

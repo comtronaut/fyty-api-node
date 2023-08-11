@@ -10,6 +10,6 @@ export class ChatController {
 
   @Get(":id")
   async getChatById(@Param("id") chatId: string) {
-    return this.chatService.getChatWithMessages(chatId);
+    return await this.chatService.getChatWithMessages(chatId);
   }
 }

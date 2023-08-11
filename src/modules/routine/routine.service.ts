@@ -106,7 +106,7 @@ export class RoutineService {
 
       await Promise.all([
         // create training result
-        ...trainingCreatableRooms.map((e) => (
+        ...trainingCreatableRooms.map((e) =>
           this.prisma.training.create({
             data: {
               appointmentId: e.appointment!.id,
@@ -121,7 +121,7 @@ export class RoutineService {
               }
             }
           })
-        )),
+        ),
         // delete images
         this.imageService.deleteImageByIds(compact(imageIds)),
         // delete rooms

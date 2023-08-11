@@ -11,17 +11,17 @@ export class AdminAppointmentsController {
 
   @Get()
   async getAll() {
-    return this.appointmentService.getAll();
+    return await this.appointmentService.getAll();
   }
 
   @Get(":id")
   async get(@Param("id") appointmentId: string) {
-    return this.appointmentService.getById(appointmentId);
+    return await this.appointmentService.getById(appointmentId);
   }
 
   @Get(":id/member")
   async getAppointmentMember(@Param("id") appointmentId: string) {
-    return this.appointmentService.getMembersById(appointmentId);
+    return await this.appointmentService.getMembersById(appointmentId);
   }
 
   @Put(":id")

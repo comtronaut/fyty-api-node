@@ -192,7 +192,10 @@ export class TrainingService {
     });
   }
 
-  async getByTeamId(teamId: string, pagination?: Pagination): Promise<TrainingResponseDto[]> {
+  async getByTeamId(
+    teamId: string,
+    pagination?: Pagination
+  ): Promise<TrainingResponseDto[]> {
     return await this.prisma.training.findMany({
       ...(pagination && paginate(pagination)),
       where: {
@@ -232,15 +235,14 @@ export class TrainingService {
       });
     }
 
-    const { host, guest, ...currentTraining } = await this.prisma.training.findUniqueOrThrow(
-      {
+    const { host, guest, ...currentTraining }
+      = await this.prisma.training.findUniqueOrThrow({
         where: { id },
         include: {
           host: true,
           guest: true
         }
-      }
-    );
+      });
 
     if (Number.isFinite(data.hostWinCount) && Number.isFinite(data.hostLoseCount)) {
       await this.compareAndUpdateParticipants(
