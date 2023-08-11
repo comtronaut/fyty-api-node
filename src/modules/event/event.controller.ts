@@ -49,7 +49,7 @@ export class EventController {
   }
 
   @Get(":id/rooms")
-  async getEventRoomsByEventId(@Param("id") id: string, @Query("round") round?: string) {
-    return await this.eventService.getEventRooms(id, round);
+  async getEventRoomsByEventId(@Param("id") id: string, @Query("round") roundId?: string) {
+    return await this.eventService.getEventRooms(id, roundId);
   }
 }
