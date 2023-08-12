@@ -9,6 +9,7 @@ import {
   Put
 } from "@nestjs/common";
 import { HttpCode, Query, UseGuards } from "@nestjs/common/decorators";
+import { CreateEventRoundDto, UpdateEventRoundDto } from "model/dto/event-round.dto";
 
 import { createPagination } from "common/utils/pagination";
 import { CreateEventDto, UpdateEventDto } from "model/dto/event.dto";
@@ -19,7 +20,6 @@ import { EventService } from "modules/event/event.service";
 @UseGuards(AdminJwtAuthGuard)
 export class AdminEventsController {
   constructor(private readonly eventService: EventService) {}
-
   @Post()
   async createEventAsAdmin(@Body() payload: CreateEventDto) {
     return await this.eventService.createEvent(payload);
@@ -53,5 +53,23 @@ export class AdminEventsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteEventByIdAsAdmin(@Param("id") id: string): Promise<void> {
     return await this.eventService.deleteEventById(id);
+  }
+
+  // EventRound
+
+  @Post("/rounds")
+  async addEventRoundAsAdmin(@Body() payload: CreateEventRoundDto) {
+    return await this.eventService.addEventRound(payload);
+  }
+
+  @Put("/rounds/:id")
+  async updateEventRoundByIdAsAdmin(@Param("id") id: string, @Body() payload: UpdateEventRoundDto) {
+    return await this.eventService.updateEventRoundById(id, payload);
+  }
+
+  @Delete("/rounds/:id")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteEventRoundByIdAsAdmin(@Param("id") id: string) {
+    return await this.eventService.deleteEventRoundById(id);
   }
 }

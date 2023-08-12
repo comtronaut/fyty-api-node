@@ -10,6 +10,8 @@ import {
 } from "model/dto/event.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
+import { CreateEventRoundDto, UpdateEventRoundDto } from "model/dto/event-round.dto";
+import { Http2ServerResponse } from "http2";
 
 @Injectable()
 export class EventService {
@@ -155,4 +157,26 @@ export class EventService {
       where: { id }
     });
   }
+
+  // Event Round CRUD
+
+  async addEventRound(data: CreateEventRoundDto) {
+    return await this.prisma.eventRound.create({
+      data
+    });
+  }
+
+  async updateEventRoundById(id: string, data: UpdateEventRoundDto) {
+    return await this.prisma.eventRound.update({
+      where: { id },
+      data
+    });
+  }
+
+  async deleteEventRoundById(id: string) {
+    return await this.prisma.eventRound.delete({
+      where: { id }
+    });
+  }
+
 }
