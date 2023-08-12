@@ -11,6 +11,7 @@ import {
   UseGuards
 } from "@nestjs/common";
 
+import { createPagination } from "common/utils/pagination";
 import { UpdateTeamDto } from "model/dto/team.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { TeamService } from "modules/team/services/team.service";
@@ -27,12 +28,7 @@ export class AdminTeamsController {
     @Query("perPage") perPage?: string
   ) {
     return await this.adminTeamsService.getFilter({
-      ...([ page, perPage ].every(Boolean) && {
-        pagination: {
-          page: Number(page),
-          perPage: Number(perPage)
-        }
-      }),
+      ...createPagination(page, perPage),
       clause: {
         ...(q && { name: q })
       }

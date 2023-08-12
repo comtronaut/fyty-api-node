@@ -21,9 +21,11 @@ export class AdminReportsController {
   constructor(private readonly trainingService: TrainingService) {}
 
   @Get()
-  async getAllTrainingReportsAsAdmin(@Query() query: Record<string, string> = {}) {
-    const { q, page, perPage } = query;
-
+  async getAllTrainingReportsAsAdmin(
+    @Query("q") q?: string,
+    @Query("page") page?: string,
+    @Query("perPage") perPage?: string
+  ) {
     return await this.trainingService.getAllReports();
   }
 

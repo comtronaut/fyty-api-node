@@ -10,6 +10,7 @@ import {
 } from "@nestjs/common";
 import { HttpCode, Query, UseGuards } from "@nestjs/common/decorators";
 
+import { createPagination } from "common/utils/pagination";
 import { CreateEventDto, UpdateEventDto } from "model/dto/event.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { EventService } from "modules/event/event.service";
@@ -31,12 +32,7 @@ export class AdminEventsController {
     @Query("perPage") perPage?: string
   ) {
     return await this.eventService.getEventsFilter({
-      ...([ page, perPage ].every(Boolean) && {
-        pagination: {
-          page: Number(page),
-          perPage: Number(perPage)
-        }
-      }),
+      ...createPagination(page, perPage),
       clause: {
         ...(name && { name })
       }

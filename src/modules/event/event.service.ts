@@ -63,13 +63,14 @@ export class EventService {
 
     // when update 'maxParticipantCount'
     if (typeof data.maxParticipantCount === "number") {
-      const { isApprovalRequired, maxParticipantCount } = await this.prisma.event.findUniqueOrThrow({
-        where: { id },
-        select: {
-          isApprovalRequired: true,
-          maxParticipantCount: true
-        }
-      });
+      const { isApprovalRequired, maxParticipantCount }
+        = await this.prisma.event.findUniqueOrThrow({
+          where: { id },
+          select: {
+            isApprovalRequired: true,
+            maxParticipantCount: true
+          }
+        });
 
       const isChanged = data.maxParticipantCount !== maxParticipantCount;
 
@@ -80,9 +81,11 @@ export class EventService {
             ...(isApprovalRequired && { approvalStatus: "APPROVED" })
           }
         });
-  
+
         if (currentParticipantCount > data.maxParticipantCount) {
-          throw new ConflictException("the to-be updated 'maxParticipantCount' must be less than the current event participant count");
+          throw new ConflictException(
+            "the to-be updated 'maxParticipantCount' must be less than the current event participant count"
+          );
         }
       }
     }
