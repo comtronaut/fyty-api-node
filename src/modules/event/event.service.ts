@@ -10,7 +10,7 @@ import {
 } from "model/dto/event.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
-import { UpdateEventParticipantDto } from "model/dto/event-participant.dto";
+import { CreateEventParticipantDto, UpdateEventParticipantDto } from "model/dto/event-participant.dto";
 
 @Injectable()
 export class EventService {
@@ -111,19 +111,16 @@ export class EventService {
 
   // Event Parti by admin
 
-  async updateEventParticipantByAdmin(id: string, data: UpdateEventParticipantDto): Promise<EventParticipant> {
+  async updateEventParticipant(id: string, data: UpdateEventParticipantDto): Promise<EventParticipant> {
     return await this.prisma.eventParticipant.update({
       where: { id },
       data
     });
   }
 
-  async addEventParticipantByAdmin(teamId: string, eventId: string): Promise<EventParticipant> {
-    return await this.prisma.eventParticipant.create({ 
-      data:{
-        eventId,
-        teamId
-      }
+  async addParticipantToEventByAdmin(data: CreateEventParticipantDto): Promise<EventParticipant> {
+    return await this.prisma.eventParticipant.create({
+      data
     });
   }
 
