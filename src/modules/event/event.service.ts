@@ -52,10 +52,16 @@ export class EventService {
     eventId: string,
     teamId: string
   ): Promise<EventParticipant> {
+    const event = await this.prisma.event.findUniqueOrThrow({
+      where: { id: eventId },
+      select: { isApprovalRequired: true }
+    });
+
     return await this.prisma.eventParticipant.create({
       data: {
         eventId,
-        teamId
+        teamId,
+        ...(event.isApprovalRequired && { approvalStatus: "PENDING" })
       }
     });
   }
