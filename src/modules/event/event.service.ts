@@ -110,10 +110,9 @@ export class EventService {
   }
 
   async deleteEventRoundById(id: string) {
-    await this.prisma.eventRound.delete({
+    return await this.prisma.eventRound.delete({
       where: { id }
     });
-    return HttpStatus.NO_CONTENT;
   }
 
 }
