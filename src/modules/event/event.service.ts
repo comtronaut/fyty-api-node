@@ -3,7 +3,7 @@ import { Event, EventParticipant, Room } from "@prisma/client";
 import { compact } from "lodash";
 
 import { paginate } from "common/utils/pagination";
-import { CreateEventParticipantDto, UpdateEventParticipantDto } from "model/dto/event-participant.dto";
+import { CreateEventParticipantDto, EventParticipantApprovalPayloadDto, UpdateEventParticipantDto } from "model/dto/event-participant.dto";
 import { CreateEventRoundDto, UpdateEventRoundDto } from "model/dto/event-round.dto";
 import {
   CreateEventDto,
@@ -52,12 +52,12 @@ export class EventService {
   async updateEventById(id: string, data: UpdateEventDto): Promise<Event> {
     // when update 'isApprovalRequired'
     if (typeof data.isApprovalRequired === "boolean") {
-      const { isApprovalRequired } = await this.prisma.event.findUniqueOrThrow({
+      const event = await this.prisma.event.findUniqueOrThrow({
         where: { id },
         select: { isApprovalRequired: true }
       });
 
-      const isChanged = data.isApprovalRequired !== isApprovalRequired;
+      const isChanged = data.isApprovalRequired !== event.isApprovalRequired;
 
       if (isChanged) {
         await this.prisma.eventParticipant.updateMany({
@@ -71,22 +71,21 @@ export class EventService {
 
     // when update 'maxParticipantCount'
     if (typeof data.maxParticipantCount === "number") {
-      const { isApprovalRequired, maxParticipantCount }
-        = await this.prisma.event.findUniqueOrThrow({
-          where: { id },
-          select: {
-            isApprovalRequired: true,
-            maxParticipantCount: true
-          }
-        });
+      const event = await this.prisma.event.findUniqueOrThrow({
+        where: { id },
+        select: {
+          isApprovalRequired: true,
+          maxParticipantCount: true
+        }
+      });
 
-      const isChanged = data.maxParticipantCount !== maxParticipantCount;
+      const isChanged = data.maxParticipantCount !== event.maxParticipantCount;
 
       if (isChanged) {
         const currentParticipantCount = await this.prisma.eventParticipant.count({
           where: {
             eventId: id,
-            ...(isApprovalRequired && { approvalStatus: "APPROVED" })
+            ...(event.isApprovalRequired && { approvalStatus: "APPROVED" })
           }
         });
 
@@ -110,8 +109,21 @@ export class EventService {
   ): Promise<EventParticipant> {
     const event = await this.prisma.event.findUniqueOrThrow({
       where: { id: eventId },
-      select: { isApprovalRequired: true }
+      select: {
+        isApprovalRequired: true,
+        maxParticipantCount: true
+      }
     });
+    const currentParticipantCount = await this.prisma.eventParticipant.count({
+      where: {
+        eventId,
+        ...(event.isApprovalRequired && { approvalStatus: "APPROVED" })
+      }
+    });
+
+    if (event.maxParticipantCount && currentParticipantCount >= event.maxParticipantCount) {
+      throw new ConflictException("cannot join, the event is full");
+    }
 
     return await this.prisma.eventParticipant.create({
       data: {
@@ -165,11 +177,51 @@ export class EventService {
   }
 
   // Event Parti by admin
+  
+  async approveParticipants(eventId: string, payload: EventParticipantApprovalPayloadDto): Promise<void> {
+    const event = await this.prisma.event.findUniqueOrThrow({
+      where: { id: eventId },
+      select: {
+        maxParticipantCount: true,
+        isApprovalRequired: true
+      }
+    });
+    const currentParticipantCount = await this.prisma.eventParticipant.count({
+      where: {
+        eventId,
+        ...(event.isApprovalRequired && { approvalStatus: "APPROVED" })
+      }
+    });
+
+    if (
+      payload.approvalStatus === "APPROVED"
+      && event.maxParticipantCount
+      && currentParticipantCount + payload.participantIds.length > event.maxParticipantCount
+    ) {
+      throw new ConflictException("the number of to-be approved participants exceed 'maxParticipantCount'");
+    }
+
+    await this.prisma.eventParticipant.updateMany({
+      where: { id: { in: payload.participantIds } },
+      data: { approvalStatus: payload.approvalStatus }
+    });
+  }
 
   async updateEventParticipant(id: string, data: UpdateEventParticipantDto): Promise<EventParticipant> {
+    const { approvalStatus, ...payload } = data;
+
+    if (approvalStatus) {
+      const { eventId } = await this.prisma.eventParticipant.findUniqueOrThrow({
+        where: { id },
+        select: { eventId: true }
+      });
+
+      await this.approveParticipants(eventId, { approvalStatus, participantIds: [ id ] });
+    }
+
     return await this.prisma.eventParticipant.update({
       where: { id },
-      data
+      data: payload
     });
   }
                                                      

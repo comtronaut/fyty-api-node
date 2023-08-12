@@ -11,7 +11,7 @@ import {
 import { HttpCode, Query, UseGuards } from "@nestjs/common/decorators";
 
 import { createPagination } from "common/utils/pagination";
-import { CreateEventParticipantDto, UpdateEventParticipantDto } from "model/dto/event-participant.dto";
+import { CreateEventParticipantDto, EventParticipantApprovalPayloadDto, UpdateEventParticipantDto } from "model/dto/event-participant.dto";
 import { CreateEventRoundDto, UpdateEventRoundDto } from "model/dto/event-round.dto";
 import { CreateEventDto, UpdateEventDto } from "model/dto/event.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
@@ -57,6 +57,14 @@ export class AdminEventsController {
   }
 
   // Event Parti CRUD
+
+  @Put(":id/participants/approval")
+  async putEventParticipantsApprovalAsAdmin(
+    @Param("id") id: string,
+    @Body() payload: EventParticipantApprovalPayloadDto
+  ) {
+    return await this.eventService.approveParticipants(id, payload);
+  }
 
   @Post("participants")
   async createEventParticipantAsAdmin(@Body() payload: CreateEventParticipantDto) {
