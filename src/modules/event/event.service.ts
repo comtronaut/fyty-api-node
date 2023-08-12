@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
-import { Event, Room } from "@prisma/client";
+import { Event, EventParticipant, Room } from "@prisma/client";
 import { compact } from "lodash";
 
 import { paginate } from "common/utils/pagination";
-import { CreateEventDto, UpdateEventDto } from "model/dto/event.dto";
+import { CreateEventDto, EventDetailResponseDto, UpdateEventDto } from "model/dto/event.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
 
@@ -11,18 +11,18 @@ import { Pagination } from "types/local";
 export class EventService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAllEvents() {
+  async getAllEvents(): Promise<Event[]> {
     return await this.prisma.event.findMany({});
   }
 
-  async getEventById(id: string) {
-    return await this.prisma.event.findMany({
+  async getEventById(id: string): Promise<Event> {
+    return await this.prisma.event.findUniqueOrThrow({
       where: { id }
     });
   }
 
-  async getEventWithDetailById(id: string) {
-    return await this.prisma.event.findMany({
+  async getEventWithDetailById(id: string): Promise<EventDetailResponseDto> {
+    return await this.prisma.event.findUniqueOrThrow({
       where: { id },
       include: {
         rounds: true,
@@ -31,20 +31,20 @@ export class EventService {
     });
   }
 
-  async createEvent(data: CreateEventDto) {
+  async createEvent(data: CreateEventDto): Promise<Event> {
     return await this.prisma.event.create({
       data
     });
   }
 
-  async updateEventById(id: string, data: UpdateEventDto) {
+  async updateEventById(id: string, data: UpdateEventDto): Promise<Event> {
     return await this.prisma.event.update({
       where: { id },
       data
     });
   }
 
-  async joinParticipantIntoEvent(eventId: string, teamId: string) {
+  async joinParticipantIntoEvent(eventId: string, teamId: string): Promise<EventParticipant> {
     return await this.prisma.eventParticipant.create({
       data: {
         eventId,
@@ -53,13 +53,13 @@ export class EventService {
     });
   }
 
-  async removeParticipantFromEvent(participantId: string) {
-    return this.prisma.eventParticipant.delete({
+  async removeParticipantFromEvent(participantId: string): Promise<void> {
+    await this.prisma.eventParticipant.delete({
       where: { id: participantId }
     });
   }
 
-  async getEventsFilter(filter: { pagination?: Pagination; clause: Partial<Event> }) {
+  async getEventsFilter(filter: { pagination?: Pagination; clause: Partial<Event> }): Promise<Event[]> {
     return await this.prisma.event.findMany({
       ...(filter.pagination && paginate(filter.pagination)),
       ...(filter.clause && {
@@ -86,8 +86,8 @@ export class EventService {
     return compact(queryResult.flatMap((e) => e.appointments.map((e) => e.room)));
   }
 
-  async deleteEventById(id: string) {
-    return await this.prisma.event.delete({
+  async deleteEventById(id: string): Promise<void> {
+    await this.prisma.event.delete({
       where: { id }
     });
   }

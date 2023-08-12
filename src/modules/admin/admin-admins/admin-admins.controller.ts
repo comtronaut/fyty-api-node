@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
-import { UseGuards } from "@nestjs/common/decorators";
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from "@nestjs/common";
+import { HttpCode, UseGuards } from "@nestjs/common/decorators";
 import { Admin } from "@prisma/client";
 
 import { UserSubject } from "common/subject.decorator";
@@ -39,7 +39,8 @@ export class AdminAdminsController {
   }
 
   @Delete(":id")
-  async deleteAdminByIdAsAdmin(@Param("id") id: string) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteAdminByIdAsAdmin(@Param("id") id: string): Promise<void> {
     return await this.adminService.deleteAdmin(id);
   }
 }

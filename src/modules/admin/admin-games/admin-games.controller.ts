@@ -20,7 +20,7 @@ export class AdminGamesController {
   }
 
   @Delete(":id")
-  async deleteGameByIdAsAdmin(@Param("id") id: string) {
-    return await this.gameService.delete(id);
+  async deleteGameByIdAsAdmin(@Param("id") id: string): Promise<void> {
+    await this.gameService.delete(id);
   }
 }

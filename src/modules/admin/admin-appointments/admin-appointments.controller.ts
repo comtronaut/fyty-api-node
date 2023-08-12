@@ -4,7 +4,6 @@ import { UpdateAppointmentDto } from "model/dto/appointment.dto";
 import { AppointmentService } from "modules/appointment/appointment.service";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 
-// FIXME: expose this controller and module
 @Controller("admin/appointments")
 @UseGuards(AdminJwtAuthGuard)
 export class AdminAppointmentsController {

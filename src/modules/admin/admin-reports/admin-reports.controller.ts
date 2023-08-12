@@ -25,6 +25,11 @@ export class AdminReportsController {
     return await this.trainingService.getAllReports();
   }
 
+  @Get(":id")
+  async getTrainingReportByIdAsAdmin(@Param("id") id: string) {
+    return await this.trainingService.getReportById(id);
+  }
+
   @Put(":id")
   async updateTrainingReportByIdAsAdmin(
     @Param("id") id: string,

@@ -69,6 +69,7 @@ export const EventScalarFieldEnumSchema = z.enum([
   "description",
   "coverUrl",
   "maxParticipantCount",
+  "isApprovalRequired",
   "isHidden",
   "signupStartAt",
   "signupEndAt",
@@ -81,6 +82,9 @@ export const EventScalarFieldEnumSchema = z.enum([
 export const EventRoundScalarFieldEnumSchema = z.enum([
   "id",
   "eventId",
+  "type",
+  "name",
+  "description",
   "startAt",
   "endAt",
   "updatedAt"
@@ -90,6 +94,8 @@ export const EventParticipantScalarFieldEnumSchema = z.enum([
   "id",
   "eventId",
   "teamId",
+  "eliminationRoundId",
+  "approvalStatus",
   "updatedAt",
   "joinedAt"
 ]);
@@ -436,6 +442,14 @@ export const EventTypeSchema = z.enum([ "TOURNAMENT" ]);
 
 export type EventTypeType = `${z.infer<typeof EventTypeSchema>}`;
 
+export const RoundTypeSchema = z.enum([ "FINAL", "SEMIFINAL", "QUARTERFINAL" ]);
+
+export type RoundTypeType = `${z.infer<typeof RoundTypeSchema>}`;
+
+export const ApprovalStatusSchema = z.enum([ "PENDING", "APPROVED", "REJECTED" ]);
+
+export type ApprovalStatusType = `${z.infer<typeof ApprovalStatusSchema>}`;
+
 // ///////////////////////////////////////
 // MODELS
 // ///////////////////////////////////////
@@ -489,6 +503,7 @@ export const EventSchema = z.object({
   description: z.string(),
   coverUrl: z.string(),
   maxParticipantCount: z.number().int().nullish(),
+  isApprovalRequired: z.boolean(),
   isHidden: z.boolean(),
   signupStartAt: z.coerce.date(),
   signupEndAt: z.coerce.date(),
@@ -514,6 +529,7 @@ export type EventPartial = z.infer<typeof EventPartialSchema>;
 export const EventOptionalDefaultsSchema = EventSchema.merge(
   z.object({
     id: z.string().cuid().optional(),
+    isApprovalRequired: z.boolean().optional(),
     isHidden: z.boolean().optional(),
     updatedAt: z.coerce.date().optional(),
     createdAt: z.coerce.date().optional()
@@ -527,8 +543,11 @@ export type EventOptionalDefaults = z.infer<typeof EventOptionalDefaultsSchema>;
 // ///////////////////////////////////////
 
 export const EventRoundSchema = z.object({
+  type: RoundTypeSchema.nullish(),
   id: z.string().cuid(),
   eventId: z.string(),
+  name: z.string(),
+  description: z.string(),
   startAt: z.coerce.date(),
   endAt: z.coerce.date(),
   updatedAt: z.coerce.date()
@@ -550,6 +569,8 @@ export type EventRoundPartial = z.infer<typeof EventRoundPartialSchema>;
 export const EventRoundOptionalDefaultsSchema = EventRoundSchema.merge(
   z.object({
     id: z.string().cuid().optional(),
+    name: z.string().optional(),
+    description: z.string().optional(),
     updatedAt: z.coerce.date().optional()
   })
 );
@@ -561,9 +582,11 @@ export type EventRoundOptionalDefaults = z.infer<typeof EventRoundOptionalDefaul
 // ///////////////////////////////////////
 
 export const EventParticipantSchema = z.object({
+  approvalStatus: ApprovalStatusSchema.nullish(),
   id: z.string().cuid(),
   eventId: z.string(),
   teamId: z.string(),
+  eliminationRoundId: z.string().nullish(),
   updatedAt: z.coerce.date(),
   joinedAt: z.coerce.date()
 });
