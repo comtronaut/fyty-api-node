@@ -6,3 +6,17 @@ export function paginate(pagination: Pagination) {
     take: pagination.perPage
   };
 }
+
+export function createPagination(
+  page?: number | string,
+  perPage?: number | string
+): { pagination?: Pagination } {
+  return [ page, perPage ].every(Boolean)
+    ? {
+      pagination: {
+        page: Number(page),
+        perPage: Number(perPage)
+      }
+    }
+    : {};
+}

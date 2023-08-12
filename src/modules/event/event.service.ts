@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
 import { Event, EventParticipant, Room } from "@prisma/client";
 import { compact } from "lodash";
 
@@ -11,6 +11,8 @@ import {
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
 import { CreateEventParticipantDto, UpdateEventParticipantDto } from "model/dto/event-participant.dto";
+import { CreateEventRoundDto, UpdateEventRoundDto } from "model/dto/event-round.dto";
+import { Http2ServerResponse } from "http2";
 
 @Injectable()
 export class EventService {
@@ -43,6 +45,54 @@ export class EventService {
   }
 
   async updateEventById(id: string, data: UpdateEventDto): Promise<Event> {
+    // when update 'isApprovalRequired'
+    if (typeof data.isApprovalRequired === "boolean") {
+      const { isApprovalRequired } = await this.prisma.event.findUniqueOrThrow({
+        where: { id },
+        select: { isApprovalRequired: true }
+      });
+
+      const isChanged = data.isApprovalRequired !== isApprovalRequired;
+
+      if (isChanged) {
+        await this.prisma.eventParticipant.updateMany({
+          where: { eventId: id },
+          data: {
+            approvalStatus: data.isApprovalRequired ? "PENDING" : null
+          }
+        });
+      }
+    }
+
+    // when update 'maxParticipantCount'
+    if (typeof data.maxParticipantCount === "number") {
+      const { isApprovalRequired, maxParticipantCount }
+        = await this.prisma.event.findUniqueOrThrow({
+          where: { id },
+          select: {
+            isApprovalRequired: true,
+            maxParticipantCount: true
+          }
+        });
+
+      const isChanged = data.maxParticipantCount !== maxParticipantCount;
+
+      if (isChanged) {
+        const currentParticipantCount = await this.prisma.eventParticipant.count({
+          where: {
+            eventId: id,
+            ...(isApprovalRequired && { approvalStatus: "APPROVED" })
+          }
+        });
+
+        if (currentParticipantCount > data.maxParticipantCount) {
+          throw new ConflictException(
+            "the to-be updated 'maxParticipantCount' must be less than the current event participant count"
+          );
+        }
+      }
+    }
+
     return await this.prisma.event.update({
       where: { id },
       data
@@ -114,14 +164,31 @@ export class EventService {
   async updateEventParticipant(id: string, data: UpdateEventParticipantDto): Promise<EventParticipant> {
     return await this.prisma.eventParticipant.update({
       where: { id },
+    }
+  }
+                                                     
+  // Event Round CRUD
+
+  async addEventRound(data: CreateEventRoundDto) {
+    return await this.prisma.eventRound.create({
       data
     });
   }
 
   async addParticipantToEventByAdmin(data: CreateEventParticipantDto): Promise<EventParticipant> {
     return await this.prisma.eventParticipant.create({
+  }
+
+  async updateEventRoundById(id: string, data: UpdateEventRoundDto) {
+    return await this.prisma.eventRound.update({
+      where: { id },
       data
     });
   }
 
+  async deleteEventRoundById(id: string) {
+    return await this.prisma.eventRound.delete({
+      where: { id }
+    });
+  }
 }
