@@ -58,4 +58,8 @@ export class AdminEventsController {
   async deleteEventByIdAsAdmin(@Param("id") id: string): Promise<void> {
     return await this.eventService.deleteEventById(id);
   }
+
+  // Event Parti CRUD
+
+  
 }
