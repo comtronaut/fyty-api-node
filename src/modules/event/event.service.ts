@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
 import { Event, EventParticipant, Room } from "@prisma/client";
 import { compact } from "lodash";
 
@@ -42,6 +42,51 @@ export class EventService {
   }
 
   async updateEventById(id: string, data: UpdateEventDto): Promise<Event> {
+    // when update 'isApprovalRequired'
+    if (typeof data.isApprovalRequired === "boolean") {
+      const { isApprovalRequired } = await this.prisma.event.findUniqueOrThrow({
+        where: { id },
+        select: { isApprovalRequired: true }
+      });
+
+      const isChanged = data.isApprovalRequired !== isApprovalRequired;
+
+      if (isChanged) {
+        await this.prisma.eventParticipant.updateMany({
+          where: { eventId: id },
+          data: {
+            approvalStatus: data.isApprovalRequired ? "PENDING" : null
+          }
+        });
+      }
+    }
+
+    // when update 'maxParticipantCount'
+    if (typeof data.maxParticipantCount === "number") {
+      const { isApprovalRequired, maxParticipantCount } = await this.prisma.event.findUniqueOrThrow({
+        where: { id },
+        select: {
+          isApprovalRequired: true,
+          maxParticipantCount: true
+        }
+      });
+
+      const isChanged = data.maxParticipantCount !== maxParticipantCount;
+
+      if (isChanged) {
+        const currentParticipantCount = await this.prisma.eventParticipant.count({
+          where: {
+            eventId: id,
+            ...(isApprovalRequired && { approvalStatus: "APPROVED" })
+          }
+        });
+  
+        if (currentParticipantCount > data.maxParticipantCount) {
+          throw new ConflictException("the to-be updated 'maxParticipantCount' must be less than the current event participant count");
+        }
+      }
+    }
+
     return await this.prisma.event.update({
       where: { id },
       data

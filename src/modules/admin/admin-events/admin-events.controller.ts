@@ -45,7 +45,7 @@ export class AdminEventsController {
 
   @Get(":id")
   async getEventByIdAsAdmin(@Param("id") id: string) {
-    return await this.eventService.getEventById(id);
+    return await this.eventService.getEventWithDetailById(id);
   }
 
   @Put(":id")
