@@ -3,7 +3,11 @@ import { Event, EventParticipant, Room } from "@prisma/client";
 import { compact } from "lodash";
 
 import { paginate } from "common/utils/pagination";
-import { CreateEventDto, EventDetailResponseDto, UpdateEventDto } from "model/dto/event.dto";
+import {
+  CreateEventDto,
+  EventDetailResponseDto,
+  UpdateEventDto
+} from "model/dto/event.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
 
@@ -44,7 +48,10 @@ export class EventService {
     });
   }
 
-  async joinParticipantIntoEvent(eventId: string, teamId: string): Promise<EventParticipant> {
+  async joinParticipantIntoEvent(
+    eventId: string,
+    teamId: string
+  ): Promise<EventParticipant> {
     return await this.prisma.eventParticipant.create({
       data: {
         eventId,
@@ -59,7 +66,10 @@ export class EventService {
     });
   }
 
-  async getEventsFilter(filter: { pagination?: Pagination; clause: Partial<Event> }): Promise<Event[]> {
+  async getEventsFilter(filter: {
+    pagination?: Pagination;
+    clause: Partial<Event>;
+  }): Promise<Event[]> {
     return await this.prisma.event.findMany({
       ...(filter.pagination && paginate(filter.pagination)),
       ...(filter.clause && {

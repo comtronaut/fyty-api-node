@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Query,
@@ -43,8 +45,9 @@ export class EventController {
   }
 
   @Delete(":id/participants")
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(UserJwtAuthGuard)
-  async removeEventParticipant(@Param("id") id: string) {
+  async removeEventParticipant(@Param("id") id: string): Promise<void> {
     return await this.eventService.removeParticipantFromEvent(id);
   }
 

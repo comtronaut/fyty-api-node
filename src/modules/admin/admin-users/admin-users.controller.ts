@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Put, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Put,
+  UseGuards
+} from "@nestjs/common";
 
 import { UpdateUserDto } from "model/dto/user.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
@@ -25,7 +35,8 @@ export class AdminUsersController {
   }
 
   @Delete(":id")
-  async deleteUserByIdAsAdmin(@Param("id") id: string) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteUserByIdAsAdmin(@Param("id") id: string): Promise<void> {
     return await this.userService.deleteById(id);
   }
 }

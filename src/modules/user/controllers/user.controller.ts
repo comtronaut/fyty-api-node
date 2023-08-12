@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -121,6 +123,7 @@ export class UserController {
   }
 
   @Delete("avatars/:id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(UserJwtAuthGuard)
   @ApiNoContentResponse()
   async deleteUserAvatarById(@Param("id") avatarId: string): Promise<void> {

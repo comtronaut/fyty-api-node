@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -54,7 +56,8 @@ export class AdminTrainingsController {
   }
 
   @Delete(":id")
-  async deleteTrainingByIdAsAdmin(@Param("id") id: string) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteTrainingByIdAsAdmin(@Param("id") id: string): Promise<void> {
     return await this.trainingService.deleteById(id);
   }
 }

@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Put,
   Query,
@@ -48,7 +50,8 @@ export class AdminTeamsController {
   }
 
   @Delete(":id")
-  async deleteTeamByIdAsAdmin(@Param("id") id: string) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteTeamByIdAsAdmin(@Param("id") id: string): Promise<void> {
     return await this.adminTeamsService.deleteSoftly(id);
   }
 }

@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Put
+} from "@nestjs/common";
 import { HttpCode, UseGuards } from "@nestjs/common/decorators";
 import { Admin } from "@prisma/client";
 

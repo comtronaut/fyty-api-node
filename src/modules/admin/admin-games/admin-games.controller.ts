@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Param, Post, Put, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  UseGuards
+} from "@nestjs/common";
 
 import { CreateGameDto, UpdateGameDto } from "model/dto/game.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
@@ -20,7 +30,8 @@ export class AdminGamesController {
   }
 
   @Delete(":id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteGameByIdAsAdmin(@Param("id") id: string): Promise<void> {
-    await this.gameService.delete(id);
+    return await this.gameService.delete(id);
   }
 }

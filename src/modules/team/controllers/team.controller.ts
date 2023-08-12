@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -86,8 +88,12 @@ export class TeamController {
   }
 
   @Delete(":id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(UserJwtAuthGuard)
-  async deleteTeamById(@UserSubject() user: User, @Param("id") teamId: string) {
+  async deleteTeamById(
+    @UserSubject() user: User,
+    @Param("id") teamId: string
+  ): Promise<void> {
     return await this.teamService.deleteByUser(user.id, teamId);
   }
 
@@ -227,14 +233,19 @@ export class TeamController {
   }
 
   @Delete("members/:id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(UserJwtAuthGuard)
-  async deleteTeamMemberById(@Param("id") teamMemberId: string, @UserSubject() user: User) {
+  async deleteTeamMemberById(
+    @Param("id") teamMemberId: string,
+    @UserSubject() user: User
+  ): Promise<void> {
     return await this.teamMemberService.kickMember(teamMemberId, user);
   }
 
   @Delete("members/:id/leave")
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(UserJwtAuthGuard)
-  async deleteTeamMemberByIdAsLeaving(@Param("id") teamMemberId: string) {
+  async deleteTeamMemberByIdAsLeaving(@Param("id") teamMemberId: string): Promise<void> {
     return await this.teamMemberService.leaveTeam(teamMemberId);
   }
 
@@ -263,8 +274,9 @@ export class TeamController {
   }
 
   @Delete("pendings/:id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(UserJwtAuthGuard)
-  async deleteTeamPendingById(@Param("id") teamPendingId: string) {
+  async deleteTeamPendingById(@Param("id") teamPendingId: string): Promise<void> {
     return await this.teamPendingService.discard(teamPendingId);
   }
 }
