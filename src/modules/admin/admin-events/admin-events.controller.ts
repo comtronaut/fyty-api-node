@@ -1,7 +1,17 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Put
+} from "@nestjs/common";
 import { HttpCode, Query, UseGuards } from "@nestjs/common/decorators";
 import { CreateEventRoundDto, UpdateEventRoundDto } from "model/dto/event-round.dto";
 
+import { createPagination } from "common/utils/pagination";
 import { CreateEventDto, UpdateEventDto } from "model/dto/event.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { EventService } from "modules/event/event.service";
@@ -22,12 +32,7 @@ export class AdminEventsController {
     @Query("perPage") perPage?: string
   ) {
     return await this.eventService.getEventsFilter({
-      ...([ page, perPage ].every(Boolean) && {
-        pagination: {
-          page: Number(page),
-          perPage: Number(perPage)
-        }
-      }),
+      ...createPagination(page, perPage),
       clause: {
         ...(name && { name })
       }
@@ -36,7 +41,7 @@ export class AdminEventsController {
 
   @Get(":id")
   async getEventByIdAsAdmin(@Param("id") id: string) {
-    return await this.eventService.getEventById(id);
+    return await this.eventService.getEventWithDetailById(id);
   }
 
   @Put(":id")
@@ -45,7 +50,8 @@ export class AdminEventsController {
   }
 
   @Delete(":id")
-  async deleteEventByIdAsAdmin(@Param("id") id: string) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteEventByIdAsAdmin(@Param("id") id: string): Promise<void> {
     return await this.eventService.deleteEventById(id);
   }
 

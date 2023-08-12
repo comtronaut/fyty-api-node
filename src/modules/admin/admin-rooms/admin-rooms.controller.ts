@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Put, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Put,
+  UseGuards
+} from "@nestjs/common";
 
 import { UpdateRoomDto } from "model/dto/room.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
@@ -35,7 +45,8 @@ export class AdminRoomsController {
   }
 
   @Delete(":id")
-  async deleteRoomByIdAsAdmin(@Param("id") id: string) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteRoomByIdAsAdmin(@Param("id") id: string): Promise<void> {
     return await this.roomService.deleteSingle(id, true);
   }
 }

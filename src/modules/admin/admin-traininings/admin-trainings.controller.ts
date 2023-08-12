@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -11,6 +13,7 @@ import {
 } from "@nestjs/common";
 import { TrainingSource } from "@prisma/client";
 
+import { createPagination } from "common/utils/pagination";
 import { CreateTrainingBypassDto, UpdateTrainingDto } from "model/dto/training.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { TrainingService } from "modules/team/services/training.service";
@@ -21,16 +24,12 @@ export class AdminTrainingsController {
   constructor(private readonly trainingService: TrainingService) {}
 
   @Get()
-  async getAllTrainingsAsAdmin(@Query() query: Record<string, string> = {}) {
-    const { page, perPage } = query;
-
+  async getAllTrainingsAsAdmin(
+    @Query("page") page?: string,
+    @Query("perPage") perPage?: string
+  ) {
     return await this.trainingService.getFilter({
-      ...([ page, perPage ].every(Boolean) && {
-        pagination: {
-          page: Number(page),
-          perPage: Number(perPage)
-        }
-      }),
+      ...createPagination(page, perPage),
       clause: {}
     });
   }
@@ -54,7 +53,8 @@ export class AdminTrainingsController {
   }
 
   @Delete(":id")
-  async deleteTrainingByIdAsAdmin(@Param("id") id: string) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteTrainingByIdAsAdmin(@Param("id") id: string): Promise<void> {
     return await this.trainingService.deleteById(id);
   }
 }

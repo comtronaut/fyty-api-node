@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Put,
   Query,
@@ -19,10 +21,17 @@ export class AdminReportsController {
   constructor(private readonly trainingService: TrainingService) {}
 
   @Get()
-  async getAllTrainingReportsAsAdmin(@Query() query: Record<string, string> = {}) {
-    const { q, page, perPage } = query;
-
+  async getAllTrainingReportsAsAdmin(
+    @Query("q") q?: string,
+    @Query("page") page?: string,
+    @Query("perPage") perPage?: string
+  ) {
     return await this.trainingService.getAllReports();
+  }
+
+  @Get(":id")
+  async getTrainingReportByIdAsAdmin(@Param("id") id: string) {
+    return await this.trainingService.getReportById(id);
   }
 
   @Put(":id")
@@ -34,7 +43,8 @@ export class AdminReportsController {
   }
 
   @Delete(":id")
-  async deleteTrainingReportByIdAsAdmin(@Param("id") id: string) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteTrainingReportByIdAsAdmin(@Param("id") id: string): Promise<void> {
     return await this.trainingService.deleteById(id);
   }
 }

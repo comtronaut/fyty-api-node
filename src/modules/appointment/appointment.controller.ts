@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Param, Put, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Put,
+  UseGuards
+} from "@nestjs/common";
 
 import { UpdateAppointmentDto } from "model/dto/appointment.dto";
 import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
@@ -16,7 +25,8 @@ export class AppointmentController {
   }
 
   @Delete(":id")
-  async delete(@Param("id") appiontmentId: string) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(@Param("id") appiontmentId: string): Promise<void> {
     return await this.appointmentService.deleteById(appiontmentId, true);
   }
 }

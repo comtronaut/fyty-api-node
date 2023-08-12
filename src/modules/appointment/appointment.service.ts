@@ -118,7 +118,7 @@ export class AppointmentService {
     };
   }
 
-  async update(id: string, data: UpdateAppointmentDto) {
+  async update(id: string, data: UpdateAppointmentDto): Promise<Appointment> {
     const appointment = await this.prisma.appointment.update({
       where: { id },
       data: {
@@ -139,7 +139,7 @@ export class AppointmentService {
     return appointment;
   }
 
-  async deleteById(id: string, isDeletedBefore = false) {
+  async deleteById(id: string, isDeletedBefore = false): Promise<void> {
     await this.prisma.appointment.update({
       where: { id },
       data: {

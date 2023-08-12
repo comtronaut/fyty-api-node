@@ -98,6 +98,18 @@ enum EventType {
   TOURNAMENT
 }
 
+enum RoundType {
+  FINAL
+  SEMIFINAL
+  QUARTERFINAL
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 // game
 model Game {
   id        String  @id
@@ -125,6 +137,7 @@ model Event {
   description         String
   coverUrl            String
   maxParticipantCount Int?
+  isApprovalRequired  Boolean   @default(false)
   isHidden            Boolean   @default(false)
   signupStartAt       DateTime
   signupEndAt         DateTime
@@ -138,26 +151,33 @@ model Event {
 }
 
 model EventRound {
-  id        String   @id @default(cuid()) @db.Char(25)
-  event     Event    @relation(fields: [eventId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  eventId   String   @db.Char(25)
-  startAt   DateTime
-  endAt     DateTime
-  updatedAt DateTime @updatedAt
+  id          String     @id @default(cuid()) @db.Char(25)
+  event       Event      @relation(fields: [eventId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  eventId     String     @db.Char(25)
+  type        RoundType?
+  name        String     @default("")
+  description String     @default("")
+  startAt     DateTime
+  endAt       DateTime
+  updatedAt   DateTime   @updatedAt
 
-  appointments Appointment[]
+  appointments           Appointment[]
+  eliminatedParticipants EventParticipant[]
 
   @@index([eventId])
 }
 
 model EventParticipant {
-  id        String   @id @default(cuid()) @db.Char(25)
-  event     Event    @relation(fields: [eventId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  eventId   String   @db.Char(25)
-  team      Team     @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  teamId    String   @db.Char(25)
-  updatedAt DateTime @updatedAt
-  joinedAt  DateTime @default(now())
+  id                 String          @id @default(cuid()) @db.Char(25)
+  event              Event           @relation(fields: [eventId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  eventId            String          @db.Char(25)
+  team               Team            @relation(fields: [teamId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  teamId             String          @db.Char(25)
+  eliminationRound   EventRound?     @relation(fields: [eliminationRoundId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  eliminationRoundId String?         @db.Char(25)
+  approvalStatus     ApprovalStatus?
+  updatedAt          DateTime        @updatedAt
+  joinedAt           DateTime        @default(now())
 
   @@unique([eventId, teamId])
   @@index([eventId])

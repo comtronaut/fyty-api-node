@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Put, Query, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Put,
+  Query,
+  UseGuards
+} from "@nestjs/common";
 import { ApiNoContentResponse, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { PendingStatus, User } from "@prisma/client";
 
@@ -56,6 +66,7 @@ export class MeController {
   }
 
   @Delete()
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse()
   async deleteMeInfo(@UserSubject() user: User): Promise<void> {
     return await this.userService.deleteById(user.id);

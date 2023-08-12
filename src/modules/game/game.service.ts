@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { Game } from "@prisma/client";
 
 import { CreateGameDto } from "model/dto/game.dto";
 import { PrismaService } from "prisma/prisma.service";
@@ -7,15 +8,15 @@ import { PrismaService } from "prisma/prisma.service";
 export class GameService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAll() {
+  async getAll(): Promise<Game[]> {
     return await this.prisma.game.findMany();
   }
 
-  async create(data: CreateGameDto) {
+  async create(data: CreateGameDto): Promise<Game> {
     return await this.prisma.game.create({ data });
   }
 
-  async update(gameId: string, data: object) {
+  async update(gameId: string, data: object): Promise<Game> {
     return await this.prisma.game.update({
       where: {
         id: gameId
@@ -24,7 +25,7 @@ export class GameService {
     });
   }
 
-  async delete(gameId: string) {
-    return await this.prisma.game.delete({ where: { id: gameId } });
+  async delete(gameId: string): Promise<void> {
+    await this.prisma.game.delete({ where: { id: gameId } });
   }
 }

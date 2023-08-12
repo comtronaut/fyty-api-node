@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -81,8 +83,9 @@ export class RoomController {
   }
 
   @Delete("disband")
-  async deleteRoom(@Body() payload: DeleteRoomDto) {
-    return await this.roomService.disband(payload);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteRoom(@Body() payload: DeleteRoomDto): Promise<void> {
+    await this.roomService.disband(payload);
   }
 
   // settings
@@ -123,7 +126,11 @@ export class RoomController {
   }
 
   @Delete("pendings/:id")
-  async deleteRoomPendingById(@Param("id") pendingId: string, @UserSubject() user: User) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteRoomPendingById(
+    @Param("id") pendingId: string,
+    @UserSubject() user: User
+  ): Promise<void> {
     return await this.roomPendingService.deleteById(pendingId, user.id);
   }
 }

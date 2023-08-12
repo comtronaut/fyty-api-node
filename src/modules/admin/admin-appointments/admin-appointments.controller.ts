@@ -1,10 +1,19 @@
-import { Body, Controller, Delete, Get, Param, Put, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Put,
+  UseGuards
+} from "@nestjs/common";
 
 import { UpdateAppointmentDto } from "model/dto/appointment.dto";
 import { AppointmentService } from "modules/appointment/appointment.service";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 
-// FIXME: expose this controller and module
 @Controller("admin/appointments")
 @UseGuards(AdminJwtAuthGuard)
 export class AdminAppointmentsController {
@@ -34,7 +43,8 @@ export class AdminAppointmentsController {
   }
 
   @Delete(":id")
-  async deleteAppointmentByIdAsAdmin(@Param("id") id: string) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteAppointmentByIdAsAdmin(@Param("id") id: string): Promise<void> {
     return await this.appointmentService.deleteById(id, true);
   }
 }

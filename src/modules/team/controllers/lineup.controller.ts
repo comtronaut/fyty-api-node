@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -52,7 +54,11 @@ export class LineupController {
   }
 
   @Delete(":id")
-  async deleteTeamLineupById(@UserSubject() user: User, @Param("id") lineupId: string) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteTeamLineupById(
+    @UserSubject() user: User,
+    @Param("id") lineupId: string
+  ): Promise<void> {
     return await this.lineupService.deleteById(user.id, lineupId);
   }
 }

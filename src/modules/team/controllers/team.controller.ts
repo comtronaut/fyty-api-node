@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -14,6 +16,7 @@ import { isEmpty } from "lodash";
 
 import { AppointmentService } from "../../appointment/appointment.service";
 import { UserSubject } from "common/subject.decorator";
+import { createPagination } from "common/utils/pagination";
 import { CreateTeamMemberDto, UpdateTeamMemberDto } from "model/dto/team-member.dto";
 import { CreateTeamPendingDto, UpdateTeamPendingDto } from "model/dto/team-pending.dto";
 import { UpdateTeamSettingsDto } from "model/dto/team-settings.dto";
@@ -62,12 +65,7 @@ export class TeamController {
     };
 
     return await this.teamService.getFilter({
-      ...([ perPage, page ].every(Boolean) && {
-        pagination: {
-          page: Number(page),
-          perPage: Number(perPage)
-        }
-      }),
+      ...createPagination(page, perPage),
       ...(!isEmpty(clause) && {
         clause
       })
@@ -86,8 +84,12 @@ export class TeamController {
   }
 
   @Delete(":id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(UserJwtAuthGuard)
-  async deleteTeamById(@UserSubject() user: User, @Param("id") teamId: string) {
+  async deleteTeamById(
+    @UserSubject() user: User,
+    @Param("id") teamId: string
+  ): Promise<void> {
     return await this.teamService.deleteByUser(user.id, teamId);
   }
 
@@ -131,11 +133,10 @@ export class TeamController {
     @Query("perPage") perPage?: string,
     @Query("page") page?: string
   ) {
-    return [ perPage, page ].every(Boolean)
-      ? await this.trainingService.getByTeamId(teamId, {
-        page: Number(page),
-        perPage: Number(perPage)
-      })
+    const { pagination } = createPagination(page, perPage);
+
+    return pagination
+      ? await this.trainingService.getByTeamId(teamId, pagination)
       : await this.trainingService.getByTeamId(teamId);
   }
 
@@ -227,14 +228,19 @@ export class TeamController {
   }
 
   @Delete("members/:id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(UserJwtAuthGuard)
-  async deleteTeamMemberById(@Param("id") teamMemberId: string, @UserSubject() user: User) {
+  async deleteTeamMemberById(
+    @Param("id") teamMemberId: string,
+    @UserSubject() user: User
+  ): Promise<void> {
     return await this.teamMemberService.kickMember(teamMemberId, user);
   }
 
   @Delete("members/:id/leave")
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(UserJwtAuthGuard)
-  async deleteTeamMemberByIdAsLeaving(@Param("id") teamMemberId: string) {
+  async deleteTeamMemberByIdAsLeaving(@Param("id") teamMemberId: string): Promise<void> {
     return await this.teamMemberService.leaveTeam(teamMemberId);
   }
 
@@ -263,8 +269,9 @@ export class TeamController {
   }
 
   @Delete("pendings/:id")
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(UserJwtAuthGuard)
-  async deleteTeamPendingById(@Param("id") teamPendingId: string) {
+  async deleteTeamPendingById(@Param("id") teamPendingId: string): Promise<void> {
     return await this.teamPendingService.discard(teamPendingId);
   }
 }
