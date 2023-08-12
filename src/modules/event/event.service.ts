@@ -3,6 +3,8 @@ import { Event, EventParticipant, Room } from "@prisma/client";
 import { compact } from "lodash";
 
 import { paginate } from "common/utils/pagination";
+import { CreateEventParticipantDto, UpdateEventParticipantDto } from "model/dto/event-participant.dto";
+import { CreateEventRoundDto, UpdateEventRoundDto } from "model/dto/event-round.dto";
 import {
   CreateEventDto,
   EventDetailResponseDto,
@@ -10,9 +12,6 @@ import {
 } from "model/dto/event.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
-import { CreateEventParticipantDto, UpdateEventParticipantDto } from "model/dto/event-participant.dto";
-import { CreateEventRoundDto, UpdateEventRoundDto } from "model/dto/event-round.dto";
-import { Http2ServerResponse } from "http2";
 
 @Injectable()
 export class EventService {
@@ -28,12 +27,18 @@ export class EventService {
     });
   }
 
-  async getEventWithDetailById(id: string): Promise<EventDetailResponseDto> {
+  async getEventWithDetailById(id: string, isTeamIncluded?: boolean): Promise<EventDetailResponseDto> {
     return await this.prisma.event.findUniqueOrThrow({
       where: { id },
       include: {
         rounds: true,
-        participants: true
+        ...(isTeamIncluded ? {
+          participants: {
+            include: { team: true }
+          }
+        } : {
+          participants: true
+        })
       }
     });
   }
@@ -164,7 +169,8 @@ export class EventService {
   async updateEventParticipant(id: string, data: UpdateEventParticipantDto): Promise<EventParticipant> {
     return await this.prisma.eventParticipant.update({
       where: { id },
-    }
+      data
+    });
   }
                                                      
   // Event Round CRUD
@@ -177,6 +183,8 @@ export class EventService {
 
   async addParticipantToEventByAdmin(data: CreateEventParticipantDto): Promise<EventParticipant> {
     return await this.prisma.eventParticipant.create({
+      data
+    });
   }
 
   async updateEventRoundById(id: string, data: UpdateEventRoundDto) {
@@ -186,8 +194,8 @@ export class EventService {
     });
   }
 
-  async deleteEventRoundById(id: string) {
-    return await this.prisma.eventRound.delete({
+  async deleteEventRoundById(id: string): Promise<void> {
+    await this.prisma.eventRound.delete({
       where: { id }
     });
   }

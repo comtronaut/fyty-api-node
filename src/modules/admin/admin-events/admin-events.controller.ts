@@ -9,10 +9,10 @@ import {
   Put
 } from "@nestjs/common";
 import { HttpCode, Query, UseGuards } from "@nestjs/common/decorators";
-import { CreateEventParticipantDto, UpdateEventParticipantDto } from "model/dto/event-participant.dto";
-import { CreateEventRoundDto, UpdateEventRoundDto } from "model/dto/event-round.dto";
 
 import { createPagination } from "common/utils/pagination";
+import { CreateEventParticipantDto, UpdateEventParticipantDto } from "model/dto/event-participant.dto";
+import { CreateEventRoundDto, UpdateEventRoundDto } from "model/dto/event-round.dto";
 import { CreateEventDto, UpdateEventDto } from "model/dto/event.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { EventService } from "modules/event/event.service";
@@ -42,7 +42,7 @@ export class AdminEventsController {
 
   @Get(":id")
   async getEventByIdAsAdmin(@Param("id") id: string) {
-    return await this.eventService.getEventWithDetailById(id);
+    return await this.eventService.getEventWithDetailById(id, true);
   }
 
   @Put(":id")
@@ -56,19 +56,19 @@ export class AdminEventsController {
     return await this.eventService.deleteEventById(id);
   }
 
-// Event Parti CRUD
+  // Event Parti CRUD
 
-  @Post("/participants")
-  async addEventParticipantAsAdmin(@Body() payload: CreateEventParticipantDto) {
+  @Post("participants")
+  async createEventParticipantAsAdmin(@Body() payload: CreateEventParticipantDto) {
     return await this.eventService.addParticipantToEventByAdmin(payload);
   }
 
-  @Put("/participants/:id")
+  @Put("participants/:id")
   async updateEventParticipantByIdAsAdmin(@Param("id") id: string, @Body() payload: UpdateEventParticipantDto) {
     return await this.eventService.updateEventParticipant(id, payload);
   }
 
-  @Delete("/participants/:id")
+  @Delete("participants/:id")
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteEventParticipantByIdAsAdmin(@Param("id") id: string): Promise<void> {
     return await this.eventService.removeParticipantFromEvent(id);
@@ -76,19 +76,19 @@ export class AdminEventsController {
   
   // EventRound
 
-  @Post("/rounds")
-  async addEventRoundAsAdmin(@Body() payload: CreateEventRoundDto) {
+  @Post("rounds")
+  async createEventRoundAsAdmin(@Body() payload: CreateEventRoundDto) {
     return await this.eventService.addEventRound(payload);
   }
 
-  @Put("/rounds/:id")
+  @Put("rounds/:id")
   async updateEventRoundByIdAsAdmin(@Param("id") id: string, @Body() payload: UpdateEventRoundDto) {
     return await this.eventService.updateEventRoundById(id, payload);
   }
 
-  @Delete("/rounds/:id")
+  @Delete("rounds/:id")
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteEventRoundByIdAsAdmin(@Param("id") id: string) {
+  async deleteEventRoundByIdAsAdmin(@Param("id") id: string): Promise<void> {
     return await this.eventService.deleteEventRoundById(id);
   }
 }
