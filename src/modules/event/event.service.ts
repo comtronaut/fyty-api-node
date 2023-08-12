@@ -10,6 +10,7 @@ import {
 } from "model/dto/event.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
+import { CreateEventParticipantDto, UpdateEventParticipantDto } from "model/dto/event-participant.dto";
 import { CreateEventRoundDto, UpdateEventRoundDto } from "model/dto/event-round.dto";
 import { Http2ServerResponse } from "http2";
 
@@ -158,12 +159,24 @@ export class EventService {
     });
   }
 
+  // Event Parti by admin
+
+  async updateEventParticipant(id: string, data: UpdateEventParticipantDto): Promise<EventParticipant> {
+    return await this.prisma.eventParticipant.update({
+      where: { id },
+    }
+  }
+                                                     
   // Event Round CRUD
 
   async addEventRound(data: CreateEventRoundDto) {
     return await this.prisma.eventRound.create({
       data
     });
+  }
+
+  async addParticipantToEventByAdmin(data: CreateEventParticipantDto): Promise<EventParticipant> {
+    return await this.prisma.eventParticipant.create({
   }
 
   async updateEventRoundById(id: string, data: UpdateEventRoundDto) {
@@ -178,5 +191,4 @@ export class EventService {
       where: { id }
     });
   }
-
 }
