@@ -59,10 +59,11 @@ export class AdminEventsController {
   // Event Parti CRUD
 
   @Put(":id/participants/approval")
+  @HttpCode(HttpStatus.NO_CONTENT)
   async putEventParticipantsApprovalAsAdmin(
     @Param("id") id: string,
     @Body() payload: EventParticipantApprovalPayloadDto
-  ) {
+  ): Promise<void> {
     return await this.eventService.approveParticipants(id, payload);
   }
 
