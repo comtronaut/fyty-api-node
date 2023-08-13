@@ -35,7 +35,7 @@ export class EventController {
     return await this.eventService.getEventWithDetailById(id);
   }
 
-  @Post(":id/participants")
+  @Post("participants/:id")
   @UseGuards(UserJwtAuthGuard)
   async joinEventParticipant(
     @Param("id") id: string,
@@ -44,7 +44,7 @@ export class EventController {
     return await this.eventService.joinParticipantIntoEvent(id, payload.teamId);
   }
 
-  @Delete(":id/participants")
+  @Delete("participants/:id")
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(UserJwtAuthGuard)
   async removeEventParticipant(@Param("id") id: string): Promise<void> {
