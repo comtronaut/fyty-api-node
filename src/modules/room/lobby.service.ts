@@ -23,7 +23,8 @@ export class LobbyService {
 
     const [ rooms, memberRes ] = await Promise.all([
       this.prisma.room.findMany({
-        where: { gameId, startAt: { gte: start, lte: end } }
+        where: { gameId, startAt: { gte: start, lte: end } },
+        include: { appointment: true }
       }),
       this.prisma.teamMember.findMany({
         where: { userId: user.id, team: { gameId } },

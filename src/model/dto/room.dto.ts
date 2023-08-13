@@ -3,6 +3,7 @@ import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
 import {
+  AppointmentSchema,
   RoomOptionalDefaultsSchema,
   RoomPartialSchema,
   RoomPendingSchema,
@@ -29,7 +30,7 @@ export class DeleteRoomDto extends createZodDto(
 
 export class LobbyDetailResponseDto extends createZodDto(
   z.object({
-    rooms: RoomSchema.array(),
+    rooms: RoomSchema.extend({ appointment: AppointmentSchema }).array(),
     userGameTeams: TeamSchema.array(),
     hostedRoomIds: z.string().cuid().array(),
     joinedRoomIds: z.string().cuid().array(),

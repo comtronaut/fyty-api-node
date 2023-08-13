@@ -13,7 +13,7 @@ import { HttpCode, Query, UseGuards } from "@nestjs/common/decorators";
 import { createPagination } from "common/utils/pagination";
 import { CreateEventParticipantDto, EventParticipantApprovalPayloadDto, UpdateEventParticipantDto } from "model/dto/event-participant.dto";
 import { CreateEventRoundDto, UpdateEventRoundDto } from "model/dto/event-round.dto";
-import { CreateEventDto, UpdateEventDto } from "model/dto/event.dto";
+import { CreateEventAppointmentsDto, CreateEventDto, UpdateEventDto } from "model/dto/event.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { EventService } from "modules/event/event.service";
 
@@ -56,7 +56,7 @@ export class AdminEventsController {
     return await this.eventService.deleteEventById(id);
   }
 
-  // Event Parti CRUD
+  // participants
 
   @Put(":id/participants/approval")
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -83,7 +83,7 @@ export class AdminEventsController {
     return await this.eventService.removeParticipantFromEvent(id);
   }
   
-  // EventRound
+  // rounds
 
   @Post("rounds")
   async createEventRoundAsAdmin(@Body() payload: CreateEventRoundDto) {
@@ -99,5 +99,23 @@ export class AdminEventsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteEventRoundByIdAsAdmin(@Param("id") id: string): Promise<void> {
     return await this.eventService.deleteEventRoundById(id);
+  }
+
+  // appointments
+
+  @Get(":id/appointments")
+  async getEventAppointmentsAsAdmin(
+    @Param("id") id: string,
+    @Query("round") round?: string
+  ) {
+    return await this.eventService.getEventRooms(id, round);
+  }
+
+  @Post(":id/appointments")
+  async createEventAppointmentsAsAdmin(
+    @Param("id") id: string,
+    @Body() payload: CreateEventAppointmentsDto
+  ) {
+    return await this.eventService.createEventAppointments(id, payload);
   }
 }

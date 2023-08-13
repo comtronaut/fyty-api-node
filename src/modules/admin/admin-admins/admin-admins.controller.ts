@@ -34,7 +34,8 @@ export class AdminAdminsController {
 
   @Get("me")
   async getMeAdminInfo(@UserSubject() user: Admin) {
-    return user;
+    const { password, ...data } = user;
+    return data;
   }
 
   @Get(":id")

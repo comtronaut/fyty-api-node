@@ -1,15 +1,17 @@
 import { ConflictException, Injectable } from "@nestjs/common";
-import { Event, EventParticipant, Room } from "@prisma/client";
+import { Appointment, Event, EventParticipant, Room, User } from "@prisma/client";
 import { compact } from "lodash";
 
 import { paginate } from "common/utils/pagination";
 import { CreateEventParticipantDto, EventParticipantApprovalPayloadDto, UpdateEventParticipantDto } from "model/dto/event-participant.dto";
 import { CreateEventRoundDto, UpdateEventRoundDto } from "model/dto/event-round.dto";
 import {
+  CreateEventAppointmentsDto,
   CreateEventDto,
   EventDetailResponseDto,
   UpdateEventDto
 } from "model/dto/event.dto";
+import { LobbyDetailResponseDto } from "model/dto/room.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
 
@@ -152,7 +154,7 @@ export class EventService {
     });
   }
 
-  async getEventRooms(id: string, roundId?: string): Promise<Room[]> {
+  async getEventRooms(id: string, roundId?: string, user?: User): Promise<LobbyDetailResponseDto> {
     const queryResult = await this.prisma.eventRound.findMany({
       where: {
         ...(roundId && { id: roundId }),
@@ -161,13 +163,41 @@ export class EventService {
       select: {
         appointments: {
           select: {
-            room: true
+            room: {
+              select: { id: true }
+            }
           }
         }
       }
     });
 
-    return compact(queryResult.flatMap((e) => e.appointments.map((e) => e.room)));
+    const roomIds = queryResult.flatMap((e) => e.appointments.flatMap((e) => e.room ? [ e.room.id ] : []));
+
+    const rooms = await this.prisma.room.findMany({
+      where: { id: { in: roomIds } },
+      include: { appointment: true }
+    });
+
+    if (!user) {
+      return {
+        rooms,
+        userGameTeams: [],
+        hostedRoomIds: [],
+        joinedRoomIds: [],
+        pendingRoomIds: [],
+        roomPendings: []
+      };
+    }
+
+    // FIXME: add more condition here
+    return {
+      rooms,
+      userGameTeams: [],
+      hostedRoomIds: [],
+      joinedRoomIds: [],
+      pendingRoomIds: [],
+      roomPendings: []
+    };
   }
 
   async deleteEventById(id: string): Promise<void> {
@@ -176,7 +206,7 @@ export class EventService {
     });
   }
 
-  // Event Parti by admin
+  // partitipants
   
   async approveParticipants(eventId: string, payload: EventParticipantApprovalPayloadDto): Promise<void> {
     const event = await this.prisma.event.findUniqueOrThrow({
@@ -225,7 +255,7 @@ export class EventService {
     });
   }
                                                      
-  // Event Round CRUD
+  // rounds
 
   async addEventRound(data: CreateEventRoundDto) {
     return await this.prisma.eventRound.create({
@@ -250,5 +280,67 @@ export class EventService {
     await this.prisma.eventRound.delete({
       where: { id }
     });
+  }
+
+  // appointments
+  
+  async createEventAppointments(eventId: string, payload: CreateEventAppointmentsDto): Promise<Appointment[]> {
+    const event = await this.prisma.event.findUniqueOrThrow({
+      where: { id: eventId },
+      select: { gameId: true }
+    });
+
+    const appointments = await Promise.all(
+      payload.matches.map((match) => (
+        this.prisma.appointment.create({
+          data: {
+            startAt: payload.startAt,
+            endAt: payload.endAt,
+            eventRoundId: payload.roundId,
+            members: {
+              createMany: {
+                data: [
+                  {
+                    teamId: match.hostTeamId
+                  },
+                  {
+                    teamId: match.guestTeamId
+                  }
+                ]
+              }
+            },
+            room: {
+              create: {
+                name: match.roomName,
+                hostTeamId: match.hostTeamId,
+                gameId: event.gameId,
+                startAt: payload.startAt,
+                endAt: payload.endAt,
+                members: {
+                  createMany: {
+                    data: [
+                      {
+                        teamId: match.hostTeamId
+                      },
+                      {
+                        teamId: match.guestTeamId
+                      }
+                    ]
+                  }
+                },
+                settings: {
+                  create: {}
+                },
+                chat: {
+                  create: {}
+                }
+              }
+            }
+          }
+        })
+      ))
+    );
+
+    return appointments;
   }
 }
