@@ -6,11 +6,12 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Post,
   Put,
   UseGuards
 } from "@nestjs/common";
 
-import { UpdateUserDto } from "model/dto/user.dto";
+import { CreateUserDto, UpdateUserDto } from "model/dto/user.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { UserService } from "modules/user/services/user.service";
 
@@ -18,6 +19,11 @@ import { UserService } from "modules/user/services/user.service";
 @UseGuards(AdminJwtAuthGuard)
 export class AdminUsersController {
   constructor(private readonly userService: UserService) {}
+
+  @Post()
+  async createUserAsAdmin(@Body() payload: CreateUserDto) {
+    return await this.userService.create(payload);
+  }
 
   @Get()
   async getAllUsersAsAdmin() {

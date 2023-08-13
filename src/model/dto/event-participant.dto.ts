@@ -17,10 +17,7 @@ export class UpdateEventParticipantDto extends createZodDto(
 ) {}
 
 export class EventParticipantApprovalPayloadDto extends createZodDto(
-  EventParticipantSchema
-    .pick({ approvalStatus: true })
-    .required()
-    .extend({
-      participantIds: z.string().cuid().array()
-    })
+  EventParticipantSchema.pick({ approvalStatus: true }).required().extend({
+    participantIds: z.string().cuid().array()
+  })
 ) {}

@@ -38,6 +38,11 @@ export class AdminAdminsController {
     return data;
   }
 
+  @Get("me/detail")
+  async getMeAdminDetail(@UserSubject() user: Admin) {
+    return await this.adminService.getAdminDetailById(user.id);
+  }
+
   @Get(":id")
   async getAdminByIdAsAdmin(@Param("id") id: string) {
     return await this.adminService.getAdminById(id);

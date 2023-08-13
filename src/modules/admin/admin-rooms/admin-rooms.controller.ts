@@ -12,12 +12,16 @@ import {
 
 import { UpdateRoomDto } from "model/dto/room.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
+import { ChatService } from "modules/chat/chat.service";
 import { RoomService } from "modules/room/room.service";
 
 @Controller("admin/rooms")
 @UseGuards(AdminJwtAuthGuard)
 export class AdminRoomsController {
-  constructor(private readonly roomService: RoomService) {}
+  constructor(
+    private readonly roomService: RoomService,
+    private readonly chatService: ChatService
+  ) {}
 
   @Get()
   async getAllRoomsAsAdmin() {
@@ -27,6 +31,11 @@ export class AdminRoomsController {
   @Get(":id")
   async getRoomByIdAsAdmin(@Param("id") id: string) {
     return await this.roomService.getById(id);
+  }
+
+  @Get(":id/chat")
+  async getRoomChatDetailByRoomIdAsAdmin(@Param("id") id: string) {
+    return await this.chatService.getChatDetailByRoomId(id);
   }
 
   @Get(":id/participants")

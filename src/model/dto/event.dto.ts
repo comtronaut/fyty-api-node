@@ -24,19 +24,18 @@ export class EventDetailResponseDto extends createZodDto(
   })
 ) {}
 
-export class CreateEventAppointmentsDto
-  extends createZodDto(
-    AppointmentSchema
-      .pick({
-        startAt: true,
-        endAt: true
+export class CreateEventAppointmentsDto extends createZodDto(
+  AppointmentSchema.pick({
+    startAt: true,
+    endAt: true
+  }).extend({
+    roundId: z.string().cuid().optional(),
+    matches: z
+      .object({
+        hostTeamId: z.string().cuid(),
+        guestTeamId: z.string().cuid(),
+        roomName: z.string()
       })
-      .extend({
-        roundId: z.string().cuid().optional(),
-        matches: z.object({
-          hostTeamId: z.string().cuid(),
-          guestTeamId: z.string().cuid(),
-          roomName: z.string()
-        }).array()
-      })
-  ) {}
+      .array()
+  })
+) {}

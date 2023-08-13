@@ -1,7 +1,13 @@
 import { Prisma } from "@prisma/client";
 import { createZodDto } from "nestjs-zod";
+import { z } from "zod";
 
-import { AdminOptionalDefaultsSchema, AdminPartialSchema, AdminSchema } from "model/schema";
+import {
+  AdminOptionalDefaultsSchema,
+  AdminPartialSchema,
+  AdminSchema,
+  UserSchema
+} from "model/schema";
 
 export class CreateAdminDto
   extends createZodDto(AdminOptionalDefaultsSchema)
@@ -16,3 +22,10 @@ export class SecureAdminDto
     })
   )
   implements Omit<Prisma.AdminUncheckedCreateInput, "password"> {}
+
+export class AdminDetailResponseDto extends createZodDto(
+  z.object({
+    info: AdminSchema.omit({ password: true }),
+    designatedUser: UserSchema.omit({ password: true }).nullable()
+  })
+) {}

@@ -3,7 +3,11 @@ import { Appointment, Event, EventParticipant, Room, User } from "@prisma/client
 import { compact } from "lodash";
 
 import { paginate } from "common/utils/pagination";
-import { CreateEventParticipantDto, EventParticipantApprovalPayloadDto, UpdateEventParticipantDto } from "model/dto/event-participant.dto";
+import {
+  CreateEventParticipantDto,
+  EventParticipantApprovalPayloadDto,
+  UpdateEventParticipantDto
+} from "model/dto/event-participant.dto";
 import { CreateEventRoundDto, UpdateEventRoundDto } from "model/dto/event-round.dto";
 import {
   CreateEventAppointmentsDto,
@@ -29,18 +33,23 @@ export class EventService {
     });
   }
 
-  async getEventWithDetailById(id: string, isTeamIncluded?: boolean): Promise<EventDetailResponseDto> {
+  async getEventWithDetailById(
+    id: string,
+    isTeamIncluded?: boolean
+  ): Promise<EventDetailResponseDto> {
     return await this.prisma.event.findUniqueOrThrow({
       where: { id },
       include: {
         rounds: true,
-        ...(isTeamIncluded ? {
-          participants: {
-            include: { team: true }
+        ...(isTeamIncluded
+          ? {
+            participants: {
+              include: { team: true }
+            }
           }
-        } : {
-          participants: true
-        })
+          : {
+            participants: true
+          })
       }
     });
   }
@@ -154,7 +163,11 @@ export class EventService {
     });
   }
 
-  async getEventRooms(id: string, roundId?: string, user?: User): Promise<LobbyDetailResponseDto> {
+  async getEventRooms(
+    id: string,
+    roundId?: string,
+    user?: User
+  ): Promise<LobbyDetailResponseDto> {
     const queryResult = await this.prisma.eventRound.findMany({
       where: {
         ...(roundId && { id: roundId }),
@@ -171,7 +184,9 @@ export class EventService {
       }
     });
 
-    const roomIds = queryResult.flatMap((e) => e.appointments.flatMap((e) => e.room ? [ e.room.id ] : []));
+    const roomIds = queryResult.flatMap((e) =>
+      e.appointments.flatMap((e) => (e.room ? [ e.room.id ] : []))
+    );
 
     const rooms = await this.prisma.room.findMany({
       where: { id: { in: roomIds } },
@@ -207,8 +222,11 @@ export class EventService {
   }
 
   // partitipants
-  
-  async approveParticipants(eventId: string, payload: EventParticipantApprovalPayloadDto): Promise<void> {
+
+  async approveParticipants(
+    eventId: string,
+    payload: EventParticipantApprovalPayloadDto
+  ): Promise<void> {
     const event = await this.prisma.event.findUniqueOrThrow({
       where: { id: eventId },
       select: {
@@ -228,7 +246,9 @@ export class EventService {
       && event.maxParticipantCount
       && currentParticipantCount + payload.participantIds.length > event.maxParticipantCount
     ) {
-      throw new ConflictException("the number of to-be approved participants exceed 'maxParticipantCount'");
+      throw new ConflictException(
+        "the number of to-be approved participants exceed 'maxParticipantCount'"
+      );
     }
 
     await this.prisma.eventParticipant.updateMany({
@@ -237,7 +257,10 @@ export class EventService {
     });
   }
 
-  async updateEventParticipant(id: string, data: UpdateEventParticipantDto): Promise<EventParticipant> {
+  async updateEventParticipant(
+    id: string,
+    data: UpdateEventParticipantDto
+  ): Promise<EventParticipant> {
     const { approvalStatus, ...payload } = data;
 
     if (approvalStatus) {
@@ -254,7 +277,7 @@ export class EventService {
       data: payload
     });
   }
-                                                     
+
   // rounds
 
   async addEventRound(data: CreateEventRoundDto) {
@@ -263,7 +286,9 @@ export class EventService {
     });
   }
 
-  async addParticipantToEventByAdmin(data: CreateEventParticipantDto): Promise<EventParticipant> {
+  async addParticipantToEventByAdmin(
+    data: CreateEventParticipantDto
+  ): Promise<EventParticipant> {
     return await this.prisma.eventParticipant.create({
       data
     });
@@ -283,15 +308,18 @@ export class EventService {
   }
 
   // appointments
-  
-  async createEventAppointments(eventId: string, payload: CreateEventAppointmentsDto): Promise<Appointment[]> {
+
+  async createEventAppointments(
+    eventId: string,
+    payload: CreateEventAppointmentsDto
+  ): Promise<Appointment[]> {
     const event = await this.prisma.event.findUniqueOrThrow({
       where: { id: eventId },
       select: { gameId: true }
     });
 
     const appointments = await Promise.all(
-      payload.matches.map((match) => (
+      payload.matches.map((match) =>
         this.prisma.appointment.create({
           data: {
             startAt: payload.startAt,
@@ -338,7 +366,7 @@ export class EventService {
             }
           }
         })
-      ))
+      )
     );
 
     return appointments;

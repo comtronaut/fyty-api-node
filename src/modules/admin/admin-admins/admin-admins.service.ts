@@ -1,7 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 
-import { CreateAdminDto, SecureAdminDto, UpdateAdminDto } from "model/dto/admin.dto";
+import {
+  AdminDetailResponseDto,
+  CreateAdminDto,
+  SecureAdminDto,
+  UpdateAdminDto
+} from "model/dto/admin.dto";
 import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
@@ -33,6 +38,29 @@ export class AdminAdminsService {
     });
 
     return data;
+  }
+
+  async getAdminDetailById(adminId: string): Promise<AdminDetailResponseDto> {
+    const { password, designatedUser, ...adminData }
+      = await this.prisma.admin.findUniqueOrThrow({
+        where: { id: adminId },
+        include: {
+          designatedUser: true
+        }
+      });
+
+    if (designatedUser) {
+      const { password, ...userData } = designatedUser;
+      return {
+        info: adminData,
+        designatedUser: userData
+      };
+    }
+
+    return {
+      info: adminData,
+      designatedUser: null
+    };
   }
 
   async updateAdminData(adminId: string, payload: UpdateAdminDto): Promise<SecureAdminDto> {
