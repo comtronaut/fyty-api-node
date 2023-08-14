@@ -35,7 +35,7 @@ export class EventController {
     return await this.eventService.getEventWithDetailById(id);
   }
 
-  @Post("participants/:id")
+  @Post(":id/participants")
   @UseGuards(UserJwtAuthGuard)
   async joinEventParticipant(
     @Param("id") id: string,
