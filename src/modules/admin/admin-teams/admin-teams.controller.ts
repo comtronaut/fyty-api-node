@@ -24,13 +24,17 @@ export class AdminTeamsController {
   @Get()
   async getAllTeamsAsAdmin(
     @Query("q") q?: string,
+    @Query("gameId") gameId?: string,
     @Query("page") page?: string,
     @Query("perPage") perPage?: string
   ) {
     return await this.adminTeamsService.getFilter({
       ...createPagination(page, perPage),
       clause: {
-        ...(q && { name: q })
+        ...(q && {
+          name: q,
+          gameId
+        })
       }
     });
   }
