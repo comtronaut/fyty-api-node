@@ -74,20 +74,18 @@ export class RoomService {
     roomId: string,
     teamIds: string[]
   ): Promise<void> {
-    const teams = await this.prisma.team.findMany({
+    const teamMembers = await this.prisma.teamMember.findMany({
       where: {
-        id: { in: teamIds }
+        team: {
+          id: { in: teamIds }
+        }
       },
       select: {
-        members: {
-          select: {
-            userId: true
-          }
-        }
+        userId: true
       }
     });
 
-    const userIds = teams.flatMap((e) => e.members.map((e) => e.userId));
+    const userIds = teamMembers.map((e) => e.userId);
 
     await this.prisma.notifUserRoomRegistration.createMany({
       data: userIds.map((userId) => ({
@@ -121,26 +119,17 @@ export class RoomService {
   }
 
   async getRoomMembersByRoomId(roomId: string): Promise<RoomMember[]> {
-    const { members } = await this.prisma.room.findFirstOrThrow({
-      where: { id: roomId },
-      select: { members: true }
+    return await this.prisma.roomMember.findMany({
+      where: { roomId }
     });
-    return members;
   }
 
   async getRoomLineupsByRoomId(roomId: string): Promise<RoomLineup[]> {
-    const { members } = await this.prisma.room.findFirstOrThrow({
-      where: { id: roomId },
-      select: {
-        members: {
-          select: {
-            lineups: true
-          }
-        }
+    return await this.prisma.roomLineup.findMany({
+      where: {
+        roomMember: { roomId }
       }
     });
-
-    return members.flatMap((m) => m.lineups);
   }
 
   async getById(roomId: string): Promise<Room> {
@@ -151,24 +140,34 @@ export class RoomService {
     teamId: string,
     cluase: Partial<{ isJoined: boolean; isPending: boolean; isHosted: boolean }>
   ): Promise<Partial<{ joined: Room[]; requested: Room[]; hosted: Room[] }>> {
-    const [ participants, request, hosted ] = await Promise.all([
+    const [ joined, requested, hosted ] = await Promise.all([
       cluase.isJoined
-        ? this.prisma.roomMember.findMany({
-          where: { teamId },
-          select: { room: true }
+        ? this.prisma.room.findMany({
+          where: {
+            members: { some: { teamId } }
+          }
         })
         : [],
       cluase.isPending
-        ? this.prisma.roomPending.findMany({
-          where: { teamId, status: PendingStatus.INCOMING },
-          select: { room: true }
+        ? this.prisma.room.findMany({
+          where: {
+            pendings: {
+              some: {
+                teamId,
+                status: PendingStatus.INCOMING
+              }
+            }
+          }
         })
         : [],
-      cluase.isHosted ? this.prisma.room.findMany({ where: { hostTeamId: teamId } }) : []
+      cluase.isHosted
+        ? this.prisma.room.findMany({
+          where: {
+            hostTeamId: teamId
+          }
+        })
+        : []
     ]);
-
-    const joined = participants.map((e) => e.room);
-    const requested = request.map((e) => e.room);
 
     return {
       ...(cluase.isJoined && { joined }),
@@ -262,10 +261,9 @@ export class RoomService {
       }
 
       // delete images
-      const imageIds
-        = room.chat?.messages
-          .flatMap((e) => e.imageUrls)
-          .map((e) => this.imageService.extractCuidFromUrl(e)) ?? [];
+      const imageIds = room.chat?.messages
+        .flatMap((e) => e.imageUrls)
+        .map((e) => this.imageService.extractCuidFromUrl(e)) ?? [];
 
       await this.imageService.deleteImageByIds(compact(imageIds));
 
@@ -510,14 +508,19 @@ export class RoomService {
   }
 
   async getRoomDetail(roomId: string) {
-    const [ room, participants ] = await Promise.all([
-      this.prisma.room.findUniqueOrThrow({ where: { id: roomId } }),
-      this.prisma.roomMember.findMany({ where: { roomId } })
-    ]);
-
-    const teams = await this.prisma.team.findMany({
-      where: { id: { in: participants.map((e) => e.teamId) } }
+    const { members: rawMembers, ...room } = await this.prisma.room.findUniqueOrThrow({
+      where: { id: roomId },
+      include: {
+        members: {
+          include: {
+            team: true
+          }
+        }
+      }
     });
+
+    const participants = rawMembers.map(({ team, ...o }) => o);
+    const teams = rawMembers.map((m) => m.team);
 
     return {
       room,

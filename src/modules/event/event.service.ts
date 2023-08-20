@@ -1,6 +1,5 @@
-import { ConflictException, Injectable } from "@nestjs/common";
-import { Appointment, Event, EventParticipant, Room, User } from "@prisma/client";
-import { compact } from "lodash";
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { Appointment, Event, EventParticipant, User } from "@prisma/client";
 
 import { paginate } from "common/utils/pagination";
 import {
@@ -168,29 +167,18 @@ export class EventService {
     roundId?: string,
     user?: User
   ): Promise<LobbyDetailResponseDto> {
-    const queryResult = await this.prisma.eventRound.findMany({
+    const event = await this.prisma.event.findUniqueOrThrow({ where: { id } });
+    const rooms = await this.prisma.room.findMany({
       where: {
-        ...(roundId && { id: roundId }),
-        eventId: id
-      },
-      select: {
-        appointments: {
-          select: {
-            room: {
-              select: { id: true }
-            }
+        appointment: {
+          eventRound: {
+            eventId: id
           }
         }
+      },
+      include: {
+        appointment: true
       }
-    });
-
-    const roomIds = queryResult.flatMap((e) =>
-      e.appointments.flatMap((e) => (e.room ? [ e.room.id ] : []))
-    );
-
-    const rooms = await this.prisma.room.findMany({
-      where: { id: { in: roomIds } },
-      include: { appointment: true }
     });
 
     if (!user) {
@@ -204,12 +192,53 @@ export class EventService {
       };
     }
 
-    // FIXME: add more condition here
+    const userGameTeams = await this.prisma.team.findMany({
+      where: {
+        members: {
+          some: {
+            userId: user.id
+          }
+        }
+      }
+    });
+    
+    const thisEventUserTeam = userGameTeams.find((team) => team.gameId === event.gameId);
+
+    if (!thisEventUserTeam) {
+      throw new InternalServerErrorException("cannot find user team in the specific event's game");
+    }
+
+    const hostedRoomIds = rooms
+      .filter((room) => room.hostTeamId === thisEventUserTeam.id)
+      .map((room) => room.id);
+
+    const joinedRooms = await this.prisma.room.findMany({
+      where: {
+        appointment: {
+          ...(roundId ? {
+            eventRoundId: roundId
+          } : {
+            eventRound: {
+              event: { id }
+            }
+          })
+        },
+        members: {
+          some: {
+            teamId: thisEventUserTeam.id
+          }
+        }
+      },
+      select: { id: true }
+    });
+
+    const joinedRoomIds = joinedRooms.map((e) => e.id);
+
     return {
       rooms,
-      userGameTeams: [],
-      hostedRoomIds: [],
-      joinedRoomIds: [],
+      userGameTeams,
+      hostedRoomIds,
+      joinedRoomIds,
       pendingRoomIds: [],
       roomPendings: []
     };
@@ -315,8 +344,20 @@ export class EventService {
   ): Promise<Appointment[]> {
     const event = await this.prisma.event.findUniqueOrThrow({
       where: { id: eventId },
-      select: { gameId: true }
+      select: {
+        gameId: true,
+        participants: {
+          select: { teamId: true }
+        }
+      }
     });
+
+    const participantTeamIds = event.participants.map((e) => e.teamId);
+    const incomingTeamIds = payload.matches.flatMap((e) => [ e.guestTeamId, e.hostTeamId ]);
+
+    if (!incomingTeamIds.every((id) => participantTeamIds.includes(id))) {
+      throw new BadRequestException("some incoming host or guest teams are not the event participant");
+    }
 
     const appointments = await Promise.all(
       payload.matches.map((match) =>

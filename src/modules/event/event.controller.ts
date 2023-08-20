@@ -10,7 +10,9 @@ import {
   Query,
   UseGuards
 } from "@nestjs/common";
+import { User } from "@prisma/client";
 
+import { UserSubject } from "common/subject.decorator";
 import { CreateEventParticipantDto } from "model/dto/event-participant.dto";
 import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 
@@ -52,7 +54,12 @@ export class EventController {
   }
 
   @Get(":id/rooms")
-  async getEventRoomsByEventId(@Param("id") id: string, @Query("round") roundId?: string) {
-    return await this.eventService.getEventRooms(id, roundId);
+  @UseGuards(UserJwtAuthGuard)
+  async getEventRoomsByEventId(
+    @UserSubject() user: User,
+    @Param("id") id: string,
+    @Query("round") roundId?: string
+  ) {
+    return await this.eventService.getEventRooms(id, roundId, user);
   }
 }

@@ -12,7 +12,6 @@ import {
   UseGuards
 } from "@nestjs/common";
 import { PendingStatus, Team, TrainingSource, User } from "@prisma/client";
-import { isEmpty } from "lodash";
 
 import { AppointmentService } from "../../appointment/appointment.service";
 import { UserSubject } from "common/subject.decorator";
@@ -66,7 +65,7 @@ export class TeamController {
 
     return await this.teamService.getFilter({
       ...createPagination(page, perPage),
-      ...(!isEmpty(clause) && {
+      ...(!Object.keys(clause).length && {
         clause
       })
     });

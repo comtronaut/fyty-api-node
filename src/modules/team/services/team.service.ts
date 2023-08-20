@@ -115,14 +115,13 @@ export class TeamService {
   }
 
   async getByUserId(userId: string): Promise<Team[]> {
-    const memberRes = await this.prisma.teamMember.findMany({
-      where: { userId },
-      select: {
-        team: true
+    return await this.prisma.team.findMany({
+      where: {
+        members: {
+          some: { userId }
+        }
       }
     });
-
-    return memberRes.map((e) => e.team);
   }
 
   async getStatsByTeamId(teamId: string): Promise<TeamStats> {
