@@ -168,13 +168,18 @@ export class EventService {
     user?: User
   ): Promise<LobbyDetailResponseDto> {
     const event = await this.prisma.event.findUniqueOrThrow({ where: { id } });
+
+    const appointment = roundId
+      ? { eventRoundId: roundId }
+      : {
+        eventRound: {
+          event: { id }
+        }
+      };
+
     const rooms = await this.prisma.room.findMany({
       where: {
-        appointment: {
-          eventRound: {
-            eventId: id
-          }
-        }
+        appointment
       },
       include: {
         appointment: true
@@ -214,15 +219,7 @@ export class EventService {
 
     const joinedRooms = await this.prisma.room.findMany({
       where: {
-        appointment: {
-          ...(roundId ? {
-            eventRoundId: roundId
-          } : {
-            eventRound: {
-              event: { id }
-            }
-          })
-        },
+        appointment,
         members: {
           some: {
             teamId: thisEventUserTeam.id

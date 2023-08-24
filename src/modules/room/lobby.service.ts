@@ -49,6 +49,9 @@ export class LobbyService {
     const [ joinedRooms, pendingRooms, roomPendings ] = await Promise.all([
       this.prisma.room.findMany({
         where: {
+          appointment: {
+            eventRoundId: null
+          },
           members: {
             some: {
               teamId: { in: userGameTeamIds }
@@ -62,6 +65,9 @@ export class LobbyService {
       }),
       this.prisma.room.findMany({
         where: {
+          appointment: {
+            eventRoundId: null
+          },
           pendings: {
             some: {
               teamId: { in: userGameTeamIds },

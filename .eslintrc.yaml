@@ -22,6 +22,8 @@ overrides:
     parser: yaml-eslint-parser
     extends:
       - plugin:yml/standard
+ignorePatterns:
+  - src/model/schema/*
 rules:
   # import
   import/order:
