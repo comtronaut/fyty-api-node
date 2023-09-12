@@ -4,7 +4,6 @@ import { z } from "zod";
 
 import {
   AppointmentOptionalDefaultsSchema,
-  AppointmentPartialSchema,
   AppointmentSchema,
   TeamSchema
 } from "model/schema";
@@ -18,7 +17,7 @@ export class CreateAppointmentDto
   implements Prisma.AppointmentUncheckedCreateInput {}
 
 export class UpdateAppointmentDto extends createZodDto(
-  AppointmentPartialSchema.pick({
+  AppointmentSchema.partial().pick({
     startAt: true,
     endAt: true
   })

@@ -6,7 +6,6 @@ import {
   TeamLineupSchema,
   TeamMemberSchema,
   TeamOptionalDefaultsSchema,
-  TeamPartialSchema,
   TeamPendingSchema,
   TeamSchema,
   TeamSettingsSchema,
@@ -22,7 +21,7 @@ export class CreateTeamDto
   extends createZodDto(TeamOptionalDefaultsSchema)
   implements Prisma.TeamUncheckedCreateInput {}
 
-export class UpdateTeamDto extends createZodDto(TeamPartialSchema) {}
+export class UpdateTeamDto extends createZodDto(TeamSchema.partial()) {}
 
 export class TeamDetailResponseDto extends createZodDto(
   z.object({

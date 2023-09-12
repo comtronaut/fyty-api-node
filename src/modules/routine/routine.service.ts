@@ -29,15 +29,15 @@ export class RoutineService {
 
       const rooms = await this.prisma.room.findMany({
         where: {
-          endAt: {
-            lte: timestamp
+          appointment: {
+            endAt: {
+              lte: timestamp
+            }
           }
         },
         select: {
           id: true,
           hostTeamId: true,
-          startAt: true,
-          endAt: true,
           game: {
             select: {
               teamCap: true
@@ -55,7 +55,9 @@ export class RoutineService {
           },
           appointment: {
             select: {
-              id: true
+              id: true,
+              startAt: true,
+              endAt: true
             }
           },
           chat: {
@@ -80,7 +82,7 @@ export class RoutineService {
 
       // update team stats
       void Promise.all(
-        rooms.map(({ startAt, endAt, members }) => {
+        rooms.map(({ appointment: { startAt, endAt }, members }) => {
           const teamIds = members.map((e) => e.teamId);
 
           return this.prisma.teamStats.updateMany({
@@ -148,43 +150,36 @@ export class RoutineService {
     try {
       const nextToBeRemovedTime = dayjs().add(-1, "day").toDate();
 
-      // find out of valid submission time trainings
-      const toBeRemovedTrainings = await this.prisma.training.findMany({
-        where: {
-          createdAt: {
-            lte: nextToBeRemovedTime
+      await Promise.all([
+        // find out of valid submission time trainings
+        this.prisma.training.updateMany({
+          where: {
+            createdAt: {
+              lte: nextToBeRemovedTime
+            },
+            isSubmitted: false,
+            status: TrainingStatus.UNREVIEWED,
+            source: TrainingSource.SYSTEM
           },
-          isSubmitted: false,
-          source: TrainingSource.SYSTEM
-        }
-      });
-
-      // make all submitted, unreviewed trainings to be accepted
-      await this.prisma.training.updateMany({
-        where: {
-          createdAt: {
-            lte: nextToBeRemovedTime
+          data: {
+            status: TrainingStatus.EXPIRED
+          }
+        }),
+        // make all submitted, unreviewed trainings to be accepted
+        this.prisma.training.updateMany({
+          where: {
+            createdAt: {
+              lte: nextToBeRemovedTime
+            },
+            isSubmitted: true,
+            status: TrainingStatus.UNREVIEWED,
+            source: TrainingSource.SYSTEM
           },
-          status: TrainingStatus.UNREVIEWED,
-          source: TrainingSource.SYSTEM
-        },
-        data: {
-          status: TrainingStatus.ACCEPTED
-        }
-      });
-
-      if (!toBeRemovedTrainings.length) {
-        return;
-      }
-
-      await this.prisma.training.updateMany({
-        where: {
-          id: { in: toBeRemovedTrainings.map((e) => e.id) }
-        },
-        data: {
-          status: TrainingStatus.EXPIRED
-        }
-      });
+          data: {
+            status: TrainingStatus.ACCEPTED
+          }
+        })
+      ]);
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(err.message);

@@ -1,56 +1,65 @@
 import { Injectable } from "@nestjs/common";
-import { User } from "@prisma/client";
+import { Room, User } from "@prisma/client";
 
 import { getDayRangeWithin } from "common/utils/date";
-import { LobbyDetailResponseDto } from "model/dto/room.dto";
+import { LobbyForUserResponseDto } from "model/dto/room.dto";
 import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
 export class LobbyService {
-  constructor(
-    private readonly prisma: PrismaService
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async getLobbyByGameId(
+  async getLobby(gameId: string, date: string): Promise<Room[]> {
+    const { start, end } = getDayRangeWithin(date, 7);
+
+    return await this.prisma.room.findMany({
+      where: {
+        gameId,
+        appointment: {
+          startAt: { gte: start, lte: end }
+        }
+      },
+      include: {
+        appointment: true,
+        members: true
+      }
+    });
+  }
+
+  async getLobbyForUser(
     gameId: string,
     date: string,
     user: User
-  ): Promise<LobbyDetailResponseDto> {
+  ): Promise<LobbyForUserResponseDto> {
     const { start, end } = getDayRangeWithin(date, 7);
 
-    const [ rooms, userGameTeams ] = await Promise.all([
-      this.prisma.room.findMany({
-        where: { gameId, startAt: { gte: start, lte: end } },
-        include: { appointment: true }
-      }),
-      this.prisma.team.findMany({
-        where: {
-          gameId,
-          members: {
-            some: { userId: user.id }
-          }
+    const userGameTeams = await this.prisma.team.findMany({
+      where: {
+        gameId,
+        members: {
+          some: { userId: user.id }
         }
-      })
-    ]);
+      }
+    });
 
     if (!userGameTeams.length) {
       return {
-        rooms,
         userGameTeams: [],
         hostedRoomIds: [],
         joinedRoomIds: [],
-        pendingRoomIds: [],
-        roomPendings: []
+        requestingPendings: [],
+        hostingPendings: []
       };
     }
 
     const userGameTeamIds = userGameTeams.map<string>((e) => e.id);
 
-    const [ joinedRooms, pendingRooms, roomPendings ] = await Promise.all([
+    const [ joinedRooms, requestingPendings, hostingPendings ] = await Promise.all([
       this.prisma.room.findMany({
         where: {
           appointment: {
-            eventRoundId: null
+            eventRoundId: null,
+            startAt: { gte: start, lte: end }
           },
           members: {
             some: {
@@ -63,40 +72,43 @@ export class LobbyService {
           hostTeamId: true
         }
       }),
-      this.prisma.room.findMany({
+      this.prisma.roomPending.findMany({
         where: {
-          appointment: {
-            eventRoundId: null
-          },
-          pendings: {
-            some: {
-              teamId: { in: userGameTeamIds },
-              status: "INCOMING"
+          teamId: { in: userGameTeamIds },
+          status: "INCOMING",
+          room: {
+            appointment: {
+              eventRoundId: null,
+              startAt: { gte: start, lte: end }
             }
           }
-        },
-        select: { id: true }
+        }
       }),
       this.prisma.roomPending.findMany({
         where: {
-          teamId: { in: userGameTeamIds }
+          status: "INCOMING",
+          room: {
+            hostTeamId: { in: userGameTeamIds },
+            appointment: {
+              eventRoundId: null,
+              startAt: { gte: start, lte: end }
+            }
+          }
         }
       })
     ]);
 
-    const hostedRoomIds = joinedRooms
-      .filter((e) => userGameTeamIds.includes(e.hostTeamId))
-      .map((e) => e.id);
+    const hostedRoomIds = joinedRooms.flatMap((e) =>
+      userGameTeamIds.includes(e.hostTeamId) ? [ e.id ] : []
+    );
     const joinedRoomIds = joinedRooms.map((e) => e.id);
-    const pendingRoomIds = pendingRooms.map((e) => e.id);
 
     return {
-      rooms,
       userGameTeams,
       hostedRoomIds,
       joinedRoomIds,
-      pendingRoomIds,
-      roomPendings
+      requestingPendings,
+      hostingPendings
     };
   }
 }

@@ -2,9 +2,13 @@ import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
 import {
+  AppointmentSchema,
   NotifUserRoomRegistrationSchema,
   NotificationActionSchema,
-  NotificationSchema
+  NotificationSchema,
+  RoomMemberSchema,
+  RoomPendingSchema,
+  RoomSchema
 } from "model/schema";
 
 export class NotificationDto extends createZodDto(NotificationSchema) {}
@@ -25,4 +29,12 @@ export class NotificationPackResponseDto extends createZodDto(
     roomMessageNotifyingCount: z.number().nonnegative().int(),
     teamNotifyingCount: z.number().nonnegative().int()
   })
+) {}
+
+export class NotificationOnHostingRoomsResponseDto extends createZodDto(
+  RoomSchema.extend({
+    appointment: AppointmentSchema,
+    members: RoomMemberSchema.array(),
+    pendings: RoomPendingSchema.array()
+  }).array()
 ) {}

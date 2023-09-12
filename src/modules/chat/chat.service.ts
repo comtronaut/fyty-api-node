@@ -58,11 +58,4 @@ export class ChatService {
       chatUsers
     };
   }
-
-  async getChatWithMessagesByRoomId(roomId: string) {
-    return await this.prisma.chat.findUniqueOrThrow({
-      where: { roomId },
-      include: { messages: true }
-    });
-  }
 }

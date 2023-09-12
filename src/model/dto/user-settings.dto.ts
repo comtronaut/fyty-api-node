@@ -1,11 +1,7 @@
 import { Prisma, UserSettings } from "@prisma/client";
 import { createZodDto } from "nestjs-zod";
 
-import {
-  UserSettingsOptionalDefaultsSchema,
-  UserSettingsPartialSchema,
-  UserSettingsSchema
-} from "model/schema";
+import { UserSettingsOptionalDefaultsSchema, UserSettingsSchema } from "model/schema";
 
 export class UserSettingsDto
   extends createZodDto(UserSettingsSchema)
@@ -15,4 +11,4 @@ export class CreateUserSettingsDto
   extends createZodDto(UserSettingsOptionalDefaultsSchema)
   implements Prisma.UserSettingsUncheckedCreateInput {}
 
-export class UpdateUserSettingsDto extends createZodDto(UserSettingsPartialSchema) {}
+export class UpdateUserSettingsDto extends createZodDto(UserSettingsSchema.partial()) {}

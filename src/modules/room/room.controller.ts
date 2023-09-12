@@ -26,7 +26,6 @@ import { RoomService } from "./room.service";
 import { ChatService } from "../chat/chat.service";
 
 @Controller("rooms")
-@UseGuards(UserJwtAuthGuard)
 export class RoomController {
   constructor(
     private readonly roomService: RoomService,
@@ -36,6 +35,7 @@ export class RoomController {
   ) {}
 
   @Get()
+  @UseGuards(UserJwtAuthGuard)
   async getRooms(
     @Query("gameId") gameId?: string,
     @Query("name") name?: string,
@@ -49,6 +49,7 @@ export class RoomController {
   }
 
   @Get("teams/:id")
+  @UseGuards(UserJwtAuthGuard)
   async getHostedRooms(
     @Param("id") teamId: string,
     @Query("isJoined") isJoined?: string,
@@ -64,25 +65,37 @@ export class RoomController {
 
   // lobby
   @Get("lobby")
-  async getRoomsLobby(
-    @UserSubject() user: User,
-    @Query("date") date: string,
-    @Query("gameId") gameId: string
-  ) {
+  async getRoomsLobby(@Query("date") date: string, @Query("gameId") gameId: string) {
     if (!date || !gameId) {
-      throw new BadRequestException("date or gameId weren't supplied");
+      throw new BadRequestException("date and gameId queries are required");
     }
 
-    return await this.lobbyService.getLobbyByGameId(gameId, date, user);
+    return await this.lobbyService.getLobby(gameId, date);
+  }
+
+  @Get("lobby/detail")
+  @UseGuards(UserJwtAuthGuard)
+  async getRoomsLobbyWithUserDetail(
+    @Query("date") date: string,
+    @Query("gameId") gameId: string,
+    @UserSubject() user: User
+  ) {
+    if (!date || !gameId) {
+      throw new BadRequestException("date and gameId queries are required");
+    }
+
+    return await this.lobbyService.getLobbyForUser(gameId, date, user);
   }
 
   // room
   @Get(":id")
+  @UseGuards(UserJwtAuthGuard)
   async getRoomById(@Param("id") roomId: string) {
     return await this.roomService.getById(roomId);
   }
 
   @Delete("disband")
+  @UseGuards(UserJwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteRoom(@Body() payload: DeleteRoomDto): Promise<void> {
     await this.roomService.disband(payload);
@@ -90,34 +103,40 @@ export class RoomController {
 
   // settings
   @Get(":id/settings")
+  @UseGuards(UserJwtAuthGuard)
   async getRoomSettingsByRoomId(@Param("id") roomId: string) {
     // TODO:
   }
 
   @Put("settings/:id")
+  @UseGuards(UserJwtAuthGuard)
   async putRoomSettings(@Param("id") roomId: string, payload: UpdateRoomSettingDto) {
     // TODO:
   }
 
   // detail
   @Get(":id/detail")
+  @UseGuards(UserJwtAuthGuard)
   async getRoomDetailById(@Param("id") roomId: string) {
-    return await this.roomService.getRoomDetail(roomId);
+    return await this.roomService.getRoomDetailById(roomId);
   }
 
   // chat
   @Get(":id/chat")
-  async getRoomChatWithMessages(@Param("id") roomId: string) {
-    return await this.chatService.getChatWithMessagesByRoomId(roomId);
+  @UseGuards(UserJwtAuthGuard)
+  async getRoomChatDetailByRoomId(@Param("id") roomId: string) {
+    return await this.chatService.getChatDetailByRoomId(roomId);
   }
 
   // pendings
   @Get(":id/pendings")
+  @UseGuards(UserJwtAuthGuard)
   async getRoomsPendingsByRoomId(@Param("id") roomId: string) {
     return await this.roomPendingService.getByRoomId(roomId);
   }
 
   @Post(":id/pendings")
+  @UseGuards(UserJwtAuthGuard)
   async postRoomPendingByRoomId(
     @Param("id") roomId: string,
     @Body() payload: CreateRoomPendingDto
@@ -126,6 +145,7 @@ export class RoomController {
   }
 
   @Delete("pendings/:id")
+  @UseGuards(UserJwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteRoomPendingById(
     @Param("id") pendingId: string,

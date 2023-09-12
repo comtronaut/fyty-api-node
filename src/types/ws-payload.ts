@@ -1,4 +1,4 @@
-import type { Prisma, Room } from "@prisma/client";
+import type { Appointment, Prisma, Room } from "@prisma/client";
 
 export type ChatMessage = {
   data: Prisma.MessageUncheckedCreateInput & { waitingKey: string };
@@ -14,7 +14,7 @@ export type RoomLeave = {
   roomParticipantId: string;
 };
 
-export type RoomCreate = Partial<Room>;
+export type RoomCreate = Room & { appointment: Appointment };
 
 export type RoomDisband = {
   teamId: string;
@@ -23,5 +23,5 @@ export type RoomDisband = {
 
 export type RoomModify = {
   roomId: string;
-  req: Partial<Room>;
+  req: Partial<Room & Pick<Appointment, "startAt" | "endAt">>;
 };

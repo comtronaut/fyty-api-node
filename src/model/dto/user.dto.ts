@@ -7,7 +7,6 @@ import { z } from "zod";
 import {
   UserAvatarSchema,
   UserOptionalDefaultsSchema,
-  UserPartialSchema,
   UserSchema,
   UserSettingsSchema
 } from "model/schema";
@@ -19,7 +18,7 @@ export class CreateUserDto
   extends createZodDto(UserOptionalDefaultsSchema)
   implements Prisma.UserUncheckedCreateInput {}
 
-export class UpdateUserDto extends createZodDto(UserPartialSchema) {}
+export class UpdateUserDto extends createZodDto(UserSchema.partial()) {}
 
 export class SecureUserDto
   extends createZodDto(

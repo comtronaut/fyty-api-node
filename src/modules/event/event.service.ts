@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException
+} from "@nestjs/common";
 import { Appointment, Event, EventParticipant, User } from "@prisma/client";
 
 import { paginate } from "common/utils/pagination";
@@ -14,7 +19,7 @@ import {
   EventDetailResponseDto,
   UpdateEventDto
 } from "model/dto/event.dto";
-import { LobbyDetailResponseDto } from "model/dto/room.dto";
+import { EventLobbyDetailResponseDto } from "model/dto/room.dto";
 import { PrismaService } from "prisma/prisma.service";
 import { Pagination } from "types/local";
 
@@ -166,7 +171,7 @@ export class EventService {
     id: string,
     roundId?: string,
     user?: User
-  ): Promise<LobbyDetailResponseDto> {
+  ): Promise<EventLobbyDetailResponseDto> {
     const event = await this.prisma.event.findUniqueOrThrow({ where: { id } });
 
     const appointment = roundId
@@ -182,7 +187,8 @@ export class EventService {
         appointment
       },
       include: {
-        appointment: true
+        appointment: true,
+        members: true
       }
     });
 
@@ -206,11 +212,13 @@ export class EventService {
         }
       }
     });
-    
+
     const thisEventUserTeam = userGameTeams.find((team) => team.gameId === event.gameId);
 
     if (!thisEventUserTeam) {
-      throw new InternalServerErrorException("cannot find user team in the specific event's game");
+      throw new InternalServerErrorException(
+        "cannot find user team in the specific event's game"
+      );
     }
 
     const hostedRoomIds = rooms
@@ -353,7 +361,9 @@ export class EventService {
     const incomingTeamIds = payload.matches.flatMap((e) => [ e.guestTeamId, e.hostTeamId ]);
 
     if (!incomingTeamIds.every((id) => participantTeamIds.includes(id))) {
-      throw new BadRequestException("some incoming host or guest teams are not the event participant");
+      throw new BadRequestException(
+        "some incoming host or guest teams are not the event participant"
+      );
     }
 
     const appointments = await Promise.all(
@@ -380,8 +390,6 @@ export class EventService {
                 name: match.roomName,
                 hostTeamId: match.hostTeamId,
                 gameId: event.gameId,
-                startAt: payload.startAt,
-                endAt: payload.endAt,
                 members: {
                   createMany: {
                     data: [

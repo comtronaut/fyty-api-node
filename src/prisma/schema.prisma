@@ -19,7 +19,7 @@ generator zod {
   validateWhereUniqueInput         = false // default is false
   createOptionalDefaultValuesTypes = true // default is false
   createRelationValuesTypes        = false // default is false
-  createPartialTypes               = true // default is false
+  createPartialTypes               = false // default is false
   useDefaultValidators             = true // default is true
   coerceDate                       = true // default is true
   writeNullishInModelTypes         = true // default is false
@@ -37,13 +37,6 @@ generator dbml {
 enum Lang {
   TH
   EN
-}
-
-enum RoomStatus {
-  AVAILABLE
-  UNAVAILABLE
-  CONFIRMED
-  FULL
 }
 
 enum MemberRole {
@@ -236,12 +229,8 @@ model NotificationAction {
 model Room {
   id            String      @id @default(cuid()) @db.Char(25)
   name          String
-  status        RoomStatus  @default(AVAILABLE)
   option        String      @default("")
-  startAt       DateTime
-  endAt         DateTime
   isPrivate     Boolean     @default(false)
-  teamCount     Int         @default(1)
   note          String      @default("")
   game          Game        @relation(fields: [gameId], references: [id], onUpdate: Cascade)
   gameId        String
@@ -258,8 +247,8 @@ model Room {
   chat                   Chat?
   settings               RoomSettings?
 
-  @@index([startAt])
-  @@index([endAt])
+  @@index([gameId])
+  @@index([appointmentId])
 }
 
 model RoomSettings {
@@ -513,6 +502,9 @@ model Appointment {
   room     Room?
   training Training?
   pending  AppointmentPending?
+
+  @@index([startAt])
+  @@index([endAt])
 }
 
 model AppointmentPending {

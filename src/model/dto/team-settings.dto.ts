@@ -1,5 +1,5 @@
 import { createZodDto } from "nestjs-zod";
 
-import { TeamSettingsPartialSchema } from "model/schema";
+import { TeamSettingsSchema } from "model/schema";
 
-export class UpdateTeamSettingsDto extends createZodDto(TeamSettingsPartialSchema) {}
+export class UpdateTeamSettingsDto extends createZodDto(TeamSettingsSchema.partial()) {}

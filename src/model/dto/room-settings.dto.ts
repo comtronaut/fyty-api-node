@@ -1,5 +1,5 @@
 import { createZodDto } from "nestjs-zod";
 
-import { RoomSettingsPartialSchema } from "model/schema";
+import { RoomSettingsSchema } from "model/schema";
 
-export class UpdateRoomSettingDto extends createZodDto(RoomSettingsPartialSchema) {}
+export class UpdateRoomSettingDto extends createZodDto(RoomSettingsSchema.partial()) {}

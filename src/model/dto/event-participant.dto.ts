@@ -4,7 +4,6 @@ import { z } from "zod";
 
 import {
   EventParticipantOptionalDefaultsSchema,
-  EventParticipantPartialSchema,
   EventParticipantSchema
 } from "model/schema";
 
@@ -13,7 +12,7 @@ export class CreateEventParticipantDto
   implements Prisma.EventParticipantUncheckedCreateInput {}
 
 export class UpdateEventParticipantDto extends createZodDto(
-  EventParticipantPartialSchema
+  EventParticipantSchema.partial()
 ) {}
 
 export class EventParticipantApprovalPayloadDto extends createZodDto(

@@ -4,7 +4,7 @@ import {
   Injectable,
   InternalServerErrorException
 } from "@nestjs/common";
-import { PendingStatus, Room, RoomLineup, RoomMember, RoomStatus } from "@prisma/client";
+import { Appointment, PendingStatus, Room, RoomLineup, RoomMember } from "@prisma/client";
 import { compact } from "lodash";
 
 import { getDayRangeWithin } from "common/utils/date";
@@ -24,8 +24,11 @@ export class RoomService {
     private readonly imageService: ImageService
   ) {}
 
-  async create({ teamLineupIds, ...data }: CreateRoomDto): Promise<Room> {
-    const { room } = await this.prisma.appointment.create({
+  async create({
+    teamLineupIds,
+    ...data
+  }: CreateRoomDto): Promise<Room & { appointment: Appointment; members: RoomMember[] }> {
+    const { room, ...appointment } = await this.prisma.appointment.create({
       data: {
         startAt: data.startAt,
         endAt: data.endAt,
@@ -58,7 +61,13 @@ export class RoomService {
           }
         }
       },
-      include: { room: true }
+      include: {
+        room: {
+          include: {
+            members: true
+          }
+        }
+      }
     });
 
     if (!room) {
@@ -67,7 +76,7 @@ export class RoomService {
 
     await this.createUserNotifRegistrationsFromTeamIds(room.id, [ data.hostTeamId ]);
 
-    return room;
+    return { ...room, appointment };
   }
 
   async createUserNotifRegistrationsFromTeamIds(
@@ -261,9 +270,10 @@ export class RoomService {
       }
 
       // delete images
-      const imageIds = room.chat?.messages
-        .flatMap((e) => e.imageUrls)
-        .map((e) => this.imageService.extractCuidFromUrl(e)) ?? [];
+      const imageIds
+        = room.chat?.messages
+          .flatMap((e) => e.imageUrls)
+          .map((e) => this.imageService.extractCuidFromUrl(e)) ?? [];
 
       await this.imageService.deleteImageByIds(compact(imageIds));
 
@@ -281,7 +291,7 @@ export class RoomService {
   async acceptRoomRequest({ roomId, teamId }: CreateRoomMemberDto) {
     const {
       team: { game },
-      room: { appointment, ...room },
+      room: { appointment, members, ...room },
       lineups,
       ...pending
     } = await this.prisma.roomPending.findUniqueOrThrow({
@@ -301,20 +311,18 @@ export class RoomService {
         },
         room: {
           include: {
-            appointment: {
-              select: { id: true }
-            }
+            members: true,
+            appointment: true
           }
         }
       }
     });
+    const isRoomUnavailable = members.length >= game.teamCap;
 
-    if (
-      [ RoomStatus.UNAVAILABLE, RoomStatus.FULL ].some((status) => status === room.status)
-    ) {
+    if (isRoomUnavailable) {
       throw new ConflictException("room is not available");
     }
-    if (new Date() > room.endAt) {
+    if (new Date() > appointment.endAt) {
       throw new BadRequestException("this room has expired");
     }
 
@@ -323,10 +331,6 @@ export class RoomService {
         id: roomId
       },
       data: {
-        ...(room.teamCount >= game.teamCap - 1 && { status: RoomStatus.UNAVAILABLE }),
-        teamCount: {
-          increment: 1
-        },
         // add room member and lineups
         members: {
           create: {
@@ -382,21 +386,12 @@ export class RoomService {
       data: {
         lineups: {
           deleteMany: {}
-        },
-        room: {
-          update: {
-            // update participant count
-            teamCount: {
-              decrement: 1
-            },
-            // update room status
-            status: RoomStatus.AVAILABLE
-          }
         }
       },
       include: {
         room: {
           include: {
+            members: true,
             appointment: true
           }
         }
@@ -424,7 +419,7 @@ export class RoomService {
     });
 
     // soft delete appointment if room is empty
-    if (room.teamCount <= 0) {
+    if (room.members.length <= 0) {
       await this.prisma.appointment.update({
         where: { id: room.appointmentId },
         data: {
@@ -507,25 +502,24 @@ export class RoomService {
     });
   }
 
-  async getRoomDetail(roomId: string) {
-    const { members: rawMembers, ...room } = await this.prisma.room.findUniqueOrThrow({
+  async getRoomDetailById(roomId: string) {
+    return await this.prisma.room.findUniqueOrThrow({
       where: { id: roomId },
       include: {
         members: {
           include: {
-            team: true
+            team: true,
+            lineups: {
+              include: {
+                teamLineup: true
+              }
+            }
           }
-        }
+        },
+        settings: true,
+        appointment: true,
+        pendings: true
       }
     });
-
-    const participants = rawMembers.map(({ team, ...o }) => o);
-    const teams = rawMembers.map((m) => m.team);
-
-    return {
-      room,
-      roomParticipants: participants,
-      teams
-    };
   }
 }

@@ -96,12 +96,8 @@ Table NotificationAction {
 Table Room {
   id String [pk]
   name String [not null]
-  status RoomStatus [not null, default: 'AVAILABLE']
   option String [not null, default: '']
-  startAt DateTime [not null]
-  endAt DateTime [not null]
   isPrivate Boolean [not null, default: false]
-  teamCount Int [not null, default: 1]
   note String [not null, default: '']
   gameId String [not null]
   hostTeamId String [not null]
@@ -402,13 +398,6 @@ Table Admin {
 Enum Lang {
   TH
   EN
-}
-
-Enum RoomStatus {
-  AVAILABLE
-  UNAVAILABLE
-  CONFIRMED
-  FULL
 }
 
 Enum MemberRole {

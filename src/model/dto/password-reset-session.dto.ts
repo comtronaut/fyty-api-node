@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { createZodDto } from "nestjs-zod";
 
-import { UserRecoverySessionPartialSchema } from "model/schema";
+import { UserRecoverySessionSchema } from "model/schema";
 import { UserRecoverySessionOptionalDefaultsSchema } from "model/schema";
 
 export class CreateUserRecoverySessionDto
@@ -9,5 +9,5 @@ export class CreateUserRecoverySessionDto
   implements Prisma.UserRecoverySessionUncheckedCreateInput {}
 
 export class UpdateUserRecoverySessionDto extends createZodDto(
-  UserRecoverySessionPartialSchema
+  UserRecoverySessionSchema.partial()
 ) {}

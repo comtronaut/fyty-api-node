@@ -2,18 +2,13 @@ import { Prisma } from "@prisma/client";
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
-import {
-  AdminOptionalDefaultsSchema,
-  AdminPartialSchema,
-  AdminSchema,
-  UserSchema
-} from "model/schema";
+import { AdminOptionalDefaultsSchema, AdminSchema, UserSchema } from "model/schema";
 
 export class CreateAdminDto
   extends createZodDto(AdminOptionalDefaultsSchema)
   implements Prisma.AdminUncheckedCreateInput {}
 
-export class UpdateAdminDto extends createZodDto(AdminPartialSchema) {}
+export class UpdateAdminDto extends createZodDto(AdminSchema.partial()) {}
 
 export class SecureAdminDto
   extends createZodDto(

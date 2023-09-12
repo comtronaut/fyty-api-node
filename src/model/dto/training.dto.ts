@@ -5,7 +5,6 @@ import { z } from "zod";
 import {
   AppointmentSchema,
   TrainingOptionalDefaultsSchema,
-  TrainingPartialSchema,
   TrainingSchema
 } from "model/schema";
 
@@ -13,7 +12,7 @@ export class CreateTrainingDto
   extends createZodDto(TrainingOptionalDefaultsSchema)
   implements Prisma.TrainingUncheckedCreateInput {}
 
-export class UpdateTrainingDto extends createZodDto(TrainingPartialSchema) {}
+export class UpdateTrainingDto extends createZodDto(TrainingSchema.partial()) {}
 
 export class CreateTrainingBypassDto
   extends createZodDto(

@@ -1,9 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { NotificationActionResponse } from "@prisma/client";
+import { NotificationActionResponse, Room } from "@prisma/client";
 
 import { NotifUserRoomRegistrationDto } from "model/dto/notif-user-room-registration.dto";
-import { NotificationDto, NotificationPackResponseDto } from "model/dto/notification.dto";
+import {
+  NotificationDto,
+  NotificationOnHostingRoomsResponseDto,
+  NotificationPackResponseDto
+} from "model/dto/notification.dto";
 import { PrismaService } from "prisma/prisma.service";
 
 @Injectable()
@@ -71,6 +75,35 @@ export class NotificationService {
       roomMessageNotifyingCount,
       teamNotifyingCount
     };
+  }
+
+  async getNotificationsOnHostingRoomsByUserId(
+    userId: string,
+    gameId?: string,
+    teamId?: string,
+    eventId?: string
+  ): Promise<NotificationOnHostingRoomsResponseDto> {
+    return await this.prisma.room.findMany({
+      where: {
+        hostTeam: {
+          ...(gameId && { gameId }),
+          ...(teamId && { id: teamId }),
+          members: {
+            some: {
+              userId
+            }
+          }
+        },
+        appointment: {
+          eventRound: eventId ? { eventId } : null
+        }
+      },
+      include: {
+        pendings: true,
+        appointment: true,
+        members: true
+      }
+    });
   }
 
   async markAsReadNotificationById(id: string): Promise<NotificationDto> {

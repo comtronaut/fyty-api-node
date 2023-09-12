@@ -14,7 +14,10 @@ import { PendingStatus, User } from "@prisma/client";
 
 import { UserSubject } from "common/subject.decorator";
 import { AppointmentPackResponseDto } from "model/dto/appointment.dto";
-import { NotificationPackResponseDto } from "model/dto/notification.dto";
+import {
+  NotificationOnHostingRoomsResponseDto,
+  NotificationPackResponseDto
+} from "model/dto/notification.dto";
 import { TeamPendingDto } from "model/dto/team-pending.dto";
 import { TeamDto } from "model/dto/team.dto";
 import { UserAvatarDto } from "model/dto/user-avatar.dto";
@@ -127,5 +130,20 @@ export class MeController {
     @UserSubject() user: User
   ): Promise<NotificationPackResponseDto> {
     return await this.notificationService.getNotificationsByUserId(user.id);
+  }
+
+  @Get("notifications/hosting-rooms")
+  async getMeNotificationsOnHosingRooms(
+    @UserSubject() user: User,
+    @Query("teamId") teamId?: string,
+    @Query("gameId") gameId?: string,
+    @Query("eventId") eventId?: string
+  ): Promise<NotificationOnHostingRoomsResponseDto> {
+    return await this.notificationService.getNotificationsOnHostingRoomsByUserId(
+      user.id,
+      gameId,
+      teamId,
+      eventId
+    );
   }
 }
