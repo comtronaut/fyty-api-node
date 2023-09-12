@@ -88,4 +88,9 @@ export class EventController {
   ) {
     return await this.eventService.getEventRooms(id, roundId, user);
   }
+
+  @Get("rounds/:id")
+  async getEventByRoundId(@Param("id") roundId: string) {
+    return await this.eventService.getEventByRoundId(roundId);
+  }
 }

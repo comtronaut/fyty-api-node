@@ -57,6 +57,18 @@ export class EventService {
     });
   }
 
+  async getEventByRoundId(roundId: string): Promise<Event> {
+    return await this.prisma.event.findFirstOrThrow({
+      where: {
+        rounds: {
+          some: {
+            id: roundId
+          }
+        }
+      }
+    });
+  }
+
   async getEventById(id: string): Promise<Event> {
     return await this.prisma.event.findUniqueOrThrow({
       where: { id }
