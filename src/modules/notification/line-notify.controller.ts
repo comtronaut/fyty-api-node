@@ -19,8 +19,12 @@ export class LineNotifyController {
   }
 
   @Get()
-  async getLine(@Res() res: Response, @Query("user_id") state: string): Promise<void> {
-    const url = await this.lineNotifyService.getAuthorizeUrl(state);
+  async redirectToLineNotifyAuthorization(
+    @Res() res: Response,
+    @Query("userId") state: string,
+    @Query("stage") stage?: string
+  ): Promise<void> {
+    const url = await this.lineNotifyService.getAuthorizeUrl(state, stage);
     res.redirect(url);
   }
 }

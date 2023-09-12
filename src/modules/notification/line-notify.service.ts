@@ -21,13 +21,13 @@ export class LineNotifyService {
     await axios.postForm(url, { message }, { headers });
   }
 
-  async getAuthorizeUrl(userId: string): Promise<string> {
+  async getAuthorizeUrl(userId: string, stage?: string): Promise<string> {
     const queryParams = new URLSearchParams({
       response_type: "code",
       client_id: env.LINE_NOTIFY_CLIENT_ID,
       redirect_uri: env.LINE_NOTIFY_REDIRECT_URI,
       scope: "notify",
-      state: userId
+      state: stage ? `${userId}:${stage}` : userId
     });
 
     return `https://notify-bot.line.me/oauth/authorize?${queryParams.toString()}`;
@@ -46,22 +46,20 @@ export class LineNotifyService {
     return response.data;
   }
 
-  async callback(code: string, state: string): Promise<void> {
+  async callback(code: string, userId: string): Promise<void> {
     try {
-      // get lineNotify token
       const token = await this.authenticate(code);
 
-      // update line_token in user
-      const res = await this.prisma.user.update({
+      const updatedUser = await this.prisma.user.update({
         where: {
-          id: state
+          id: userId
         },
         data: {
           lineToken: token.access_token
         }
       });
 
-      await this.cacheManager.set(`user:${state}`, res);
+      await this.cacheManager.set(`user:${userId}`, updatedUser);
     } catch (error) {
       console.error(error);
     }
