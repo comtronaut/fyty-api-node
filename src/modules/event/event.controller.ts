@@ -35,11 +35,21 @@ export class EventController {
   ) {
     const parsedStatuses = status ? status.split(",").filter(Boolean) : [];
 
-    if (!parsedStatuses.every((status) => [ "active", "upcoming", "completed" ].includes(status))) {
-      throw new BadRequestException("status query values must be 'active', 'upcomeing', 'completed'");
+    if (
+      !parsedStatuses.every((status) =>
+        [ "active", "upcoming", "completed" ].includes(status)
+      )
+    ) {
+      throw new BadRequestException(
+        "status query values must be 'active', 'upcomeing', 'completed'"
+      );
     }
 
-    const validatedStatuses = uniq(parsedStatuses) as ("active" | "upcoming" | "completed")[];
+    const validatedStatuses = uniq(parsedStatuses) as (
+      | "active"
+      | "upcoming"
+      | "completed"
+    )[];
 
     const clause: Partial<Event> = {
       ...(gameId && { gameId }),
