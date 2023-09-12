@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -10,9 +11,11 @@ import {
   Query,
   UseGuards
 } from "@nestjs/common";
-import { User } from "@prisma/client";
+import { Event, User } from "@prisma/client";
+import { uniq } from "lodash";
 
 import { UserSubject } from "common/subject.decorator";
+import { createPagination } from "common/utils/pagination";
 import { CreateEventParticipantDto } from "model/dto/event-participant.dto";
 import { UserJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 
@@ -23,8 +26,31 @@ export class EventController {
   constructor(private readonly eventService: EventService) {}
 
   @Get()
-  async getEvents() {
-    return await this.eventService.getAllEvents();
+  async getEvents(
+    @Query("q") q?: string,
+    @Query("status") status?: string,
+    @Query("gameId") gameId?: string,
+    @Query("perPage") perPage?: string,
+    @Query("page") page?: string
+  ) {
+    const parsedStatuses = status ? status.split(",").filter(Boolean) : [];
+
+    if (!parsedStatuses.every((status) => [ "active", "upcoming", "completed" ].includes(status))) {
+      throw new BadRequestException("status query values must be 'active', 'upcomeing', 'completed'");
+    }
+
+    const validatedStatuses = uniq(parsedStatuses) as ("active" | "upcoming" | "completed")[];
+
+    const clause: Partial<Event> = {
+      ...(gameId && { gameId }),
+      ...(q && { name: q })
+    };
+
+    return await this.eventService.getAllEvents({
+      ...createPagination(page, perPage),
+      ...(!Object.keys(clause).length && { clause }),
+      ...(validatedStatuses.length && { statuses: validatedStatuses })
+    });
   }
 
   @Get(":id")

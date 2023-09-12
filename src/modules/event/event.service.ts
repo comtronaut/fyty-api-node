@@ -6,6 +6,7 @@ import {
 } from "@nestjs/common";
 import { Appointment, Event, EventParticipant, User } from "@prisma/client";
 
+import { getDatetimeWithOffset } from "common/utils/date";
 import { paginate } from "common/utils/pagination";
 import {
   CreateEventParticipantDto,
@@ -27,8 +28,33 @@ import { Pagination } from "types/local";
 export class EventService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAllEvents(): Promise<Event[]> {
-    return await this.prisma.event.findMany({});
+  async getAllEvents(filter: {
+    pagination?: Pagination;
+    clause?: Partial<Event>;
+    statuses?: ("active" | "upcoming" | "completed")[];
+  }): Promise<Event[]> {
+    const curerntTime = getDatetimeWithOffset(new Date(), 7);
+
+    return await this.prisma.event.findMany({
+      ...(filter.pagination && paginate(filter.pagination)),
+      ...(filter.clause && {
+        where: {
+          ...filter.clause,
+          ...(filter.statuses && {
+            OR: filter.statuses.map((status) => (
+              status === "active" ? ({
+                startAt: { gte: curerntTime },
+                endAt: { lt: curerntTime }
+              }) : status === "upcoming" ? ({
+                startAt: { lt: curerntTime }
+              }) : status === "completed" ? ({
+                endAt: { lte: curerntTime }
+              }) : ({})
+            ))
+          })
+        }
+      })
+    });
   }
 
   async getEventById(id: string): Promise<Event> {

@@ -18,3 +18,16 @@ export function getDayRangeWithin(
     end: dayEnd.endOf("day").toDate()
   };
 }
+
+export function getDatetimeWithOffset(
+  rawDate: ConstructorParameters<typeof Date>[0],
+  timezoneOffset?: number
+): Date {
+  const today = new Date(rawDate);
+
+  const dayStart = timezoneOffset
+    ? dayjs(today).utcOffset(timezoneOffset * 60)
+    : dayjs(today);
+
+  return dayStart.toDate();
+}

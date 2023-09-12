@@ -47,9 +47,7 @@ rules:
         # sibling
         - pattern: "../**"
           group: sibling
-      pathGroupsExcludedImportTypes:
-        - deep-object-diff
-        - fast-deep-equal
+      pathGroupsExcludedImportTypes: []
 
   # vanilla warn
   accessor-pairs:
