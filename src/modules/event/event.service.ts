@@ -42,20 +42,14 @@ export class EventService {
           ...filter.clause,
           ...(filter.statuses && {
             OR: filter.statuses.map((status) =>
-              status === "active"
-                ? {
-                  startAt: { gte: curerntTime },
-                  endAt: { lt: curerntTime }
-                }
-                : status === "upcoming"
-                  ? {
-                    startAt: { lt: curerntTime }
-                  }
-                  : status === "completed"
-                    ? {
-                      endAt: { lte: curerntTime }
-                    }
-                    : {}
+              status === "active" ? {
+                signupStartAt: { lte: curerntTime },
+                endAt: { gte: curerntTime }
+              } : status === "upcoming" ? {
+                signupStartAt: { gt: curerntTime }
+              } : status === "completed" ? {
+                endAt: { lte: curerntTime }
+              } : {}
             )
           })
         }

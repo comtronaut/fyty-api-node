@@ -16,6 +16,7 @@ export class LobbyService {
       where: {
         gameId,
         appointment: {
+          eventRoundId: null,
           startAt: { gte: start, lte: end }
         }
       },
@@ -26,7 +27,7 @@ export class LobbyService {
     });
   }
 
-  async getLobbyForUser(
+  async getLobbyDetail(
     gameId: string,
     date: string,
     user: User

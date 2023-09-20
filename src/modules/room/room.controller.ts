@@ -84,7 +84,7 @@ export class RoomController {
       throw new BadRequestException("date and gameId queries are required");
     }
 
-    return await this.lobbyService.getLobbyForUser(gameId, date, user);
+    return await this.lobbyService.getLobbyDetail(gameId, date, user);
   }
 
   // room
