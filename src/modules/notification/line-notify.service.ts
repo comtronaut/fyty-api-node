@@ -661,7 +661,7 @@ export class LineNotifyService {
   }
 
   // chat
-  async sendChatMessageNotificationToOthers(chatId: string, teamId: string) {
+  async sendChatMessageNotificationToOthers(chatId: string, serderTeamId?: string) {
     const chat = await this.prisma.chat.findUnique({
       where: { id: chatId }
     });
@@ -669,7 +669,7 @@ export class LineNotifyService {
     const roomMemberRes = await this.prisma.roomMember.findMany({
       where: {
         roomId: chat?.roomId,
-        NOT: { teamId }
+        ...(serderTeamId && { NOT: { teamId: serderTeamId } })
       },
       select: {
         team: {
@@ -695,11 +695,11 @@ export class LineNotifyService {
       }
     });
 
-    const team = await this.prisma.team.findFirst({
-      where: {
-        id: teamId
-      }
-    });
+    const team = serderTeamId
+      ? await this.prisma.team.findFirst({
+        where: { id: serderTeamId },
+        select: { name: true }
+      }) : null;
 
     const lineTokenOfOtherUsers
       = roomMemberRes.flatMap(
@@ -714,7 +714,11 @@ export class LineNotifyService {
 
     for (const token of lineTokenOfOtherUsers) {
       if (token.token && token.isRoom) {
-        void this.sendNotification(`คุณได้รับข้อความใหม่จาก ${team?.name}`, token.token);
+        if (team) {
+          void this.sendNotification(`คุณได้รับข้อความใหม่จาก ${team?.name}`, token.token);
+        } else {
+          void this.sendNotification("คุณได้รับข้อความใหม่จากแอดมิน", token.token);
+        }
       }
     }
   }

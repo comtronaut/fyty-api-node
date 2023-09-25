@@ -14,9 +14,10 @@ export class MessageService {
   ) {}
 
   async create({ waitingKey, ...data }: CreateMessageDto & { waitingKey: string }) {
-    if (data.teamId) {
-      void this.lineNotify.sendChatMessageNotificationToOthers(data.chatId, data.teamId);
-    }
+    data.teamId
+      ? void this.lineNotify.sendChatMessageNotificationToOthers(data.chatId, data.teamId)
+      : void this.lineNotify.sendChatMessageNotificationToOthers(data.chatId);
+
     if (data.senderId) {
       void this.notificationService.sendChatMessageNotificationToOthers(
         data.chatId,

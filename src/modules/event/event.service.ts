@@ -411,6 +411,12 @@ export class EventService {
             startAt: payload.startAt,
             endAt: payload.endAt,
             eventRoundId: payload.roundId,
+            training: {
+              create: {
+                hostId: match.hostTeamId,
+                guestId: match.guestTeamId
+              }
+            },
             members: {
               createMany: {
                 data: [

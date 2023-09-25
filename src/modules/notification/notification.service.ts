@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { NotificationActionResponse, Room } from "@prisma/client";
+import { NotificationActionResponse } from "@prisma/client";
 
 import { NotifUserRoomRegistrationDto } from "model/dto/notif-user-room-registration.dto";
 import {
@@ -145,7 +145,7 @@ export class NotificationService {
 
   async sendChatMessageNotificationToOthers(
     chatId: string,
-    userId: string,
+    senderUserId: string,
     message: string
   ) {
     const chat = await this.prisma.chat.findUnique({
@@ -176,7 +176,7 @@ export class NotificationService {
     const toBeNotifiedUserIds = roomMemberRes
       .flatMap((e) => e.team.members)
       .map((e) => e.user.id)
-      .filter((e) => e !== userId);
+      .filter((e) => e !== senderUserId);
 
     await this.prisma.notifUserRoomRegistration.updateMany({
       where: {

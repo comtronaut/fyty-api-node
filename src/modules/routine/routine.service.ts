@@ -57,7 +57,8 @@ export class RoutineService {
             select: {
               id: true,
               startAt: true,
-              endAt: true
+              endAt: true,
+              training: true
             }
           },
           chat: {
@@ -104,6 +105,7 @@ export class RoutineService {
           e.appointment
           && e.members.length === e.game.teamCap
           && e.members.filter((f) => f.teamId !== e.hostTeamId).length
+          && !e.appointment.training
       );
 
       await Promise.all([
