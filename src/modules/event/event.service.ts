@@ -404,6 +404,18 @@ export class EventService {
       );
     }
 
+    const teamWithMembers = await this.prisma.team.findMany({
+      where: {
+        id: { in: incomingTeamIds }
+      },
+      select: {
+        members: {
+          select: { userId: true }
+        }
+      }
+    });
+    const userIds = teamWithMembers.flatMap((m) => m.members.map((m) => m.userId));
+
     const appointments = await Promise.all(
       payload.matches.map((match) =>
         this.prisma.appointment.create({
@@ -434,6 +446,13 @@ export class EventService {
                 name: match.roomName,
                 hostTeamId: match.hostTeamId,
                 gameId: event.gameId,
+                userNotifRegistrations: {
+                  createMany: {
+                    data: userIds.map((userId) => ({
+                      userId
+                    }))
+                  }
+                },
                 members: {
                   createMany: {
                     data: [

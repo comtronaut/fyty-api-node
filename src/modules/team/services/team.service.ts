@@ -16,6 +16,20 @@ export class TeamService {
     private readonly lineNotify: LineNotifyService
   ) {}
 
+  async createEmptyTeam(data: CreateTeamDto): Promise<Team> {
+    return await this.prisma.team.create({
+      data: {
+        ...data,
+        settings: {
+          create: {}
+        },
+        stats: {
+          create: {}
+        }
+      }
+    });
+  }
+
   async create(user: User, data: CreateTeamDto): Promise<Team> {
     const teamMemberRes = await this.prisma.teamMember.findMany({
       where: { userId: user.id },

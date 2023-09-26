@@ -6,13 +6,14 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Post,
   Put,
   Query,
   UseGuards
 } from "@nestjs/common";
 
 import { createPagination } from "common/utils/pagination";
-import { UpdateTeamDto } from "model/dto/team.dto";
+import { CreateTeamDto, UpdateTeamDto } from "model/dto/team.dto";
 import { AdminJwtAuthGuard } from "modules/auth/guard/jwt-auth.guard";
 import { TeamService } from "modules/team/services/team.service";
 
@@ -41,7 +42,12 @@ export class AdminTeamsController {
 
   @Get(":id")
   async getTeamByIdAsAdmin(@Param("id") id: string) {
-    return await this.adminTeamsService.getById(id);
+    return await this.adminTeamsService.getDetailById(id);
+  }
+
+  @Post()
+  async createTeamAsAdmin(@Body() payload: CreateTeamDto) {
+    return await this.adminTeamsService.createEmptyTeam(payload);
   }
 
   @Put(":id")
