@@ -26,12 +26,14 @@ export class RoomService {
 
   async create({
     teamLineupIds,
+    startAt,
+    endAt,
     ...data
   }: CreateRoomDto): Promise<Room & { appointment: Appointment; members: RoomMember[] }> {
     const { room, ...appointment } = await this.prisma.appointment.create({
       data: {
-        startAt: data.startAt,
-        endAt: data.endAt,
+        startAt,
+        endAt,
         members: {
           create: {
             teamId: data.hostTeamId
