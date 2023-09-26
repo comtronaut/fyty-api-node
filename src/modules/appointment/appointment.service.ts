@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { Appointment, AppointmentMember, Team } from "@prisma/client";
+import { Appointment, AppointmentMember, Team, Training } from "@prisma/client";
 
 import {
   AppointmentPackResponseDto,

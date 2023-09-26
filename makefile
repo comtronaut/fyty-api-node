@@ -6,10 +6,6 @@ app_name_dev := fyty-api-dev
 
 # usage example: make git m="your message"
 
-git:
-	git add .
-	git commit -m "$m"
-	git push
 docker-deploy.%:
 	docker build -t ${app_name_$*} -f ./docker/dockerfile.$* .
 	docker save ${app_name_$*} > ${app_name_$*}.tar

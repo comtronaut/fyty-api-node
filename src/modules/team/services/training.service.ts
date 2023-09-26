@@ -142,6 +142,10 @@ export class TrainingService {
     return await this.prisma.trainingLineup.findMany({ where: { trainingId } });
   }
 
+  async getByAppointmentId(id: string): Promise<Training> {
+    return await this.prisma.training.findUniqueOrThrow({ where: { appointmentId: id } });
+  }
+
   async getAllReports(): Promise<TrainingReport[]> {
     return await this.prisma.trainingReport.findMany();
   }
