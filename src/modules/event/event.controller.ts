@@ -58,7 +58,7 @@ export class EventController {
 
     return await this.eventService.getAllEvents({
       ...createPagination(page, perPage),
-      ...(!Object.keys(clause).length && { clause }),
+      ...(Object.keys(clause).length && { clause }),
       ...(validatedStatuses.length && { statuses: validatedStatuses })
     });
   }

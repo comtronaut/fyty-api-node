@@ -65,7 +65,7 @@ export class TeamController {
 
     return await this.teamService.getFilter({
       ...createPagination(page, perPage),
-      ...(!Object.keys(clause).length && {
+      ...(Object.keys(clause).length && {
         clause
       })
     });
