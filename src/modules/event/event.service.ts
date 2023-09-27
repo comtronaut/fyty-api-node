@@ -5,6 +5,7 @@ import {
   InternalServerErrorException
 } from "@nestjs/common";
 import { Appointment, Event, EventParticipant, User } from "@prisma/client";
+import { uniq } from "lodash";
 
 import { getDatetimeWithOffset } from "common/utils/date";
 import { paginate } from "common/utils/pagination";
@@ -409,12 +410,17 @@ export class EventService {
         id: { in: incomingTeamIds }
       },
       select: {
+        id: true,
         members: {
           select: { userId: true }
         }
       }
     });
-    const userIds = teamWithMembers.flatMap((m) => m.members.map((m) => m.userId));
+    const teamIdUserIdsPair = Object.fromEntries(teamWithMembers.map((m) => [ m.id, m.members.map((m) => m.userId) ]));
+
+    function findUserIdsOfPair(hostTeamId: string, guestTeamId: string) {
+      return uniq([ ...(teamIdUserIdsPair[hostTeamId] ?? []), ...(teamIdUserIdsPair[guestTeamId] ?? []) ]);
+    }
 
     const appointments = await Promise.all(
       payload.matches.map((match) =>
@@ -448,7 +454,7 @@ export class EventService {
                 gameId: event.gameId,
                 userNotifRegistrations: {
                   createMany: {
-                    data: userIds.map((userId) => ({
+                    data: findUserIdsOfPair(match.hostTeamId, match.guestTeamId).map((userId) => ({
                       userId
                     }))
                   }
