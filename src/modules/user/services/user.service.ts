@@ -28,7 +28,10 @@ export class UserService {
 
   async getByIds(ids: string[]): Promise<SecureUserDto[]> {
     const users = await this.prisma.user.findMany({ where: { id: { in: ids } } });
-    return users.map(({ password, ...e }) => e);
+
+    const sortedUsers = sortArrayByIdOrder(users, ids);
+
+    return sortedUsers.map(({ password, ...e }) => e);
   }
 
   async getById(id: string) {

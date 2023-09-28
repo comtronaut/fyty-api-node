@@ -117,9 +117,11 @@ export class TeamService {
   }
 
   async getByIds(teamIds: string[]): Promise<Team[]> {
-    return await this.prisma.team.findMany({
+    const teams = await this.prisma.team.findMany({
       where: { id: { in: teamIds } }
     });
+
+    return sortArrayByIdOrder(teams, teamIds);
   }
 
   async getById(teamId: string): Promise<Team> {
