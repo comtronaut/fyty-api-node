@@ -108,6 +108,15 @@ export class RoomController {
     // TODO:
   }
 
+  // noti registration
+  @Post(":id/notif-registrations")
+  @UseGuards(UserJwtAuthGuard)
+  async getRoomRegistrationsByRoomId(
+    @Param("id") roomId: string
+  ) {
+    return await this.roomService.getRoomRegistrationsById(roomId);
+  }
+
   @Put("settings/:id")
   @UseGuards(UserJwtAuthGuard)
   async putRoomSettings(@Param("id") roomId: string, payload: UpdateRoomSettingDto) {

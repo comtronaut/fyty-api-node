@@ -4,7 +4,7 @@ import {
   Injectable,
   InternalServerErrorException
 } from "@nestjs/common";
-import { Appointment, PendingStatus, Room, RoomLineup, RoomMember } from "@prisma/client";
+import { Appointment, NotifUserRoomRegistration, PendingStatus, Room, RoomLineup, RoomMember } from "@prisma/client";
 import { compact } from "lodash";
 
 import { getDayRangeWithin } from "common/utils/date";
@@ -141,6 +141,10 @@ export class RoomService {
         roomMember: { roomId }
       }
     });
+  }
+
+  async getRoomRegistrationsById(roomId: string): Promise<NotifUserRoomRegistration[]> {
+    return await this.prisma.notifUserRoomRegistration.findMany({ where: { roomId } });
   }
 
   async getById(roomId: string): Promise<Room> {
