@@ -1,7 +1,8 @@
 import fs from "fs";
 
-import { AdminRole, PrismaClient } from "@prisma/client";
+import { AdminRole, PrismaClient, TrainingSource, TrainingStatus } from "@prisma/client";
 import * as bcrypt from "bcrypt";
+import dayjs from "dayjs";
 import { match } from "ts-pattern";
 import { AnyFunction } from "tsdef";
 import { z } from "zod";
@@ -9,40 +10,24 @@ import { z } from "zod";
 const prisma = new PrismaClient();
 
 async function run() {
-  const rooms = await prisma.room.findMany({
-    select: {
-      userNotifRegistrations: true,
-      members: {
-        select: {
-          team: {
-            select: {
-              members: {
-                select: {
-                  user: {
-                    select: { id: true }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  });
-
-  const toBeDelNotiIds = [] as string[];
-  for (const { userNotifRegistrations, members } of rooms) {
-    const roomUserIds = members.flatMap((m) => m.team.members.map((m) => m.user.id));
-    const a = userNotifRegistrations.filter((m) => !roomUserIds.includes(m.userId)).map((m) => m.id);
-
-    toBeDelNotiIds.push(...a);
-  }
-
-  await prisma.notifUserRoomRegistration.deleteMany({
+  const nextToBeRemovedTime = dayjs().add(-1, "day").toDate();
+  const eventTrainings = await prisma.training.findMany({
     where: {
-      id: { in: toBeDelNotiIds }
+      appointment: {
+        eventRound: {
+          eventId: "cln0999r70005mn01kqppvcjg"
+        }
+      },
+      isSubmitted: false,
+      status: TrainingStatus.EXPIRED,
+      source: TrainingSource.SYSTEM
+    },
+    select: {
+      id: true
     }
   });
+  
+  console.log(eventTrainings);
 }
 
 async function main(fn: AnyFunction) {

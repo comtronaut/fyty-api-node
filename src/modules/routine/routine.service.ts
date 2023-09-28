@@ -156,9 +156,25 @@ export class RoutineService {
         // find out of valid submission time trainings
         this.prisma.training.updateMany({
           where: {
-            createdAt: {
-              lte: nextToBeRemovedTime
-            },
+            OR: [
+              {
+                createdAt: {
+                  lte: nextToBeRemovedTime
+                },
+                appointment: {
+                  eventRoundId: null
+                }
+              },
+              {
+                appointment: {
+                  eventRound: {
+                    endAt: {
+                      lte: nextToBeRemovedTime
+                    }
+                  }
+                }
+              }
+            ],
             isSubmitted: false,
             status: TrainingStatus.UNREVIEWED,
             source: TrainingSource.SYSTEM
@@ -170,9 +186,25 @@ export class RoutineService {
         // make all submitted, unreviewed trainings to be accepted
         this.prisma.training.updateMany({
           where: {
-            createdAt: {
-              lte: nextToBeRemovedTime
-            },
+            OR: [
+              {
+                createdAt: {
+                  lte: nextToBeRemovedTime
+                },
+                appointment: {
+                  eventRoundId: null
+                }
+              },
+              {
+                appointment: {
+                  eventRound: {
+                    endAt: {
+                      lte: nextToBeRemovedTime
+                    }
+                  }
+                }
+              }
+            ],
             isSubmitted: true,
             status: TrainingStatus.UNREVIEWED,
             source: TrainingSource.SYSTEM
