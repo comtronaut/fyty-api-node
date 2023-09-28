@@ -4,6 +4,7 @@ import { User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { Cache } from "cache-manager";
 
+import sortArrayByIdOrder from "common/utils/sortArrayByIdOrder";
 import {
   CreateUserDto,
   SecureUserDto,

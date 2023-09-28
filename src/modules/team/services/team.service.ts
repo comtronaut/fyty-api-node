@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { MemberRole, Team, TeamStats, User } from "@prisma/client";
 
 import { paginate } from "common/utils/pagination";
+import sortArrayByIdOrder from "common/utils/sortArrayByIdOrder";
 import { CreateTeamDto, TeamDetailResponseDto, UpdateTeamDto } from "model/dto/team.dto";
 import { LineNotifyService } from "modules/notification/line-notify.service";
 import { RoomService } from "modules/room/room.service";

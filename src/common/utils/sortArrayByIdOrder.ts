@@ -1,4 +1,4 @@
-function sortArrayByIdOrder<T extends { id: string }>(arrayToSort: T[], sortOrder: string[]): T[] {
+export default function sortArrayByIdOrder<T extends { id: string }>(arrayToSort: T[], sortOrder: string[]): T[] {
   // Create a map to store the index of each ID in the sortOrder array
   const idIndexMap = Object.fromEntries(sortOrder.map((id, i) => [ id, i ]));
 
